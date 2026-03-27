@@ -1,3 +1,8 @@
+---
+name: pdf-product-catalog
+description: 从 PDF 产品目录（模具图纸）中自动提取产品信息，生成结构化知识库和 Excel 填充数据。
+---
+
 # PDF 产品目录提取 Skill
 
 > **技能名称：** pdf-product-catalog  

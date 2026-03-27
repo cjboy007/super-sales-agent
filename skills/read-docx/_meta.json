@@ -1,8 +1,0 @@
-{
-  "ownerId": "wilson",
-  "slug": "read-docx",
-  "version": "1.0.0",
-  "description": "Read Word DOCX files and extract text content",
-  "dependencies": ["python-docx"],
-  "createdAt": "2026-03-14"
-}

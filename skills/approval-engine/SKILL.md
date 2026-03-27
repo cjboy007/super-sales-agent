@@ -1,3 +1,8 @@
+---
+name: approval-engine
+description: 审批流程引擎 + 异常处理系统 — 规则驱动的多级审批、异常检测、自动恢复策略和 Discord 通知集成
+---
+
 # approval-engine Skill
 
 ## Description
@@ -13,7 +18,7 @@
 
 ## Location
 
-`/Users/wilson/.openclaw/workspace/skills/approval-engine/`
+`<approval-engine-root>/` 或 `$APPROVAL_ENGINE_ROOT`
 
 ## Modules
 
@@ -53,7 +58,9 @@
 ### 触发审批（自动匹配规则）
 
 ```javascript
-const engine = require('/Users/wilson/.openclaw/workspace/skills/approval-engine/src/approval-engine');
+const engine = require('<approval-engine-root>/src/approval-engine');
+// 或使用环境变量
+const engine = require(process.env.APPROVAL_ENGINE_ROOT + '/src/approval-engine');
 
 // 提交业务数据，引擎自动评估规则
 const approvals = await engine.autoCreateApprovals({
@@ -66,7 +73,9 @@ const approvals = await engine.autoCreateApprovals({
 ### 手动创建并提交审批
 
 ```javascript
-const engine = require('./src/approval-engine');
+const engine = require('<approval-engine-root>/src/approval-engine');
+// 或使用环境变量
+const engine = require(process.env.APPROVAL_ENGINE_ROOT + '/src/approval-engine');
 
 // 创建审批
 const approval = await engine.createApproval('quotation-approval', {
@@ -83,7 +92,9 @@ const status = await engine.getApprovalStatus(approval.id);
 ### 异常检测（周期巡检）
 
 ```javascript
-const detector = require('./src/exception-detector');
+const detector = require('<approval-engine-root>/src/exception-detector');
+// 或使用环境变量
+const detector = require(process.env.APPROVAL_ENGINE_ROOT + '/src/exception-detector');
 
 // 全量检测（返回新发现的异常列表）
 const exceptions = await detector.detectAll();
@@ -95,7 +106,7 @@ await detector.runPeriodicCheck();
 ### 自动恢复
 
 ```javascript
-const recovery = require('./src/recovery-engine');
+const recovery = require('<approval-engine-root>/src/recovery-engine');
 
 // 自动选择恢复策略并执行
 const result = await recovery.recover({
@@ -110,7 +121,7 @@ const result = await recovery.recover({
 ### 发送 Discord 通知
 
 ```javascript
-const notifier = require('./src/discord-notifier');
+const notifier = require('<approval-engine-root>/src/discord-notifier');
 
 // 发送审批请求（带按钮/Embed）
 await notifier.sendApprovalRequest({
@@ -130,7 +141,7 @@ await notifier.sendRecoveryNotification({ type: 'retry', success: true, attempts
 ### 重试处理
 
 ```javascript
-const retry = require('./src/retry-handler');
+const retry = require('<approval-engine-root>/src/retry-handler');
 
 // 带自动重试执行异步函数（指数退避 + Jitter）
 const result = await retry.withRetry(
@@ -142,7 +153,7 @@ const result = await retry.withRetry(
 ### 超时检测与升级
 
 ```javascript
-const engine = require('./src/approval-engine');
+const engine = require('<approval-engine-root>/src/approval-engine');
 
 // 检测超时审批并自动升级
 const expired = await engine.checkTimeouts();
@@ -154,9 +165,9 @@ const expired = await engine.checkTimeouts();
 ### 完整业务流程示例
 
 ```javascript
-const engine = require('./src/approval-engine');
-const detector = require('./src/exception-detector');
-const recovery = require('./src/recovery-engine');
+const engine = require('<approval-engine-root>/src/approval-engine');
+const detector = require('<approval-engine-root>/src/exception-detector');
+const recovery = require('<approval-engine-root>/src/recovery-engine');
 
 async function processQuotation(quotationData) {
   // 1. 提交报价，自动触发审批规则
@@ -185,8 +196,8 @@ async function processQuotation(quotationData) {
 ```bash
 # 每 15 分钟运行一次异常检测和超时处理
 */15 * * * * node -e "
-  const engine = require('/Users/wilson/.openclaw/workspace/skills/approval-engine/src/approval-engine');
-  const detector = require('/Users/wilson/.openclaw/workspace/skills/approval-engine/src/exception-detector');
+  const engine = require(process.env.APPROVAL_ENGINE_ROOT + '/src/approval-engine');
+  const detector = require(process.env.APPROVAL_ENGINE_ROOT + '/src/exception-detector');
   Promise.all([engine.checkTimeouts(), detector.runPeriodicCheck()])
     .then(() => process.exit(0))
     .catch(e => { console.error(e); process.exit(1); });
@@ -197,7 +208,7 @@ async function processQuotation(quotationData) {
 
 ```bash
 # 运行冒烟测试
-bash /Users/wilson/.openclaw/workspace/skills/approval-engine/test/smoke-test.sh
+bash $APPROVAL_ENGINE_ROOT/test/smoke-test.sh
 ```
 
 ## Related Skills

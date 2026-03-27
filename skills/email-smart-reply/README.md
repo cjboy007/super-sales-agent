@@ -1,12 +1,12 @@
 # Email Smart Reply — Quick Start
 
-Intelligent email auto-reply pipeline for Farreach Electronic's B2B sales inbox.
+Intelligent email auto-reply pipeline for B2B sales.
 
 ## What It Does
 
 1. **Fetch** incoming emails via IMAP
 2. **Classify** intent (inquiry / delivery / complaint / technical / partnership / spam)
-3. **Retrieve** relevant knowledge from Farreach KB + OKKI CRM
+3. **Retrieve** relevant knowledge from your KB + CRM
 4. **Generate** personalized reply draft
 5. **Review** via Discord embed (Approve / Edit / Discard)
 6. **Send** via SMTP (only after approval)
@@ -19,16 +19,16 @@ Ensure these are configured:
 
 ```bash
 # IMAP/SMTP credentials
-cat /Users/wilson/.openclaw/workspace/skills/imap-smtp-email/.env
+cat $WORKSPACE/skills/imap-smtp-email/.env
 
 # Discord bot config
-cat /Users/wilson/.openclaw/workspace/skills/email-smart-reply/config/discord-config.json
+cat config/discord-config.json
 ```
 
 ### 2. Test the Pipeline (Safe — No Real Sends)
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/email-smart-reply/scripts
+cd scripts
 node integration-test.js --dry-run --limit 5
 ```
 
@@ -66,7 +66,7 @@ In the `#email-review` Discord channel, each draft appears as an embed with:
 
 ```json
 {
-  "channel_id": "1478948663815442545",
+  "channel_id": "<your-discord-channel-id>",
   "review_timeout_minutes": 30
 }
 ```
@@ -92,7 +92,7 @@ const kb = await retrieveKB({ intent: 'inquiry', emailText: '...' });
 const { generateReply } = require('./reply-generation');
 const draft = await generateReply({ email, intentResult, kbResults });
 // → { draft_id: 'DRAFT-1711234567-INQ', subject, body, needs_manual: false }
-// Draft file saved to: imap-smtp-email/drafts/
+// Draft file saved to: $WORKSPACE/skills/imap-smtp-email/drafts/
 ```
 
 ### discord-review.js
@@ -105,7 +105,7 @@ await pushToDiscordReview({ draft, email, intentResult });
 
 ```bash
 # Add to crontab: check every 30 minutes
-*/30 * * * * cd /Users/wilson/.openclaw/workspace/skills/email-smart-reply/scripts && node integration-test.js --limit 20 >> /tmp/email-smart-reply.log 2>&1
+*/30 * * * * cd $WORKSPACE/skills/email-smart-reply/scripts && node integration-test.js --limit 20 >> /tmp/email-smart-reply.log 2>&1
 ```
 
 ## Troubleshooting
@@ -121,14 +121,14 @@ await pushToDiscordReview({ draft, email, intentResult });
 
 - ❗ **Never runs unattended sends** — all drafts require Discord approval
 - ✅ Use `--dry-run` for testing; no Discord messages or emails are sent
-- 🚨 Complaints are never auto-drafted; always escalated to WILSON
+- 🚨 Complaints are never auto-drafted; always escalated to human
 - 🗑️ Spam is silently discarded
 
 ## Source Directory
 
 Active scripts live in:
 ```
-/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/
+$WORKSPACE/skills/imap-smtp-email/
 ```
 
 This `email-smart-reply/` directory is the **packaged, documented copy**.

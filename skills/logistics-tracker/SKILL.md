@@ -1,3 +1,8 @@
+---
+name: logistics-tracker
+description: 物流跟踪技能，对接 17Track 批量 API，自动跟踪运单状态，向客户发送邮件通知，并在异常时告警。
+---
+
 # logistics-tracker
 
 **物流跟踪 Skill** — 对接 17Track 批量 API，自动跟踪运单状态，向客户发送邮件通知，并在异常时告警。

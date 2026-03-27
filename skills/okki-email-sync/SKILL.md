@@ -1,4 +1,9 @@
-# SKILL.md - okki-email-sync
+---
+name: okki-email-sync
+description: "Synchronize email activities and quotation events with OKKI CRM as follow-up trail records. Automatically matches emails to CRM customers via domain lookup and vector search, creates trail records (email type=102, quotation type=101), and deduplicates entries. Requires OKKI CRM API access and optional vector search setup. Use when you need to automatically log email communications and quotation events in your CRM."
+---
+
+# okki-email-sync
 
 ## Description
 
@@ -16,7 +21,7 @@
 
 ## Core Module
 
-**主文件：** `scripts/okki-sync.js`（同步镜像至 `/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/okki-sync.js`）
+**主文件：** `scripts/okki-sync.js`（同步镜像至 `$WORKSPACE/skills/imap-smtp-email/okki-sync.js`）
 
 ### 导出 API
 
@@ -81,11 +86,11 @@ node scripts/okki-sync.js quotation '{"dataFile":"/path/to/data.json","quotation
 
 | 依赖 | 路径 | 说明 |
 |------|------|------|
-| OKKI CLI | `/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py` | OKKI API 客户端（`trail add` 命令） |
-| 向量搜索 | `/Users/wilson/.openclaw/workspace/vector_store/search-customers.py` | LanceDB 客户向量索引 |
-| Python venv | `/Users/wilson/.openclaw/workspace/vector_store/venv/bin/python3` | 向量搜索依赖（nomic-embed-text） |
-| imap-smtp-email | `/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/` | 邮件 skill（集成点） |
-| quotation-workflow | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/` | 报价单 skill（集成点） |
+| OKKI CLI | `$WORKSPACE/xiaoman-okki/api/okki.py` | OKKI API 客户端（`trail add` 命令） |
+| 向量搜索 | `$WORKSPACE/vector_store/search-customers.py` | LanceDB 客户向量索引 |
+| Python venv | `python3` 或自定义 venv | 向量搜索依赖（nomic-embed-text） |
+| imap-smtp-email | `$WORKSPACE/skills/imap-smtp-email/` | 邮件 skill（集成点） |
+| quotation-workflow | `$WORKSPACE/skills/quotation-workflow/` | 报价单 skill（集成点） |
 
 ---
 
@@ -94,7 +99,7 @@ node scripts/okki-sync.js quotation '{"dataFile":"/path/to/data.json","quotation
 ### 邮件发送（smtp.js）
 
 ```javascript
-// /Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js
+// $WORKSPACE/skills/imap-smtp-email/scripts/smtp.js
 // L13: require('../okki-sync')
 // L131+: 发送成功后异步调用
 const { syncEmailToOkki } = require('../okki-sync');
@@ -112,7 +117,7 @@ syncEmailToOkki({
 ### 报价单生成（generate-all.sh）
 
 ```bash
-# /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate-all.sh
+# $WORKSPACE/skills/quotation-workflow/scripts/generate-all.sh
 # 末尾调用（|| true 不阻断流程）
 node /path/to/okki-sync.js quotation \
   "{\"dataFile\":\"${DATA_FILE}\",\"quotationNo\":\"${QUOTATION_NO}\"}" \
@@ -168,10 +173,10 @@ matchCustomer(email, subject?, body?)
    cp scripts/okki-sync.js /path/to/your-skill/okki-sync.js
    ```
 
-2. **确认依赖路径**
-   - OKKI CLI：`/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py`
-   - 向量搜索：`/Users/wilson/.openclaw/workspace/vector_store/search-customers.py`
-   - Python venv：`/Users/wilson/.openclaw/workspace/vector_store/venv/bin/python3`
+2. **确认依赖路径**（通过环境变量配置）
+   - `OKKI_CLI_PATH`：OKKI CLI 脚本路径
+   - `VECTOR_SEARCH_PATH`：向量搜索脚本路径
+   - `PYTHON_VENV_PATH`：Python 虚拟环境路径（可选，默认 `python3`）
 
 3. **测试连接**
    ```bash

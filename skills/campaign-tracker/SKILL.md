@@ -1,3 +1,8 @@
+---
+name: campaign-tracker
+description: 客户开发信追踪与分析 — 自动归档发送记录、匹配客户回复、生成效果分析报告、优化邮件模板
+---
+
 # campaign-tracker SKILL
 
 > 客户开发信追踪与分析 — 完整闭环系统
@@ -20,7 +25,9 @@
 
 ```bash
 # 切换到 skill 目录
-cd /Users/wilson/.openclaw/workspace/skills/campaign-tracker
+cd <path-to-campaign-tracker>
+# 或使用环境变量
+cd $CAMPAIGN_TRACKER_ROOT
 ```
 
 ## 核心命令
@@ -77,26 +84,26 @@ node scripts/template-optimizer.js analyze --obsidian  # 输出到 Obsidian
 ## 数据位置
 
 ```
-/Users/wilson/.openclaw/workspace/skills/campaign-tracker/
+<campaign-tracker-root>/
 ├── archive/          # 发送记录归档（JSONL）
 ├── reply-tracking/   # 回复状态数据（JSONL）
 ├── reports/          # 分析报告（Markdown+JSON）
 └── logs/             # 运行日志
 
-~/obsidian-vault/开发信追踪/   # Obsidian 知识库输出
+$OBSIDIAN_VAULT/开发信追踪/   # Obsidian 知识库输出
 ```
 
 ## 依赖集成
 
 ```javascript
 // archive-sent-records.js 读取 smtp.js 发送日志
-const emailSkillPath = '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email';
+const emailSkillPath = process.env.EMAIL_SKILL_ROOT || '<path-to-imap-smtp-email>';
 
 // reply-matcher.js 使用 IMAP 收件箱
-const imapConfig = require('/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/.env');
+const imapConfig = require(process.env.EMAIL_SKILL_ROOT + '/.env');
 
 // 客户匹配使用 OKKI 向量搜索
-const vectorSearch = '/Users/wilson/.openclaw/workspace/vector_store/okki_vector_search_v3.py';
+const vectorSearch = process.env.OKKI_VECTOR_SEARCH || '<path-to-okki_vector_search_v3.py>';
 ```
 
 ## 注意事项

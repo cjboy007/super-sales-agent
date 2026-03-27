@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Drafts and temporary files
+drafts/
+temp/
+tmp/
+
+# Test results
+test-results/
+coverage/
+
+# Data files (runtime generated)
+data/*.json
+data/*.json.bak
+output/*.json
+output/*.jsonl
+output/*.pdf
+output/*.html
+output/*.xlsx
+
+# Cache
+cache/*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build output
+dist/
+build/

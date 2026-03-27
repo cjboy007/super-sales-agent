@@ -73,7 +73,7 @@
 
 ### 快速报价
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/pricing-engine/scripts
+cd <pricing-engine-root>/scripts
 
 # 单品报价
 node pricing-engine.js quote HDMI-2.1-8K-2M 1000 B USD
@@ -169,7 +169,7 @@ PRICE_HISTORY_FILE=/path/to/custom.jsonl  # 自定义历史记录路径
 - `scripts/generate_quotation_html.py`：HTML 报价单生成
 
 确保 quotation-workflow 已安装在：
-`/Users/wilson/.openclaw/workspace/skills/quotation-workflow/`
+`<quotation-workflow-root>/`
 
 ### copper-price-monitor 集成
 copper-price-adapter 从 copper-price-monitor 的输出数据文件读取铜价。

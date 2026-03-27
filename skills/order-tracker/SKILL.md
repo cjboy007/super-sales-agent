@@ -1,3 +1,7 @@
+---
+name: order-tracker
+description: "Track and manage sales orders with status updates, notifications, and dashboard reporting. Supports order creation, status transitions (pending/confirmed/shipped/delivered), email/Discord notifications, and order history visualization. Use when you need to monitor order fulfillment, send shipping updates to customers, or generate order analytics."
+---
 # Order Tracker Skill
 
 ## Description
@@ -20,7 +24,7 @@
 
 ## Skills Directory
 
-`/Users/wilson/.openclaw/workspace/skills/order-tracker/`
+`skills/order-tracker/`
 
 ## How to Invoke
 
@@ -29,7 +33,7 @@ All scripts are run from the `scripts/` subdirectory.
 ### 1. View Order Dashboard
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/order-tracker/scripts
+cd skills/order-tracker/scripts
 
 # 查看所有订单（按状态分组）
 node order-dashboard.js
@@ -48,7 +52,7 @@ node order-dashboard.js --format json
 ### 2. Update Order Status
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/order-tracker/scripts
+cd skills/order-tracker/scripts
 
 # 预览（dry-run，不写入）
 node update-order-status.js --order-id ORD-20260324-001 --status ready_to_ship --dry-run
@@ -70,7 +74,7 @@ node update-order-status.js \
 ### 3. Send Customer Notification Email
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/order-tracker/scripts
+cd skills/order-tracker/scripts
 
 # 预览邮件（不发送）
 node send-order-notification.js --order-id ORD-20260324-001 --dry-run
@@ -112,7 +116,7 @@ pending_production → in_production → ready_to_ship → shipped → completed
 ## Typical Workflow Example
 
 ```bash
-BASE=/Users/wilson/.openclaw/workspace/skills/order-tracker/scripts
+BASE=skills/order-tracker/scripts
 ORDER=ORD-20260324-001
 
 # 开始生产 + 通知客户

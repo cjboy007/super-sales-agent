@@ -12,17 +12,18 @@
 const { execFile } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 // ==================== 配置 ====================
 const CONFIG = {
   // OKKI CLI 路径
-  okkiCliPath: '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py',
+  okkiCliPath: process.env.OKKI_CLI_PATH || path.join(os.homedir(), '.openclaw/workspace/xiaoman-okki/api/okki.py'),
   
   // 客户向量搜索脚本路径
-  customerSearchScript: '/Users/wilson/.openclaw/workspace/vector_store/search-customers.py',
+  customerSearchScript: process.env.VECTOR_SEARCH_PATH || path.join(os.homedir(), '.openclaw/workspace/vector_store/search-customers.py'),
   
   // Python 虚拟环境路径（优先使用）
-  pythonVenv: '/Users/wilson/.openclaw/workspace/vector_store/venv/bin/python3',
+  pythonVenv: process.env.PYTHON_VENV_PATH || 'python3',
   
   // 公共域名黑名单
   publicDomains: [

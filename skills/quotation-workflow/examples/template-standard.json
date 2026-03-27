@@ -3,18 +3,18 @@
   "date": "2026-03-15",
   "validUntil": "2026-04-14",
   "customer": {
-    "name": "SPECIALIZED COMPUTER PRODUCTS USA",
-    "address": "9474 NW 13th St, Doral, FL 33172",
+    "name": "EXAMPLE COMPUTER PRODUCTS INC.",
+    "address": "123 Business St, Your City",
     "country": "United States",
-    "email": "sales@scpi-usa.net",
+    "email": "sales@example-customer.com",
     "phone": ""
   },
   "supplier": {
-    "name": "Farreach Electronic Co., Ltd.",
-    "address": "No. 88, Technology Road, Zhuhai, Guangdong, China",
-    "website": "www.farreach-electronic.com",
-    "email": "sale-9@farreach-electronic.com",
-    "phone": "+86-756-XXXX-XXXX"
+    "name": "Example Electronic Co., Ltd.",
+    "address": "123 Business St, Your City",
+    "website": "www.example-company.com",
+    "email": "sales@example-company.com",
+    "phone": "+86-XXX-XXXX-XXXX"
   },
   "products": [
     {

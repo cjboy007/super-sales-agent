@@ -11,9 +11,9 @@ const fs = require('fs');
 const path = require('path');
 
 const CONFIG = {
-  vectorStorePath: '/Users/wilson/.openclaw/workspace/vector_store',
-  obsidianVault: '/Users/wilson/.openclaw/workspace/obsidian-vault/Farreach 知识库',
-  venvPython: '/Users/wilson/.openclaw/workspace/vector_store/venv/bin/python3',
+  vectorStorePath: process.env.VECTOR_STORE_PATH || path.join(__dirname, '..', '..', 'vector_store'),
+  obsidianVault: process.env.KB_PATH || path.join(__dirname, '..', '..', 'obsidian-vault', 'Farreach 知识库'),
+  venvPython: process.env.PYTHON_PATH || 'python3',
 };
 
 /**

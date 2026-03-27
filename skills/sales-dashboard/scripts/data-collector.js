@@ -25,9 +25,10 @@ const http = require('http');
 // ============ 路径 ============
 const BASE_DIR = path.join(__dirname, '..');
 const CONFIG_PATH = path.join(BASE_DIR, 'config', 'dashboard-config.json');
-const OKKI_CONFIG_PATH = '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/config.json';
-const OKKI_TOKEN_CACHE = '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/token.cache';
-const ENV_PATH = '/Users/wilson/.openclaw/workspace/.env';
+const OKKI_WORKSPACE = process.env.OKKI_WORKSPACE || path.resolve(__dirname, '../../../xiaoman-okki');
+const OKKI_CONFIG_PATH = path.join(OKKI_WORKSPACE, 'api/config.json');
+const OKKI_TOKEN_CACHE = path.join(OKKI_WORKSPACE, 'api/token.cache');
+const ENV_PATH = process.env.ENV_PATH || path.resolve(__dirname, '../../../.env');
 const SNAPSHOTS_DIR = path.join(BASE_DIR, 'data', 'snapshots');
 const LATEST_PATH = path.join(BASE_DIR, 'data', 'latest.json');
 const LOGS_DIR = path.join(BASE_DIR, 'logs');
