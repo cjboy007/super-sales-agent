@@ -12,17 +12,18 @@
 const { execFile } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 // ==================== 配置 ====================
 const CONFIG = {
-  // OKKI CLI 路径
-  okkiCliPath: '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py',
+  // OKKI CLI 路径（可通过环境变量覆盖）
+  okkiCliPath: process.env.OKKI_CLI_PATH || path.join(__dirname, '../../xiaoman-okki/api/okki.py'),
   
-  // 客户向量搜索脚本路径
-  customerSearchScript: '/Users/wilson/.openclaw/workspace/vector_store/search-customers.py',
+  // 客户向量搜索脚本路径（可通过环境变量覆盖）
+  customerSearchScript: process.env.VECTOR_SEARCH_PATH || path.join(__dirname, '../../vector_store/search-customers.py'),
   
-  // Python 虚拟环境路径（优先使用）
-  pythonVenv: '/Users/wilson/.openclaw/workspace/vector_store/venv/bin/python3',
+  // Python 虚拟环境路径（可通过环境变量覆盖）
+  pythonVenv: process.env.PYTHON_VENV_PATH || 'python3',
   
   // 公共域名黑名单
   publicDomains: [
@@ -31,11 +32,11 @@ const CONFIG = {
     'icloud.com', 'me.com', 'mac.com', 'live.com', 'msn.com'
   ],
   
-  // 去重记录文件
-  processedFile: '/tmp/okki-sync-processed.json',
+  // 去重记录文件（可通过环境变量覆盖）
+  processedFile: process.env.OKKI_SYNC_RECORD_FILE || path.join(os.tmpdir(), 'okki-sync-processed.json'),
   
   // 未匹配日志文件
-  unmatchedLog: '/tmp/okki-unmatched-emails.log',
+  unmatchedLog: path.join(os.tmpdir(), 'okki-unmatched-emails.log'),
   
   // Trail 类型枚举
   TRAIL_TYPE: {
@@ -54,10 +55,8 @@ const CONFIG = {
  */
 function execPython(scriptPath, args = [], options = {}) {
   return new Promise((resolve, reject) => {
-    // 优先使用 venv Python，否则使用系统 Python
-    const pythonPath = fs.existsSync(CONFIG.pythonVenv) 
-      ? CONFIG.pythonVenv 
-      : 'python3';
+    // 使用配置的 Python 路径（可能是 venv 或系统 Python）
+    const pythonPath = CONFIG.pythonVenv;
     
     const fullArgs = [scriptPath, ...args];
     

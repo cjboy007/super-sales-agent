@@ -22,7 +22,7 @@ const crypto = require('crypto');
 
 const CONFIG = {
   // task-001 邮件系统目录
-  emailSystemDir: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email',
+  emailSystemDir: process.env.EMAIL_SKILL_ROOT || path.join(__dirname, '..', '..', 'imap-smtp-email'),
   
   // 归档目录
   archiveDir: path.join(__dirname, '..', 'archive'),
@@ -31,7 +31,7 @@ const CONFIG = {
   logsDir: path.join(__dirname, '..', 'logs'),
   
   // 已处理记录文件（去重用）
-  processedFile: '/tmp/campaign-tracker-processed.json',
+  processedFile: process.env.CAMPAIGN_TRACKER_PROCESSED_FILE || '/tmp/campaign-tracker-processed.json',
   
   // 跟踪 schema 路径
   trackingSchema: path.join(__dirname, '..', 'config', 'tracking-schema.json')

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Runtime data
+data/shipments.json
+data/events/
+data/alert-history.json
+data/backups/
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+
+# Test results
+test-results/

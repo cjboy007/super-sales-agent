@@ -29,7 +29,7 @@ const CONFIG = {
   configDir: path.join(__dirname, '..', 'config'),
   reportsDir: path.join(__dirname, '..', 'reports'),
   logsDir: path.join(__dirname, '..', 'logs', 'optimizer'),
-  obsidianDir: '/Users/wilson/obsidian-vault/Farreach 知识库/业务分析/开发信效果',
+  obsidianDir: process.env.OBSIDIAN_VAULT ? path.join(process.env.OBSIDIAN_VAULT, 'Farreach 知识库/业务分析/开发信效果') : '<path-to-obsidian-vault>/Farreach 知识库/业务分析/开发信效果',
   trackingSchemaPath: path.join(__dirname, '..', 'config', 'tracking-schema.json')
 };
 

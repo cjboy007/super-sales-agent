@@ -21,7 +21,7 @@ const { execFile } = require('child_process');
 
 const CONFIG_DIR = path.join(__dirname, '..', 'config');
 const INTENT_SCHEMA_PATH = path.join(CONFIG_DIR, 'intent-schema.json');
-const DRAFTS_DIR = path.join(__dirname, 'drafts');
+const DRAFTS_DIR = process.env.DRAFTS_DIR || path.join(__dirname, '..', 'drafts');
 const TEMPLATE_DIR = path.join(__dirname, 'templates');
 
 /**

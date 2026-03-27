@@ -1,3 +1,8 @@
+---
+name: okki-crm-integration
+description: 连接 OKKI（小满）CRM 系统，支持查询客户、创建跟进记录、管理订单等操作。频道限定触发。
+---
+
 # OKKI CRM 集成技能
 
 ## 描述
@@ -9,7 +14,7 @@
 
 | 配置项 | 值 |
 |--------|-----|
-| 触发频道 | `#okki` (ID: 1479353905476538410) |
+| 触发频道 | `#okki` (ID: `process.env.DISCORD_OKKI_CHANNEL_ID`) |
 | 触发模式 | 频道限定 |
 | 关键词触发 | 关闭（避免误触发） |
 
@@ -21,8 +26,8 @@
 
 ## 环境
 - **环境**: 沙盒环境 (`api-sandbox.xiaoman.cn`)
-- **配置**: `/Users/wilson/.openclaw/workspace/xiaoman-okki/api/config.json`
-- **客户端**: `/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_client.py`
+- **配置**: `$OKKI_WORKSPACE/api/config.json` (环境变量或相对路径)
+- **客户端**: `$OKKI_WORKSPACE/api/okki_client.py`
 
 ## 输出格式规范
 
@@ -82,13 +87,13 @@
 ### 命令行
 ```bash
 # 查询客户列表
-python3 /Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_client.py list_companies
+python3 $OKKI_WORKSPACE/api/okki_client.py list_companies
 
 # 查询客户详情
-python3 /Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_client.py get_company <company_id>
+python3 $OKKI_WORKSPACE/api/okki_client.py get_company <company_id>
 
 # 查询跟进动态
-python3 /Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_client.py list_trails <company_id>
+python3 $OKKI_WORKSPACE/api/okki_client.py list_trails <company_id>
 ```
 
 ### Python 调用

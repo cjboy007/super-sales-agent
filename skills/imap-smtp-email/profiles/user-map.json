@@ -3,10 +3,10 @@
   "_usage": "NANA 根据企业微信 sender ID 自动查找对应的邮箱 profile",
   "mappings": [
     {
-      "wecom_userid": "sale-9",
+      "wecom_userid": "example_user_id",
       "profile": "default",
       "name": "公共账号",
-      "email": "sale-9@farreach-electronic.com",
+      "email": "user@example.com",
       "note": "默认账号，不指定 profile 时使用 .env"
     }
   ],

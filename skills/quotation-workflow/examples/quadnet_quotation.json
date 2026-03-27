@@ -1,10 +1,10 @@
 {
   "customer": {
-    "company_name": "QUADNET",
-    "contact": "Paul Giacomantonio",
-    "email": "paul@quadnet.com.au",
+    "company_name": "Example Customer Corp",
+    "contact": "John Doe",
+    "email": "contact@example-customer.com",
     "phone": "",
-    "address": "26 Mellefont St, West Gladstone, Queensland, Australia"
+    "address": "123 Business St, Your City"
   },
   "quotation": {
     "quotation_no": "QT-20260315-001",

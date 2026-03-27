@@ -93,7 +93,7 @@ Excel PDF = 内部存档
 
 ```bash
 # 一键生成所有格式（Excel + Word + HTML + PDF）
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate-all.sh \
+skills/quotation-workflow/scripts/generate-all.sh \
   my_quotation.json \
   QT-20260314-001
 
@@ -104,11 +104,11 @@ Excel PDF = 内部存档
 
 ```bash
 # 1. 准备数据
-cp /Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples/farreach_sample.json \
+cp skills/quotation-workflow/examples/farreach_sample.json \
    my_quotation.json
 
 # 2. 生成 HTML
-python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate_quotation_html.py \
+python3 skills/quotation-workflow/scripts/generate_quotation_html.py \
   --data my_quotation.json \
   --output QT-20260314-001.html
 
@@ -119,7 +119,7 @@ python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/gene
   "file://$(pwd)/QT-20260314-001.html"
 
 # 4. 添加页码（底部右侧）
-python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/add-pagenumbers.py \
+python3 skills/quotation-workflow/scripts/add-pagenumbers.py \
   QT-20260314-001.pdf \
   QT-20260314-001-Final.pdf
 
@@ -130,15 +130,15 @@ python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/add-
 
 ```bash
 # Excel 版本
-python3 /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation_traditional.py \
+python3 skills/excel-xlsx/scripts/generate_quotation_traditional.py \
   --data my_quotation.json --output QT-001.xlsx
 
 # Word 版本
-python3 /Users/wilson/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py \
+python3 skills/word-docx/scripts/generate_quotation_docx.py \
   --data my_quotation.json --output QT-001.docx
 
 # HTML 版本（现代设计，推荐 ⭐）
-python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate_quotation_html.py \
+python3 skills/quotation-workflow/scripts/generate_quotation_html.py \
   --data my_quotation.json --output QT-001.html
 ```
 
@@ -205,17 +205,17 @@ python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/gene
 
 | 功能 | 脚本路径 |
 |------|----------|
-| **Excel 生成** | `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py` |
-| **Excel 读取** | `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py` |
-| **Word 生成** | `/Users/wilson/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py` |
-| **Word 读取** | `/Users/wilson/.openclaw/workspace/skills/read-docx/read-docx.py` |
-| **HTML 生成 ⭐** | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate_quotation_html.py` |
-| **PDF 转换** | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/convert-to-pdf.sh` |
-| **一键生成** | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate-all.sh` |
+| **Excel 生成** | `skills/excel-xlsx/scripts/generate_quotation.py` |
+| **Excel 读取** | `skills/excel-xlsx/scripts/read_excel.py` |
+| **Word 生成** | `skills/word-docx/scripts/generate_quotation_docx.py` |
+| **Word 读取** | `skills/read-docx/read-docx.py` |
+| **HTML 生成 ⭐** | `skills/quotation-workflow/scripts/generate_quotation_html.py` |
+| **PDF 转换** | `skills/quotation-workflow/scripts/convert-to-pdf.sh` |
+| **一键生成** | `skills/quotation-workflow/scripts/generate-all.sh` |
 
 ## 📎 产品目录（Catalogue）
 
-**统一位置：** `/Users/wilson/.openclaw/workspace/obsidian-vault/Farreach 知识库/02-产品目录/`
+**统一位置：** `obsidian-vault/Farreach 知识库/02-产品目录/`
 
 **可用目录：**
 - `SKW 2026 catalogue-15M.pdf` - 2026 版完整产品目录
@@ -226,14 +226,14 @@ node scripts/smtp.js send \
   --to "customer@example.com" \
   --subject "🔌 Product Catalog & Quotation" \
   --html --body-file "email.html" \
-  --attach "/Users/wilson/.openclaw/workspace/obsidian-vault/Farreach 知识库/02-产品目录/SKW 2026 catalogue-15M.pdf" \
+  --attach "obsidian-vault/Farreach 知识库/02-产品目录/SKW 2026 catalogue-15M.pdf" \
   --attach "QT-20260314-001-Final.pdf"
 ```
 
 ## 示例文件
 
 ```
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples/
+skills/quotation-workflow/examples/
 ├── farreach_sample.json                    # Farreach 产品示例
 ├── QT-20260314-001-Farreach.xlsx          # Excel 示例
 ├── QT-20260314-001-Farreach.docx          # Word 示例
@@ -245,13 +245,13 @@ node scripts/smtp.js send \
 
 ### 读取 Excel 内容
 ```bash
-python3 /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py \
+python3 skills/excel-xlsx/scripts/read_excel.py \
   "QT-*.xlsx" --format table -v
 ```
 
 ### 批量转换 PDF
 ```bash
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/convert-to-pdf.sh \
+skills/quotation-workflow/scripts/convert-to-pdf.sh \
   *.xlsx *.docx
 ```
 
@@ -312,7 +312,7 @@ done
 
 - **快速开始：** `QUICK_START.md`
 - **完整文档：** `README.md`
-- **工具集成：** `/Users/wilson/.openclaw/workspace/TOOLS.md`
+- **工具集成：** `workspace/TOOLS.md`
 
 ## 版本历史
 
@@ -328,4 +328,4 @@ done
   - ✅ 示例数据和模板
   
   <description>待补充描述</description>
-  <location>/Users/wilson/.openclaw/workspace/skills/quotation-workflow</location>
+  <location>skills/quotation-workflow</location>

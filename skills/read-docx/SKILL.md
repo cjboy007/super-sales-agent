@@ -9,8 +9,8 @@ metadata: {"clawdbot":{"emoji":"📘","os":["linux","darwin","win32"]}}
 ### CLI
 
 ```bash
-# Read single file or wildcard pattern
-python3 /Users/wilson/.openclaw/workspace/skills/read-docx/read-docx.py "path/*.docx"
+# Read single file or wildcard pattern (run from skill directory)
+python3 read-docx.py "path/*.docx"
 
 # Verbose mode
 python3 read-docx.py "exams/*.docx" --verbose
@@ -84,9 +84,5 @@ pip3 install python-docx
 ```
 read-docx/
 ├── SKILL.md          # This file
-├── read-docx.py      # CLI script
-└── _meta.json        # Skill metadata
+└── read-docx.py      # CLI script
 ```
-  
-  <description>待补充描述</description>
-  <location>/Users/wilson/.openclaw/workspace/skills/read-docx</location>

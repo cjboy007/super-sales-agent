@@ -34,10 +34,10 @@ const CONFIG = {
   logsDir: path.join(__dirname, '..', 'logs'),
   
   // task-001 邮件系统目录
-  emailSystemDir: '/Users/wilson/.openclaw/workspace/skills/email-smart-reply',
+  emailSystemDir: process.env.EMAIL_SKILL_ROOT || path.join(__dirname, '..', '..', 'imap-smtp-email'),
   
   // 已处理回复文件（去重用）
-  processedRepliesFile: '/tmp/campaign-tracker-processed-replies.json',
+  processedRepliesFile: process.env.CAMPAIGN_TRACKER_PROCESSED_FILE || '/tmp/campaign-tracker-processed-replies.json',
   
   // 匹配时间窗口（小时）
   matchTimeWindowHours: 72,

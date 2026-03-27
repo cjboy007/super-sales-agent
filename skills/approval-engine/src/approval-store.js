@@ -3,7 +3,7 @@
  * 
  * 审批记录存储模块 - 使用 JSON 文件持久化审批状态
  * 
- * 存储路径：/Users/wilson/.openclaw/workspace/skills/approval-engine/data/approvals.json
+ * 存储路径：$APPROVAL_ENGINE_ROOT/data/approvals.json
  * 
  * 审批记录结构：
  * {
@@ -25,7 +25,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 // 存储文件路径
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.APPROVAL_ENGINE_DATA_DIR || path.join(__dirname, '..', 'data');
 const STORAGE_FILE = path.join(DATA_DIR, 'approvals.json');
 
 /**

@@ -33,7 +33,7 @@ const OUTPUT_DIR = path.resolve(SKILL_DIR, 'output');
 const DATA_DIR = path.resolve(SKILL_DIR, 'data');
 const COUNTER_FILE = path.join(DATA_DIR, 'quotation-counter.json');
 
-const QUOTATION_WORKFLOW_DIR = '/Users/wilson/.openclaw/workspace/skills/quotation-workflow';
+const QUOTATION_WORKFLOW_DIR = process.env.QUOTATION_WORKFLOW_ROOT || path.join(__dirname, '..', '..', 'quotation-workflow');
 const GENERATE_ALL_SCRIPT = path.join(QUOTATION_WORKFLOW_DIR, 'scripts/generate-all.sh');
 const GENERATE_HTML_SCRIPT = path.join(QUOTATION_WORKFLOW_DIR, 'scripts/generate_quotation_html.py');
 

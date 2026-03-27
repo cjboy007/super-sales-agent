@@ -1,13 +1,13 @@
 {
-  "company_name": "Farreach Electronic Co., Ltd.",
+  "company_name": "Example Electronic Co., Ltd.",
   "company_tagline": "Premium Connectivity Solutions",
-  "company_address": "No. 123, Technology Road, Zhuhai, Guangdong, China",
-  "company_email": "sale@farreach-electronic.com",
-  "company_website": "www.farreach-electronic.com",
+  "company_address": "123 Business St, Your City",
+  "company_email": "sales@example-company.com",
+  "company_website": "www.example-company.com",
   "customer": {
     "company_name": "Best Buy Electronics Inc.",
     "contact": "Michael Johnson",
-    "address": "7601 Penn Avenue South, Richfield, MN 55423, USA",
+    "address": "123 Business St, Your City",
     "email": "mjohnson@bestbuy-example.com"
   },
   "quotation": {
@@ -55,9 +55,9 @@
   "payment_terms": "T/T 30% deposit, 70% before shipment",
   "freight": 350.00,
   "bank_info": {
-    "beneficiary": "Farreach Electronic Co., Ltd.",
-    "bank_name": "Standard Chartered Bank",
-    "account_no": "1234 5678 9012",
-    "swift_code": "SCBLHKHH"
+    "beneficiary": "[YOUR COMPANY NAME]",
+    "bank_name": "[YOUR BANK NAME]",
+    "account_no": "[YOUR BANK DETAILS]",
+    "swift_code": "[YOUR SWIFT CODE]"
   }
 }

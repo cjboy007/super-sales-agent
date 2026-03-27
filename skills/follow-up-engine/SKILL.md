@@ -1,3 +1,7 @@
+---
+name: follow-up-engine
+description: "Automated customer follow-up scheduling and execution engine for B2B sales. Generates personalized follow-up email drafts based on customer stage, last contact date, and follow-up strategy. Integrates with CRM systems (configurable) to sync follow-up records. Use when you need to automate outbound sales follow-ups, schedule reminders, or generate follow-up email content for dormant leads."
+---
 # Follow-up Engine - OpenClaw Skill 定义
 
 ## 技能描述
@@ -12,10 +16,10 @@
 
 ```bash
 # 每 30 分钟执行一次检测
-*/30 * * * * cd /Users/wilson/.openclaw/workspace/skills/follow-up-engine && node scripts/follow-up-scheduler.js --mode auto >> /tmp/follow-up-scheduler.log 2>&1
+*/30 * * * * cd $WORKSPACE/skills/follow-up-engine && node scripts/follow-up-scheduler.js --mode auto >> /tmp/follow-up-scheduler.log 2>&1
 
 # 每小时执行一次 OKKI 同步
-0 * * * * cd /Users/wilson/.openclaw/workspace/skills/follow-up-engine && node scripts/okki-integration.js --sync >> /tmp/okki-integration.log 2>&1
+0 * * * * cd $WORKSPACE/skills/follow-up-engine && node scripts/okki-integration.js --sync >> /tmp/okki-integration.log 2>&1
 ```
 
 ### 事件触发
@@ -94,13 +98,13 @@
 
 ```bash
 # OKKI CLI 路径
-export OKKI_CLI_PATH="/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py"
+export OKKI_CLI_PATH="$WORKSPACE/xiaoman-okki/api/okki.py"
 
 # Discord Bot Token（通知用）
 export DISCORD_BOT_TOKEN="your-discord-bot-token-here"
 
 # 通知频道 ID
-export DISCORD_CHANNEL_ID="1478948663815442545"
+export DISCORD_CHANNEL_ID="<your-discord-channel-id>"
 ```
 
 ### 配置文件

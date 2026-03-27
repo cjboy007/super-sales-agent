@@ -2,9 +2,9 @@
   "orders": [
     {
       "order_id": "ORD-20260324-001",
-      "customer_name": "Michael Chen",
-      "customer_email": "michael.chen@techsource.com",
-      "customer_company": "TechSource Electronics Ltd",
+      "customer_name": "John Smith",
+      "customer_email": "john.smith@acmecorp.com",
+      "customer_company": "Acme Corp",
       "product_list": [
         {
           "sku": "SKW-HDMI-2.1-2M",
@@ -58,9 +58,9 @@
     },
     {
       "order_id": "ORD-20260320-002",
-      "customer_name": "Sarah Johnson",
-      "customer_email": "sarah.j@globalconnect.us",
-      "customer_company": "GlobalConnect Inc",
+      "customer_name": "Emily Davis",
+      "customer_email": "emily.davis@globaltech.com",
+      "customer_company": "GlobalTech Inc",
       "product_list": [
         {
           "sku": "SKW-USB-C-1M",
@@ -114,9 +114,9 @@
     },
     {
       "order_id": "ORD-20260315-003",
-      "customer_name": "Hans Mueller",
-      "customer_email": "h.mueller@eurotech.de",
-      "customer_company": "EuroTech GmbH",
+      "customer_name": "Robert Wilson",
+      "customer_email": "robert.wilson@techsolutions.de",
+      "customer_company": "TechSolutions GmbH",
       "product_list": [
         {
           "sku": "SKW-HDMI-2.0-5M",
