@@ -56,6 +56,44 @@ echo "数据文件：$DATA_FILE"
 echo "输出文件：$OUTPUT_NAME"
 echo ""
 
+# 🔴 P0: 运行数据验证（强制）
+echo "🔍 运行数据验证..."
+VALIDATION_RESULT=$(python3 "$SCRIPT_DIR/quotation_schema.py" 2>&1 <<EOF
+{"data_file": "$DATA_FILE"}
+EOF
+)
+
+# 使用 Python 直接验证数据文件
+python3 -c "
+import sys
+import json
+sys.path.insert(0, '$SCRIPT_DIR')
+from quotation_schema import validate_quotation_data
+
+with open('$DATA_FILE', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+valid, errors = validate_quotation_data(data)
+
+if not valid:
+    print('❌ 数据验证失败:')
+    for err in errors:
+        print(f'  - {err}')
+    sys.exit(1)
+else:
+    print('✅ 数据验证通过')
+    sys.exit(0)
+"
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ 数据验证失败，报价单生成已终止"
+    echo "请检查数据文件，确保使用真实客户信息"
+    exit 1
+fi
+
+echo ""
+
 # 只生成 HTML 模式
 if [ "$HTML_ONLY" = true ]; then
     echo "🌐 生成 HTML..."
