@@ -1,0 +1,50 @@
+{
+  "logisticsId": "LG-1774534838145",
+  "docType": "packing_list",
+  "generatedAt": "2026-03-26T14:20:38.146Z",
+  "data": {
+    "customer": {
+      "customerId": "CUST-E2E-001",
+      "name": "E2E Test Customer",
+      "company": "Test Import Export Co.",
+      "email": "test@customer-example.com",
+      "phone": "+1-555-0123",
+      "address": "123 Test Street, Los Angeles, CA 90001, USA"
+    },
+    "cargo": {
+      "products": [
+        {
+          "name": "HDMI Cable 2.1",
+          "model": "HDMI-2.1-2M",
+          "quantity": 500,
+          "unitPrice": 5.5,
+          "total": 2750
+        },
+        {
+          "name": "USB-C Cable 100W",
+          "model": "USBC-100W-1M",
+          "quantity": 300,
+          "unitPrice": 8,
+          "total": 2400
+        },
+        {
+          "name": "Ethernet Cable CAT6A",
+          "model": "LAN-CAT6A-5M",
+          "quantity": 200,
+          "unitPrice": 6.5,
+          "total": 1300
+        }
+      ],
+      "totalQuantity": 1000,
+      "totalVolume": 2.5,
+      "totalWeight": 150,
+      "packages": 10,
+      "description": "Electronic Cables for E2E Test"
+    },
+    "order": {
+      "orderId": "ORD-E2E-TEST-001",
+      "orderDate": "2026-03-20",
+      "customerRef": "PO-2026-0320"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "reviewId": "review-1774319660011",
+  "createdAt": "2026-03-24T02:34:20.011Z",
+  "status": "pending",
+  "email": {
+    "subject": "Inquiry about HDMI cables - MOQ and pricing",
+    "from": "john@example.com",
+    "date": "2026-03-24T02:34:10.036Z",
+    "intent": "inquiry"
+  },
+  "draft": {
+    "content": "Dear Valued Customer,\n\nThank you for your interest in Farreach Electronic products.\n\nWe specialize in HDMI, DisplayPort, and USB cables with competitive pricing and reliable quality.\n\nCould you please share more details about your requirements?\n- Product type and specifications\n- Estimated quantity\n- Target market\n\nThis will help us provide an accurate quotation.\n\nBest regards,\nJaden\nFarreach Electronic Co., Ltd.",
+    "wordCount": 61
+  },
+  "actions": {
+    "approve": "node review-processor.js approve review-1774319660011",
+    "edit": "node review-processor.js edit review-1774319660011",
+    "reject": "node review-processor.js reject review-1774319660011"
+  }
+}

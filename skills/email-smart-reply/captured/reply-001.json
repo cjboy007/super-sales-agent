@@ -1,0 +1,22 @@
+{
+  "uid": "reply-001",
+  "message_id": "<reply-001@example.com>",
+  "direction": "incoming",
+  "folder": "INBOX",
+  "subject": "Re: High-quality HDMI cables for your electronics business",
+  "from": {
+    "email": "john@example.com",
+    "name": "John Smith"
+  },
+  "to": [
+    {
+      "email": "sales@farreach.com",
+      "name": "Farreach Sales"
+    }
+  ],
+  "date": "2026-03-24T09:30:00.000Z",
+  "body": "Hi,\n\nThank you for reaching out. We are interested in your HDMI cables. Could you please send us a price list for HDMI 2.1 cables?\n\nWe typically order in bulk (500+ units). What's your MOQ and lead time?\n\nBest regards,\nJohn Smith\nExample Corp",
+  "is_reply": true,
+  "in_reply_to": "<original-001@farreach.com>",
+  "references": ["<original-001@farreach.com>"]
+}

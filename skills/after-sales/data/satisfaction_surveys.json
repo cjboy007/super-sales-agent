@@ -1,0 +1,72 @@
+[
+  {
+    "id": "SRV-E2E-20260326T16521-232",
+    "customerId": "CUST-E2E-001",
+    "customerName": "E2E Test Customer Ltd.",
+    "orderId": "ORD-E2E-20260326T16521-677",
+    "complaintId": "CMP-E2E-20260326T16521-452",
+    "overallScore": 4,
+    "qualityScore": 4,
+    "serviceScore": 5,
+    "deliveryScore": 4,
+    "communicationScore": 5,
+    "feedback": "E2E 测试：整体满意，服务质量很好",
+    "createdAt": "2026-03-26"
+  },
+  {
+    "id": "SRV-E2E-20260326T16524-291",
+    "customerId": "CUST-E2E-001",
+    "customerName": "E2E Test Customer Ltd.",
+    "orderId": "ORD-E2E-20260326T16524-621",
+    "complaintId": "CMP-E2E-20260326T16524-998",
+    "overallScore": 4,
+    "qualityScore": 4,
+    "serviceScore": 5,
+    "deliveryScore": 4,
+    "communicationScore": 5,
+    "feedback": "E2E 测试：整体满意，服务质量很好",
+    "createdAt": "2026-03-26"
+  },
+  {
+    "id": "SRV-E2E-20260326T16525-807",
+    "customerId": "CUST-E2E-001",
+    "customerName": "E2E Test Customer Ltd.",
+    "orderId": "ORD-E2E-20260326T16525-122",
+    "complaintId": "CMP-E2E-20260326T16525-686",
+    "overallScore": 4,
+    "qualityScore": 4,
+    "serviceScore": 5,
+    "deliveryScore": 4,
+    "communicationScore": 5,
+    "feedback": "E2E 测试：整体满意，服务质量很好",
+    "createdAt": "2026-03-26"
+  },
+  {
+    "id": "SRV-E2E-20260326T16531-058",
+    "customerId": "CUST-E2E-001",
+    "customerName": "E2E Test Customer Ltd.",
+    "orderId": "ORD-E2E-20260326T16531-529",
+    "complaintId": "CMP-E2E-20260326T16531-754",
+    "overallScore": 4,
+    "qualityScore": 4,
+    "serviceScore": 5,
+    "deliveryScore": 4,
+    "communicationScore": 5,
+    "feedback": "E2E 测试：整体满意，服务质量很好",
+    "createdAt": "2026-03-26"
+  },
+  {
+    "id": "SRV-E2E-20260326T16533-387",
+    "customerId": "CUST-E2E-001",
+    "customerName": "E2E Test Customer Ltd.",
+    "orderId": "ORD-E2E-20260326T16533-927",
+    "complaintId": "CMP-E2E-20260326T16533-172",
+    "overallScore": 4,
+    "qualityScore": 4,
+    "serviceScore": 5,
+    "deliveryScore": 4,
+    "communicationScore": 5,
+    "feedback": "E2E 测试：整体满意，服务质量很好",
+    "createdAt": "2026-03-26"
+  }
+]
