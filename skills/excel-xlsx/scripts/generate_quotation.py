@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""生成 Excel 报价单 - 支持模板填充、公式、格式、多 sheet"""
+"""生成 Excel 报价单 - 支持模板填充、公式、格式、多 sheet
+
+🔴 P0-REVISE: 集成数据验证（防止示例数据）
+"""
 
 import sys
 import json
@@ -10,6 +13,15 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment, Border, Side, PatternFill, Color
 from openpyxl.utils import get_column_letter
 from openpyxl.formatting.rule import FormulaRule
+
+# 🔴 P0: 导入验证模块
+sys.path.insert(0, str(Path(__file__).parent.parent / 'quotation-workflow' / 'scripts'))
+try:
+    from quotation_schema import validate_quotation_data
+    VALIDATION_AVAILABLE = True
+except ImportError:
+    VALIDATION_AVAILABLE = False
+    print("⚠️  警告：quotation_schema 模块不可用，将跳过数据验证")
 
 # 颜色定义
 COLORS = {
@@ -371,8 +383,25 @@ def main():
             print("❌ 请提供 --data 或 --quick-test", file=sys.stderr)
             sys.exit(1)
         
+        # 🔴 P0: 数据验证（强制，无交互确认）
+        if VALIDATION_AVAILABLE and not args.quick_test:
+            print("🔍 验证报价单数据...")
+            valid, errors = validate_quotation_data(data)
+            
+            if not valid:
+                print("❌ 数据验证失败，Excel 报价单生成已终止:")
+                for i, err in enumerate(errors, start=1):
+                    print(f"  {i}. {err}")
+                print()
+                print("请检查数据文件，确保使用真实客户信息。")
+                print("如需要测试，请使用 --quick-test 参数")
+                sys.exit(1)
+            
+            print("✅ 数据验证通过")
+            print()
+        
         output = create_quotation_template(args.output, data)
-        print(f"✅ 报价单已生成：{output}")
+        print(f"✅ Excel 报价单已生成：{output}")
         return
     
     # 没有参数时显示帮助

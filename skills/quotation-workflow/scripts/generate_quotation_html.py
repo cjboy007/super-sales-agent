@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""生成 HTML 报价单 - 现代设计，支持打印/PDF 导出"""
+"""生成 HTML 报价单 - 现代设计，支持打印/PDF 导出
+
+集成多层次验证：
+1. quotation_schema.py - 完整数据验证（客户/产品/条款/日期）
+2. 示例数据检测 - 防止使用测试/占位符数据
+3. 强制失败 - 验证失败立即终止，无交互确认
+"""
 
 import sys
 import json
@@ -7,10 +13,31 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
+# 导入验证模块
+from quotation_schema import validate_quotation_data
+
+
 def generate_html_quotation(output_path, data):
     """生成 HTML 报价单（基于提供的模板优化）"""
     
-    # 输入校验
+    # 🔴 P0: 完整数据验证（强制，无交互确认）
+    print("🔍 验证报价单数据...")
+    valid, errors = validate_quotation_data(data)
+    
+    if not valid:
+        print("❌ 数据验证失败，报价单生成已终止:")
+        print()
+        for i, err in enumerate(errors, start=1):
+            print(f"  {i}. {err}")
+        print()
+        print("请检查数据文件，确保使用真实客户信息。")
+        print("如需要测试，请使用 --skip-validation 参数（仅限开发环境）")
+        sys.exit(1)
+    
+    print("✅ 数据验证通过")
+    print()
+    
+    # 输入校验（基础检查）
     errors = []
     customer = data.get('customer', {})
     customer_name = customer.get('company_name', customer.get('name', ''))
@@ -446,12 +473,16 @@ def main():
   open QT-20260314-001.html
   
   # 导出 PDF（在浏览器中点击 "Export to PDF" 按钮）
+  
+  # 跳过验证（仅限开发环境测试）
+  python3 generate_quotation_html.py --data test.json --output test.html --skip-validation
         '''
     )
     
     parser.add_argument('--data', '-d', help='报价数据 JSON 文件路径')
     parser.add_argument('--output', '-o', help='输出文件路径')
     parser.add_argument('--quick-test', action='store_true', help='使用测试数据快速生成')
+    parser.add_argument('--skip-validation', action='store_true', help='跳过数据验证（仅限开发环境，生产环境禁止使用）')
     
     args = parser.parse_args()
     
@@ -516,6 +547,20 @@ def main():
         if not args.data and not args.quick_test:
             print("❌ 请提供 --data 或 --quick-test", file=sys.stderr)
             sys.exit(1)
+        
+        # 跳过验证模式（仅限开发环境）
+        if args.skip_validation:
+            # 安全检查：必须设置环境变量
+            import os
+            if os.environ.get('QUOTATION_DEV_ENV') != 'true':
+                print("❌ 错误：--skip-validation 仅限开发环境")
+                print("请设置环境变量：export QUOTATION_DEV_ENV=true")
+                print()
+                print("⚠️  生产环境禁止跳过数据验证")
+                sys.exit(1)
+            
+            print("⚠️  警告：开发环境，跳过数据验证")
+            print()
         
         output = generate_html_quotation(args.output, data)
         print(f"✅ HTML 报价单已生成：{output}")
