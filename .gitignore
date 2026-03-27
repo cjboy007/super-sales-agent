@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Test outputs
+test-results/
+coverage/
+
+# Data files (keep examples, remove large data)
+skills/*/data/*.json.bak
+skills/*/data/*.json.e2e-backup
+skills/*/logs/*.log
+skills/*/cache/*.json
+skills/*/output/*.pdf
+skills/*/output/*.xlsx
+
+# Secrets
+*.env
+.env
+.env.*

@@ -1,0 +1,10 @@
+# Auto-Evolution / Revolution Skill
+
+node_modules/
+*.lock
+tasks/*.json
+archive/
+.DS_Store
+*.log
+tmp/
+.output/
