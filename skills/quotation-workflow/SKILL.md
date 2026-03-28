@@ -166,7 +166,7 @@ python3 skills/quotation-workflow/scripts/generate_quotation_html.py \
 
 # 3. Chrome 导出 PDF（无页眉页脚）
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu --no-pdf-header-footer \
+  --headless=new --disable-gpu --no-pdf-header-footer \
   --print-to-pdf=QT-20260314-001.pdf \
   "file://$(pwd)/QT-20260314-001.html"
 
