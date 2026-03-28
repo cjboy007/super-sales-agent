@@ -67,7 +67,7 @@ def generate_html_quotation(output_path, data, skip_validation=False):
     company_name = data.get('company_name', 'Farreach Electronic Co., Ltd.')
     company_tagline = data.get('company_tagline', 'Premium Connectivity Solutions')
     company_address = data.get('company_address', 'No. 123, Technology Road, Zhuhai, Guangdong, China')
-    company_email = data.get('company_email', 'sale@farreach-electronic.com')
+    company_email = data.get('company_email', 'your-email@farreach-electronic.com')
     company_website = data.get('company_website', 'www.farreach-electronic.com')
     
     # 客户信息（支持多种字段名）
@@ -518,7 +518,7 @@ def main():
                 'company_name': 'Farreach Electronic Co., Ltd.',
                 'company_tagline': 'Premium Connectivity Solutions',
                 'company_address': 'No. 123, Technology Road, Zhuhai, Guangdong, China',
-                'company_email': 'sale@farreach-electronic.com',
+                'company_email': 'your-email@farreach-electronic.com',
                 'company_website': 'www.farreach-electronic.com',
                 'customer': {
                     'company_name': 'Best Buy Electronics Inc.',

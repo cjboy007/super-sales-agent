@@ -107,7 +107,7 @@ def create_quotation_docx(output_path, data=None):
     
     info = doc.add_paragraph()
     info.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = info.add_run("📧 sale@farreach-electronic.com | 🌐 www.farreach-electronic.com | 📱 +86-756-XXXXXXX")
+    run = info.add_run("📧 your-email@farreach-electronic.com | 🌐 www.farreach-electronic.com | 📱 +86-756-XXXXXXX")
     run.font.size = Pt(10)
     run.font.italic = True
     

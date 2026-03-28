@@ -65,7 +65,7 @@ def create_quotation_excel(output_path, data=None):
     ws['A2'].font = Font(size=10, color='64748B', italic=True)
     
     # 联系信息（A4:A6）
-    ws['A4'] = f"📧 {company.get('company_email', 'sale@farreach-electronic.com')}"
+    ws['A4'] = f"📧 {company.get('company_email', 'your-email@farreach-electronic.com')}"
     ws['A4'].font = Font(size=9, color='64748B')
     
     ws['A5'] = f"🌐 {company.get('company_website', 'www.farreach-electronic.com')}"
@@ -368,7 +368,7 @@ def main():
             data = {
                 'company_name': 'Farreach Electronic Co., Ltd.',
                 'company_tagline': 'Premium Connectivity Solutions',
-                'company_email': 'sale@farreach-electronic.com',
+                'company_email': 'your-email@farreach-electronic.com',
                 'company_website': 'www.farreach-electronic.com',
                 'company_address': 'Zhuhai, Guangdong, China',
                 'customer': {

@@ -1,0 +1,31 @@
+{
+  "_comment": "Farreach 收款通知示例数据",
+  "customer": {
+    "company_name": "Test Customer Corp",
+    "contact": "John Smith",
+    "email": "john@testcustomer.com",
+    "phone": "+86-755-8888-9999",
+    "address": "Floor 12, Building A, High-Tech Industrial Park, Nanshan District, Shenzhen, Guangdong, China",
+    "country": "China"
+  },
+  "notice": {
+    "notice_no": "PN-20260327-001",
+    "date": "2026-03-27",
+    "due_date": "2026-04-10"
+  },
+  "reference": {
+    "pi_no": "PI-20260327-001",
+    "quotation_no": "QT-20260327-001"
+  },
+  "payment": {
+    "total_amount": 8600.00,
+    "currency": "USD",
+    "deposit_amount": 2580.00,
+    "deposit_date": "2026-03-20",
+    "balance_due": 6020.00
+  },
+  "terms": {
+    "payment_terms": "T/T 30% deposit, 70% before shipment",
+    "remarks": "1. Please arrange payment before the due date.\n2. Send payment slip to your-email@farreach-electronic.com.\n3. Goods will be shipped after payment confirmation."
+  }
+}

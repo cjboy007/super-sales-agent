@@ -1,0 +1,47 @@
+{
+  "_comment": "收款通知标准数据模板 - 用于提醒客户付款",
+  "_usage": "复制此模板，填入真实客户和订单信息，然后用 generate-payment-notice.py 生成收款通知",
+  
+  "customer": {
+    "company_name": "客户公司全称（必填）",
+    "contact": "联系人姓名",
+    "email": "客户邮箱",
+    "phone": "客户电话",
+    "address": "客户地址",
+    "country": "客户国家"
+  },
+  
+  "notice": {
+    "notice_no": "PN-YYYYMMDD-XXX（建议格式）",
+    "date": "2026-03-27",
+    "due_date": "2026-04-10"
+  },
+  
+  "reference": {
+    "pi_no": "PI-20260327-001",
+    "quotation_no": "QT-20260327-001",
+    "order_no": "PO-12345"
+  },
+  
+  "payment": {
+    "total_amount": 8600.00,
+    "currency": "USD",
+    "deposit_amount": 2580.00,
+    "deposit_date": "2026-03-20",
+    "balance_due": 6020.00
+  },
+  
+  "bank_info": {
+    "_comment": "银行账户信息从 config/bank-accounts.json 自动加载",
+    "beneficiary": "YOUR COMPANY NAME LIMITED",
+    "bank_name": "Your Bank Name",
+    "account_no": "XXX-XXXXXX-XXX",
+    "swift_code": "XXXXXXXXXXX",
+    "bank_address": "Bank Address Here"
+  },
+  
+  "terms": {
+    "payment_terms": "T/T 30% deposit, 70% before shipment",
+    "remarks": "1. Please arrange payment before the due date.\n2. Send payment slip to your-email@farreach-electronic.com.\n3. Goods will be shipped after payment confirmation."
+  }
+}

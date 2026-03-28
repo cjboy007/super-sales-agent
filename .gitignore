@@ -26,6 +26,7 @@ temp/
 # Test outputs
 test-results/
 coverage/
+scripts/test-reports/
 
 # Data files (keep examples, remove large data)
 skills/*/data/*.json.bak
