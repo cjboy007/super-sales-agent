@@ -1,44 +1,61 @@
 #!/bin/bash
-# 批量转换 Excel/Word 为 PDF
-# 用法：./convert-to-pdf.sh file.xlsx [file2.docx ...]
 
-if [ $# -eq 0 ]; then
-    echo "用法：$0 <文件1> [文件2 ...]"
-    echo "示例：$0 QT-20260314-001.xlsx"
-    echo "      $0 *.xlsx *.docx"
+# Convert HTML to PDF using Chrome/Chromium
+# Usage: ./convert-to-pdf.sh <input.html> [output.pdf]
+
+set -e
+
+INPUT_FILE="$1"
+OUTPUT_FILE="${2:-${INPUT_FILE%.html}.pdf}"
+
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Error: Input file not found: $INPUT_FILE"
     exit 1
 fi
 
-# 检查 LibreOffice 是否安装
-if ! command -v soffice &> /dev/null; then
-    echo "❌ LibreOffice 未安装"
-    echo "请运行：brew install --cask libreoffice"
-    exit 1
-fi
+echo "Converting $INPUT_FILE to $OUTPUT_FILE..."
 
-# 输出目录（默认当前目录）
-OUTPUT_DIR="${OUTPUT_DIR:-.}"
+# Try different Chrome paths
+CHROME_PATHS=(
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    "/usr/bin/google-chrome"
+    "/usr/bin/chromium-browser"
+    "/usr/bin/chromium"
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+)
 
-echo "📄 转换 PDF..."
-echo "输出目录：$OUTPUT_DIR"
-echo ""
-
-# 转换每个文件
-for file in "$@"; do
-    if [ ! -f "$file" ]; then
-        echo "⚠️  文件不存在：$file"
-        continue
+CHROME=""
+for path in "${CHROME_PATHS[@]}"; do
+    if [ -f "$path" ] || command -v "$path" &> /dev/null; then
+        CHROME="$path"
+        break
     fi
-    
-    echo "正在转换：$file"
-    soffice --headless --convert-to pdf "$file" --outdir "$OUTPUT_DIR"
-    
-    if [ $? -eq 0 ]; then
-        echo "✅ 成功：$(basename "$file" .${file##*.}).pdf"
-    else
-        echo "❌ 失败：$file"
-    fi
-    echo ""
 done
 
-echo "完成！"
+if [ -z "$CHROME" ]; then
+    echo "Error: Chrome/Chromium not found. Please install Google Chrome."
+    exit 1
+fi
+
+# Convert to PDF
+"$CHROME" \
+    --headless \
+    --disable-gpu \
+    --print-to-pdf="$OUTPUT_FILE" \
+    --print-to-pdf-no-header \
+    --print-to-pdf-no-footer \
+    --paper-width=8.27 \
+    --paper-height=11.69 \
+    --margin-top=0.4 \
+    --margin-bottom=0.4 \
+    --margin-left=0.4 \
+    --margin-right=0.4 \
+    "file://$(cd "$(dirname "$INPUT_FILE")" && pwd)/$(basename "$INPUT_FILE")"
+
+if [ -f "$OUTPUT_FILE" ]; then
+    echo "✅ PDF created: $OUTPUT_FILE"
+    ls -lh "$OUTPUT_FILE"
+else
+    echo "❌ Failed to create PDF"
+    exit 1
+fi

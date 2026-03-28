@@ -1,0 +1,71 @@
+{
+  "task_id": "task-test-impl-001",
+  "title": "为 Super Sales Agent 实现完整的单元测试套件",
+  "priority": "P0",
+  "description": "## 任务背景\n\nTest-Driven Revolution 系统已搭建完成，但所有测试都显示\"通过\"是因为没有实际测试代码。\n\n需要根据已生成的测试方案，为 14 个模块实现完整的单元测试。\n\n## 测试方案位置\n\n`/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/tests/` 目录下有 14 个测试方案文档：\n- 01-imap-smtp-email-test-plan.md\n- 02-quotation-workflow-test-plan.md\n- 03-pi-workflow-test-plan.md\n- ...\n\n## 实现要求\n\n### 第一阶段：核心文档模块（P0）\n\n**模块：** 02-报价单、03-PI、04-样品单、05-收款通知\n\n**每个模块需要实现：**\n1. 数据验证测试（7 个用例）\n2. Excel 生成测试（7 个用例）\n3. Word 生成测试（5 个用例）\n4. HTML 生成测试（5 个用例）\n5. PDF 转换测试（5 个用例）\n6. 银行账户测试（5 个用例）\n\n**测试框架：** pytest (Python) + Jest (Node.js)\n\n**预期文件结构：**\n```\nskills/quotation-workflow/tests/\n├── unit/\n│   ├── test_validation.py\n│   ├── test_excel_generation.py\n│   ├── test_word_generation.py\n│   ├── test_html_generation.py\n│   ├── test_pdf_conversion.py\n│   └── test_bank_config.py\n├── integration/\n│   └── test_full_workflow.py\n├── fixtures/\n│   ├── valid_customer.json\n│   ├── invalid_example_customer.json\n│   └── invalid_test_email.json\n└── conftest.py\n```\n\n### 第二阶段：邮件模块（P1）\n\n**模块：** 01-邮件处理、12-智能回复、13-OKKI 同步\n\n### 第三阶段：业务引擎（P2）\n\n**模块：** 06-跟进、07-订单、08-售后、09-物流、10-定价、11-客户细分\n\n### 第四阶段：Revolution 自身（P3）\n\n**模块：** 14-auto-evolution\n\n## 验收标准\n\n1. **测试可执行** - `pytest skills/quotation-workflow/tests/unit/` 能运行\n2. **有失败有通过** - 不是全部\"通过\"（说明测试真实有效）\n3. **覆盖率报告** - 生成 HTML 覆盖率报告\n4. **CI 集成** - 能集成到 TDR cron 任务\n\n## 执行策略\n\n按阶段执行，每个阶段：\n1. Reviewer 审阅测试方案，生成实现计划\n2. Executor 实现测试代码\n3. Auditor 验收测试是否能运行、是否有意义\n4. 通过后进入下一阶段\n",
+  "subtasks": [
+    {
+      "id": "subtask-1",
+      "title": "审阅测试方案并生成实现计划",
+      "type": "analysis",
+      "instruction": "请审阅以下测试方案文档：\n\n1. /Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/tests/02-quotation-workflow-test-plan.md\n2. /Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/tests/03-pi-workflow-test-plan.md\n3. /Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/tests/04-sample-workflow-test-plan.md\n4. /Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/tests/05-payment-notice-workflow-test-plan.md\n\n请回答：\n1. 每个模块的核心测试用例数量\n2. 需要的测试 fixtures 列表\n3. 依赖的 Python/Node.js 包\n4. 预计实现时间（每个模块）\n5. 潜在风险点",
+      "timeoutMinutes": 15
+    },
+    {
+      "id": "subtask-2",
+      "title": "实现报价单模块测试（02-quotation-workflow）",
+      "type": "coding",
+      "instruction": "为报价单模块实现完整的单元测试：\n\n1. 创建测试目录结构\n2. 实现 test_validation.py（7 个用例）\n3. 实现 test_excel_generation.py（7 个用例）\n4. 实现 test_word_generation.py（5 个用例）\n5. 实现 test_html_generation.py（5 个用例）\n6. 实现 test_pdf_conversion.py（5 个用例）\n7. 实现 test_bank_config.py（5 个用例）\n8. 创建必要的 fixtures\n\n参考测试方案：tests/02-quotation-workflow-test-plan.md",
+      "timeoutMinutes": 60
+    },
+    {
+      "id": "subtask-3",
+      "title": "运行报价单模块测试验证",
+      "type": "exec",
+      "command": "cd /Users/wilson/.openclaw/workspace/monorepo/super-sales-agent && pytest skills/quotation-workflow/tests/unit/ -v --tb=short 2>&1 | head -100",
+      "timeoutMinutes": 10
+    },
+    {
+      "id": "subtask-4",
+      "title": "实现其他核心文档模块测试（03/04/05）",
+      "type": "coding",
+      "instruction": "为以下模块实现测试：\n- 03-pi-workflow: 参照 02 模块，调整 PI 特有逻辑\n- 04-sample-workflow: 参照 02 模块，调整样品单特有逻辑\n- 05-payment-notice-workflow: 参照 02 模块，调整收款通知特有逻辑\n\n每个模块至少实现：\n- 数据验证测试\n- 文档生成测试\n- 银行配置测试",
+      "timeoutMinutes": 90
+    },
+    {
+      "id": "subtask-5",
+      "title": "运行所有核心模块测试 + 生成覆盖率报告",
+      "type": "exec",
+      "command": "cd /Users/wilson/.openclaw/workspace/monorepo/super-sales-agent && pytest skills/quotation-workflow/tests/unit/ skills/pi-workflow/tests/unit/ skills/sample-workflow/tests/unit/ skills/payment-notice-workflow/tests/unit/ -v --tb=short --cov=skills --cov-report=html 2>&1 | tail -50",
+      "timeoutMinutes": 15
+    },
+    {
+      "id": "subtask-6",
+      "title": "验收：检查测试质量和覆盖率",
+      "type": "analysis",
+      "instruction": "请验收已实现的测试：\n\n1. 运行测试结果（查看 subtask-5 输出）\n2. 检查覆盖率报告（coverage/index.html）\n3. 评估测试质量：\n   - 是否有真实的断言？\n   - 是否覆盖了边界条件？\n   - fixtures 是否充分？\n4. 决定是否通过或需要改进",
+      "timeoutMinutes": 20
+    }
+  ],
+  "reviewer": {
+    "model": "claude-sonnet-4-20250514",
+    "instruction": "严格审阅测试实现计划和质量。重点关注：\n1. 测试用例是否覆盖测试方案中的关键场景\n2. 断言是否真实有效（不是永远通过的假测试）\n3. 边界条件和异常处理是否充分\n4. 测试代码是否可维护"
+  },
+  "executor": {
+    "model": "qwen3.5-plus",
+    "instruction": "按审阅通过的计划实现测试代码。原则：\n1. 先实现 fixtures 和测试框架\n2. 逐个实现测试用例\n3. 每实现一个文件就运行验证\n4. 保持测试代码简洁清晰"
+  },
+  "auditor": {
+    "model": "claude-sonnet-4-20250514",
+    "instruction": "严格验收测试结果：\n1. 测试是否能运行（不是全部\"通过\"）\n2. 是否有失败的测试（说明测试真实有效）\n3. 覆盖率是否达到 80%+\n4. 决定是否通过或要求返工"
+  },
+  "status": "pending",
+  "priority": "P0",
+  "metadata": {
+    "source": "manual-created",
+    "createdAt": "2026-03-28T08:20:00+08:00",
+    "projectRoot": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent",
+    "relatedTask": "test-driven-revolution-implementation",
+    "phase": "P0-core-modules"
+  }
+}

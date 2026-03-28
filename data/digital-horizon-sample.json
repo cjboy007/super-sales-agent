@@ -1,0 +1,69 @@
+{
+  "customer": {
+    "company_name": "Digital Horizon Inc.",
+    "contact": "Jennifer Martinez, Product Development Manager",
+    "email": "j.martinez@digitalhorizon-usa.com",
+    "phone": "+1 (305) 555-0189",
+    "address": "1450 Brickell Avenue, Suite 1900, Miami, FL 33131, USA",
+    "country": "United States"
+  },
+  "sample": {
+    "sample_no": "SPL-20260328-001",
+    "quotation_no": "SQ-20260328-001",
+    "date": "2026-03-28",
+    "valid_until": "2026-04-27",
+    "purpose": "Sample Evaluation for Potential Partnership"
+  },
+  "products": [
+    {
+      "description": "HDMI 2.1 Ultra High Speed Cable",
+      "specification": "8K@60Hz, 48Gbps, 1 meter",
+      "quantity": 5,
+      "unit_price": 12.00
+    },
+    {
+      "description": "HDMI 2.1 Ultra High Speed Cable",
+      "specification": "8K@60Hz, 48Gbps, 2 meters",
+      "quantity": 5,
+      "unit_price": 15.00
+    },
+    {
+      "description": "HDMI 2.1 Ultra High Speed Cable",
+      "specification": "8K@60Hz, 48Gbps, 3 meters",
+      "quantity": 3,
+      "unit_price": 18.00
+    },
+    {
+      "description": "USB-C to HDMI 2.1 Adapter",
+      "specification": "8K@60Hz, HDR, 100W PD",
+      "quantity": 5,
+      "unit_price": 25.00
+    },
+    {
+      "description": "DisplayPort 1.4 to HDMI 2.1 Adapter",
+      "specification": "8K@60Hz, Active",
+      "quantity": 3,
+      "unit_price": 28.00
+    }
+  ],
+  "currency": "USD",
+  "freight": 45.00,
+  "freight_method": "DHL Express (3-5 business days)",
+  "tax": 0,
+  "terms": {
+    "payment": "100% advance payment (PayPal / Wire Transfer)",
+    "lead_time": "1-2 business days preparation + 3-5 days shipping",
+    "estimated_delivery": "April 2-4, 2026",
+    "remarks": "1. This quotation is valid for 30 days.\n2. Samples include retail packaging, spec sheets, and HDMI 2.1 certificates.\n3. Bulk order pricing available upon request.\n4. We offer Amazon FBA labeling and direct shipping services."
+  },
+  "bulk_pricing_reference": {
+    "note": "For reference only - final pricing based on confirmed order quantity",
+    "tiers": [
+      {"product": "HDMI 2.1 1M", "1000+": "$4.20", "5000+": "$3.80", "10000+": "$3.50"},
+      {"product": "HDMI 2.1 2M", "1000+": "$5.50", "5000+": "$5.00", "10000+": "$4.50"},
+      {"product": "HDMI 2.1 3M", "1000+": "$6.80", "5000+": "$6.20", "10000+": "$5.50"},
+      {"product": "USB-C to HDMI", "1000+": "$18.00", "5000+": "$16.50", "10000+": "$15.00"},
+      {"product": "DP to HDMI", "1000+": "$20.00", "5000+": "$18.50", "10000+": "$17.00"}
+    ]
+  }
+}

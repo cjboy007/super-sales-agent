@@ -1,0 +1,16 @@
+{
+  "pi": {
+    "pi_no": "PI-20260327-001",
+    "date": "2026-03-27",
+    "valid_until": "2026-04-26"
+  },
+  "terms": {
+    "payment": "T/T 30% deposit, 70% before shipment",
+    "packaging": "Standard export packaging",
+    "delivery": "15-20 days after deposit"
+  },
+  "total_amount": 6550.00,
+  "currency": "USD",
+  "deposit_amount": 1965.00,
+  "balance_due": 4585.00
+}

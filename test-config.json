@@ -1,0 +1,95 @@
+{
+  "test_config": {
+    "monorepo": "super-sales-agent",
+    "skills_dir": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills",
+    "total_skills": 24,
+    "batch_size": 2,
+    "timeout_per_skill_minutes": 15,
+    "test_email": "cjboy0756@gmail.com",
+    "discord_channel": "#🧪-hq-指挥中心",
+    "okki_isolation": "create_test_customers_with_[TEST]_tag",
+    "use_production_data": true,
+    "use_real_api": true,
+    "on_failure": "stop_and_notify",
+    "report_format": "html",
+    "report_destination": "discord"
+  },
+  "test_plan": {
+    "batches": [
+      {
+        "batch_id": 1,
+        "skills": ["after-sales", "approval-engine"],
+        "risk_level": "high",
+        "estimated_minutes": 30
+      },
+      {
+        "batch_id": 2,
+        "skills": ["campaign-tracker", "customer-segmentation"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 3,
+        "skills": ["email-smart-reply", "follow-up-engine"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 4,
+        "skills": ["imap-smtp-email", "logistics"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 5,
+        "skills": ["logistics-tracker", "okki"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 6,
+        "skills": ["okki-email-sync", "order-tracker"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 7,
+        "skills": ["payment-notice-workflow", "pdf-product-catalog"],
+        "risk_level": "high",
+        "estimated_minutes": 25
+      },
+      {
+        "batch_id": 8,
+        "skills": ["pi-workflow", "pricing-engine"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 9,
+        "skills": ["product-doc-reader", "quotation-workflow"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 10,
+        "skills": ["sales-dashboard", "sample-workflow"],
+        "risk_level": "medium",
+        "estimated_minutes": 20
+      },
+      {
+        "batch_id": 11,
+        "skills": ["auto-evolution", "excel-xlsx"],
+        "risk_level": "low",
+        "estimated_minutes": 10
+      },
+      {
+        "batch_id": 12,
+        "skills": ["word-docx", "read-docx"],
+        "risk_level": "low",
+        "estimated_minutes": 10
+      }
+    ]
+  },
+  "started_at": "2026-03-28T10:52:00+08:00",
+  "status": "starting"
+}

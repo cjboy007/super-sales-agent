@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation {{quotation_no}}</title>
+    <style>
+        /* Traditional Style - Times New Roman, Black & White */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .company-name {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quotation-title {
+            font-size: 16pt;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Info Section */
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            width: 48%;
+            border: 1px solid #ccc;
+            padding: 15px;
+            background: #f5f5f5;
+        }
+
+        .info-box h3 {
+            font-size: 11pt;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #999;
+            padding-bottom: 5px;
+        }
+
+        /* Table */
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .products-table th,
+        .products-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .products-table th {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .products-table .text-right {
+            text-align: right;
+        }
+
+        .products-table .text-center {
+            text-align: center;
+        }
+
+        /* Totals */
+        .totals-section {
+            margin-left: auto;
+            width: 300px;
+            margin-bottom: 30px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            border: 1px solid #000;
+        }
+
+        .total-row.grand-total {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        /* Terms */
+        .terms-section {
+            border: 1px solid #000;
+            padding: 15px;
+            margin-bottom: 30px;
+            background: #f9f9f9;
+        }
+
+        .terms-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .terms-section ul {
+            margin-left: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 2px solid #000;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+        }
+
+        /* Export Button */
+        .export-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .export-btn:hover {
+            background: #555;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .export-btn {
+                display: none;
+            }
+
+            .info-box {
+                background: #f5f5f5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .products-table th {
+                background: #e0e0e0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .total-row.grand-total {
+                background: #e0e0e0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .info-section {
+                flex-direction: column;
+            }
+
+            .info-box {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .products-table {
+                font-size: 10pt;
+            }
+
+            .totals-section {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-name">FARREACH ELECTRONIC CO LIMITED</div>
+            <div class="quotation-title">QUOTATION</div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-box">
+                <h3>To:</h3>
+                <div id="customer-info">
+                    <strong>{{customer.company_name}}</strong><br>
+                    {{customer.address}}<br>
+                    {{customer.country}}<br>
+                    Tel: {{customer.phone}}<br>
+                    Email: {{customer.email}}
+                </div>
+            </div>
+            <div class="info-box">
+                <h3>Quotation Details:</h3>
+                <div>
+                    <strong>Quotation No:</strong> {{quotation.quotation_no}}<br>
+                    <strong>Date:</strong> {{quotation.date}}<br>
+                    <strong>Valid Until:</strong> {{quotation.valid_until}}<br>
+                    <strong>Currency:</strong> {{trade_terms.currency}}<br>
+                    <strong>Incoterms:</strong> {{trade_terms.incoterms}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">No.</th>
+                    <th style="width: 35%;">Description</th>
+                    <th style="width: 25%;">Specification</th>
+                    <th style="width: 10%;" class="text-center">Qty</th>
+                    <th style="width: 12%;" class="text-right">Unit Price</th>
+                    <th style="width: 13%;" class="text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#products}}
+                <tr>
+                    <td class="text-center">{{index}}</td>
+                    <td>{{description}}</td>
+                    <td>{{specification}}</td>
+                    <td class="text-center">{{quantity}}</td>
+                    <td class="text-right">{{currency}} {{unit_price}}</td>
+                    <td class="text-right">{{currency}} {{line_total}}</td>
+                </tr>
+                {{/products}}
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>{{currency}} {{subtotal}}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span><strong>TOTAL:</strong></span>
+                <span><strong>{{currency}} {{total}}</strong></span>
+            </div>
+        </div>
+
+        <!-- Terms -->
+        <div class="terms-section">
+            <h3>Terms & Conditions:</h3>
+            <ul>
+                <li>Payment: T/T 30% deposit, 70% before shipment</li>
+                <li>Delivery: {{trade_terms.delivery}}</li>
+                <li>Packaging: Standard export packaging</li>
+                <li>This quotation is valid until {{quotation.valid_until}}</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Thank you for your inquiry. We look forward to your order.</p>
+            <p style="margin-top: 10px;">
+                <strong>FARREACH ELECTRONIC CO LIMITED</strong><br>
+                Email: sales@farreach.com | Tel: +86-755-1234-5678
+            </p>
+        </div>
+
+        <!-- Export Button -->
+        <div style="text-align: center;">
+            <button class="export-btn" onclick="window.print()">Export to PDF</button>
+        </div>
+    </div>
+
+    <script>
+        // Auto-trigger print for PDF export
+        function exportToPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

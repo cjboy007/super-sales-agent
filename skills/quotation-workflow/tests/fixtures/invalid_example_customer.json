@@ -1,0 +1,23 @@
+{
+  "customer": {
+    "company_name": "Example Corp",
+    "contact": "Test User",
+    "email": "test@example.com",
+    "phone": "+1-555-000-0000",
+    "address": "123 Test Street, Example City",
+    "country": "United States"
+  },
+  "products": [
+    {
+      "description": "HDMI Cable",
+      "specification": "2 meters",
+      "quantity": 100,
+      "unit_price": 5.00
+    }
+  ],
+  "quotation": {
+    "quotation_no": "QT-20260328-002",
+    "date": "2026-03-28",
+    "valid_until": "2026-04-27"
+  }
+}

@@ -300,7 +300,7 @@ node order-dashboard.js
 SMTP_HOST=smtphz.qiye.163.com
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=your-email@farreach-electronic.com
+SMTP_USER=your-email
 SMTP_PASS=<password>
 ```
 

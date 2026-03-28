@@ -63,7 +63,7 @@ const { matchCustomer, createEmailTrail, syncEmailToOkki } = require('./okki-syn
 const result = await syncEmailToOkki({
   uid: 'unique-email-id',
   from: 'customer@example.com',
-  to: 'your-email@farreach-electronic.com',
+  to: 'your-email',
   subject: 'Product inquiry',
   date: new Date().toISOString(),
   body: 'We are interested in...',

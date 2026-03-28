@@ -1,0 +1,32 @@
+{
+  "customer": {
+    "company_name": "European Customer GmbH",
+    "contact": "Hans Mueller",
+    "email": "hans@eurocustomer.de",
+    "phone": "+49-30-1234-5678",
+    "address": "Unter den Linden 77, Berlin, Germany",
+    "country": "Germany"
+  },
+  "notice": {
+    "notice_no": "PN-20260328-001",
+    "date": "2026-03-28",
+    "due_date": "2026-04-10"
+  },
+  "reference": {
+    "pi_no": "PI-20260315-001",
+    "pi_date": "2026-03-15"
+  },
+  "payment": {
+    "total_amount": 15000.0,
+    "currency": "USD",
+    "deposit_amount": 4500.0,
+    "deposit_paid": true,
+    "balance_due": 10500.0
+  },
+  "bank": {
+    "beneficiary": "FARREACH ELECTRONIC CO LIMITED",
+    "bank_name": "HSBC Hong Kong",
+    "account_no": "411-758097-838",
+    "swift_code": "HSBCHKHHHKH"
+  }
+}

@@ -1,0 +1,388 @@
+{
+  "scanned_at": "2026-03-28T02:46:54.575Z",
+  "monorepo": "super-sales-agent",
+  "skills_dir": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills",
+  "total_count": 24,
+  "high_risk_count": 2,
+  "requires_api_count": 17,
+  "has_existing_tests_count": 5,
+  "total_estimated_minutes": 220,
+  "skills": [
+    {
+      "name": "after-sales",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki"
+      ],
+      "has_existing_tests": true,
+      "test_files": [
+        "e2e_test.js",
+        "okki_sync_test.js"
+      ],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 5,
+      "risk_level": "medium",
+      "notes": "已有 2 个测试文件"
+    },
+    {
+      "name": "approval-engine",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": true,
+      "test_files": [
+        "smoke-test.sh"
+      ],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 15,
+      "risk_level": "high",
+      "notes": "已有 1 个测试文件"
+    },
+    {
+      "name": "auto-evolution",
+      "function": "功能待分析",
+      "external_deps": [
+        "discord"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 5,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "campaign-tracker",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "customer-segmentation",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 5,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "email-smart-reply",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "excel-xlsx",
+      "function": "功能待分析",
+      "external_deps": [
+        "excel"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 5,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "follow-up-engine",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": true,
+      "test_files": [
+        "e2e.sh"
+      ],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "已有 1 个测试文件"
+    },
+    {
+      "name": "imap-smtp-email",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "discord",
+        "pdf"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "logistics",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki"
+      ],
+      "has_existing_tests": true,
+      "test_files": [
+        "e2e_test.js"
+      ],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 5,
+      "risk_level": "medium",
+      "notes": "已有 1 个测试文件"
+    },
+    {
+      "name": "logistics-tracker",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "okki",
+      "function": "连接 OKKI（小满）CRM 系统，支持查询客户、创建跟进记录、管理订单等操作。",
+      "external_deps": [
+        "okki",
+        "smtp"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "okki-email-sync",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "order-tracker",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": true,
+      "test_files": [
+        "smoke-test.sh"
+      ],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "已有 1 个测试文件"
+    },
+    {
+      "name": "payment-notice-workflow",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp",
+        "pdf"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 15,
+      "risk_level": "high",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "pdf-product-catalog",
+      "function": "功能待分析",
+      "external_deps": [
+        "pdf",
+        "excel"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 10,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "pi-workflow",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp",
+        "pdf"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "pricing-engine",
+      "function": "功能待分析",
+      "external_deps": [
+        "discord",
+        "pdf",
+        "excel"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 10,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "product-doc-reader",
+      "function": "功能待分析",
+      "external_deps": [
+        "pdf",
+        "excel"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 10,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "quotation-workflow",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "pdf",
+        "excel",
+        "word"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "read-docx",
+      "function": "功能待分析",
+      "external_deps": [
+        "word"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 5,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "sales-dashboard",
+      "function": "渐进式销售数据概览，从 OKKI CRM 和 Campaign Tracker 采集核心指标，生成周报/月报，通过 Discord 推送。",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "discord"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "sample-workflow",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp",
+        "pdf"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "word-docx",
+      "function": "功能待分析",
+      "external_deps": [
+        "pdf",
+        "excel",
+        "word"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": false,
+      "estimated_minutes": 10,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    }
+  ]
+}
