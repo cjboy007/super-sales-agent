@@ -169,7 +169,7 @@ Best regards,
 [Your Name]
 Sales Manager
 Farreach Electronic Co., Ltd.
-📧 sale@farreach-electronic.com
+📧 your-email@farreach-electronic.com
 🌐 www.farreach-electronic.com
 ```
 

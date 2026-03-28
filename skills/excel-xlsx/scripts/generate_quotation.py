@@ -102,7 +102,7 @@ def create_quotation_template(output_path, data=None):
     
     # 联系信息（第 3 行）
     ws.merge_cells('A3:F3')
-    ws['A3'].value = "📧 sale@farreach-electronic.com | 🌐 www.farreach-electronic.com | 📱 +86-756-XXXXXXX"
+    ws['A3'].value = "📧 your-email@farreach-electronic.com | 🌐 www.farreach-electronic.com | 📱 +86-756-XXXXXXX"
     ws['A3'].font = Font(size=9)
     ws['A3'].alignment = Alignment(horizontal='center')
     ws.row_dimensions[3].height = 15

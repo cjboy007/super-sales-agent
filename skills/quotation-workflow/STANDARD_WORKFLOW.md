@@ -96,7 +96,7 @@ python3 scripts/generate_quotation_html.py \
   "company_name": "Farreach Electronic Co., Ltd.",
   "company_tagline": "Premium Connectivity Solutions",
   "company_address": "No. 123, Technology Road, Zhuhai, Guangdong, China",
-  "company_email": "sale@farreach-electronic.com",
+  "company_email": "your-email@farreach-electronic.com",
   "company_website": "www.farreach-electronic.com",
   "customer": {
     "company_name": "Best Buy Electronics Inc.",
