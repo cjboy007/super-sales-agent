@@ -45,8 +45,8 @@
 |---------|---------|---------|
 | TC-BANK-001 | 受益人名称正确 | FARREACH ELECTRONIC |
 | TC-BANK-002 | 银行名称正确 | HSBC Hong Kong |
-| TC-BANK-003 | 账号正确 | 411-758097-838 |
-| TC-BANK-004 | SWIFT 正确 | HSBCHKHHHKH |
+| TC-BANK-003 | 账号正确 | YOUR-ACCOUNT-NUMBER |
+| TC-BANK-004 | SWIFT 正确 | YOUR-SWIFT-CODE |
 | TC-BANK-005 | 银行地址完整 | No.1 Queen's Road Central |
 
 ### 1.4 HTML 生成测试

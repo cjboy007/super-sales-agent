@@ -18,7 +18,7 @@ pip3 install docling openpyxl
 cd /Users/wilson/.openclaw/workspace
 
 python3 skills/pdf-product-catalog/scripts/extract.py \
-  --pdf-dir "/Users/wilson/Library/CloudStorage/GoogleDrive-cjboy0756@gmail.com/我的云端硬盘/Job/产品资料/599" \
+  --pdf-dir "/Users/wilson/Library/CloudStorage/GoogleDrive-your-email@gmail.com/我的云端硬盘/Job/产品资料/599" \
   --output-dir "./knowledge-base/客户/599" \
   --verbose
 ```
