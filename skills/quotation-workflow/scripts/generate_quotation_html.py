@@ -17,25 +17,26 @@ from datetime import datetime
 from quotation_schema import validate_quotation_data
 
 
-def generate_html_quotation(output_path, data):
+def generate_html_quotation(output_path, data, skip_validation=False):
     """生成 HTML 报价单（基于提供的模板优化）"""
     
     # 🔴 P0: 完整数据验证（强制，无交互确认）
-    print("🔍 验证报价单数据...")
-    valid, errors = validate_quotation_data(data)
-    
-    if not valid:
-        print("❌ 数据验证失败，报价单生成已终止:")
+    if not skip_validation:
+        print("🔍 验证报价单数据...")
+        valid, errors = validate_quotation_data(data)
+        
+        if not valid:
+            print("❌ 数据验证失败，报价单生成已终止:")
+            print()
+            for i, err in enumerate(errors, start=1):
+                print(f"  {i}. {err}")
+            print()
+            print("请检查数据文件，确保使用真实客户信息。")
+            print("如需要测试，请使用 --skip-validation 参数（仅限开发环境）")
+            sys.exit(1)
+        
+        print("✅ 数据验证通过")
         print()
-        for i, err in enumerate(errors, start=1):
-            print(f"  {i}. {err}")
-        print()
-        print("请检查数据文件，确保使用真实客户信息。")
-        print("如需要测试，请使用 --skip-validation 参数（仅限开发环境）")
-        sys.exit(1)
-    
-    print("✅ 数据验证通过")
-    print()
     
     # 输入校验（基础检查）
     errors = []
@@ -99,13 +100,41 @@ def generate_html_quotation(output_path, data):
     tax = data.get('tax', 0)
     total = subtotal + freight + tax
     
-    # 银行信息
-    bank_info = data.get('bank_info', {
-        'beneficiary': 'Farreach Electronic Co., Ltd.',
-        'bank_name': 'Standard Chartered Bank',
-        'account_no': '1234 5678 9012',
-        'swift_code': 'SCBLHKHH'
-    })
+    # 银行信息（从统一配置加载，防止硬编码）
+    # 优先使用数据文件中的 bank_info，否则从本 skill 的 config 目录加载
+    import os
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'bank-accounts.json')
+    default_bank_info = {}
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            import json
+            config = json.load(f)
+            if config.get('primary') and config['primary'].get('active'):
+                default_bank_info = config['primary']
+    except (FileNotFoundError, json.JSONDecodeError):
+        # 配置文件不存在时，回退到主 config 目录
+        main_config_path = os.path.join(
+            os.path.dirname(__file__),
+            '..', '..', '..',
+            'config', 'bank-accounts.json'
+        )
+        try:
+            with open(main_config_path, 'r', encoding='utf-8') as f:
+                import json
+                config = json.load(f)
+                if config.get('primary') and config['primary'].get('active'):
+                    default_bank_info = config['primary']
+        except:
+            # 最后备用：硬编码默认值
+            default_bank_info = {
+                'beneficiary': 'FARREACH ELECTRONIC CO LIMITED',
+                'bank_name': 'HSBC Hong Kong',
+                'account_no': '411-758097-838',
+                'swift_code': 'HSBCHKHHHKH',
+                'bank_address': "No.1 Queen's Road Central,Central, Hong Kong"
+            }
+    
+    bank_info = data.get('bank_info', default_bank_info)
     
     # 条款（支持字典和列表两种格式）
     terms_data = data.get('terms', {})
@@ -267,13 +296,6 @@ def generate_html_quotation(output_path, data):
 </head>
 <body class="text-slate-800 font-sans">
 
-    <!-- Action Bar (Hidden on Print) -->
-    <div class="no-print fixed top-4 right-4 flex gap-4">
-        <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded-lg font-medium shadow-lg transition-colors flex items-center gap-2">
-            <i data-lucide="printer" class="w-4 h-4"></i> Export to PDF
-        </button>
-    </div>
-
     <!-- Quotation Document -->
     <div class="a4-container rounded-xl">
         
@@ -425,6 +447,7 @@ def generate_html_quotation(output_path, data):
                     <p><span class="font-medium text-slate-900">Bank Name:</span> {bank_info.get('bank_name', '')}</p>
                     <p><span class="font-medium text-slate-900">Account No:</span> {bank_info.get('account_no', '')}</p>
                     <p><span class="font-medium text-slate-900">SWIFT Code:</span> {bank_info.get('swift_code', '')}</p>
+                    <p><span class="font-medium text-slate-900">Bank Address:</span> {bank_info.get('bank_address', '')}</p>
                 </div>
 
                 <!-- 签名区域（暂时移除，待确认） -->
@@ -471,8 +494,6 @@ def main():
   
   # 在浏览器打开
   open QT-20260314-001.html
-  
-  # 导出 PDF（在浏览器中点击 "Export to PDF" 按钮）
   
   # 跳过验证（仅限开发环境测试）
   python3 generate_quotation_html.py --data test.json --output test.html --skip-validation
@@ -562,9 +583,29 @@ def main():
             print("⚠️  警告：开发环境，跳过数据验证")
             print()
         
-        output = generate_html_quotation(args.output, data)
+        output = generate_html_quotation(args.output, data, skip_validation=args.skip_validation)
         print(f"✅ HTML 报价单已生成：{output}")
-        print(f"💡 提示：在浏览器打开并点击 'Export to PDF' 按钮")
+        
+        # 如果输出是 HTML，自动生成 PDF（去掉页眉页脚）
+        if str(output).endswith('.html'):
+            import subprocess
+            pdf_output = str(output).replace('.html', '.pdf')
+            try:
+                subprocess.run([
+                    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                    '--headless',
+                    '--disable-gpu',
+                    f'--print-to-pdf={pdf_output}',
+                    '--print-to-pdf-no-header',
+                    '--print-to-pdf-no-footer',
+                    '--print-to-pdf-no-background',
+                    '--paper-width=8.27',
+                    '--paper-height=11.69',
+                    f'file://{output}'
+                ], check=True, capture_output=True)
+                print(f"✅ PDF 已生成：{pdf_output} (已去掉页眉页脚)")
+            except Exception as e:
+                print(f"⚠️  PDF 生成失败：{e}")
         return
     
     parser.print_help()
