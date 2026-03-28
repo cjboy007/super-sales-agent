@@ -1,0 +1,44 @@
+{
+  "_comment": "Farreach PI 示例数据",
+  "customer": {
+    "company_name": "Test Customer Corp",
+    "contact": "John Smith",
+    "email": "john@testcustomer.com",
+    "phone": "+86-755-8888-9999",
+    "address": "Floor 12, Building A, High-Tech Industrial Park, Nanshan District, Shenzhen, Guangdong, China",
+    "country": "China"
+  },
+  "pi": {
+    "pi_no": "PI-20260327-001",
+    "date": "2026-03-27",
+    "valid_until": "2026-04-26"
+  },
+  "products": [
+    {
+      "description": "HDMI 2.1 Ultra High Speed Cable",
+      "specification": "8K@60Hz, 4K@120Hz, 48Gbps, HDR, eARC, 2m",
+      "quantity": 500,
+      "unit_price": 8.50
+    },
+    {
+      "description": "HDMI 2.1 Fiber Optical Cable (AOC)",
+      "specification": "8K@60Hz, 48Gbps, Active Optical, 10m",
+      "quantity": 200,
+      "unit_price": 25.00
+    },
+    {
+      "description": "USB-C to USB-C Cable",
+      "specification": "USB 4.0, 80Gbps, 100W PD 2.0, 1m",
+      "quantity": 1000,
+      "unit_price": 12.00
+    }
+  ],
+  "currency": "USD",
+  "freight": 350.00,
+  "tax": 0,
+  "terms": {
+    "payment": "T/T 30% deposit, 70% before shipment",
+    "packaging": "Standard export packaging (Gift box, kraft box, PE bag)",
+    "remarks": "1. This PI is valid for 30 days from the date of issue.\n2. Please ensure payment is made before the validity date.\n3. Goods will be shipped after payment confirmation."
+  }
+}

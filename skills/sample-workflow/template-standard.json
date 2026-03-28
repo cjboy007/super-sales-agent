@@ -1,0 +1,51 @@
+{
+  "_comment": "样品单标准数据模板 - 用于生成客户专属样品申请单",
+  "_usage": "复制此模板，填入真实客户信息，然后用 generate-sample.py 生成样品单",
+  
+  "customer": {
+    "company_name": "客户公司全称（必填）",
+    "contact": "联系人姓名",
+    "email": "客户邮箱",
+    "phone": "客户电话",
+    "address": "客户地址",
+    "country": "客户国家"
+  },
+  
+  "sample": {
+    "sample_no": "SPL-YYYYMMDD-XXX（建议格式）",
+    "date": "2026-03-27",
+    "purpose": "Testing / Evaluation / Exhibition"
+  },
+  
+  "shipping_address": {
+    "company_name": "收货公司名称（如与客户相同可留空）",
+    "contact": "收货联系人姓名",
+    "phone": "收货联系电话",
+    "address": "详细收货地址（街道 + 楼层等）",
+    "country": "收货国家/地区",
+    "postal_code": "邮政编码"
+  },
+  
+  "products": [
+    {
+      "description": "样品名称（必填）",
+      "specification": "规格参数，逗号分隔",
+      "quantity": 2,
+      "unit_price": 8.50,
+      "remarks": "样品备注（可选）"
+    }
+  ],
+  
+  "shipping": {
+    "method": "DHL / FedEx / UPS / TNT",
+    "account_no": "快递到付账号（可选）",
+    "freight_collect": true,
+    "freight_amount": 0
+  },
+  
+  "terms": {
+    "sample_charge": "Free / Charged",
+    "lead_time": "3-5 days after confirmation",
+    "remarks": "1. Sample lead time: 3-5 days.\n2. Courier account preferred for freight collect.\n3. Sample charge can be refunded upon bulk order."
+  }
+}

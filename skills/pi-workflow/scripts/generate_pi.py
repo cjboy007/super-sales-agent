@@ -41,7 +41,7 @@ def generate_pi_html(output_path, data):
     company_phone = data.get('company_phone', '86-756-8699660')
     company_fax = data.get('company_fax', '86-756-8699663')
     company_website = data.get('company_website', 'www.farreach-cable.com')
-    company_email = data.get('company_email', 'your-email@farreach-electronic.com')
+    company_email = data.get('company_email', 'your-email')
     
     # 客户信息
     customer = data.get('customer', {})

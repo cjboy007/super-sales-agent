@@ -1,0 +1,10 @@
+{
+  "from": "john.doe@acme-corp.com",
+  "to": "sales@farreach.com",
+  "subject": "Inquiry: Product Pricing",
+  "body": "Dear Sales Team,\n\nWe are interested in purchasing your wireless Bluetooth headphones. Could you please provide a quotation for 500 units?\n\nAlso, please let us know:\n1. Delivery time\n2. Payment terms\n3. Warranty policy\n\nBest regards,\nJohn Doe\nAcme Corporation",
+  "timestamp": "2026-03-27T10:00:00Z",
+  "attachments": [],
+  "expected_intent": "price_inquiry",
+  "expected_confidence": 0.92
+}

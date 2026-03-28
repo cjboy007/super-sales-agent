@@ -4,7 +4,7 @@
 
 | 项目 | 状态 | 详情 |
 |------|------|------|
-| **邮箱账号** | ✅ 已配置 | `your-email@farreach-electronic.com` |
+| **邮箱账号** | ✅ 已配置 | `your-email` |
 | **IMAP 服务器** | ✅ 已连接 | `imaphz.qiye.163.com:993` (SSL) |
 | **SMTP 服务器** | ✅ 已配置 | `smtphz.qiye.163.com:465` (SSL) |
 | **邮件总数** | ✅ 1835 封 | 当前未读：0 |
@@ -297,7 +297,7 @@ node scripts/smtp.js send \
 node scripts/smtp.js test
 
 # 发送测试邮件到自己邮箱
-node scripts/smtp.js send --to "your-email@farreach-electronic.com" --subject "Test" --html --body "<h1>Test Email</h1><p>Format check.</p>"
+node scripts/smtp.js send --to "your-email" --subject "Test" --html --body "<h1>Test Email</h1><p>Format check.</p>"
 
 # 检查附件路径是否正确
 ls -lh /path/to/attachment.pdf
@@ -356,7 +356,7 @@ ls -lh /path/to/attachment.pdf
 # IMAP 配置
 IMAP_HOST=imaphz.qiye.163.com
 IMAP_PORT=993
-IMAP_USER=your-email@farreach-electronic.com
+IMAP_USER=your-email
 IMAP_PASS=<授权码>
 IMAP_TLS=true
 
@@ -364,7 +364,7 @@ IMAP_TLS=true
 SMTP_HOST=smtphz.qiye.163.com
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=your-email@farreach-electronic.com
+SMTP_USER=your-email
 SMTP_PASS=<授权码>
 
 # 输出目录

@@ -1,0 +1,40 @@
+{
+  "customer": {
+    "company_name": "Tech Solutions International Ltd",
+    "contact": "John Smith",
+    "email": "john.smith@techsolutions.com",
+    "phone": "+1-555-123-4567",
+    "address": "1234 Business Park Drive, Suite 500, San Francisco, CA 94105, USA",
+    "country": "United States"
+  },
+  "products": [
+    {
+      "description": "HDMI 2.1 Cable",
+      "specification": "8K@60Hz, 4K@120Hz, 2 meters",
+      "quantity": 500,
+      "unit_price": 8.50
+    },
+    {
+      "description": "DisplayPort 1.4 Cable",
+      "specification": "8K@60Hz, 4K@144Hz, 1.8 meters",
+      "quantity": 300,
+      "unit_price": 6.75
+    },
+    {
+      "description": "USB-C to HDMI Adapter",
+      "specification": "4K@60Hz, Aluminum alloy",
+      "quantity": 200,
+      "unit_price": 12.00
+    }
+  ],
+  "quotation": {
+    "quotation_no": "QT-20260328-001",
+    "date": "2026-03-28",
+    "valid_until": "2026-04-27"
+  },
+  "trade_terms": {
+    "incoterms": "FOB Shenzhen",
+    "currency": "USD",
+    "delivery": "15-20 days after order confirmation"
+  }
+}

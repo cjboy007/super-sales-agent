@@ -1,0 +1,43 @@
+{
+  "_comment": "Farreach 样品单示例数据",
+  "customer": {
+    "company_name": "Test Customer Corp",
+    "contact": "John Smith",
+    "email": "john@testcustomer.com",
+    "phone": "+86-755-8888-9999",
+    "address": "Floor 12, Building A, High-Tech Industrial Park, Nanshan District, Shenzhen, Guangdong, China",
+    "country": "China"
+  },
+  "sample": {
+    "sample_no": "SPL-20260327-001",
+    "date": "2026-03-27",
+    "purpose": "Testing / Evaluation"
+  },
+  "products": [
+    {
+      "description": "HDMI 2.1 Ultra High Speed Cable",
+      "specification": "8K@60Hz, 4K@120Hz, 48Gbps, 2m",
+      "quantity": 2,
+      "unit_price": 8.50,
+      "remarks": "For quality testing"
+    },
+    {
+      "description": "USB-C to USB-C Cable",
+      "specification": "USB 4.0, 80Gbps, 100W PD, 1m",
+      "quantity": 2,
+      "unit_price": 12.00,
+      "remarks": "For compatibility testing"
+    }
+  ],
+  "shipping": {
+    "method": "DHL",
+    "account_no": "",
+    "freight_collect": true,
+    "freight_amount": 0
+  },
+  "terms": {
+    "sample_charge": "Free",
+    "lead_time": "3-5 days after confirmation",
+    "remarks": "1. Sample lead time: 3-5 days.\n2. Courier account preferred for freight collect.\n3. Sample charge can be refunded upon bulk order."
+  }
+}

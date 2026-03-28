@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proforma Invoice - PI-20260327-001</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                colors: {
+                    brand: {
+                        50: '#f0fdfa',
+                        100: '#ccfbf1',
+                        500: '#14b8a6',
+                        600: '#0d9488',
+                        700: '#0f766e',
+                        900: '#134e4a',
+                    }
+                }
+            }
+        }
+    }
+    </script>
+    <style>
+        body { background-color: #f3f4f6; -webkit-font-smoothing: antialiased; }
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 2rem auto;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 40mm 20mm 30mm 20mm;
+        }
+        @media print {
+            body { background-color: white; margin: 0; padding: 0; }
+            .a4-container { margin: 0; box-shadow: none; padding: 5mm 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 font-sans">
+
+    <!-- Action Bar -->
+    <div class="no-print fixed top-4 right-4 flex gap-4">
+        <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded-lg font-medium shadow-lg transition-colors">
+            📄 Export to PDF
+        </button>
+    </div>
+
+    <!-- PI Document -->
+    <div class="a4-container rounded-xl">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-start border-b-2 border-slate-100 pb-8 mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">
+                    FARREACH ELECTRONIC CO LIMITED
+                </h1>
+                <p class="text-sm text-slate-500 font-medium">Premium Connectivity Solutions</p>
+                <p class="text-xs text-brand-600 font-medium italic mt-2">"real cables for real people"</p>
+                
+                <div class="mt-6 space-y-1 text-sm text-slate-600">
+                    <p class="flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-slate-400"></i>
+                        No. 6, Chuangye Road East, Shuanglinpian, Liangang Industrial Zone, Zhuhai, China
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i>
+                        +86-756-8699660
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-400"></i>
+                        sale-9@farreach-electronic.com
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <i data-lucide="globe" class="w-4 h-4 text-slate-400"></i>
+                        www.farreach-cable.com
+                    </p>
+                </div>
+            </div>
+            
+            <div class="text-right">
+                <h2 class="text-4xl font-light text-brand-600 tracking-widest uppercase mb-4">
+                    Proforma Invoice
+                </h2>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <span class="text-slate-500 font-medium">PI No:</span>
+                    <span class="font-semibold text-slate-900">PI-20260327-001</span>
+                    <span class="text-slate-500 font-medium">Date:</span>
+                    <span class="font-semibold text-slate-900">2026-03-27</span>
+                    <span class="text-slate-500 font-medium">Valid Until:</span>
+                    <span class="font-semibold text-slate-900">2026-04-26</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bill To -->
+        <div class="bg-slate-50 p-5 rounded-lg border border-slate-100 mb-8">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Bill To</h3>
+            <p class="font-bold text-slate-900 text-lg">Test Customer Corp</p>
+            <p class="text-sm text-slate-600 mt-1">Attn: John Smith</p>
+            <p class="text-sm text-slate-600 mt-1">Floor 12, Building A, High-Tech Industrial Park</p>
+            <p class="text-sm text-slate-600 mt-1">Shenzhen, China</p>
+            <p class="text-sm text-slate-600 mt-1">Email: john@testcustomer.com</p>
+        </div>
+
+        <!-- Products Table -->
+        <div class="mb-8">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-900 text-white text-xs uppercase tracking-wider">
+                        <th class="p-2 rounded-tl-lg font-medium w-12 text-center">No.</th>
+                        <th class="p-2 font-medium">Description & Specifications</th>
+                        <th class="p-2 font-medium text-center w-20">Qty</th>
+                        <th class="p-2 font-medium text-right w-24">Unit Price</th>
+                        <th class="p-2 font-medium text-right w-24">Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="text-xs border-b border-slate-200">
+                    <tr class="border-b border-slate-100">
+                        <td class="p-2 text-center font-medium text-slate-500">01</td>
+                        <td class="p-2 py-1.5">
+                            <p class="font-bold text-slate-900 text-xs">HDMI 2.1 Ultra High Speed Cable</p>
+                            <p class="text-slate-600 text-xs mt-0.5">8K@60Hz, 4K@120Hz, 48Gbps, HDR, eARC, 2m</p>
+                        </td>
+                        <td class="p-2 text-center text-slate-700">500</td>
+                        <td class="p-2 text-right font-medium text-slate-900">$8.50</td>
+                        <td class="p-2 text-right font-bold text-slate-900">$4,250.00</td>
+                    </tr>
+                    <tr class="border-b border-slate-100">
+                        <td class="p-2 text-center font-medium text-slate-500">02</td>
+                        <td class="p-2 py-1.5">
+                            <p class="font-bold text-slate-900 text-xs">USB-C to USB-C Cable</p>
+                            <p class="text-slate-600 text-xs mt-0.5">USB 4.0, 80Gbps, 100W PD 2.0, 1m</p>
+                        </td>
+                        <td class="p-2 text-center text-slate-700">1000</td>
+                        <td class="p-2 text-right font-medium text-slate-900">$12.00</td>
+                        <td class="p-2 text-right font-bold text-slate-900">$12,000.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="mb-8">
+            <div class="w-full bg-slate-50 rounded-lg p-4 border border-slate-100">
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-slate-500 font-medium">Subtotal</span>
+                    <span class="font-semibold text-slate-900">$16,250.00</span>
+                </div>
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-slate-500 font-medium">Freight</span>
+                    <span class="font-semibold text-slate-900">$350.00</span>
+                </div>
+                <div class="flex justify-between items-center border-t-2 border-slate-200 pt-4">
+                    <span class="text-xl font-bold text-slate-900">Total (FOB Shenzhen)</span>
+                    <span class="text-3xl font-bold text-brand-600">$16,600.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Terms -->
+        <div class="bg-brand-50 border border-brand-200 rounded-lg p-5 mb-8">
+            <h4 class="font-bold text-brand-900 mb-3 flex items-center gap-2">
+                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                Payment Terms
+            </h4>
+            <div class="grid grid-cols-2 gap-4 text-sm text-brand-800">
+                <div>
+                    <p class="font-medium text-brand-900 mb-1">Payment Method:</p>
+                    <p>T/T 30% deposit, 70% before shipment</p>
+                </div>
+                <div>
+                    <p class="font-medium text-brand-900 mb-1">Delivery Time:</p>
+                    <p>15-20 days after deposit</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="border-t-2 border-slate-100 pt-6">
+            <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <i data-lucide="building-2" class="w-5 h-5 text-brand-500"></i>
+                Bank Details for Payment
+            </h4>
+            <div class="bg-slate-50 p-5 rounded-lg text-sm">
+                <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-slate-600">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium mb-1">Beneficiary:</p>
+                        <p class="font-semibold text-slate-900">FARREACH ELECTRONIC CO LIMITED</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium mb-1">Bank Name:</p>
+                        <p class="font-semibold text-slate-900">HSBC Hong Kong</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium mb-1">Account No:</p>
+                        <p class="font-semibold text-slate-900">411-758097-838</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium mb-1">SWIFT Code:</p>
+                        <p class="font-semibold text-slate-900">HSBCHKHHHKH</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-xs text-slate-500 font-medium mb-1">Bank Address:</p>
+                        <p class="text-slate-900">No.1 Queen's Road Central, Central, Hong Kong</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-500">
+            <p>Thank you for your business!</p>
+            <p class="mt-1">For any questions, please contact us at sale-9@farreach-electronic.com</p>
+        </div>
+        
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

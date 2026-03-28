@@ -1,0 +1,37 @@
+{
+  "_comment": "真实客户测试数据",
+  "customer": {
+    "company_name": "Shenzhen Techtronics Co., Ltd.",
+    "contact": "David Chen",
+    "email": "david.chen@techtronics.com.cn",
+    "phone": "+86-755-8888-9999",
+    "address": "Floor 12, Building A, High-Tech Industrial Park, Nanshan District, Shenzhen, Guangdong, China",
+    "country": "China"
+  },
+  "quotation": {
+    "quotation_no": "QT-20260327-002",
+    "date": "2026-03-27",
+    "valid_until": "2026-04-26"
+  },
+  "products": [
+    {
+      "description": "HDMI 2.1 Ultra High Speed Cable",
+      "specification": "8K@60Hz, 4K@120Hz, 48Gbps, HDR, eARC, 2m",
+      "quantity": 500,
+      "unit_price": 8.50
+    },
+    {
+      "description": "USB-C to USB-C Cable",
+      "specification": "USB 4.0, 80Gbps, 100W PD 2.0, 1m",
+      "quantity": 1000,
+      "unit_price": 12.00
+    }
+  ],
+  "trade_terms": {
+    "incoterms": "FOB Shenzhen",
+    "currency": "USD",
+    "delivery": "15-20 days after deposit"
+  },
+  "freight": 350.00,
+  "tax": 0
+}

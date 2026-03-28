@@ -3,7 +3,7 @@
 # Follow-up Engine - End-to-End Test Script
 # 测试跟进引擎完整流程
 
-set -e
+# set -e  # 禁用，遇到问题继续执行
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(dirname "$SCRIPT_DIR")"

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proforma Invoice - PI-20260327-001</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.4;
+            color: #000;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            padding: 25mm 20mm;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                padding: 20mm 15mm;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+        .header {
+            border: 2px solid #000;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 18pt;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3px;
+            margin-bottom: 8px;
+        }
+        .total-box {
+            border: 2px solid #000;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .bank-box {
+            border: 1px solid #000;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+        .right {
+            text-align: right;
+        }
+        .center {
+            text-align: center;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print" style="position: fixed; top: 10px; right: 10px;">
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">
+            📄 Export to PDF
+        </button>
+    </div>
+
+    <div class="page">
+        
+        <!-- Header -->
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div class="title" style="text-align: left; font-size: 16pt;">
+                        FARREACH ELECTRONIC CO LIMITED
+                    </div>
+                    <div style="margin-top: 10px; font-size: 10pt;">
+                        <strong>Address:</strong> No. 6, Chuangye Road East, Shuanglinpian, Liangang Industrial Zone, Zhuhai, China<br>
+                        <strong>Tel:</strong> 86-756-8699660 &nbsp;|&nbsp; 
+                        <strong>Fax:</strong> 86-756-8699663<br>
+                        <strong>Email:</strong> sale-9@farreach-electronic.com<br>
+                        <strong>Website:</strong> www.farreach-cable.com
+                    </div>
+                </div>
+                <div style="text-align: right; border: 2px solid #000; padding: 10px; margin-left: 20px;">
+                    <div class="title">PROFORMA INVOICE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PI Info -->
+        <div class="section">
+            <table style="width: 100%; margin-bottom: 15px;">
+                <tr>
+                    <td style="width: 20%;" class="bold">PI No:</td>
+                    <td style="width: 30%;">PI-20260327-001</td>
+                    <td style="width: 20%;" class="bold">Date:</td>
+                    <td style="width: 30%;">2026.03.27</td>
+                </tr>
+                <tr>
+                    <td class="bold">Valid Until:</td>
+                    <td></td>
+                    <td class="bold">Currency:</td>
+                    <td>USD</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Bill To -->
+        <div class="section">
+            <div class="section-title">BILL TO:</div>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 20%;" class="bold">Company:</td>
+                    <td>Shenzhen Techtronics Co., Ltd.</td>
+                </tr>
+                <tr>
+                    <td class="bold">Attn:</td>
+                    <td>David Chen</td>
+                </tr>
+                <tr>
+                    <td class="bold">Address:</td>
+                    <td>Floor 12, Building A, High-Tech Industrial Park, Nanshan District, Shenzhen, Guangdong, China</td>
+                </tr>
+                <tr><td class="bold">Email:</td><td>david.chen@techtronics.com.cn</td></tr>
+                <tr><td class="bold">Phone:</td><td>+86-755-8888-9999</td></tr>
+            </table>
+        </div>
+
+        <!-- Products -->
+        <div class="section">
+            <div class="section-title">GOODS DESCRIPTION:</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;" class="center">No.</th>
+                        <th style="width: 50%;">Description</th>
+                        <th style="width: 10%;" class="center">Qty</th>
+                        <th style="width: 15%;" class="right">Unit Price</th>
+                        <th style="width: 20%;" class="right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td class="center">1</td>
+                        <td>
+                            <strong>HDMI 2.1 Ultra High Speed Cable</strong><br><small>8K@60Hz, 4K@120Hz, 48Gbps, HDR, eARC, 2m</small>
+                        </td>
+                        <td class="center">500</td>
+                        <td class="right">$8.50</td>
+                        <td class="right">$4,250.00</td>
+                    </tr>
+
+                    <tr>
+                        <td class="center">2</td>
+                        <td>
+                            <strong>USB-C to USB-C Cable</strong><br><small>USB 4.0, 80Gbps, 100W PD 2.0, 1m</small>
+                        </td>
+                        <td class="center">1000</td>
+                        <td class="right">$12.00</td>
+                        <td class="right">$12,000.00</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="section">
+            <div style="float: right; width: 50%;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="bold">Subtotal:</td>
+                        <td class="right">$16,250.00</td>
+                    </tr>
+                    <tr><td class="bold">Freight:</td><td class="right">$350.00</td></tr>
+                    
+                    <tr>
+                        <td class="bold" style="border-top: 2px solid #000; padding-top: 10px;">TOTAL:</td>
+                        <td class="right bold" style="border-top: 2px solid #000; padding-top: 10px; font-size: 14pt;">$16,600.00</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+
+        <!-- Payment Terms -->
+        <div class="section" style="margin-top: 30px;">
+            <div class="section-title">PAYMENT TERMS & CONDITIONS:</div>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 30%;" class="bold">Payment Method:</td>
+                    <td>T/T 30% deposit, 70% before shipment</td>
+                </tr>
+                <tr>
+                    <td class="bold">Delivery Time:</td>
+                    <td>15-20 days after deposit</td>
+                </tr>
+                <tr>
+                    <td class="bold">Port of Loading:</td>
+                    <td>FOB Shenzhen</td>
+                </tr>
+                <tr>
+                    <td class="bold">Packaging:</td>
+                    <td>Standard export packaging</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="section" style="margin-top: 30px;">
+            <div class="section-title">BANK DETAILS FOR PAYMENT:</div>
+            <div class="bank-box">
+                <table style="width: 100%; border: none;">
+                    <tr>
+                        <td style="width: 25%; border: none;" class="bold">Beneficiary:</td>
+                        <td style="border: none;">FARREACH ELECTRONIC CO LIMITED</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;" class="bold">Bank Name:</td>
+                        <td style="border: none;">HSBC Hong Kong</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;" class="bold">Account No:</td>
+                        <td style="border: none;">411-758097-838</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;" class="bold">SWIFT Code:</td>
+                        <td style="border: none;">HSBCHKHHHKH</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;" class="bold">Bank Address:</td>
+                        <td style="border: none;">No.1 Queen's Road Central,Central, Hong Kong</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="section" style="margin-top: 20px;">
+            <div class="section-title">TERMS & CONDITIONS:</div>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 30%;" class="bold">Payment:</td>
+                    <td>T/T 30% deposit, 70% before shipment</td>
+                </tr>
+                <tr>
+                    <td class="bold">Delivery:</td>
+                    <td>15-20 days after deposit</td>
+                </tr>
+                <tr>
+                    <td class="bold">Packaging:</td>
+                    <td>Standard export packaging</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

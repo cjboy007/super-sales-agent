@@ -124,7 +124,7 @@ IMAP_HOST=imaphz.qiye.163.com
 IMAP_PORT=993
 SMTP_HOST=smtphz.qiye.163.com
 SMTP_PORT=465
-EMAIL=your-email@farreach-electronic.com
+EMAIL=your-email
 PASSWORD=your_password
 ```
 

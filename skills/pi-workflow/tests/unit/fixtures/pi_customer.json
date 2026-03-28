@@ -1,0 +1,26 @@
+{
+  "customer": {
+    "company_name": "Test Customer Ltd",
+    "contact": "John Doe",
+    "email": "john@testcustomer.com",
+    "phone": "+1-555-123-4567",
+    "address": "123 Business St, City, Country",
+    "country": "United States"
+  },
+  "products": [
+    {
+      "description": "HDMI Cable",
+      "specification": "2m",
+      "quantity": 100,
+      "unit_price": 5.0
+    }
+  ],
+  "pi": {
+    "pi_no": "PI-20260328-001",
+    "date": "2026-03-28",
+    "valid_until": "2026-04-27"
+  },
+  "terms": {
+    "payment": "T/T 30% deposit, 70% before shipment"
+  }
+}

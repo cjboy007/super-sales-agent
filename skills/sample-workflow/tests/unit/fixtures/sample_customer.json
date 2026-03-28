@@ -1,0 +1,32 @@
+{
+  "customer": {
+    "company_name": "Test Customer Inc",
+    "contact": "Mike Chen",
+    "email": "mike@testcustomer.com",
+    "phone": "+1-408-555-1234",
+    "address": "456 Tech Drive, San Jose, CA",
+    "country": "United States"
+  },
+  "products": [
+    {
+      "description": "HDMI Sample",
+      "specification": "1m",
+      "quantity": 5,
+      "unit_price": 0.0
+    }
+  ],
+  "sample": {
+    "sample_no": "SPL-20260328-001",
+    "date": "2026-03-28",
+    "purpose": "Testing"
+  },
+  "shipping_address": {
+    "company_name": "Test Customer Inc",
+    "contact": "Mike Chen",
+    "address": "456 Tech Drive, San Jose, CA"
+  },
+  "shipping": {
+    "method": "DHL",
+    "freight_collect": true
+  }
+}
