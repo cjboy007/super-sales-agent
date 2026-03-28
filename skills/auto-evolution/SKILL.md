@@ -6,7 +6,7 @@ description: "Multi-agent auto-evolution system — orchestrate review-execute-a
 # auto-evolution
 
 **Category:** Agent Orchestration / Meta-Skill
-**Version:** 0.6.0
+**Version:** 0.7.0
 
 ---
 
@@ -96,7 +96,24 @@ openclaw cron add --agent <any-agent> \
   --message "Run: node skills/auto-evolution/scripts/monitor.js"
 ```
 
-### 5. Environment variables (optional)
+### 5. Configure models (optional)
+
+Edit `evolution/config/models.json` to customize which models are used for each role:
+
+```json
+{
+  "roles": {
+    "reviewer": "google/gemini-3.1-pro",
+    "executor": "aiberm/gpt-5.4",
+    "auditor": "google/gemini-3.1-pro",
+    "coordinator": "bailian/qwen3.5-plus"
+  }
+}
+```
+
+**Default:** Scripts read from this config file. No environment variables needed.
+
+### 6. Environment variables (optional)
 
 ```bash
 export OPENCLAW_WORKSPACE=/path/to/workspace
