@@ -199,11 +199,15 @@ async function buildMailOptions(options) {
 
   // Append quoted text if present
   if (quotedText) {
+    // Always append to text version (for proper plain text quoting)
     if (mailOptions.text) {
       mailOptions.text += quotedText;
     }
+    // For HTML, use properly formatted block
     if (mailOptions.html) {
-      mailOptions.html += `<br><br><div style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 20px; color: #666; font-size: 13px;">${quotedText.replace(/\n/g, '<br>').replace(/─/g, '<span style="color: #999;">─</span>')}</div>`;
+      // Strip HTML tags from quoted text for clean display
+      const plainQuoted = quotedText.replace(/<[^>]*>/g, '');
+      mailOptions.html += `<br><br><div style="border-left: 2px solid #ccc; padding-left: 15px; margin-top: 20px; color: #666; font-size: 13px;"><p style="margin: 0 0 10px 0; font-weight: bold; color: #999;">────────────────────────────────</p><p style="margin: 0; white-space: pre-wrap;">${plainQuoted}</p></div>`;
     }
   }
 
@@ -300,11 +304,15 @@ async function sendEmail(options) {
 }
 
 function renderSignature(sigData) {
+  // Replace placeholder [Your Name] with actual sender name
+  const senderName = process.env.SMTP_SENDER_NAME || 'Simon Lee';
+  const nameValue = sigData.name_field === '[Your Name]' ? senderName : sigData.name_field;
+  
   return `
 <br>
 <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333;">
   <p style="margin: 0;">${sigData.greeting}</p>
-  <p style="margin: 5px 0;"><strong>${sigData.name_field}</strong><br>
+  <p style="margin: 5px 0;"><strong>${nameValue}</strong><br>
   ${sigData.title}<br>
   ${sigData.company}</p>
   <p style="margin: 5px 0; font-size: 12px; color: #666;">
@@ -578,6 +586,8 @@ async function prepareSendOptions(options) {
   if (options.attach) {
     const attachFiles = options.attach.split(',').map(f => f.trim()).filter(Boolean);
     options.attachments = attachFiles.map(f => readAttachment(f));
+    console.log(`📎 已添加 ${options.attachments.length} 个附件:`);
+    options.attachments.forEach(att => console.log(`   - ${att.filename}`));
   }
 
   if (options.signature) {
