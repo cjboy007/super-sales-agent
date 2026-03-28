@@ -410,12 +410,10 @@ def main():
             try:
                 subprocess.run([
                     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-                    '--headless',
+                    '--headless=new',
                     '--disable-gpu',
                     f'--print-to-pdf={pdf_output}',
-                    '--print-to-pdf-no-header',
-                    '--print-to-pdf-no-footer',
-                    '--print-to-pdf-no-background',
+                    '--no-pdf-header-footer',
                     '--paper-width=8.27',
                     '--paper-height=11.69',
                     f'file://{output}'
