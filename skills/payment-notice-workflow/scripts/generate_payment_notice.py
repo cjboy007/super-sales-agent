@@ -30,8 +30,8 @@ def generate_payment_notice_html(output_path, data):
     # 公司信息（Farreach）
     company_name = data.get('company_name', 'FARREACH ELECTRONIC CO LIMITED')
     company_address = data.get('company_address', 'No. 6, Chuangye Road East, Shuanglinpian, Liangang Industrial Zone, Zhuhai, China')
-    company_phone = data.get('company_phone', '86-756-8699660')
-    company_fax = data.get('company_fax', '86-756-8699663')
+    company_phone = data.get('company_phone', 'YOUR-PHONE')
+    company_fax = data.get('company_fax', 'YOUR-FAX')
     company_website = data.get('company_website', 'www.farreach-cable.com')
     company_email = data.get('company_email', 'your-email')
     

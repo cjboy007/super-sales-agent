@@ -49,9 +49,9 @@
 |---------|------|---------|---------|
 | TC-BANK-001 | 单一账户 | 正确加载 | 5 字段完整 |
 | TC-BANK-002 | 受益人名称 | 正确显示 | FARREACH ELECTRONIC |
-| TC-BANK-003 | SWIFT 代码 | 正确显示 | HSBCHKHHHKH |
+| TC-BANK-003 | SWIFT 代码 | 正确显示 | YOUR-SWIFT-CODE |
 | TC-BANK-004 | 银行地址 | 完整显示 | 无截断 |
-| TC-BANK-005 | 账户号码 | 正确显示 | 411-758097-838 |
+| TC-BANK-005 | 账户号码 | 正确显示 | YOUR-ACCOUNT-NUMBER |
 
 ### 1.4 金额计算测试
 

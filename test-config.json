@@ -5,7 +5,7 @@
     "total_skills": 24,
     "batch_size": 2,
     "timeout_per_skill_minutes": 15,
-    "test_email": "cjboy0756@gmail.com",
+    "test_email": "your-email@gmail.com",
     "discord_channel": "#🧪-hq-指挥中心",
     "okki_isolation": "create_test_customers_with_[TEST]_tag",
     "use_production_data": true,

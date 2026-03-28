@@ -2,8 +2,8 @@
   "primary": {
     "beneficiary": "FARREACH ELECTRONIC CO LIMITED",
     "bank_name": "HSBC Hong Kong",
-    "account_no": "411-758097-838",
-    "swift_code": "HSBCHKHHHKH",
+    "account_no": "YOUR-ACCOUNT-NUMBER",
+    "swift_code": "YOUR-SWIFT-CODE",
     "bank_address": "No.1 Queen's Road Central,Central, Hong Kong",
     "active": true
   }
