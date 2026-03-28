@@ -3,8 +3,8 @@
  * 
  * 功能:
  * 1. matchCustomer(email) - 域名匹配（含公共域黑名单）+ 向量搜索回退
- * 2. createEmailTrail(companyId, emailData) - 创建邮件类型跟进记录（trail_type=102）
- * 3. createQuotationTrail(companyId, quotationData) - 创建报价单类型跟进记录（trail_type=101）
+ * 2. createEmailTrail(companyId, emailData) - 创建邮件类型跟进记录（remark_type=102）
+ * 3. createQuotationTrail(companyId, quotationData) - 创建报价单类型跟进记录（remark_type=101）
  * 4. 去重检查：以邮件 UID 为 key，维护 /tmp/okki-sync-processed.json
  * 5. 匹配失败时写入 /tmp/okki-unmatched-emails.log
  */
