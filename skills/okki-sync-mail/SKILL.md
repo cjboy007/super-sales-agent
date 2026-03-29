@@ -301,6 +301,11 @@ node scripts/smtp.js send --to <email> --subject <text> [options]
 - `--reply-to <UID>`: Reply to email by UID (auto-fetch and quote original email, adds In-Reply-To header)
 - `--quote <text|@file>`: Append quoted text to email (use @filepath to read from file)
 - `--cc <email>`: Override auto-CC (by default, --reply-to enables "Reply All")
+- `--plain-text`: Force plain text mode (strips HTML tags, converts HTML body to plain text)
+- `--inline <json>`: Inline images with CID references. Format: `'[{"cid":"abc123","path":"/path/to/image.png"}]'`
+
+**⚠️ Parameter Conflict:**
+- `--plain-text` and `--inline` **cannot be used together**. Plain text mode does not support inline images.
 
 **Scheduled sending (定时发送):**
 - Pending jobs are stored in `scheduled/` under this skill directory
@@ -372,6 +377,21 @@ node scripts/smtp.js send --to customer@example.com --subject "Re: Inquiry" --re
 
 # Dry-run mode - preview without sending (recommended before sending to customers)
 node scripts/smtp.js send --to customer@example.com --subject "Product Inquiry" --body "Test email" --dry-run
+
+# Plain text mode - force plain text (strips HTML tags)
+node scripts/smtp.js send --to customer@example.com --subject "Simple Text" --body "<p>Hello</p>" --plain-text
+
+# Plain text mode - convert HTML file to plain text
+node scripts/smtp.js send --to customer@example.com --subject "Newsletter" --body-file content.html --plain-text
+
+# Inline images - embed images with CID references (HTML emails only)
+node scripts/smtp.js send --to customer@example.com --subject "Logo" --html --body '<p><img src="cid:logo123"></p>' --inline '[{"cid":"logo123","path":"./logo.png"}]'
+
+# Inline images - multiple images
+node scripts/smtp.js send --to customer@example.com --subject "Product Images" --html --body '<img src="cid:img1"><img src="cid:img2">' --inline '[{"cid":"img1","path":"./product1.png"},{"cid":"img2","path":"./product2.png"}]'
+
+# ⚠️ Invalid: Cannot use --plain-text with --inline (will throw error)
+# node scripts/smtp.js send --to customer@example.com --subject "Test" --body "Text" --plain-text --inline '[{"cid":"x","path":"x.png"}]'
 ```
 
 ---
@@ -407,7 +427,7 @@ node scripts/smtp.js send \
 # 📧 [DRY RUN] Email preview (not sent):
 # To: customer@example.com
 # Subject: Product Inquiry
-# From: sale-9@farreach-electronic.com
+# From: your-email@example.com
 # Body: Dear Customer, ...
 # Signature: en-sales (applied)
 # Attachments: (none)
@@ -573,7 +593,7 @@ node scripts/smtp.js show-signature en-sales
   "company": "Farreach Electronic Co., Limited",
   "address_cn": "No. 56, Xingwang Road, Pingshan Town, Jinwan District, Zhuhai, Guangdong, China",
   "address_vn": "Van Lam Industrial Park, Yen My District, Hung Yen Province, Vietnam",
-  "email": "sale-9@farreach-electronic.com",
+  "email": "your-email@example.com",
   "phone": "+86 (756) 8699660",
   "website": "www.farreach-cable.com",
   "tagline": "18 Years | HDMI Certified | ISO9001 | China + Vietnam Dual Base"
@@ -735,7 +755,7 @@ Farreach Electronic Co., Limited
 
 Add: No. 56, Xingwang Road, Pingshan Town, Jinwan District, Zhuhai, Guangdong, China
 Add: Van Lam Industrial Park, Yen My District, Hung Yen Province, Vietnam
-Email: sale-9@farreach-electronic.com
+Email: your-email@example.com
 Tel: +86 (756) 8699660
 Website: www.farreach-cable.com
 
@@ -753,7 +773,7 @@ Website: www.farreach-cable.com
 
 地址：中国广东省珠海市金湾区平沙镇星旺路 56 号 1、3、4 楼
 地址：越南兴安省文林工业区
-邮箱：sale-9@farreach-electronic.com
+邮箱：your-email@example.com
 电话：+86 (756) 8699660
 网站：www.farreach-cable.com
 

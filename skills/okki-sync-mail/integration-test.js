@@ -274,7 +274,7 @@ async function main() {
       {
         uid: 'test-1',
         from: 'customer@example.com',
-        to: 'sale-9@farreach-electronic.com',
+        to: 'your-email@example.com',
         subject: 'Inquiry: HDMI Cable 2.1 - 4K 120Hz',
         body: 'Hi,\n\nWe are interested in your HDMI 2.1 cables. Can you send us a quote for 500 units?\n\nBest regards,\nJohn',
         receivedAt: new Date().toISOString(),
@@ -283,7 +283,7 @@ async function main() {
       {
         uid: 'test-2',
         from: 'tech@client.com',
-        to: 'sale-9@farreach-electronic.com',
+        to: 'your-email@example.com',
         subject: 'Technical Question: DP 1.4 Compatibility',
         body: 'Hello,\n\nDoes your DP 1.4 cable support 8K resolution at 60Hz?\n\nThanks,\nSarah',
         receivedAt: new Date().toISOString(),

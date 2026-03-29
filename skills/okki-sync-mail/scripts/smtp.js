@@ -186,7 +186,7 @@ async function buildMailOptions(options) {
     subject: options.subject || '(no subject)',
     text: options.text || undefined,
     html: options.html || undefined,
-    attachments: options.attachments || [],
+    attachments: [],
     headers: {
       'In-Reply-To': inReplyTo || undefined,
       'References': references || undefined,
@@ -221,6 +221,16 @@ async function buildMailOptions(options) {
     } else {
       mailOptions.html = options.signatureHtml;
     }
+  }
+
+  // Add inline attachments (CID images)
+  if (options.inlineAttachments && options.inlineAttachments.length > 0) {
+    mailOptions.attachments.push(...options.inlineAttachments);
+  }
+
+  // Add regular attachments
+  if (options.attachments && options.attachments.length > 0) {
+    mailOptions.attachments.push(...options.attachments);
   }
 
   return mailOptions;
@@ -276,10 +286,23 @@ async function sendEmail(options) {
   if (mailOptions.html) {
     console.error('Body (html):', mailOptions.html.substring(0, 500) + (mailOptions.html.length > 500 ? '...' : ''));
   }
-  if (mailOptions.attachments && mailOptions.attachments.length > 0) {
+  
+  // Separate inline and regular attachments
+  const inlineAttachments = (mailOptions.attachments || []).filter(att => att.cid);
+  const regularAttachments = (mailOptions.attachments || []).filter(att => !att.cid);
+  
+  if (inlineAttachments.length > 0) {
+    console.error('───────────────────────────────────────────────────────────');
+    console.error('Inline Images (CID):');
+    inlineAttachments.forEach((att, i) => {
+      console.error(`  ${i + 1}. CID: ${att.cid}, File: ${att.filename || att.path}`);
+    });
+  }
+  
+  if (regularAttachments.length > 0) {
     console.error('───────────────────────────────────────────────────────────');
     console.error('Attachments:');
-    mailOptions.attachments.forEach((att, i) => {
+    regularAttachments.forEach((att, i) => {
       console.error(`  ${i + 1}. ${att.filename || att.path}`);
     });
   }
@@ -554,6 +577,11 @@ async function prepareSendOptions(options) {
     throw new Error('Missing required option: --subject <text> or --subject-file <file>');
   }
 
+  // Parameter mutual exclusion check: --plain-text and --inline cannot be used together
+  if (options['plain-text'] && options.inline) {
+    throw new Error('Parameter conflict: --plain-text and --inline cannot be used together. Plain text mode does not support inline images.');
+  }
+
   if (options['subject-file']) {
     validateReadPath(options['subject-file']);
     options.subject = fs.readFileSync(options['subject-file'], 'utf8').trim();
@@ -580,6 +608,45 @@ async function prepareSendOptions(options) {
     } else {
       options.text = options.body;
       delete options.html;
+    }
+  }
+
+  // --plain-text: Force plain text mode (remove HTML even if provided)
+  if (options['plain-text']) {
+    if (options.html && !options.text) {
+      // Convert HTML to plain text by stripping tags
+      options.text = options.html.replace(/<[^>]*>/g, '');
+      delete options.html;
+      console.log('📝 Plain text mode: HTML content converted to plain text');
+    } else if (options.text) {
+      // Ensure HTML is removed
+      delete options.html;
+      console.log('📝 Plain text mode enabled');
+    }
+  }
+
+  // --inline: Inline images (CID references)
+  // Format: --inline '[{"cid":"abc123","path":"/path/to/image.png"}]'
+  if (options.inline) {
+    try {
+      const inlineItems = JSON.parse(options.inline);
+      if (!Array.isArray(inlineItems)) {
+        throw new Error('--inline must be a JSON array of {cid, path} objects');
+      }
+      
+      options.inlineAttachments = inlineItems.map(item => {
+        if (!item.cid || !item.path) {
+          throw new Error('Each inline item must have "cid" and "path" properties');
+        }
+        const attachment = readAttachment(item.path);
+        attachment.cid = item.cid;
+        return attachment;
+      });
+      
+      console.log(`🖼️  Added ${options.inlineAttachments.length} inline image(s)`);
+      options.inlineAttachments.forEach(att => console.log(`   - CID: ${att.cid}, File: ${att.filename}`));
+    } catch (e) {
+      throw new Error(`Invalid --inline format: ${e.message}. Expected JSON array: '[{"cid":"abc123","path":"/path/to/image.png"}]'`);
     }
   }
 
@@ -850,12 +917,15 @@ async function main() {
         console.error('  send                    --to <email> --subject <text> --body <text> [--signature <name>] [--html] [--attach <file>]');
         console.error('  send                    --to <email> --subject <text> --body-file <file> [--signature <name>] [--html-file <file>] [--attach <file>]');
         console.error('  send                    --to <email> --subject <text> --body <text> --send-at "YYYY-MM-DD HH:mm"');
+        console.error('  send                    --to <email> --subject <text> --body <text> --plain-text (force plain text mode)');
+        console.error('  send                    --to <email> --subject <text> --body <text> --inline \'[{"cid":"abc123","path":"/img.png"}]\'');
         console.error('  send-due                Send all pending scheduled emails that are due');
         console.error('  list-scheduled          List scheduled email jobs');
         console.error('  test                    Test SMTP connection');
         console.error('  list-signatures         列出所有可用签名模板');
         console.error('  show-signature <name>   显示指定签名的详细内容');
         console.error('  interactive             Interactive mode - guided email sending wizard');
+        console.error('\nNote: --plain-text and --inline cannot be used together.');
         process.exit(1);
     }
 

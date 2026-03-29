@@ -66,7 +66,7 @@ npm install
 # IMAP 配置（接收邮件）
 IMAP_HOST=imaphz.qiye.163.com
 IMAP_PORT=993
-IMAP_USER=sale-9@farreach-electronic.com
+IMAP_USER=your-email@example.com
 IMAP_PASS=<授权码>
 IMAP_TLS=true
 
@@ -74,7 +74,7 @@ IMAP_TLS=true
 SMTP_HOST=smtphz.qiye.163.com
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=sale-9@farreach-electronic.com
+SMTP_USER=your-email@example.com
 SMTP_PASS=<授权码>
 
 # OKKI 配置
@@ -298,7 +298,7 @@ okki-sync-mail/
       "Add: No. 56, Xingwang Road, Pingshan Town, Jinwan District, Zhuhai, Guangdong, China",
       "Add: Van Lam Industrial Park, Yen My District, Hung Yen Province, Vietnam"
     ],
-    "email": "sale-9@farreach-electronic.com",
+    "email": "your-email@example.com",
     "tel": "+86 (756) 8699660",
     "website": "www.farreach-cable.com",
     "tagline": "18 Years | HDMI Certified | ISO9001 | China + Vietnam Dual Base"
