@@ -502,7 +502,7 @@ async function runTest() {
     'john@example.com',
     'sales@farreach-electronic.com',
     'invalid-email',
-    'test@gmail.com'
+    'test-email@your-domain.com'
   ];
   testEmails.forEach(email => {
     const domain = extractDomain(email);

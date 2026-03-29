@@ -75,7 +75,7 @@ If you have any questions, please don't hesitate to contact us.
 
 Best regards,
 Farreach Electronic Co., Ltd
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim(),
       zh: (order) => `
 尊敬的 ${order.customer_name}：
@@ -99,7 +99,7 @@ ${order.product_list.map(p => `  - ${p.name} (SKU: ${p.sku}): ${p.quantity} 件 
 此致
 敬礼
 远达电子有限公司
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim()
     }
   },
@@ -129,7 +129,7 @@ Thank you for your patience and trust in Farreach Electronic.
 
 Best regards,
 Farreach Electronic Co., Ltd
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim(),
       zh: (order) => `
 尊敬的 ${order.customer_name}：
@@ -152,7 +152,7 @@ ${order.product_list.map(p => `  - ${p.name} (SKU: ${p.sku}): ${p.quantity} 件`
 此致
 敬礼
 远达电子有限公司
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim()
     }
   },
@@ -190,7 +190,7 @@ Thank you for choosing Farreach Electronic!
 
 Best regards,
 Farreach Electronic Co., Ltd
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim(),
       zh: (order) => `
 尊敬的 ${order.customer_name}：
@@ -221,7 +221,7 @@ ${order.shipping_address ? [
 此致
 敬礼
 远达电子有限公司
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim()
     }
   },
@@ -249,7 +249,7 @@ We look forward to serving you again!
 
 Best regards,
 Farreach Electronic Co., Ltd
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim(),
       zh: (order) => `
 尊敬的 ${order.customer_name}：
@@ -270,7 +270,7 @@ sale-9@farreach-electronic.com
 此致
 敬礼
 远达电子有限公司
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim()
     }
   },
@@ -296,7 +296,7 @@ We apologize for any inconvenience caused.
 
 Best regards,
 Farreach Electronic Co., Ltd
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim(),
       zh: (order) => `
 尊敬的 ${order.customer_name}：
@@ -315,7 +315,7 @@ sale-9@farreach-electronic.com
 此致
 敬礼
 远达电子有限公司
-sale-9@farreach-electronic.com
+your-email@your-domain.com
       `.trim()
     }
   }
