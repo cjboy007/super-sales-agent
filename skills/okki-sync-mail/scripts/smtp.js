@@ -16,7 +16,7 @@ const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const { recordSentEmail, getStatus } = require('./send-log');
 const { fetchEmail } = require('./imap');
-const { validateReadPath } = require('./path-utils');
+const { checkEnvConfiguration, validateReadPath } = require('./path-utils');
 const { sanitizeQuotedContent } = require('../lib/sanitize');
 const { buildReplyAllRecipients, parseAndValidate } = require('../lib/email-parser');
 
@@ -862,6 +862,9 @@ async function sendDueScheduledEmails() {
 }
 
 async function prepareSendOptions(options) {
+  // Step 0: Check .env configuration
+  checkEnvConfiguration();
+  
   if (!options.to) {
     throw new Error('Missing required option: --to <email>');
   }
@@ -1481,6 +1484,24 @@ function registerCommands() {
       try {
         const { deleteDraft } = require('./drafts');
         const result = deleteDraft(draftId);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
+      }
+    });
+
+  // Draft inspect command
+  program
+    .command('draft-inspect <draftId>')
+    .description('🔍 Inspect draft (returns current state for pre-edit check)')
+    .action((draftId) => {
+      try {
+        const { inspectDraft } = require('./drafts');
+        if (!draftId) {
+          console.error('Usage: draft-inspect <draft-id>');
+          process.exit(1);
+        }
+        const result = inspectDraft(draftId);
         console.log(JSON.stringify(result, null, 2));
       } catch (err) {
         handleError(err);
