@@ -9,11 +9,15 @@
     "search": "node scripts/imap.js search"
   },
   "dependencies": {
+    "address-rfc2822": "^2.2.3",
+    "commander": "^14.0.3",
     "dotenv": "^16.6.1",
     "imap": "^0.8.19",
     "imap-simple": "^5.1.0",
     "mailparser": "^3.9.3",
-    "nodemailer": "^7.0.13"
+    "nodemailer": "^7.0.13",
+    "prompts": "^2.4.2",
+    "sanitize-html": "^2.17.2"
   },
   "keywords": [
     "imap",
