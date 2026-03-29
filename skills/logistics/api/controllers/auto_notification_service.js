@@ -14,7 +14,7 @@ const EMAIL_CONFIG = {
   enabled: true,
   smtpHost: 'smtphz.qiye.163.com',
   smtpPort: 465,
-  from: 'sale-9@farreach-electronic.com'
+  from: 'your-email@your-domain.com'
 };
 
 /**
