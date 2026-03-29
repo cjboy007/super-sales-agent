@@ -1,0 +1,67 @@
+{
+  "task_id": 4,
+  "title": "Email Skill P1 - 邮件规则/过滤器",
+  "description": "实现邮件自动分类规则，根据发件人/主题/内容自动标记优先级和分类（询价/广告/通知等）",
+  "status": "reviewing",
+  "priority": "P1",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T10:25:58.939Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/auto-capture.js",
+    "/Users/wilson/.openclaw/workspace/skills/email-smart-reply/intent-recognition.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/imap.js"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "设计邮件规则配置格式",
+      "description": "创建 rules.json 配置文件，支持 from/subject/contains 条件和 action（标记优先级/分类/移动到文件夹）"
+    },
+    {
+      "id": 1,
+      "title": "实现规则引擎",
+      "description": "创建 rule-engine.js，解析规则配置并匹配邮件"
+    },
+    {
+      "id": 2,
+      "title": "集成到 auto-capture.js",
+      "description": "在捕获邮件时应用规则，保存分类结果到邮件归档文件"
+    },
+    {
+      "id": 3,
+      "title": "添加规则管理 CLI",
+      "description": "添加 list-rules/test-rule 命令"
+    },
+    {
+      "id": 4,
+      "title": "创建默认规则集",
+      "description": "预设 Farreach 业务规则（询价→高优先级/广告→低优先级等）"
+    },
+    {
+      "id": 5,
+      "title": "更新文档",
+      "description": "在 SKILL.md 中添加邮件规则说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "设计邮件规则配置格式",
+      "status": "success",
+      "completed_at": "2026-03-28T18:20:00+08:00",
+      "summary": "创建 rules.json 配置文件，包含 6 条规则（询价/投诉/技术支持/广告/订单/物流），支持 from/subject/contains 条件和 set_priority/set_category 动作。JSON 格式验证通过。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "实现规则引擎",
+      "status": "success",
+      "completed_at": "2026-03-28T18:23:00+08:00",
+      "summary": "创建 rule-engine.js，实现 loadRules/matchCondition/testRule/matchRules/clearCache/testMode 6 个核心函数，支持规则缓存（5 分钟 TTL）、条件匹配（from/subject/contains）、优先级排序。4/4 测试用例通过。"
+    }
+  ],
+  "current_subtask": 2,
+  "result": null
+}

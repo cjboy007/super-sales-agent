@@ -1,0 +1,76 @@
+{
+  "task_id": 3,
+  "title": "Email Skill P1 - 签名模板管理",
+  "description": "实现签名模板功能，支持预定义英文/中文/不同职位的签名模板，发送时可快速调用",
+  "status": "pending",
+  "priority": "P1",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T17:15:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/SKILL.md",
+    "/Users/wilson/obsidian-vault/Farreach 知识库/05-模板工具/邮件模板.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "创建签名模板目录和示例文件",
+      "description": "创建 signatures/ 目录，包含 signature-en-sales.json, signature-cn-sales.json 等模板"
+    },
+    {
+      "id": 1,
+      "title": "实现 --signature 参数",
+      "description": "在 smtp.js 中添加 --signature <name> 参数，自动加载对应签名模板并追加到邮件末尾"
+    },
+    {
+      "id": 2,
+      "title": "实现签名模板 CLI 管理命令",
+      "description": "添加 list-signatures/show-signature 命令，方便查看和管理签名模板"
+    },
+    {
+      "id": 3,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加签名模板使用说明和示例"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "创建签名模板目录和示例文件",
+      "status": "success",
+      "completed_at": "2026-03-28T17:43:00+08:00",
+      "summary": "创建 signatures/ 目录和 3 个签名模板（signature-en-sales.json, signature-cn-sales.json, signature-en-tech.json），JSON 格式验证通过，内容符合 Farreach 标准签名规范。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "实现 --signature 参数",
+      "status": "success",
+      "completed_at": "2026-03-28T18:03:00+08:00",
+      "summary": "smtp.js 添加 renderSignature() 函数渲染 HTML 签名，在 main()'send' case 中加载签名模板，在 sendEmail() 中追加签名到邮件末尾，更新帮助信息。验证测试全部通过。"
+    },
+    {
+      "subtask_index": 2,
+      "subtask": "实现签名模板 CLI 管理命令",
+      "status": "success",
+      "completed_at": "2026-03-28T18:06:00+08:00",
+      "summary": "添加 list-signatures 命令（列出 3 个签名模板）和 show-signature <name> 命令（显示签名详情），更新帮助信息。语法检查和功能测试全部通过。"
+    },
+    {
+      "subtask_index": 3,
+      "subtask": "更新 SKILL.md 文档",
+      "status": "success",
+      "completed_at": "2026-03-28T18:09:00+08:00",
+      "summary": "SKILL.md 第 203 行添加「邮件签名模板」章节，包含功能介绍、3 个可用模板列表、--signature 参数用法、CLI 管理命令说明、模板文件结构、完整发送示例。验证测试通过。"
+    }
+  ],
+  "current_subtask": 4,
+  "result": {
+    "summary": "签名模板管理功能完成：✅ 创建 3 个签名模板（en-sales/cn-sales/en-tech），✅ 实现 --signature 参数（自动加载并追加签名到邮件），✅ 实现 CLI 管理命令（list-signatures/show-signature），✅ 更新 SKILL.md 文档。支持多语言、多角色签名，快速统一邮件签名格式。",
+    "completed_at": "2026-03-28T18:09:00+08:00"
+  },
+  "status": "completed",
+  "updated_at": "2026-03-28T18:09:00+08:00"
+}

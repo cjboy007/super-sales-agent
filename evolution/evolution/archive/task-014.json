@@ -1,0 +1,255 @@
+{
+  "task_id": "task-014",
+  "phase": 4,
+  "priority": "urgent",
+  "status": "packaged",
+  "goal": "🧪 E2E 集成测试：询盘处理全链路验证",
+  "created_at": "2026-03-25T08:02:00+08:00",
+  "updated_at": "2026-03-25T02:31:59.153004Z",
+  "current_iteration": 8,
+  "max_iterations": 10,
+  "assigned_to": "iron",
+  "context": {
+    "background": "所有 16 个业务模块已开发完成，需要进行端到端集成测试。第一个测试场景：客户询盘处理全链路（收到询价邮件→意图识别→知识库检索→价格计算→生成报价单→生成回复草稿→Discord 审核→发送邮件→同步 OKKI→触发跟进）。每个 subtask 测试一个模块或一组模块的连接点。",
+    "constraints": [
+      "使用真实邮箱 your-email@example.com 的现有邮件测试",
+      "OKKI 操作使用 dry-run 模式（不写入真实数据）",
+      "Discord 审核推送到 #⚙️-phase3-skills 频道",
+      "每个测试步骤记录结果到 /Users/wilson/.openclaw/workspace/evolution/test-results/",
+      "失败的步骤要记录错误信息和修复建议",
+      "所有脚本路径基于 /Users/wilson/.openclaw/workspace/skills/"
+    ],
+    "depends_on": [
+      "follow-up-engine (soft)"
+    ],
+    "reference_files": [
+      "/Users/wilson/.openclaw/workspace/evolution/INTEGRATION_PLAN.md",
+      "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/SKILL.md",
+      "/Users/wilson/.openclaw/workspace/skills/email-smart-reply/SKILL.md",
+      "/Users/wilson/.openclaw/workspace/skills/pricing-engine/SKILL.md",
+      "/Users/wilson/.openclaw/workspace/skills/quotation-workflow/SKILL.md"
+    ],
+    "subtasks": [
+      "1. 基础设施验证：运行 `node scripts/imap.js check --limit 3` 验证 IMAP 连接，运行 `node okki-sync.js test` 验证 OKKI 连接，检查知识库目录完整性。将结果写入 /Users/wilson/.openclaw/workspace/evolution/test-results/step-01-infra.json",
+      "2. 邮件智能回复链路测试：取最近一封未读询价邮件（若无未读邮件，使用最近一封已读邮件的 UID 作为 fallback），依次调用 intent-recognition.js（意图识别）→ kb-retrieval.js（知识库检索）→ reply-generation.js（回复生成），验证每一步输出格式正确。结果写入 test-results/step-02-smart-reply.json",
+      "3. 价格计算引擎测试：调用 pricing-engine.js 计算 HDMI 2.1 线缆报价（数量 500/1000/5000），验证数量阶梯折扣、底价红线、利润率计算。调用 exchange-rate.js 验证汇率获取。结果写入 test-results/step-03-pricing.json",
+      "4. 报价单生成测试：用 Step 3 的价格数据生成完整报价单（HTML+PDF），验证客户名、价格、条款正确填充。结果写入 test-results/step-04-quotation.json",
+      "5. 跟进引擎 + 客户分层测试：调用 /Users/wilson/.openclaw/workspace/skills/follow-up-engine/scripts/follow-up-scheduler.js（dry-run 模式：--dry-run 参数）验证跟进规则触发，调用 scoring-engine.js（--sample 模式）验证客户评分和分层。结果写入 test-results/step-05-followup.json",
+      "6. 订单 + 物流 + 样品模块测试：创建测试订单（order-tracker），模拟物流跟踪（logistics-tracker），创建样品申请（sample-manager），验证各模块数据存储和状态流转。结果写入 test-results/step-06-order-logistics.json",
+      "7. 销售仪表盘 + 审批引擎测试：调用 data-collector.js 采集数据，生成周报（report-generator.js），测试审批引擎 smoke-test。结果写入 test-results/step-07-dashboard-approval.json",
+      "8. 全链路串联测试：模拟完整业务流程（邮件→意图→检索→报价→回复→审批引擎 smoke-test→OKKI 同步），记录每一步的输入输出和耗时，生成最终测试报告 test-results/e2e-report.md"
+    ]
+  },
+  "review": {
+    "verdict": "complete",
+    "reviewed_at": "2026-03-25T02:23:51.899Z",
+    "reviewed_by": "WILSON",
+    "feedback": "Task-014 E2E 集成测试全部通过。7/7 步骤 PASS，总耗时 38396ms，覆盖完整业务链路：IMAP 邮件获取 → 意图识别(inquiry 95%) → 知识库检索(LanceDB+Obsidian 4条) → 报价计算(HDMI-2.1 $4.17/pcs) → 回复生成(dry-run) → 审批引擎(3/3 smoke-test) → OKKI 同步(4项通过)。所有模块采用 library import 调用，已编写统一 e2e-runner.js 脚本。测试基础设施稳健，可作为回归测试基线。"
+  },
+  "result": {
+    "iteration": 8,
+    "completed_at": "2026-03-25T02:23:03.672Z",
+    "subtask_completed": 8,
+    "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-08-e2e-chain.json",
+    "summary": "E2E 全链路测试 7/7 步骤全部 PASS（通过率 100%），总耗时 38396ms。链路：邮件获取(IMAP)→意图识别(LLM, inquiry 95%)→知识库检索(LanceDB+Obsidian, 4条结果)→报价计算(HDMI-2.1 $4.17/pcs)→回复生成(dry-run, draft DRAFT-20260325022201-I)→审批引擎(3/3 smoke-test)→OKKI同步(4项测试通过)。所有模块均为 library import 方式调用（intent/kb/reply/approval 无 CLI 入口），已编写统一 e2e-runner.js 测试脚本。",
+    "acceptance_criteria_met": [
+      "step-08-e2e-chain.json 存在且包含 7 个步骤记录（>=5）",
+      "每个步骤记录包含 step_name/status/duration_ms/input_summary/output_summary 字段",
+      "e2e-report.md 存在且包含标题、测试时间、环境信息、步骤总览表格、每步详情、总通过率",
+      "全链路通过率 100%（7/7 PASS，>=70% 要求）",
+      "总耗时 38396ms，每步耗时均为正整数",
+      "回复生成步骤使用 dry-run 模式，未实际发送邮件"
+    ]
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-25T08:02:00+08:00",
+      "action": "task_created",
+      "agent": "WILSON",
+      "model": "bailian/qwen3.5-plus",
+      "notes": "Phase 4 E2E 集成测试任务。由 Jaden 指示启动。"
+    },
+    {
+      "timestamp": "2026-03-25T08:11:00+08:00",
+      "action": "iteration_0_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/anthropic/claude-sonnet-4.6",
+      "verdict": "approve (after revision)",
+      "notes": "任务设计审阅通过（修订后）。修正 subtask 5 路径（follow-up-engine）、补充 dry-run 参数、subtask 2 fallback、subtask 8 approval-engine 节点。批准执行 Subtask 1：基础设施验证。"
+    },
+    {
+      "timestamp": "2026-03-25T00:16:48.544Z",
+      "action": "iteration_1_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 1,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-01-infra.json",
+      "notes": "基础设施验证全部通过: IMAP连接成功(163企业邮箱), OKKI CLI正常(客户查询+向量搜索+去重), 知识库目录完整(含公司介绍/产品目录/认证资质等核心文档)"
+    },
+    {
+      "timestamp": "2026-03-25T00:17:44.627Z",
+      "action": "iteration_2_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "基础设施验证（Step 1）已成功通过，IMAP 连接、OKKI CLI 及知识库完整性均无问题。"
+    },
+    {
+      "timestamp": "2026-03-25T01:09:02.537Z",
+      "action": "iteration_2_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 2,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-02-smart-reply.json",
+      "notes": "partial_pass | 邮件智能回复链路测试：3 个模块均可执行，但存在 2 个 blocking issues。(1) imap.js check 命令返回空结果（bug），通过直接 IMAP 连接 workaround 获取到 UID 1735972787。(2) intent-recognition.js LLM 分类 401 失败（.env 缺少 OPENROUTER_API_KEY），降级到关键词匹配（置信度 0.2）。(3) kb-retrieval.js 正常，返回 4 条结果。(4) reply-generation.js 正确拒绝低置信度请求（needs_manual=true）。链路功能逻辑正确，但需修复 imap.js bug 和配置 API Key 才能完整通过。"
+    },
+    {
+      "timestamp": "2026-03-25T09:12:00+08:00",
+      "action": "iteration_2_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/anthropic/claude-sonnet-4.6",
+      "verdict": "revise",
+      "notes": "Step 2 partial_pass。两个阻塞问题：BUG-001（imap.js check 空结果）+ CONFIG-001（OPENROUTER_API_KEY 缺失导致 LLM 401）。需修复后重跑 Step 2。"
+    },
+    {
+      "timestamp": "2026-03-25T01:26:01.198Z",
+      "action": "iteration_2_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 2,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-02-smart-reply.json",
+      "notes": "Step 2 全链路测试 PASS。修复 2 个阻塞问题后全部验收标准通过：(1) BUG-001: imap.js check 超时挂起，原因是对 1911 封邮件全量 fetch，修复 searchMessages 增加 maxResults 限制；(2) CONFIG-001: 添加 OPENROUTER_API_KEY + 修正 model ID (claude-sonnet-4-20250514 → claude-sonnet-4)。LLM 意图识别 confidence=0.95，reply-generation 成功输出含 subject/body 的草稿。"
+    },
+    {
+      "timestamp": "2026-03-25T09:33:00+08:00",
+      "action": "iteration_2_fix_reviewed",
+      "agent": "WILSON",
+      "model": "bailian/qwen3.5-plus",
+      "verdict": "approve",
+      "notes": "Step 2 修复后全部通过。BUG-001 + CONFIG-001 已修复，5 子步骤全 PASS。批准进入 Step 3：价格计算引擎测试。"
+    },
+    {
+      "timestamp": "2026-03-25T01:40:23.413Z",
+      "action": "iteration_3_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 3,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-03-pricing.json",
+      "notes": "PASS - 价格计算引擎全部 5 项测试通过：(1) pricing-engine.js 正确计算 HDMI-2.1-8K-2M 在 500/1000/5000 数量梯度的报价（$5.2373/$5.0753/$4.8593），折扣分别为 3%/6%/10%；(2) 阶梯折扣正确递增应用；(3) 底价红线双重检查（绝对值+百分比≥5%）生效，正常场景不误触发；(4) exchange-rate.js 汇率获取成功（DRY_RUN模式，USD/CNY=7.25, USD/EUR=0.92）；(5) 结果已写入 step-03-pricing.json。无需修复。"
+    },
+    {
+      "timestamp": "2026-03-25T01:41:58.837Z",
+      "action": "iteration_4_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 3 价格计算引擎测试全部通过，5 项验证均正确：阶梯折扣递增（3%/6%/10%）、底价红线双重检查（绝对值+百分比≥5%）、汇率获取（DRY_RUN 模式）。数据质量可靠，可直接用于 Step 4 报价单生成。"
+    },
+    {
+      "timestamp": "2026-03-25T01:44:57.944Z",
+      "action": "iteration_4_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 4,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-04-quotation.json",
+      "notes": "PASS - 报价单生成全链路测试通过。HTML(14.2KB) + PDF(274.8KB) 均成功生成。客户名(E2E Test Corp)、3个数量梯度价格(500/$5.24, 1000/$5.08, 5000/$4.86)均与step-03-pricing数据一致。付款条款/交期/有效期等商务条款正确填充。无需修复。"
+    },
+    {
+      "timestamp": "2026-03-25T01:48:01.425Z",
+      "action": "iteration_5_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 4 报价单生成测试完全通过。HTML(14.2KB) + PDF(274.8KB) 均正确生成，客户名/价格/商务条款全部与 step-03 数据一致。可以继续 Step 5。\n\n预验证结果：\n- follow-up-scheduler.js --dry-run 正常运行：扫描 3 客户，识别 3 个跟进任务（new_inquiry/quoted/sample_sent），dry-run 模式正确未生成实际草稿\n- scoring-engine.js --sample 正常运行：6 个样本客户评分完成，分层 VIP(1)/active(1)/dormant(3)/lost(1)，四维评分（金额/频次/活跃度/互动）逻辑正确"
+    },
+    {
+      "timestamp": "2026-03-25T01:54:15.644Z",
+      "action": "iteration_5_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 5,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-05-followup.json",
+      "notes": "PASS - 跟进引擎和客户分层两个模块全部通过。follow-up-scheduler --dry-run 正确返回 success=true/dry_run=true，扫描 3 个客户覆盖 3 种跟进阶段（new_inquiry/quoted/sample_sent）。scoring-engine --sample 对 6 个客户完成四维评分，分层覆盖 4 个层级（VIP/active/dormant/lost），总分与层级映射全部正确。无需修复。"
+    },
+    {
+      "timestamp": "2026-03-25T01:55:22.426Z",
+      "action": "iteration_6_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 5 跟进引擎 + 客户分层测试全部通过，follow-up-scheduler --dry-run 和 scoring-engine --sample 两条链路均验证成功，覆盖了多种跟进阶段和客户层级，无修复项。批准进入 Step 6。"
+    },
+    {
+      "timestamp": "2026-03-25T02:02:20.543Z",
+      "action": "iteration_6_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 6,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-06-order-logistics.json",
+      "notes": "E2E Step 06 PASS. order-tracker(7 tests pass): 创建测试订单、3次状态流转(pending_production→in_production→ready_to_ship→shipped)均成功，数据持久化验证通过。logistics-tracker(8 tests pass): 创建运单、3次状态流转(pending_shipment→in_transit→customs_clearance→in_transit)、事件追加和去重、持久化验证通过。sample-manager(9 tests pass): 创建样品申请(applied)、4次状态流转(→pending_approval→approved→preparing→shipped)、数据持久化验证通过。所有测试数据已清理。"
+    },
+    {
+      "timestamp": "2026-03-25T02:03:24.848Z",
+      "action": "iteration_7_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "{\n  \"verdict\": \"approve\",\n  \"feedback\": \"Step 06 全部通过，order-tracker(7 tests)、logistics-tracker(8 tests)、sample-manager(9 tests) 三个模块共 24 个测试点均 PASS，状态流转和持久化验证完整，测试数据已清理。质量优秀，继续推进 Step 7。\",\n  \"next_instructions\": {\n    \"summary\": \"第 7 轮迭代：销售仪表盘 + 审批引擎测试\",\n    \"current_step\": 7,\n    \"total_steps\": 8,\n    \"step\": {\n      \"step\": 7,\n      \"action\": \"7. 销售仪表盘 + 审批引擎测试：调用 data-collector.js 采集数据，生成周报（report-generator.js），测试审批引擎 smoke-test。结果写入 test-results/step-07-dashboard-approval.json\",\n      \"detail\": \"分三部分执行：\\n\\n**Part A: 数据采集器测试**\\n1. 定位 data-collector.js 脚本（预期路径：/Users/wilson/.openclaw/workspace/skills/sales-dashboard/scripts/data-collector.js 或类似）\\n2. 如脚本存在，执行 `node data-collector.js --dry-run` 或 `node data-collector.js --sample`\\n3. 验证输出包含：采集时间戳、数据来源列表、采集条目数量\\n4. 如脚本不存在，记录 SKIP 并注明原因\\n\\n**Part B: 周报生成器测试**\\n1. 定位 report-generator.js（预期路径：/Users/wilson/.openclaw/workspace/skills/sales-dashboard/scripts/report-generator.js 或类似）\\n2. 如存在，执行 `node report-generator.js --dry-run --period weekly`\\n3. 验证输出包含：报告标题、时间范围、关键指标（邮件数/询盘数/报价数）、生成状态\\n4. 如脚本不存在，记录 SKIP 并注明原因\\n\\n**Part C: 审批引擎 Smoke Test**\\n1. 定位审批引擎脚本（预期路径：/Users/wilson/.openclaw/workspace/skills/approval-engine/scripts/ 或 /Users/wilson/.openclaw/workspace/skills/sales-dashboard/scripts/approval-engine.js）\\n2. 如存在，执行 smoke-test：创建测试审批请求（type=quotation, amount=5000）→ 验证状态为 pending → 模拟审批通过 → 验证状态变为 approved\\n3. 如有 --dry-run 或 --test 模式优先使用\\n4. 如脚本不存在，记录 SKIP 并注明原因\\n\\n**结果汇总**\\n将三部分结果写入 /Users/wilson/.openclaw/workspace/evolution/test-results/step-07-dashboard-approval.json，格式：\\n```json\\n{\\n  \\\"step\\\": 7,\\n  \\\"name\\\": \\\"sales-dashboard-approval-engine\\\",\\n  \\\"timestamp\\\": \\\"ISO时间\\\",\\n  \\\"parts\\\": {\\n    \\\"data_collector\\\": { \\\"status\\\": \\\"pass/skip/fail\\\", \\\"details\\\": \\\"...\\\" },\\n    \\\"report_generator\\\": { \\\"status\\\": \\\"pass/skip/fail\\\", \\\"details\\\": \\\"...\\\" },\\n    \\\"approval_engine\\\": { \\\"status\\\": \\\"pass/skip/fail\\\", \\\"details\\\": \\\"...\\\" }\\n  },\\n  \\\"overall\\\": \\\"pass/partial/fail\\\",\\n  \\\"notes\\\": \\\"汇总说明\\\"\\n}\\n```\\n注意：模块如果尚未实现（SKIP），不算 FAIL，整体可为 partial。清理所有测试数据。\"\n    },\n    \"acceptance_criteria\": [\n      \"data-collector.js 能正常执行或明确记录 SKIP 原因\",\n      \"report-generator.js 能生成周报或明确记录 SKIP 原因\",\n      \"审批引擎 smoke-test 通过（创建→审批流转）或明确记录 SKIP 原因\",\n      \"step-07-dashboard-approval.json 结果文件格式正确，包含三部分状态\",\n      \"所有测试数据已清理，无残留\",\n      \"overall 状态准确反映实际情况（全通过=pass，部分跳过=partial，有失败=fail）\"\n    ]\n  }\n}"
+    },
+    {
+      "timestamp": "2026-03-25T02:14:01.833Z",
+      "action": "iteration_7_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 7,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-07-dashboard-approval.json",
+      "notes": "E2E Step 07 PASS. 三个模块全部通过：data-collector(PASS) 成功连接 OKKI 采集周度数据(2 数据源, 11 KPIs, 1 告警)；report-generator(PASS) dry-run 生成完整 Markdown 周报(含标题/时间范围/核心指标/漏斗/建议)；approval-engine(PASS) smoke-test 5/5 通过(创建审批→验证pending→审批通过→统计→清理)。无需修复，所有测试数据已清理。"
+    },
+    {
+      "timestamp": "2026-03-25T02:15:03.248Z",
+      "action": "iteration_8_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 7 全部通过：data-collector 成功采集 OKKI 周度数据(2 数据源, 11 KPIs, 1 告警)，report-generator dry-run 生成完整 Markdown 周报，approval-engine smoke-test 5/5 全部通过。测试数据已清理，无遗留问题。进入最后一步 Step 8 全链路串联测试。"
+    },
+    {
+      "timestamp": "2026-03-25T02:23:03.672Z",
+      "action": "iteration_8_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "subtask": 8,
+      "result": "success",
+      "output_file": "/Users/wilson/.openclaw/workspace/evolution/test-results/step-08-e2e-chain.json",
+      "notes": "E2E 全链路测试 7/7 步骤全部 PASS（通过率 100%），总耗时 38396ms。链路：邮件获取(IMAP)→意图识别(LLM, inquiry 95%)→知识库检索(LanceDB+Obsidian, 4条结果)→报价计算(HDMI-2.1 $4.17/pcs)→回复生成(dry-run, draft DRAFT-20260325022201-I)→审批引擎(3/3 smoke-test)→OKKI同步(4项测试通过)。所有模块均为 library import 方式调用（intent/kb/reply/approval 无 CLI 入口），已编写统一 e2e-runner.js 测试脚本。"
+    },
+    {
+      "timestamp": "2026-03-25T02:23:51.899Z",
+      "action": "iteration_8_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "complete",
+      "notes": "Task-014 E2E 集成测试全部通过。7/7 步骤 PASS，总耗时 38396ms，覆盖完整业务链路：IMAP 邮件获取 → 意图识别(inquiry 95%) → 知识库检索(LanceDB+Obsidian 4条) → 报价计算(HDMI-2.1 $4.17/pcs) → 回复生成(dry-run) → 审批引擎(3/3 smoke-test) → OKKI 同步(4项通过)。所有模块采用 library import 调用，已编写统一 e2e-runner.js 脚本。测试基础设施稳健，可作为回归测试基线。"
+    },
+    {
+      "timestamp": "2026-03-25T02:31:59.153004Z",
+      "action": "packaged",
+      "agent": "WILSON",
+      "model": "manual",
+      "notes": "E2E test task archived (no skill dir needed). 7/7 steps PASS, 100% pass rate."
+    }
+  ],
+  "packaged": {
+    "packaged_at": "2026-03-25T02:31:59.153004Z",
+    "packaged_by": "WILSON (manual - E2E test task, no skill dir)",
+    "note": "E2E integration test completed successfully (7/7 PASS). No skill directory to package - test results at evolution/test-results/step-08-e2e-chain.json"
+  }
+}

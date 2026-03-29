@@ -1,0 +1,81 @@
+{
+  "task_id": 17,
+  "title": "OKKI Sync Mail P0 - 转发功能",
+  "description": "实现 forward 命令，支持转发邮件",
+  "status": "blocked",
+  "priority": "P0",
+  "created_at": "2026-03-29T08:30:00+08:00",
+  "updated_at": "2026-03-29T02:35:34.715Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-forward.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 forward 命令",
+      "description": "node scripts/smtp.js forward --message-id <UID> --to \"third@example.com\" --body \"转发说明\""
+    },
+    {
+      "id": 1,
+      "title": "实现原邮件内容引用",
+      "description": "自动引用原邮件正文（默认草稿模式）"
+    },
+    {
+      "id": 2,
+      "title": "实现附件转发选项",
+      "description": "支持 --forward-attachments 参数转发原邮件附件"
+    },
+    {
+      "id": 3,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加转发功能使用说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 forward 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T08:46:00+08:00",
+      "summary": "审阅完成 (verdict: approve)。forward 命令已完整实现：复用 fetchEmail/downloadAttachments 模块（无重复代码），仅使用已有依赖 nodemailer，自动构建标准转发头（From/Date/Subject/To），支持附件转发（--forward-attachments），支持 dry-run 预览，记录发送日志并追踪投递状态，自动清理临时附件文件。建议后续增强：添加 --draft 草稿模式、--confirm-send 确认参数、HTML 转发支持，以完全对齐 lark-mail 安全规则。"
+    },
+    {
+      "timestamp": "2026-03-29T01:21:15.528Z",
+      "action": "review_completed",
+      "verdict": "approve",
+      "confidence": 0.95,
+      "feedback": "Subtask-0 已完成。forward 命令实现完整：复用 fetchEmail/downloadAttachments 模块（无重复代码），仅使用已有依赖 nodemailer，自动构建标准转发头（From/Date/Subject/To），支持附件转发（--forward-attachments），支持 dry-run 预览，记录发送日志并追踪投递状态，自动清理临时附件文件。可以进入 subtask-1（原邮件内容引用）。"
+    },
+    {
+      "timestamp": "2026-03-29T02:35:34.715Z",
+      "action": "execution_completed",
+      "status": "failed",
+      "error": "Command failed: 继续 subtask-1：实现原邮件内容引用。检查 forward.js 是否已自动引用原邮件正文。如未实现，需要在转发邮件正文中拼接原邮件内容（包括原发件人、日期、正文）。参考 lark-mail-forward.md 设计。验证：node scripts/smtp.js forward --message-id <UID> --to \"third@example.com\" --body \"转发说明\" --dry-run\n/bin/sh: UID: No such file or directory\n",
+      "files_modified": []
+    }
+  ],
+  "current_subtask": 1,
+  "result": null,
+  "review": {
+    "verdict": "approve",
+    "confidence": 0.95,
+    "feedback": "Subtask-0 已完成。forward 命令实现完整：复用 fetchEmail/downloadAttachments 模块（无重复代码），仅使用已有依赖 nodemailer，自动构建标准转发头（From/Date/Subject/To），支持附件转发（--forward-attachments），支持 dry-run 预览，记录发送日志并追踪投递状态，自动清理临时附件文件。可以进入 subtask-1（原邮件内容引用）。",
+    "next_instructions": "继续 subtask-1：实现原邮件内容引用。检查 forward.js 是否已自动引用原邮件正文。如未实现，需要在转发邮件正文中拼接原邮件内容（包括原发件人、日期、正文）。参考 lark-mail-forward.md 设计。验证：node scripts/smtp.js forward --message-id <UID> --to \"third@example.com\" --body \"转发说明\" --dry-run",
+    "acceptance_criteria": [
+      "forward 命令可成功执行（dry-run 模式）",
+      "转发邮件包含标准转发头（From/Date/Subject/To）",
+      "附件转发选项 --forward-attachments 可用",
+      "发送日志记录完整",
+      "临时文件自动清理"
+    ],
+    "risk_flags": [],
+    "technical_review": "技术选型正确：复用现有模块（fetchEmail/downloadAttachments/send-log），无新增依赖。代码质量良好（273 行，结构清晰，注释完整）。安全机制完备（dry-run 预览、发送日志、投递状态追踪）。建议后续增强：--draft 草稿模式、--confirm-send 确认参数，以完全对齐 lark-mail 安全规则。"
+  },
+  "blocked_at": "2026-03-29T02:35:34.715Z",
+  "blocked_reason": "Command failed: 继续 subtask-1：实现原邮件内容引用。检查 forward.js 是否已自动引用原邮件正文。如未实现，需要在转发邮件正文中拼接原邮件内容（包括原发件人、日期、正文）。参考 lark-mail-forward.md 设计。验证：node scripts/smtp.js forward --message-id <UID> --to \"third@example.com\" --body \"转发说明\" --dry-run\n/bin/sh: UID: No such file or directory\n"
+}

@@ -1,0 +1,46 @@
+{
+  "task_id": 22,
+  "title": "OKKI Sync Mail P1 - draft-edit 结构化 patch 支持",
+  "description": "引入结构化 patch，支持 set_body / set_reply_body / inspect / attachment ops，对齐 lark-mail 的 draft-edit 能力",
+  "status": "pending",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-draft-edit.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现结构化 patch 格式",
+      "description": "支持 ops 数组格式：[{op: 'set_body', value: '...'}, {op: 'set_reply_body', value: '...'}]"
+    },
+    {
+      "id": 1,
+      "title": "实现 set_body / set_reply_body 操作",
+      "description": "set_body 用于普通草稿，set_reply_body 用于回复/转发草稿（保留引用区）"
+    },
+    {
+      "id": 2,
+      "title": "实现 inspect 操作",
+      "description": "返回草稿当前状态，用于编辑前检查"
+    },
+    {
+      "id": 3,
+      "title": "实现 attachment 操作",
+      "description": "支持 add_attachment / remove_attachment 操作"
+    },
+    {
+      "id": 4,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加结构化 patch 使用说明和示例"
+    }
+  ],
+  "history": [],
+  "result": null
+}

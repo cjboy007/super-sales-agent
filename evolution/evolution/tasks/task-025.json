@@ -1,0 +1,46 @@
+{
+  "task_id": 25,
+  "title": "OKKI Sync Mail P1 - HTML sanitizer 实现",
+  "description": "引入 HTML sanitizer，防止 prompt injection 和 XSS 攻击",
+  "status": "pending",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/forward.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "安装 sanitize-html 库",
+      "description": "npm install sanitize-html"
+    },
+    {
+      "id": 1,
+      "title": "实现 HTML sanitizer 函数",
+      "description": "创建 lib/sanitize.js，过滤危险标签和属性"
+    },
+    {
+      "id": 2,
+      "title": "在 reply/forward 中应用 sanitizer",
+      "description": "引用原邮件内容时使用 sanitizer 处理"
+    },
+    {
+      "id": 3,
+      "title": "实现危险 scheme 过滤",
+      "description": "过滤 javascript:、data: 等危险协议"
+    },
+    {
+      "id": 4,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加安全说明"
+    }
+  ],
+  "history": [],
+  "result": null
+}

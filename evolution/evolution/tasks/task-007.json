@@ -1,0 +1,87 @@
+{
+  "task_id": 7,
+  "title": "Email Skill P2 - 定时发送 + 交互式模式",
+  "description": "实现邮件定时发送和交互式 CLI 模式，提升用户体验",
+  "status": "pending",
+  "priority": "P2",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T17:15:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/SKILL.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现定时发送功能",
+      "description": "添加 --send-at \"YYYY-MM-DD HH:mm\" 参数，使用 setTimeout 或 cron 调度"
+    },
+    {
+      "id": 1,
+      "title": "创建定时任务管理",
+      "description": "创建 scheduled/ 目录，管理待发送的定时邮件"
+    },
+    {
+      "id": 2,
+      "title": "实现交互式模式",
+      "description": "添加 interactive 命令，提供向导式邮件编写体验"
+    },
+    {
+      "id": 3,
+      "title": "添加邮件预览功能",
+      "description": "check 命令增加 --preview 参数，显示正文前 100 字"
+    },
+    {
+      "id": 4,
+      "title": "更新文档",
+      "description": "在 SKILL.md 中添加定时发送和交互式模式说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现定时发送功能",
+      "status": "success",
+      "completed_at": "2026-03-28T19:47:00+08:00",
+      "summary": "定时发送功能已在 smtp.js 中完整实现（第 234-321 行），支持 --send-at 参数、scheduleEmail() 函数（setTimeout 调度）、scheduled/ 目录持久化、send-due 命令（处理到期邮件）、list-scheduled 命令（查看待发送队列）。验证通过。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "创建定时任务管理",
+      "status": "success",
+      "completed_at": "2026-03-28T19:47:00+08:00",
+      "summary": "scheduled/ 目录已存在且正常工作，list-scheduled 命令可列出待发送/已发送的定时邮件。验证通过。"
+    },
+    {
+      "subtask_index": 2,
+      "subtask": "实现交互式模式",
+      "status": "success",
+      "completed_at": "2026-03-28T19:51:00+08:00",
+      "summary": "安装 prompts 依赖，添加 interactiveMode() 函数（8 步向导：收件人→抄送→主题→内容类型→正文→附件→签名→确认发送），在 main() 中添加 interactive case，更新帮助信息。语法检查通过，功能测试通过。"
+    },
+    {
+      "subtask_index": 3,
+      "subtask": "添加邮件预览功能",
+      "status": "success",
+      "completed_at": "2026-03-28T19:55:00+08:00",
+      "summary": "修改 checkEmails() 签名（添加 showPreview 参数），修改 fetchOptions（条件化获取正文），添加 preview 字段（限制 100 字符，去除 HTML），修改 check 命令参数传递。验证通过（输出包含 preview 字段）。"
+    },
+    {
+      "subtask_index": 4,
+      "subtask": "更新文档",
+      "status": "success",
+      "completed_at": "2026-03-28T19:59:00+08:00",
+      "summary": "SKILL.md 已更新：添加定时发送说明（--send-at 参数、list-scheduled/send-due 命令、示例，行 297-356），添加交互式模式独立章节（行 376-463，包含工作流程和高级用法），增强 --dry-run 预览功能说明。验证通过（grep 确认内容存在）。"
+    }
+  ],
+  "current_subtask": 5,
+  "result": {
+    "summary": "定时发送 + 交互式模式功能完成：✅ 定时发送功能（--send-at 参数、scheduled/ 目录持久化、send-due/list-scheduled 命令），✅ 交互式模式（interactive 命令，8 步向导），✅ 邮件预览功能（check --preview 显示正文前 100 字），✅ 文档更新（SKILL.md 添加完整说明和示例）。提升用户体验，支持灵活邮件发送。",
+    "completed_at": "2026-03-28T19:59:00+08:00"
+  },
+  "status": "completed",
+  "updated_at": "2026-03-28T19:59:00+08:00"
+}

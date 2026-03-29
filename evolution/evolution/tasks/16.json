@@ -1,0 +1,79 @@
+{
+  "task_id": 16,
+  "title": "OKKI Sync Mail P0 - 纯文本强制模式",
+  "description": "实现 --plain-text 参数，强制纯文本模式",
+  "status": "blocked",
+  "priority": "P0",
+  "created_at": "2026-03-29T08:30:00+08:00",
+  "updated_at": "2026-03-29T02:35:34.657Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-send.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 --plain-text 参数",
+      "description": "强制纯文本模式，忽略 HTML 自动检测"
+    },
+    {
+      "id": 1,
+      "title": "添加参数互斥检查",
+      "description": "--plain-text 与 --inline 不能同时使用"
+    },
+    {
+      "id": 2,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加纯文本模式使用说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 --plain-text 参数",
+      "status": "success",
+      "completed_at": "2026-03-29T08:41:00+08:00",
+      "summary": "审阅完成 (verdict: revise)。--plain-text 参数已声明（帮助文档第 136 行，示例第 158 行，互斥检查第 1110 行），但核心实现逻辑缺失。在 prepareSendOptions 函数中，当用户传递 --plain-text 时：不会删除 options.html，不会阻止 --html 标志生效，HTML 内容仍会被发送。需要在 signature 处理之后添加逻辑：如果 options['plain-text'] 为真，删除 options.html 并将 options.body 赋值给 options.text。"
+    },
+    {
+      "timestamp": "2026-03-29T01:20:47.333Z",
+      "action": "review_completed",
+      "verdict": "revise",
+      "confidence": 0.95,
+      "feedback": "Subtask-0 尚未完成。--plain-text 参数已声明（帮助文档第 136 行、示例第 158 行、互斥检查第 1110 行），但核心实现逻辑缺失。在 prepareSendOptions 函数中，当用户传递 --plain-text 时：不会删除 options.html，不会阻止 --html 标志生效，HTML 内容仍会被发送。需要在 signature 处理之后添加纯文本强制逻辑。"
+    },
+    {
+      "timestamp": "2026-03-29T02:35:34.657Z",
+      "action": "execution_completed",
+      "status": "failed",
+      "error": "Command failed: 在 smtp.js 的 prepareSendOptions 函数中添加 --plain-text 核心逻辑（signature 处理之后，约行 1145 后）：\n\nif (options['plain-text']) {\n  if (options.html) {\n    console.log('⚠️  --plain-text specified, HTML content will be converted to plain text');\n    delete options.html;\n  }\n  if (options.body && !options.text) {\n    options.text = options.body;\n  }\n  console.log('📝 强制纯文本模式已启用');\n}\n\n验证：\ncd /Users/wilson/.openclaw/workspace/skills/imap-smtp-email\nnode scripts/smtp.js send --to \"test@example.com\" --subject \"Test\" --body \"Plain text\" --plain-text --dry-run\nnode scripts/smtp.js send --to \"test@example.com\" --subject \"Test\" --html --body \"<b>HTML</b>\" --plain-text --dry-run\n/bin/sh: 在: command not found\n/bin/sh: -c: line 2: syntax error near unexpected token `{'\n/bin/sh: -c: line 2: `if (options['plain-text']) {'\n",
+      "files_modified": []
+    }
+  ],
+  "current_subtask": 1,
+  "result": null,
+  "review": {
+    "verdict": "revise",
+    "confidence": 0.95,
+    "feedback": "Subtask-0 尚未完成。--plain-text 参数已声明（帮助文档第 136 行、示例第 158 行、互斥检查第 1110 行），但核心实现逻辑缺失。在 prepareSendOptions 函数中，当用户传递 --plain-text 时：不会删除 options.html，不会阻止 --html 标志生效，HTML 内容仍会被发送。需要在 signature 处理之后添加纯文本强制逻辑。",
+    "next_instructions": "在 smtp.js 的 prepareSendOptions 函数中添加 --plain-text 核心逻辑（signature 处理之后，约行 1145 后）：\n\nif (options['plain-text']) {\n  if (options.html) {\n    console.log('⚠️  --plain-text specified, HTML content will be converted to plain text');\n    delete options.html;\n  }\n  if (options.body && !options.text) {\n    options.text = options.body;\n  }\n  console.log('📝 强制纯文本模式已启用');\n}\n\n验证：\ncd /Users/wilson/.openclaw/workspace/skills/imap-smtp-email\nnode scripts/smtp.js send --to \"test@example.com\" --subject \"Test\" --body \"Plain text\" --plain-text --dry-run\nnode scripts/smtp.js send --to \"test@example.com\" --subject \"Test\" --html --body \"<b>HTML</b>\" --plain-text --dry-run",
+    "acceptance_criteria": [
+      "--plain-text 参数强制删除 options.html",
+      "--plain-text 参数将 options.body 赋值给 options.text",
+      "同时使用 --html 和 --plain-text 时，纯文本模式优先",
+      "dry-run 输出显示纯文本模式已启用",
+      "与 --inline 互斥检查正常工作（第 1110 行）"
+    ],
+    "risk_flags": [
+      "向后兼容：已有脚本使用 --plain-text 不应报错",
+      "与 --inline 互斥：已在第 1110 行检查，无需重复"
+    ],
+    "technical_review": "技术选型正确：nodemailer 支持 text（纯文本）和 html（HTML）两种格式。--plain-text 参数强制使用 text 格式，忽略 HTML。实现简单（约 6 行代码），风险低。修改后支持完整功能：用户可强制发送纯文本邮件，适用于只支持纯文本的邮件系统或合规要求。"
+  },
+  "blocked_at": "2026-03-29T02:35:34.657Z",
+  "blocked_reason": "Command failed: 在 smtp.js 的 prepareSendOptions 函数中添加 --plain-text 核心逻辑（signature 处理之后，约行 1145 后）：\n\nif (options['plain-text']) {\n  if (options.html) {\n    console.log('⚠️  --plain-text specified, HTML content will be converted to plain text');\n    delete options.html;\n  }\n  if (options.body && !options.text) {\n    options.text = options.body;\n  }\n  console.log('📝 强制纯文本模式已启用');\n}\n\n验证：\ncd /Users/wilson/.openclaw/workspace/skills/imap-smtp-email\nnode scripts/smtp.js send --to \"test@example.com\" --subject \"Test\" --body \"Plain text\" --plain-text --dry-run\nnode scripts/smtp.js send --to \"test@example.com\" --subject \"Test\" --html --body \"<b>HTML</b>\" --plain-text --dry-run\n/bin/sh: 在: command not found\n/bin/sh: -c: line 2: syntax error near unexpected token `{'\n/bin/sh: -c: line 2: `if (options['plain-text']) {'\n"
+}

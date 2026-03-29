@@ -1,0 +1,84 @@
+{
+  "task_id": 15,
+  "title": "OKKI Sync Mail P0 - 内嵌图片支持",
+  "description": "实现 --inline 参数，支持内嵌图片（CID 引用）",
+  "status": "blocked",
+  "priority": "P0",
+  "created_at": "2026-03-29T08:30:00+08:00",
+  "updated_at": "2026-03-29T02:35:34.599Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-send.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 --inline 参数解析",
+      "description": "解析 --inline '[{\"cid\":\"abc123\",\"path\":\"./logo.png\"}]' JSON 数组"
+    },
+    {
+      "id": 1,
+      "title": "实现 CID 引用处理",
+      "description": "在 HTML 正文中识别 <img src=\"cid:...\"> 并关联附件"
+    },
+    {
+      "id": 2,
+      "title": "添加 --plain-text 与 --inline 互斥检查",
+      "description": "--plain-text 和 --inline 不能同时使用"
+    },
+    {
+      "id": 3,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加内嵌图片使用说明和示例"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 --inline 参数解析",
+      "status": "success",
+      "completed_at": "2026-03-29T08:34:00+08:00",
+      "summary": "审阅完成 (verdict: revise)。smtp.js 已完整实现 --inline 参数（行 479-511），支持 JSON 数组格式 CID 引用。但 drafts.js 缺失 inlineImages 字段支持（saveDraft/editDraft/sendDraft 均未处理）。需要补充：1) saveDraft 添加 inlineImages 字段 2) editDraft allowedFields 添加 inlineImages 3) sendDraft 传递 inlineImages 给 nodemailer。"
+    },
+    {
+      "timestamp": "2026-03-29T01:20:36.883Z",
+      "action": "review_completed",
+      "verdict": "revise",
+      "confidence": 0.95,
+      "feedback": "Subtask-0 尚未完成。smtp.js 的 --inline 参数已完整实现（行 1110-1146 解析 JSON、行 629-653 CID 处理、行 1114 互斥检查），但 drafts.js 缺失 inlineImages 支持：1) saveDraft（行 104-145）未保存 inlineImages 字段 2) editDraft（行 414-419）的 allowedFields 未包含 inlineImages 3) sendDraft（行 349-358）未传递 inlineImages 给 mailOptions。必须先修复 drafts.js 才能标记 subtask-0 完成。"
+    },
+    {
+      "timestamp": "2026-03-29T02:35:34.599Z",
+      "action": "execution_completed",
+      "status": "failed",
+      "error": "Command failed: 修复 drafts.js 的 inlineImages 支持（3 处修改）：\n\n1) saveDraft 函数：在 draft 对象中添加 inlineImages: draftData.inlineImages || []\n\n2) editDraft 函数：在 allowedFields 数组中添加 'inlineImages'\n\n3) sendDraft 函数：在 mailOptions 中添加 inlineImages: draft.inlineImages || []\n\n验证：\ncd /Users/wilson/.openclaw/workspace/skills/imap-smtp-email\nnode scripts/smtp.js draft --to \"test@example.com\" --subject \"Test\" --html --body \"<img src=\\\"cid:logo123\\\">\" --inline '[{\"cid\":\"logo123\",\"path\":\"./logo.png\"}]'\nnode scripts/smtp.js list-drafts --json | grep inlineImages\nnode scripts/smtp.js send-draft <DRAFT-ID> --dry-run\n/bin/sh: 修复: command not found\n/bin/sh: -c: line 2: syntax error near unexpected token `)'\n/bin/sh: -c: line 2: `1) saveDraft 函数：在 draft 对象中添加 inlineImages: draftData.inlineImages || []'\n",
+      "files_modified": []
+    }
+  ],
+  "current_subtask": 1,
+  "result": null,
+  "review": {
+    "verdict": "revise",
+    "confidence": 0.95,
+    "feedback": "Subtask-0 尚未完成。smtp.js 的 --inline 参数已完整实现（行 1110-1146 解析 JSON、行 629-653 CID 处理、行 1114 互斥检查），但 drafts.js 缺失 inlineImages 支持：1) saveDraft（行 104-145）未保存 inlineImages 字段 2) editDraft（行 414-419）的 allowedFields 未包含 inlineImages 3) sendDraft（行 349-358）未传递 inlineImages 给 mailOptions。必须先修复 drafts.js 才能标记 subtask-0 完成。",
+    "next_instructions": "修复 drafts.js 的 inlineImages 支持（3 处修改）：\n\n1) saveDraft 函数：在 draft 对象中添加 inlineImages: draftData.inlineImages || []\n\n2) editDraft 函数：在 allowedFields 数组中添加 'inlineImages'\n\n3) sendDraft 函数：在 mailOptions 中添加 inlineImages: draft.inlineImages || []\n\n验证：\ncd /Users/wilson/.openclaw/workspace/skills/imap-smtp-email\nnode scripts/smtp.js draft --to \"test@example.com\" --subject \"Test\" --html --body \"<img src=\\\"cid:logo123\\\">\" --inline '[{\"cid\":\"logo123\",\"path\":\"./logo.png\"}]'\nnode scripts/smtp.js list-drafts --json | grep inlineImages\nnode scripts/smtp.js send-draft <DRAFT-ID> --dry-run",
+    "acceptance_criteria": [
+      "saveDraft 保存 inlineImages 字段到草稿 JSON 文件",
+      "editDraft 的 allowedFields 包含 'inlineImages'",
+      "sendDraft 的 mailOptions 包含 inlineImages 字段",
+      "草稿 JSON 文件包含 inlineImages 数组（可为空）",
+      "旧草稿（无 inlineImages 字段）加载时不报错"
+    ],
+    "risk_flags": [
+      "向后兼容：旧草稿没有 inlineImages 字段，默认值应为 [] 而非 undefined",
+      "文件路径验证：应与 smtp.js 一致，检查图片文件是否存在"
+    ],
+    "technical_review": "技术选型正确：CID (Content-ID) 是标准 MIME 协议方案，nodemailer 原生支持 attachments 数组的 cid 属性。smtp.js 实现完整（JSON 解析、文件验证、CID 匹配、互斥检查）。drafts.js 仅需 3 处小修改（各 1 行），风险低。修改后支持完整工作流：保存带内嵌图片的草稿 → 编辑草稿 → 发送草稿。"
+  },
+  "blocked_at": "2026-03-29T02:35:34.599Z",
+  "blocked_reason": "Command failed: 修复 drafts.js 的 inlineImages 支持（3 处修改）：\n\n1) saveDraft 函数：在 draft 对象中添加 inlineImages: draftData.inlineImages || []\n\n2) editDraft 函数：在 allowedFields 数组中添加 'inlineImages'\n\n3) sendDraft 函数：在 mailOptions 中添加 inlineImages: draft.inlineImages || []\n\n验证：\ncd /Users/wilson/.openclaw/workspace/skills/imap-smtp-email\nnode scripts/smtp.js draft --to \"test@example.com\" --subject \"Test\" --html --body \"<img src=\\\"cid:logo123\\\">\" --inline '[{\"cid\":\"logo123\",\"path\":\"./logo.png\"}]'\nnode scripts/smtp.js list-drafts --json | grep inlineImages\nnode scripts/smtp.js send-draft <DRAFT-ID> --dry-run\n/bin/sh: 修复: command not found\n/bin/sh: -c: line 2: syntax error near unexpected token `)'\n/bin/sh: -c: line 2: `1) saveDraft 函数：在 draft 对象中添加 inlineImages: draftData.inlineImages || []'\n"
+}

@@ -1,0 +1,46 @@
+{
+  "task_id": 26,
+  "title": "OKKI Sync Mail P1 - 写入路径白名单校验",
+  "description": "实现 ALLOWED_WRITE_DIRS 的系统性校验，防止任意文件写入",
+  "status": "pending",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/.env.example"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 validateWritePath 函数",
+      "description": "类似 validateReadPath，校验写入路径是否在白名单内"
+    },
+    {
+      "id": 1,
+      "title": "在 drafts.saveDraft 中应用校验",
+      "description": "保存草稿时校验 drafts/ 目录"
+    },
+    {
+      "id": 2,
+      "title": "在 send-log.recordSentEmail 中应用校验",
+      "description": "记录日志时校验 mail-archive/ 目录"
+    },
+    {
+      "id": 3,
+      "title": "在附件处理中应用校验",
+      "description": "下载/保存附件时校验目录"
+    },
+    {
+      "id": 4,
+      "title": "更新 .env.example",
+      "description": "添加 ALLOWED_WRITE_DIRS 配置说明"
+    }
+  ],
+  "history": [],
+  "result": null
+}

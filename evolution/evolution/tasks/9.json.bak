@@ -1,0 +1,55 @@
+{
+  "task_id": 9,
+  "title": "OKKI Sync Mail P0 - 实现草稿模式",
+  "description": "实现草稿保存和发送功能，默认保存草稿，发送需额外确认",
+  "status": "reviewing",
+  "priority": "P0",
+  "created_at": "2026-03-29T00:20:00+08:00",
+  "updated_at": "2026-03-28T22:31:26.087Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-send.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/IMPROVEMENT-PLAN-LARK-REFERENCE.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "创建 drafts/ 目录结构",
+      "description": "创建 scheduled/ 类似的 drafts/ 目录，用于保存草稿 JSON 文件"
+    },
+    {
+      "id": 1,
+      "title": "实现 draft 命令",
+      "description": "node scripts/smtp.js draft --to ... --subject ... --body ... --save，保存草稿到 drafts/ 目录"
+    },
+    {
+      "id": 2,
+      "title": "实现 send-draft 命令",
+      "description": "node scripts/smtp.js send-draft <draft_id> --confirm-send，发送指定草稿"
+    },
+    {
+      "id": 3,
+      "title": "实现 list-drafts 命令",
+      "description": "列出所有草稿，支持过滤和搜索"
+    },
+    {
+      "id": 4,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加草稿模式使用说明和示例"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "创建 drafts/ 目录结构",
+      "status": "success",
+      "completed_at": "2026-03-29T04:19:00+08:00",
+      "summary": "drafts/目录已存在且功能完整（Mar 29 00:24 创建）。scripts/drafts.js 实现完整草稿管理功能（save/load/list/delete/send），smtp.js 已集成 draft 命令。草稿 ID 格式规范（DRAFT-时间戳 - 类型），支持元数据管理（intent/confidence/requires_human_approval）和发送确认机制（--confirm-send）。与 lark-mail 参考设计一致甚至更优。"
+    }
+  ],
+  "current_subtask": 1,
+  "result": null
+}

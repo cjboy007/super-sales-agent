@@ -1,0 +1,84 @@
+{
+  "task_id": 22,
+  "title": "OKKI Sync Mail P1 - draft-edit 结构化 patch 支持",
+  "description": "引入结构化 patch，支持 set_body / set_reply_body / inspect / attachment ops，对齐 lark-mail 的 draft-edit 能力",
+  "status": "blocked",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T02:35:34.989Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-draft-edit.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现结构化 patch 格式",
+      "description": "支持 ops 数组格式：[{op: 'set_body', value: '...'}, {op: 'set_reply_body', value: '...'}]"
+    },
+    {
+      "id": 1,
+      "title": "实现 set_body / set_reply_body 操作",
+      "description": "set_body 用于普通草稿，set_reply_body 用于回复/转发草稿（保留引用区）"
+    },
+    {
+      "id": 2,
+      "title": "实现 inspect 操作",
+      "description": "返回草稿当前状态，用于编辑前检查"
+    },
+    {
+      "id": 3,
+      "title": "实现 attachment 操作",
+      "description": "支持 add_attachment / remove_attachment 操作"
+    },
+    {
+      "id": 4,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加结构化 patch 使用说明和示例"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-29T02:34:18.856Z",
+      "action": "review_completed",
+      "verdict": "revise",
+      "confidence": 0.9,
+      "feedback": "Task-022 刚刚开始，history 为空，尚未执行任何 subtask。需要先检查 drafts.js 当前 editDraft 函数的实现，了解现有 patch 格式（直接字段覆盖），然后设计结构化 ops 数组格式。"
+    },
+    {
+      "timestamp": "2026-03-29T02:35:34.989Z",
+      "action": "execution_completed",
+      "status": "failed",
+      "error": "Command failed: 第一步：检查当前实现\n\ngrep -n 'editDraft\\|patchFile\\|allowedFields' /Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js\n\n第二步：设计结构化 patch 格式\n\n参考 lark-mail-draft-edit.md，定义 ops 数组格式：\n- { op: 'set_body', value: '...' } - 设置正文\n- { op: 'set_reply_body', value: '...' } - 设置回复正文（保留引用区）\n- { op: 'set_subject', value: '...' } - 设置主题\n- { op: 'add_recipient', field: 'to'|'cc'|'bcc', email: '...' } - 添加收件人\n- { op: 'remove_recipient', field: 'to'|'cc'|'bcc', email: '...' } - 移除收件人\n- { op: 'add_attachment', path: '...', filename: '...' } - 添加附件\n- { op: 'remove_attachment', filename: '...' } - 移除附件\n- { op: 'add_inline', cid: '...', path: '...' } - 添加内嵌图片\n- { op: 'inspect' } - 返回草稿当前状态\n\n第三步：在 drafts.js 中实现 applyPatch 函数\n\nfunction applyPatch(draft, patch) {\n  if (!patch.ops || !Array.isArray(patch.ops)) {\n    throw new Error('Invalid patch format: expected { ops: [...] }');\n  }\n  \n  for (const op of patch.ops) {\n    switch (op.op) {\n      case 'set_body':\n        draft.body = op.value;\n        break;\n      case 'set_reply_body':\n        // Preserve quoted content, replace only user-written part\n        draft.body = replaceReplyBody(draft.body, op.value);\n        break;\n      // ... other ops\n    }\n  }\n  \n  return draft;\n}\n\n第四步：更新 editDraft 函数支持 ops 格式\n\n允许 --patch-file 传入 ops 数组格式，而不仅是直接字段覆盖。\n\n验证：\nnode scripts/smtp.js draft-edit DRAFT-xxx --patch-file ops-patch.json\nnode scripts/smtp.js draft-edit DRAFT-xxx --inspect\n/bin/sh: 第一步：检查当前实现: command not found\n/bin/sh: line 4: 第二步：设计结构化: command not found\n/bin/sh: line 6: 参考: command not found\n/bin/sh: line 7: -: command not found\n/bin/sh: line 8: -: command not found\n/bin/sh: line 9: -: command not found\n/bin/sh: line 10: -: command not found\n/bin/sh: line 10: bcc,: command not found\nclang: error: no input files\n/bin/sh: line 11: -: command not found\n/bin/sh: line 11: bcc,: command not found\nclang: error: no input files\n/bin/sh: line 12: -: command not found\n/bin/sh: line 13: -: command not found\n/bin/sh: line 14: -: command not found\n/bin/sh: line 15: -: command not found\n/bin/sh: line 17: 第三步：在: command not found\n/bin/sh: -c: line 19: syntax error near unexpected token `draft,'\n/bin/sh: -c: line 19: `function applyPatch(draft, patch) {'\n",
+      "files_modified": []
+    }
+  ],
+  "result": null,
+  "review": {
+    "verdict": "revise",
+    "confidence": 0.9,
+    "feedback": "Task-022 刚刚开始，history 为空，尚未执行任何 subtask。需要先检查 drafts.js 当前 editDraft 函数的实现，了解现有 patch 格式（直接字段覆盖），然后设计结构化 ops 数组格式。",
+    "next_instructions": "第一步：检查当前实现\n\ngrep -n 'editDraft\\|patchFile\\|allowedFields' /Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js\n\n第二步：设计结构化 patch 格式\n\n参考 lark-mail-draft-edit.md，定义 ops 数组格式：\n- { op: 'set_body', value: '...' } - 设置正文\n- { op: 'set_reply_body', value: '...' } - 设置回复正文（保留引用区）\n- { op: 'set_subject', value: '...' } - 设置主题\n- { op: 'add_recipient', field: 'to'|'cc'|'bcc', email: '...' } - 添加收件人\n- { op: 'remove_recipient', field: 'to'|'cc'|'bcc', email: '...' } - 移除收件人\n- { op: 'add_attachment', path: '...', filename: '...' } - 添加附件\n- { op: 'remove_attachment', filename: '...' } - 移除附件\n- { op: 'add_inline', cid: '...', path: '...' } - 添加内嵌图片\n- { op: 'inspect' } - 返回草稿当前状态\n\n第三步：在 drafts.js 中实现 applyPatch 函数\n\nfunction applyPatch(draft, patch) {\n  if (!patch.ops || !Array.isArray(patch.ops)) {\n    throw new Error('Invalid patch format: expected { ops: [...] }');\n  }\n  \n  for (const op of patch.ops) {\n    switch (op.op) {\n      case 'set_body':\n        draft.body = op.value;\n        break;\n      case 'set_reply_body':\n        // Preserve quoted content, replace only user-written part\n        draft.body = replaceReplyBody(draft.body, op.value);\n        break;\n      // ... other ops\n    }\n  }\n  \n  return draft;\n}\n\n第四步：更新 editDraft 函数支持 ops 格式\n\n允许 --patch-file 传入 ops 数组格式，而不仅是直接字段覆盖。\n\n验证：\nnode scripts/smtp.js draft-edit DRAFT-xxx --patch-file ops-patch.json\nnode scripts/smtp.js draft-edit DRAFT-xxx --inspect",
+    "acceptance_criteria": [
+      "支持 ops 数组格式：{ ops: [{ op: '...', value: '...' }] }",
+      "实现 set_body 操作",
+      "实现 set_reply_body 操作（保留引用区）",
+      "实现 inspect 操作（返回草稿当前状态）",
+      "实现 add_attachment / remove_attachment 操作",
+      "向后兼容：旧格式 { field: value } 仍可工作",
+      "错误处理：无效 op 类型应报错"
+    ],
+    "risk_flags": [
+      "向后兼容：旧 patch 格式（直接字段覆盖）需继续支持",
+      "引用区保护：set_reply_body 需正确识别引用区边界",
+      "附件路径验证：需检查文件是否存在，防止路径遍历攻击"
+    ],
+    "technical_review": "技术选型正确：结构化 ops 数组格式是行业标准（参考 RFC 6902 JSON Patch），支持细粒度操作和原子性批量更新。lark-mail 使用类似格式。实现复杂度中等：需要解析 ops、按顺序应用、处理错误回滚。建议先实现核心 ops（set_body/set_reply_body/inspect），再扩展附件操作。"
+  },
+  "blocked_at": "2026-03-29T02:35:34.989Z",
+  "blocked_reason": "Command failed: 第一步：检查当前实现\n\ngrep -n 'editDraft\\|patchFile\\|allowedFields' /Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js\n\n第二步：设计结构化 patch 格式\n\n参考 lark-mail-draft-edit.md，定义 ops 数组格式：\n- { op: 'set_body', value: '...' } - 设置正文\n- { op: 'set_reply_body', value: '...' } - 设置回复正文（保留引用区）\n- { op: 'set_subject', value: '...' } - 设置主题\n- { op: 'add_recipient', field: 'to'|'cc'|'bcc', email: '...' } - 添加收件人\n- { op: 'remove_recipient', field: 'to'|'cc'|'bcc', email: '...' } - 移除收件人\n- { op: 'add_attachment', path: '...', filename: '...' } - 添加附件\n- { op: 'remove_attachment', filename: '...' } - 移除附件\n- { op: 'add_inline', cid: '...', path: '...' } - 添加内嵌图片\n- { op: 'inspect' } - 返回草稿当前状态\n\n第三步：在 drafts.js 中实现 applyPatch 函数\n\nfunction applyPatch(draft, patch) {\n  if (!patch.ops || !Array.isArray(patch.ops)) {\n    throw new Error('Invalid patch format: expected { ops: [...] }');\n  }\n  \n  for (const op of patch.ops) {\n    switch (op.op) {\n      case 'set_body':\n        draft.body = op.value;\n        break;\n      case 'set_reply_body':\n        // Preserve quoted content, replace only user-written part\n        draft.body = replaceReplyBody(draft.body, op.value);\n        break;\n      // ... other ops\n    }\n  }\n  \n  return draft;\n}\n\n第四步：更新 editDraft 函数支持 ops 格式\n\n允许 --patch-file 传入 ops 数组格式，而不仅是直接字段覆盖。\n\n验证：\nnode scripts/smtp.js draft-edit DRAFT-xxx --patch-file ops-patch.json\nnode scripts/smtp.js draft-edit DRAFT-xxx --inspect\n/bin/sh: 第一步：检查当前实现: command not found\n/bin/sh: line 4: 第二步：设计结构化: command not found\n/bin/sh: line 6: 参考: command not found\n/bin/sh: line 7: -: command not found\n/bin/sh: line 8: -: command not found\n/bin/sh: line 9: -: command not found\n/bin/sh: line 10: -: command not found\n/bin/sh: line 10: bcc,: command not found\nclang: error: no input files\n/bin/sh: line 11: -: command not found\n/bin/sh: line 11: bcc,: command not found\nclang: error: no input files\n/bin/sh: line 12: -: command not found\n/bin/sh: line 13: -: command not found\n/bin/sh: line 14: -: command not found\n/bin/sh: line 15: -: command not found\n/bin/sh: line 17: 第三步：在: command not found\n/bin/sh: -c: line 19: syntax error near unexpected token `draft,'\n/bin/sh: -c: line 19: `function applyPatch(draft, patch) {'\n"
+}

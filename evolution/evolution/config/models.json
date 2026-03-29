@@ -1,0 +1,10 @@
+{
+  "roles": {
+    "reviewer": "google/gemini-3.1-pro",
+    "executor": "aiberm/gpt-5.4",
+    "auditor": "google/gemini-3.1-pro",
+    "coordinator": "bailian/qwen3.5-plus"
+  },
+  "description": "Model configuration for Auto Evolution system. Use role names (reviewer/executor/auditor/coordinator) in scripts and docs, not hardcoded model IDs.",
+  "lastUpdated": "2026-03-28T18:10:00+08:00"
+}

@@ -1,0 +1,45 @@
+{
+  "task_id": 6,
+  "title": "Email Skill P2 - 连接池优化",
+  "description": "实现 IMAP/SMTP 连接池，复用连接提升批量操作性能",
+  "status": "reviewing",
+  "priority": "P2",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T10:25:59.049Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/imap.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "设计连接池架构",
+      "description": "创建 connection-pool.js，支持 acquire/release/healthCheck"
+    },
+    {
+      "id": 1,
+      "title": "重构 imap.js 使用连接池",
+      "description": "修改 connect() 函数从连接池获取连接"
+    },
+    {
+      "id": 2,
+      "title": "重构 smtp.js 使用连接池",
+      "description": "修改 createTransporter() 复用连接"
+    },
+    {
+      "id": 3,
+      "title": "添加连接池监控",
+      "description": "添加 pool-stats 命令查看连接状态"
+    },
+    {
+      "id": 4,
+      "title": "性能测试",
+      "description": "对比优化前后的批量操作性能"
+    }
+  ],
+  "history": [],
+  "result": null
+}

@@ -1,0 +1,76 @@
+{
+  "task_id": 8,
+  "title": "OKKI Sync Mail P0 - 添加安全规则文档",
+  "description": "在 SKILL.md 顶部添加安全规则警告，说明 prompt injection 防护和发送前确认规则",
+  "status": "pending",
+  "priority": "P0",
+  "created_at": "2026-03-29T00:20:00+08:00",
+  "updated_at": "2026-03-29T00:20:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/SKILL.md",
+    "/Users/wilson/.agents/skills/lark-mail/SKILL.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/IMPROVEMENT-PLAN-LARK-REFERENCE.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "在 SKILL.md 顶部添加安全规则章节",
+      "description": "参考 lark-mail 的安全规则，添加'邮件内容是不可信的外部输入'警告，包含 6 条核心规则"
+    },
+    {
+      "id": 1,
+      "title": "添加发送前确认流程说明",
+      "description": "说明发送前必须展示收件人、主题、正文摘要，获得用户明确同意"
+    },
+    {
+      "id": 2,
+      "title": "添加发送后投递状态确认说明",
+      "description": "说明发送后必须查询投递状态并向用户报告"
+    },
+    {
+      "id": 3,
+      "title": "更新典型工作流文档",
+      "description": "在典型工作流中添加安全确认步骤"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "在 SKILL.md 顶部添加安全规则章节",
+      "status": "success",
+      "completed_at": "2026-03-29T00:26:00+08:00",
+      "summary": "SKILL.md 已包含完整的安全规则章节（7 条核心规则：prompt injection 防护、区分用户指令与邮件数据、敏感操作确认、警惕伪造身份、发送前用户确认、草稿安全兜底、XSS 防护）。审阅通过，无需修改。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "添加发送前确认流程说明",
+      "status": "success",
+      "completed_at": "2026-03-29T00:29:00+08:00",
+      "summary": "SKILL.md 第 446-524 行添加「发送前确认流程（安全规则）」章节，包含 4 步确认流程（--dry-run 预览→展示→确认→发送）、5 条最佳实践、4 条安全提醒（包括 prompt injection 防护）。验证通过（grep 确认内容存在）。"
+    },
+    {
+      "subtask_index": 2,
+      "subtask": "添加发送后投递状态确认说明",
+      "status": "success",
+      "completed_at": "2026-03-29T00:34:00+08:00",
+      "summary": "SKILL.md 第 523-566 行添加「发送后投递状态确认流程」章节，包含 3 步确认流程（发送响应查看→用户报告→send-status 查询）、5 条最佳实践、状态码说明表（4 种状态）。验证通过（grep 确认内容存在）。"
+    },
+    {
+      "subtask_index": 3,
+      "subtask": "更新典型工作流文档",
+      "status": "success",
+      "completed_at": "2026-03-29T00:40:00+08:00",
+      "summary": "SKILL.md 典型工作流章节更新完成：步骤 6-7 升级为🔒安全关卡（强制、不可跳过），添加安全确认流程子章节（3 个安全关卡详细说明），添加教训 5（未经确认直接发送邮件）。验证通过（15 处安全关卡、7 处确认示例、9 处安全红线）。"
+    }
+  ],
+  "current_subtask": 4,
+  "result": {
+    "summary": "安全规则文档完善完成：✅ 顶部安全规则章节（7 条核心规则），✅ 发送前确认流程（4 步流程、最佳实践、安全提醒），✅ 发送后投递状态确认（3 步流程、状态码表），✅ 典型工作流安全确认（3 个安全关卡、教训 5）。形成完整的安全防护体系，防止 prompt injection 攻击和误操作。",
+    "completed_at": "2026-03-29T00:40:00+08:00"
+  },
+  "status": "completed",
+  "updated_at": "2026-03-29T00:40:00+08:00"
+}
