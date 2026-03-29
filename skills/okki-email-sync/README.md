@@ -23,7 +23,7 @@ node okki-sync.js test
 
 测试 1: 域名提取
   john@example.com → example.com (公共域：false)
-  test@gmail.com → gmail.com (公共域：true)
+  test-email@your-domain.com → gmail.com (公共域：true)
 
 测试 2: 去重机制
   创建测试记录：test-1234567890

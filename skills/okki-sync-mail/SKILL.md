@@ -59,9 +59,9 @@ IMAP_MAILBOX=INBOX                # Default mailbox
 SMTP_HOST=smtp.gmail.com          # SMTP server hostname
 SMTP_PORT=587                     # SMTP port (587 for STARTTLS, 465 for SSL)
 SMTP_SECURE=false                 # true for SSL (465), false for STARTTLS (587)
-SMTP_USER=your@gmail.com          # Your email address
+SMTP_USER=your-email@your-domain.com          # Your email address
 SMTP_PASS=your_password           # Your password or app password
-SMTP_FROM=your@gmail.com          # Default sender email (optional)
+SMTP_FROM=your-email@your-domain.com          # Default sender email (optional)
 SMTP_REJECT_UNAUTHORIZED=true     # Set to false for self-signed certs
 ```
 
@@ -1307,7 +1307,7 @@ node scripts/smtp.js send \
 # 📧 [DRY RUN] Email preview (not sent):
 # To: customer@example.com
 # Subject: Product Inquiry
-# From: sale-9@farreach-electronic.com
+# From: your-email@your-domain.com
 # Body: Dear Customer, ...
 # Signature: en-sales (applied)
 # Attachments: (none)
@@ -1473,7 +1473,7 @@ node scripts/smtp.js show-signature en-sales
   "company": "Farreach Electronic Co., Limited",
   "address_cn": "No. 56, Xingwang Road, Pingshan Town, Jinwan District, Zhuhai, Guangdong, China",
   "address_vn": "Van Lam Industrial Park, Yen My District, Hung Yen Province, Vietnam",
-  "email": "sale-9@farreach-electronic.com",
+  "email": "your-email@your-domain.com",
   "phone": "+86 (756) 8699660",
   "website": "www.farreach-cable.com",
   "tagline": "18 Years | HDMI Certified | ISO9001 | China + Vietnam Dual Base"
@@ -1644,7 +1644,7 @@ node scripts/smtp.js send \
 To: customer@example.com
 Cc: manager@farreach-electronic.com
 Subject: Product Inquiry
-From: sale-9@farreach-electronic.com
+From: your-email@your-domain.com
 Body: Dear Customer, thank you for your inquiry... (共 350 字符)
 Signature: en-sales (applied)
 Attachments: 
@@ -1758,7 +1758,7 @@ Farreach Electronic Co., Limited
 
 Add: No. 56, Xingwang Road, Pingshan Town, Jinwan District, Zhuhai, Guangdong, China
 Add: Van Lam Industrial Park, Yen My District, Hung Yen Province, Vietnam
-Email: sale-9@farreach-electronic.com
+Email: your-email@your-domain.com
 Tel: +86 (756) 8699660
 Website: www.farreach-cable.com
 
@@ -1776,7 +1776,7 @@ Website: www.farreach-cable.com
 
 地址：中国广东省珠海市金湾区平沙镇星旺路 56 号 1、3、4 楼
 地址：越南兴安省文林工业区
-邮箱：sale-9@farreach-electronic.com
+邮箱：your-email@your-domain.com
 电话：+86 (756) 8699660
 网站：www.farreach-cable.com
 
@@ -2421,7 +2421,7 @@ After each successful send, the system automatically:
   },
   "logEntry": {
     "timestamp": "2026-03-29T10:00:00.000Z",
-    "from": "sale-9@farreach-electronic.com",
+    "from": "your-email@your-domain.com",
     "subject": "Product Inquiry"
   }
 }

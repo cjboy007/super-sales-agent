@@ -23,10 +23,11 @@ tmp/
 temp/
 *.tmp
 
-# Test outputs
+# Test outputs (generated, may contain sensitive data)
 test-results/
 coverage/
 scripts/test-reports/
+scripts/output/
 
 # Generated outputs (keep examples, remove generated files)
 output/
