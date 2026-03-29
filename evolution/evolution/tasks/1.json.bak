@@ -1,0 +1,43 @@
+{
+  "task_id": 1,
+  "title": "Email Skill P0 安全改进 - dry-run + 发送日志",
+  "description": "实现邮件发送前的 dry-run 模式和发送日志记录功能，符合 AGENTS.md 安全红线要求",
+  "status": "reviewing",
+  "priority": "P0",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T10:25:58.883Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/SKILL.md",
+    "/Users/wilson/.openclaw/workspace/AGENTS.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 --dry-run 模式",
+      "description": "在 smtp.js 中添加 --dry-run 参数，模拟发送但不实际调用 SMTP，输出将要发送的内容预览"
+    },
+    {
+      "id": 1,
+      "title": "实现发送日志记录",
+      "description": "创建 mail-archive/sent/ 目录，记录每封已发送邮件的元数据（timestamp/to/subject/messageId/status）"
+    },
+    {
+      "id": 2,
+      "title": "添加速率限制检查",
+      "description": "在 smtp.js 中增加 SMTP_RATE_LIMIT 环境变量检查，超过限制时拒绝发送"
+    },
+    {
+      "id": 3,
+      "title": "更新文档和示例",
+      "description": "在 SKILL.md 中添加 --dry-run 用法示例和发送日志说明"
+    }
+  ],
+  "history": [],
+  "current_subtask": 0,
+  "result": null,
+  "notes": "2026-03-28 17:58: dry-run 测试失败 - 邮件实际发送了，需要修复"
+}

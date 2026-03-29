@@ -1,0 +1,45 @@
+{
+  "task_id": 28,
+  "title": "OKKI Sync Mail P2 - 邮箱地址解析库升级",
+  "description": "改用成熟的邮箱地址解析库（如 address-rfc2822），替换字符串 split 处理",
+  "status": "pending",
+  "priority": "P2",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [27],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/package.json"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "安装 address-rfc2822 库",
+      "description": "npm install address-rfc2822"
+    },
+    {
+      "id": 1,
+      "title": "实现 RFC 邮箱地址解析",
+      "description": "支持 \"Name <email@example.com>\" 格式"
+    },
+    {
+      "id": 2,
+      "title": "在 reply-all 中应用解析库",
+      "description": "收件人聚合使用解析库而非字符串 split"
+    },
+    {
+      "id": 3,
+      "title": "实现地址去重和验证",
+      "description": "大小写不敏感去重，邮箱格式验证"
+    },
+    {
+      "id": 4,
+      "title": "测试验证",
+      "description": "确保 reply-all 收件人正确聚合"
+    }
+  ],
+  "history": [],
+  "result": null
+}

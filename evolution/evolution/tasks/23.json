@@ -1,0 +1,90 @@
+{
+  "task_id": 23,
+  "title": "OKKI Sync Mail P1 - 补齐 references 文档",
+  "description": "补齐缺失的 references 文档，对齐 lark-mail 的 11 个文档",
+  "status": "blocked",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T02:35:35.048Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/references/",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "创建 message.md 文档",
+      "description": "查看单封邮件详情"
+    },
+    {
+      "id": 1,
+      "title": "创建 thread.md 文档",
+      "description": "查看整个邮件会话"
+    },
+    {
+      "id": 2,
+      "title": "创建 messages.md 文档",
+      "description": "批量查看邮件列表"
+    },
+    {
+      "id": 3,
+      "title": "创建 triage.md 文档",
+      "description": "收件箱摘要和分类"
+    },
+    {
+      "id": 4,
+      "title": "创建 watch.md 文档",
+      "description": "监听新邮件"
+    },
+    {
+      "id": 5,
+      "title": "更新索引文档",
+      "description": "更新 references/README.md 索引"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-29T02:34:31.232Z",
+      "action": "review_completed",
+      "verdict": "approve",
+      "confidence": 0.92,
+      "feedback": "Task-023 subtask-0 审阅已完成。分析结论：lark-mail 有 11 个 references 文档，OKKI 当前有 8 个，需补齐 5 个（message.md, messages.md, thread.md, triage.md, watch.md）。建议保持 OKKI 现有文档风格（简洁、表格化、基于 node scripts/imap.js 命令），不必强行对齐 lark-mail 的 '+' shortcut 风格。"
+    },
+    {
+      "timestamp": "2026-03-29T02:35:35.048Z",
+      "action": "execution_completed",
+      "status": "failed",
+      "error": "Command failed: 创建 references/message.md 文档：\n\n1. 标题：# message — 查看单封邮件详情\n\n2. 功能说明：根据 UID 获取单封完整邮件（包括邮件头、正文、附件）\n\n3. 命令示例：\n   - node scripts/imap.js fetch <UID>\n   - node scripts/imap.js fetch <UID> --format json\n   - node scripts/imap.js fetch <UID> --dir ./attachments\n\n4. 参数表格：\n   | 参数 | 必填 | 说明 | 示例 |\n   |------|------|------|------|\n   | UID | 是 | 邮件 UID | 12345 |\n   | --format | 否 | 输出格式（text/json） | json |\n   | --dir | 否 | 附件下载目录 | ./attachments |\n   | --mailbox | 否 | 邮箱目录 | INBOX |\n\n5. 返回字段表格：subject, from, to, cc, date, body_plain_text, body_html, attachments[]\n\n6. 响应示例：展示完整 JSON 结构\n\n7. 附件处理说明：附件信息包含 filename, content_type, size，下载需调用 imap.js download 命令\n\n8. 典型场景：读取邮件→摘要→回复的工作流\n\n9. 相关命令链接：reply.md, forward.md, messages.md\n\n文档风格参考 OKKI 现有的 api-get-messages.md（简洁、表格化、示例清晰）\n/bin/sh: 创建: command not found\n/bin/sh: line 2: 1.: command not found\n/bin/sh: line 4: 2.: command not found\n/bin/sh: line 6: 3.: command not found\n/bin/sh: -c: line 7: syntax error near unexpected token `newline'\n/bin/sh: -c: line 7: `   - node scripts/imap.js fetch <UID>'\n",
+      "files_modified": []
+    }
+  ],
+  "result": null,
+  "review": {
+    "verdict": "approve",
+    "confidence": 0.92,
+    "feedback": "Task-023 subtask-0 审阅已完成。分析结论：lark-mail 有 11 个 references 文档，OKKI 当前有 8 个，需补齐 5 个（message.md, messages.md, thread.md, triage.md, watch.md）。建议保持 OKKI 现有文档风格（简洁、表格化、基于 node scripts/imap.js 命令），不必强行对齐 lark-mail 的 '+' shortcut 风格。",
+    "next_instructions": "创建 references/message.md 文档：\n\n1. 标题：# message — 查看单封邮件详情\n\n2. 功能说明：根据 UID 获取单封完整邮件（包括邮件头、正文、附件）\n\n3. 命令示例：\n   - node scripts/imap.js fetch <UID>\n   - node scripts/imap.js fetch <UID> --format json\n   - node scripts/imap.js fetch <UID> --dir ./attachments\n\n4. 参数表格：\n   | 参数 | 必填 | 说明 | 示例 |\n   |------|------|------|------|\n   | UID | 是 | 邮件 UID | 12345 |\n   | --format | 否 | 输出格式（text/json） | json |\n   | --dir | 否 | 附件下载目录 | ./attachments |\n   | --mailbox | 否 | 邮箱目录 | INBOX |\n\n5. 返回字段表格：subject, from, to, cc, date, body_plain_text, body_html, attachments[]\n\n6. 响应示例：展示完整 JSON 结构\n\n7. 附件处理说明：附件信息包含 filename, content_type, size，下载需调用 imap.js download 命令\n\n8. 典型场景：读取邮件→摘要→回复的工作流\n\n9. 相关命令链接：reply.md, forward.md, messages.md\n\n文档风格参考 OKKI 现有的 api-get-messages.md（简洁、表格化、示例清晰）",
+    "acceptance_criteria": [
+      "message.md 文档创建完成",
+      "包含完整参数表格（UID, --format, --dir, --mailbox）",
+      "包含返回字段表格（subject, from, to, cc, date, body, attachments）",
+      "包含 JSON 响应示例",
+      "包含附件处理说明",
+      "包含典型场景示例",
+      "包含相关命令链接",
+      "文档风格与 OKKI 现有 references 一致"
+    ],
+    "risk_flags": [
+      "UID 与 Message-ID 区别需明确说明",
+      "附件下载是独立命令（imap.js download），需明确说明",
+      "保持 OKKI 命令风格（node scripts/imap.js），不要改用 lark-cli 风格"
+    ],
+    "technical_review": "技术选型正确：OKKI 基于 node-imap 实现，使用 UID 标识邮件（IMAP 协议标准），与 lark-mail 的 message_id（API 标识）不同。文档需明确说明这一区别。附件处理采用两步流程（fetch 获取信息 → download 下载文件），符合 IMAP 协议特性。建议保持 OKKI 现有文档风格，确保一致性和可维护性。"
+  },
+  "blocked_at": "2026-03-29T02:35:35.048Z",
+  "blocked_reason": "Command failed: 创建 references/message.md 文档：\n\n1. 标题：# message — 查看单封邮件详情\n\n2. 功能说明：根据 UID 获取单封完整邮件（包括邮件头、正文、附件）\n\n3. 命令示例：\n   - node scripts/imap.js fetch <UID>\n   - node scripts/imap.js fetch <UID> --format json\n   - node scripts/imap.js fetch <UID> --dir ./attachments\n\n4. 参数表格：\n   | 参数 | 必填 | 说明 | 示例 |\n   |------|------|------|------|\n   | UID | 是 | 邮件 UID | 12345 |\n   | --format | 否 | 输出格式（text/json） | json |\n   | --dir | 否 | 附件下载目录 | ./attachments |\n   | --mailbox | 否 | 邮箱目录 | INBOX |\n\n5. 返回字段表格：subject, from, to, cc, date, body_plain_text, body_html, attachments[]\n\n6. 响应示例：展示完整 JSON 结构\n\n7. 附件处理说明：附件信息包含 filename, content_type, size，下载需调用 imap.js download 命令\n\n8. 典型场景：读取邮件→摘要→回复的工作流\n\n9. 相关命令链接：reply.md, forward.md, messages.md\n\n文档风格参考 OKKI 现有的 api-get-messages.md（简洁、表格化、示例清晰）\n/bin/sh: 创建: command not found\n/bin/sh: line 2: 1.: command not found\n/bin/sh: line 4: 2.: command not found\n/bin/sh: line 6: 3.: command not found\n/bin/sh: -c: line 7: syntax error near unexpected token `newline'\n/bin/sh: -c: line 7: `   - node scripts/imap.js fetch <UID>'\n"
+}

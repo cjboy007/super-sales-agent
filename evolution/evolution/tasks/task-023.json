@@ -1,0 +1,51 @@
+{
+  "task_id": 23,
+  "title": "OKKI Sync Mail P1 - 补齐 references 文档",
+  "description": "补齐缺失的 references 文档，对齐 lark-mail 的 11 个文档",
+  "status": "pending",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/references/",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "创建 message.md 文档",
+      "description": "查看单封邮件详情"
+    },
+    {
+      "id": 1,
+      "title": "创建 thread.md 文档",
+      "description": "查看整个邮件会话"
+    },
+    {
+      "id": 2,
+      "title": "创建 messages.md 文档",
+      "description": "批量查看邮件列表"
+    },
+    {
+      "id": 3,
+      "title": "创建 triage.md 文档",
+      "description": "收件箱摘要和分类"
+    },
+    {
+      "id": 4,
+      "title": "创建 watch.md 文档",
+      "description": "监听新邮件"
+    },
+    {
+      "id": 5,
+      "title": "更新索引文档",
+      "description": "更新 references/README.md 索引"
+    }
+  ],
+  "history": [],
+  "result": null
+}

@@ -1,0 +1,64 @@
+{
+  "task_id": 16,
+  "title": "OKKI Sync Mail P0 - 纯文本强制模式",
+  "description": "实现 --plain-text 参数，强制纯文本模式",
+  "status": "pending",
+  "priority": "P0",
+  "created_at": "2026-03-29T08:30:00+08:00",
+  "updated_at": "2026-03-29T08:30:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-send.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 --plain-text 参数",
+      "description": "强制纯文本模式，忽略 HTML 自动检测"
+    },
+    {
+      "id": 1,
+      "title": "添加参数互斥检查",
+      "description": "--plain-text 与 --inline 不能同时使用"
+    },
+    {
+      "id": 2,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加纯文本模式使用说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 --plain-text 参数",
+      "status": "success",
+      "completed_at": "2026-03-29T09:23:00+08:00",
+      "summary": "修复完成。在 signature 处理之后（约行 1162）添加 --plain-text 核心逻辑：1) 如果 options.html 存在则删除 2) 将 options.body 赋值给 options.text 3) 输出提示信息。互斥检查已在行 1112-1114 实现。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "添加参数互斥检查",
+      "status": "success",
+      "completed_at": "2026-03-29T09:26:00+08:00",
+      "summary": "已实现（行 1112-1114）：--plain-text 和 --inline 互斥检查，抛出错误 '--plain-text and --inline are mutually exclusive. Inline images require HTML content.'"
+    },
+    {
+      "subtask_index": 2,
+      "subtask": "更新 SKILL.md 文档",
+      "status": "success",
+      "completed_at": "2026-03-29T09:26:00+08:00",
+      "summary": "SKILL.md 已包含纯文本模式说明：参数说明（行 136）、示例（行 158）、与 --inline 互斥说明（行 451/676/695）。"
+    }
+  ],
+  "current_subtask": 3,
+  "result": {
+    "summary": "OKKI Sync Mail P0 - 纯文本强制模式全部完成：✅ --plain-text 参数核心逻辑（删除 HTML、强制 text 模式），✅ 与 --inline 互斥检查，✅ SKILL.md 完整文档。支持强制发送纯文本邮件，适用于只支持纯文本的邮件系统或合规要求。",
+    "completed_at": "2026-03-29T09:26:00+08:00"
+  },
+  "status": "completed",
+  "updated_at": "2026-03-29T09:26:00+08:00"
+}

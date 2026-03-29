@@ -1,0 +1,45 @@
+{
+  "task_id": 29,
+  "title": "OKKI Sync Mail P2 - 临时附件清理优化",
+  "description": "统一 temp 文件清理策略，所有分支都清理临时文件",
+  "status": "pending",
+  "priority": "P2",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/forward.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "分析 forward.js 的 temp 清理逻辑",
+      "description": "找出哪些分支未清理 temp 文件"
+    },
+    {
+      "id": 1,
+      "title": "实现统一的 temp 文件管理",
+      "description": "创建 lib/temp.js 统一管理临时文件"
+    },
+    {
+      "id": 2,
+      "title": "在 forward.js 所有分支应用清理",
+      "description": "使用 try-finally 确保清理"
+    },
+    {
+      "id": 3,
+      "title": "草稿附件改持久化存储",
+      "description": "草稿附件存 drafts/<draft_id>/attachments/ 而非 temp"
+    },
+    {
+      "id": 4,
+      "title": "测试验证",
+      "description": "确保 temp 文件正确清理"
+    }
+  ],
+  "history": [],
+  "result": null
+}

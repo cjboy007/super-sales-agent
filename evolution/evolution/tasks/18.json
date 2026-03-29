@@ -1,0 +1,87 @@
+{
+  "task_id": 18,
+  "title": "OKKI Sync Mail P1 - 草稿编辑功能",
+  "description": "实现 draft-edit 命令，支持编辑已有草稿",
+  "status": "blocked",
+  "priority": "P1",
+  "created_at": "2026-03-29T08:30:00+08:00",
+  "updated_at": "2026-03-29T02:35:34.776Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-draft-edit.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 draft-edit 命令",
+      "description": "node scripts/smtp.js draft-edit --draft-id <id> --body \"新内容\""
+    },
+    {
+      "id": 1,
+      "title": "支持部分字段更新",
+      "description": "支持 --to、--subject、--body、--attach 等字段单独更新"
+    },
+    {
+      "id": 2,
+      "title": "实现补丁文件支持",
+      "description": "支持 --patch-file 从 JSON 文件读取更新内容"
+    },
+    {
+      "id": 3,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加草稿编辑使用说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 draft-edit 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T08:56:00+08:00",
+      "summary": "审阅完成 (verdict: revise)。核心功能已完成：drafts.js 的 editDraft 函数（行 279-323）和 smtp.js 的 draft-edit 命令（行 1076-1136）均已实现，支持字段白名单保护、--patch-file JSON 补丁、--body-file/--html-file 从文件读取、--no-approval 移除审批。但相比 lark-mail 缺少：1) --inspect 只读查看 2) --print-patch-template 模板打印 3) patch-file ops 数组格式支持 4) set_reply_body op（保护回复/转发草稿引用区）5) --dry-run 预览。建议分阶段补充（Phase 1: --inspect/--print-patch-template/--dry-run; Phase 2: ops 数组格式; Phase 3: 安全增强）。"
+    },
+    {
+      "timestamp": "2026-03-29T01:21:26.277Z",
+      "action": "review_completed",
+      "verdict": "approve",
+      "confidence": 0.9,
+      "feedback": "Subtask-0 核心功能已完成。draft-edit 命令已实现：drafts.js 的 editDraft 函数（行 279-323）和 smtp.js 的 draft-edit 命令（行 1076-1136）均正常工作，支持字段白名单保护、--patch-file JSON 补丁、--body-file/--html-file 从文件读取、--no-approval 移除审批。虽然相比 lark-mail 缺少一些高级功能（--inspect、--print-patch-template、ops 数组格式等），但这些属于增强功能而非核心功能缺失。可以进入 subtask-1（支持部分字段更新）。"
+    },
+    {
+      "timestamp": "2026-03-29T02:35:34.776Z",
+      "action": "execution_completed",
+      "status": "failed",
+      "error": "Command failed: 继续 subtask-1：验证部分字段更新功能。测试各个字段单独更新：\n\nnode scripts/smtp.js draft-edit <DRAFT-ID> --to \"new@example.com\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --subject \"新主题\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --body \"新正文\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --cc \"cc@example.com\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --signature \"cn-sales\"\n\n验证只有指定字段被更新，其他字段保持不变。\n/bin/sh: 继续: command not found\n/bin/sh: line 2: DRAFT-ID: No such file or directory\n/bin/sh: line 3: DRAFT-ID: No such file or directory\n/bin/sh: line 4: DRAFT-ID: No such file or directory\n/bin/sh: line 5: DRAFT-ID: No such file or directory\n/bin/sh: line 6: DRAFT-ID: No such file or directory\n/bin/sh: line 8: 验证只有指定字段被更新，其他字段保持不变。: command not found\n",
+      "files_modified": []
+    }
+  ],
+  "current_subtask": 1,
+  "result": null,
+  "review": {
+    "verdict": "approve",
+    "confidence": 0.9,
+    "feedback": "Subtask-0 核心功能已完成。draft-edit 命令已实现：drafts.js 的 editDraft 函数（行 279-323）和 smtp.js 的 draft-edit 命令（行 1076-1136）均正常工作，支持字段白名单保护、--patch-file JSON 补丁、--body-file/--html-file 从文件读取、--no-approval 移除审批。虽然相比 lark-mail 缺少一些高级功能（--inspect、--print-patch-template、ops 数组格式等），但这些属于增强功能而非核心功能缺失。可以进入 subtask-1（支持部分字段更新）。",
+    "next_instructions": "继续 subtask-1：验证部分字段更新功能。测试各个字段单独更新：\n\nnode scripts/smtp.js draft-edit <DRAFT-ID> --to \"new@example.com\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --subject \"新主题\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --body \"新正文\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --cc \"cc@example.com\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --signature \"cn-sales\"\n\n验证只有指定字段被更新，其他字段保持不变。",
+    "acceptance_criteria": [
+      "draft-edit 命令可成功执行",
+      "支持 --to 字段单独更新",
+      "支持 --subject 字段单独更新",
+      "支持 --body 字段单独更新",
+      "支持 --cc/--bcc 字段单独更新",
+      "支持 --signature 字段单独更新",
+      "未指定的字段保持不变",
+      "字段白名单保护正常工作"
+    ],
+    "risk_flags": [
+      "向后兼容：旧草稿编辑时不报错",
+      "字段验证：非法字段应被拒绝并提示"
+    ],
+    "technical_review": "技术选型正确：使用字段白名单保护（allowedFields 数组），只允许更新指定字段。editDraft 函数实现清晰（约 45 行），包含字段验证、变更检测、时间戳更新。支持 JSON 补丁文件（--patch-file）和文件读取（--body-file/--html-file）。修改量适中，风险低。建议后续增强：--inspect 只读查看、--dry-run 预览、ops 数组格式，以提升用户体验和安全性。"
+  },
+  "blocked_at": "2026-03-29T02:35:34.776Z",
+  "blocked_reason": "Command failed: 继续 subtask-1：验证部分字段更新功能。测试各个字段单独更新：\n\nnode scripts/smtp.js draft-edit <DRAFT-ID> --to \"new@example.com\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --subject \"新主题\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --body \"新正文\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --cc \"cc@example.com\"\nnode scripts/smtp.js draft-edit <DRAFT-ID> --signature \"cn-sales\"\n\n验证只有指定字段被更新，其他字段保持不变。\n/bin/sh: 继续: command not found\n/bin/sh: line 2: DRAFT-ID: No such file or directory\n/bin/sh: line 3: DRAFT-ID: No such file or directory\n/bin/sh: line 4: DRAFT-ID: No such file or directory\n/bin/sh: line 5: DRAFT-ID: No such file or directory\n/bin/sh: line 6: DRAFT-ID: No such file or directory\n/bin/sh: line 8: 验证只有指定字段被更新，其他字段保持不变。: command not found\n"
+}

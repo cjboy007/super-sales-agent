@@ -1,0 +1,45 @@
+{
+  "task_id": 30,
+  "title": "OKKI Sync Mail P2 - 核心安全路径测试",
+  "description": "增加 send gate、draft flow、headers、inline/plain-text、status 语义测试",
+  "status": "pending",
+  "priority": "P2",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/test/",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 send gate 测试",
+      "description": "测试未加 --confirm-send 时不发送邮件"
+    },
+    {
+      "id": 1,
+      "title": "实现 draft flow 测试",
+      "description": "测试草稿保存、编辑、发送的完整流程"
+    },
+    {
+      "id": 2,
+      "title": "实现 headers 测试",
+      "description": "测试 In-Reply-To / References 正确设置"
+    },
+    {
+      "id": 3,
+      "title": "实现 inline/plain-text 测试",
+      "description": "测试 --inline 和 --plain-text 功能及互斥"
+    },
+    {
+      "id": 4,
+      "title": "实现 status 语义测试",
+      "description": "测试状态码 1-6 的正确映射和说明"
+    }
+  ],
+  "history": [],
+  "result": null
+}

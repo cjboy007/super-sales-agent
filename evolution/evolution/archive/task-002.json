@@ -1,0 +1,292 @@
+{
+  "task_id": "task-002",
+  "phase": 1,
+  "priority": "urgent",
+  "goal": "OKKI 双向同步：邮件和报价单自动写入 OKKI 跟进记录",
+  "created_at": "2026-03-24T09:51:00+08:00",
+  "updated_at": "2026-03-24T12:51:00+08:00",
+  "current_iteration": 7,
+  "max_iterations": 10,
+  "assigned_to": "iron",
+  "status": "packaged",
+  "context": {
+    "background": "当前发送邮件/报价单后需要手动在 OKKI 创建跟进记录，容易遗漏。需要实现：1) 发送邮件后自动在 OKKI 对应客户下创建跟进记录 2) 生成报价单后自动关联到 OKKI 客户 3) 收到客户邮件后自动匹配 OKKI 客户并记录",
+    "constraints": [
+      "使用现有 OKKI CLI v2.0（okki.py trail add）",
+      "客户匹配：优先用邮箱域名匹配，其次用客户向量搜索",
+      "跟进记录内容包含：邮件主题、摘要、附件列表、发送/接收时间",
+      "报价单记录包含：报价单编号、产品列表、总金额、有效期"
+    ],
+    "reference_files": [
+      "/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py",
+      "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/",
+      "/Users/wilson/.openclaw/workspace/skills/quotation-workflow/",
+      "/Users/wilson/.openclaw/workspace/vector_store/search-customers.py"
+    ],
+    "subtasks": [
+      "1. 设计邮件→OKKI 映射逻辑（邮箱→客户 ID）",
+      "2. 实现发送邮件后自动创建跟进记录的 hook",
+      "3. 实现报价单生成后自动创建跟进记录的 hook",
+      "4. 实现收件邮件自动匹配客户并记录",
+      "5. 处理匹配失败场景（新客户/未知邮箱）",
+      "6. 端到端测试"
+    ],
+    "resolved_values": {
+      "trail_type_email": 102,
+      "trail_type_quotation": 101,
+      "source": "okki.py trail add --help",
+      "confirmed_at": "2026-03-24T11:30:00+08:00",
+      "okki_sync_js_path": "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/okki-sync.js",
+      "okki_sync_js_confirmed_at": "2026-03-24T12:22:00+08:00"
+    }
+  },
+  "review": {
+    "verdict": "complete",
+    "reviewed_at": "2026-03-24T12:51:00+08:00",
+    "reviewed_by": "WILSON",
+    "confidence": "high",
+    "feedback": {
+      "iteration_1_assessment": {
+        "score": "pass",
+        "notes": "Step 1 执行正确。trail_type_email=102、trail_type_quotation=101 已从 okki.py CLI 确认，已写入 context.resolved_values，有来源记录（okki.py trail add --help），验收标准全部达成。"
+      },
+      "iteration_2_assessment": {
+        "score": "pass",
+        "notes": "Step 2 执行正确。okki-sync.js 已创建（15873 字节，582 行）。代码审查通过：(1) matchCustomer() 实现两阶段匹配（域名黑名单 + 向量搜索回退），黑名单含 gmail/yahoo/hotmail/outlook/qq/163/126 等；(2) createEmailTrail() 正确使用 trail_type=102；(3) createQuotationTrail() 正确使用 trail_type=101；(4) 去重机制完整（/tmp/okki-sync-processed.json）；(5) 未匹配日志完整（/tmp/okki-unmatched-emails.log）；(6) venv 路径使用 vector_store/venv/bin/python3（实际目录名为 venv 非 .venv，已验证正确），并有 fallback 至系统 python3；(7) CLI 入口 node okki-sync.js test 已实现。所有验收标准全部达成。"
+      },
+      "iteration_3_assessment": {
+        "score": "pass",
+        "notes": "Step 3 验证通过（代码实测确认）。smtp.js 第 13 行有 require('../okki-sync')，第 131 行 sendMail() 成功后异步调用 syncEmailToOkki()，UID 格式 smtp-{timestamp}-{to_hash}，.then/.catch 包裹确保失败不阻断发件流程，失败信息以 console.warn 输出。所有验收标准达成。"
+      },
+      "iteration_4_assessment": {
+        "score": "pass",
+        "notes": "Step 4 验证通过（实测确认）。okki-sync.js 新增 'quotation' CLI 入口，generate-all.sh 末尾调用 OKKI 同步（|| true 不阻断流程）。实测创建 trail 88049733418293 for QT-20260314-001，验证报价单编号/产品/金额/有效期均写入跟进记录。所有验收标准达成。"
+      },
+      "iteration_5_assessment": {
+        "score": "pass",
+        "notes": "Step 5 端到端测试全部通过。链路A（邮件→OKKI）：发送邮件至 your-email@example.com，trail 88050591907961 创建成功，内容含主题和发送时间。链路B（报价单→OKKI）：generate-all.sh 生成 QT-E2E-002，trail 88050865152265 创建成功（Cable Germany, 4603005833），内容含编号/USD 9730.00/有效期 2026-04-14/4种产品。链路C（公共域名）：your-email@example.com 触发 unmatched 日志写入，主流程不崩溃，返回 customer_not_found。去重验证：相同 UID 返回 duplicate，不创建重复记录。附带修复：okki-sync.js quotation 解析 bug（顶层字段 validUntil/date/total 读取问题）已在本迭代内修复。所有验收标准全部达成。"
+      }
+    },
+    "next_instructions": {
+      "summary": "任务已完成，所有 5 个步骤验证通过",
+      "current_step": 5,
+      "total_steps": 5,
+      "step": {
+        "step": 5,
+        "action": "端到端测试：验证完整流程",
+        "detail": "已完成。三条链路均通过测试。",
+        "test_checklist": [
+          "[x] 链路A：smtp.js 发送邮件后 OKKI trail_type=102 记录创建成功（trail 88050591907961）",
+          "[x] 链路A：trail 内容包含邮件主题、发送时间",
+          "[x] 链路B：generate-all.sh 生成报价单后 OKKI trail_type=101 记录创建成功（trail 88050865152265）",
+          "[x] 链路B：trail 内容包含报价单编号、产品列表摘要（4种）、总金额 USD 9730.00、有效期 2026-04-14",
+          "[x] 链路C：公共域名邮箱（gmail.com）触发 unmatched 日志写入",
+          "[x] 链路C：匹配失败不影响主流程（邮件/报价单正常完成）",
+          "[x] 去重验证：相同 UID 重复触发返回 duplicate，不创建重复 trail"
+        ]
+      },
+      "acceptance_criteria": [
+        "✅ 发送测试邮件后能在 OKKI 对应客户下看到 trail_type=102 的跟进记录",
+        "✅ 生成测试报价单后能在 OKKI 对应客户下看到 trail_type=101 的跟进记录",
+        "✅ 两条记录内容格式正确（邮件：主题+时间；报价单：编号+产品+金额+有效期）",
+        "✅ 公共域名邮箱匹配失败场景：unmatched 日志有写入，主流程不崩溃",
+        "✅ 去重机制有效：相同 UID 重复运行不产生重复 trail"
+      ]
+    }
+  },
+  "result": {
+    "iteration": 5,
+    "completed_steps": [
+      {
+        "step": 1,
+        "action": "confirm_trail_type_enum",
+        "details": "Trail type confirmed: email=102, quotation=101 from okki.py trail add --help.",
+        "status": "completed"
+      },
+      {
+        "step": 2,
+        "action": "create_okki_sync_hook_module",
+        "output_file": "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/okki-sync.js",
+        "details": "Created okki-sync.js module with: (1) matchCustomer() - domain matching with public domain blacklist (gmail.com, yahoo.com, etc.) + vector search fallback, (2) createEmailTrail() - creates email trail with trail_type=102, (3) createQuotationTrail() - creates quotation trail with trail_type=101, (4) deduplication via /tmp/okki-sync-processed.json, (5) unmatched email logging to /tmp/okki-unmatched-emails.log. All acceptance criteria met: file exists (14KB+), matchCustomer() implements two-stage matching, createEmailTrail() calls okki.py correctly, smoke test passes (node okki-sync.js test), deduplication mechanism implemented.",
+        "status": "completed"
+      },
+      {
+        "step": 3,
+        "action": "integrate_okki_sync_into_smtp",
+        "output_file": "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+        "details": "Integrated okki-sync.js into smtp.js send flow. Changes: (1) Added require('../okki-sync') at top of smtp.js, (2) After successful sendMail(), async call to syncEmailToOkki() with uid, from, to, subject, date, body, attachments, direction='out', (3) Wrapped in .then/.catch to log results without blocking email send, (4) UID format: smtp-{timestamp}-{to_hash}. All acceptance criteria met: smtp.js syntax validated, OKKI sync triggered on send success, failures logged as warnings without affecting email delivery, unmatched customers logged to /tmp/okki-unmatched-emails.log.",
+        "status": "completed"
+      },
+      {
+        "step": 4,
+        "action": "integrate_okki_sync_into_quotation_workflow",
+        "output_files": [
+          "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/okki-sync.js",
+          "/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate-all.sh"
+        ],
+        "details": "Integrated okki-sync.js into quotation-workflow. Changes: (1) Added 'quotation' CLI entry to okki-sync.js that accepts JSON params {dataFile, quotationNo}, (2) Reads customer email from DATA_FILE and matches to OKKI customer, (3) Creates quotation trail with trail_type=101, (4) Added OKKI sync call to generate-all.sh after all files generated (|| true to not block on failure). Test passed: node okki-sync.js quotation successfully created trail 88049733418293 for QT-20260314-001. All acceptance criteria met: generate-all.sh triggers OKKI sync on success, quotation trail includes quotation number/products/total/valid_until, sync failure doesn't block workflow, unmatched customers logged.",
+        "status": "completed"
+      },
+      {
+        "step": 5,
+        "action": "end_to_end_test",
+        "status": "completed",
+        "tested_at": "2026-03-24T12:51:00+08:00",
+        "bug_fixed": "okki-sync.js quotation handler: fixed data field parsing to support both top-level (cable-germany.json format: validUntil/date/customer.name) and nested quotation object (farreach_5products.json format: quotation.validUntil/quotation.date); fixed total calculation to use p.amount || p.quantity*(p.unit_price||p.unitPrice)",
+        "chain_A": {
+          "description": "发送邮件 → OKKI 跟进记录",
+          "command": "node scripts/smtp.js send --to your-email@example.com --subject 'E2E Test Email - OKKI Sync Verification'",
+          "email_sent": true,
+          "trail_id": 88050591907961,
+          "company_id": 3331394084,
+          "company_name": "EZYHD HDMI CBALES@ACCESSORIES",
+          "trail_content_verified": true,
+          "content_preview": "发送邮件\\n主题：E2E Test Email - OKKI Sync Verification\\n时间：2026-03-24T04:47:44.422Z\\n发件人：your-email@example.com\\n收件人：your-email@example.com",
+          "result": "pass"
+        },
+        "chain_B": {
+          "description": "生成报价单 → OKKI 跟进记录",
+          "command": "generate-all.sh cable-germany.json QT-E2E-002",
+          "data_file": "/Users/wilson/.openclaw/workspace/skills/quotation-workflow/data/cable-germany.json",
+          "quotation_no": "QT-E2E-002",
+          "trail_id": 88050865152265,
+          "company_id": 4603005833,
+          "company_name": "Cable Germany",
+          "trail_content_verified": true,
+          "content_preview": "报价单\\n编号：QT-E2E-002\\n日期：2026-03-15\\n总金额：USD 9730.00\\n有效期：2026-04-14\\n产品列表:\\n  - HDMI 2.1 Cable 8K@60Hz 48Gbps Ultra High Speed x 500\\n  - DisplayPort 2.1 Cable UHBR20 80Gbps x 300\\n  - USB-C to USB-C Cable USB4 80Gbps PD 240W x 600\\n  - CAT6A Ethernet Cable 10Gbps Shielded x 800",
+          "result": "pass"
+        },
+        "chain_C": {
+          "description": "公共域名邮箱匹配失败场景",
+          "test_email": "your-email@example.com",
+          "sync_result": "{\"success\":false,\"reason\":\"customer_not_found\",\"message\":\"未找到匹配的客户\",\"email\":\"your-email@example.com\"}",
+          "unmatched_log_written": true,
+          "unmatched_log_entry": "2026-03-24T04:47:20.021Z | your-email@example.com | domain=gmail.com, vector_search=no_match",
+          "main_process_unaffected": true,
+          "result": "pass"
+        },
+        "dedup_test": {
+          "description": "去重验证：相同 UID 不创建重复 trail",
+          "test_uid": "smtp-1774327664422-servicet",
+          "result_json": "{\"success\":false,\"reason\":\"duplicate\",\"message\":\"邮件已处理\",\"uid\":\"smtp-1774327664422-servicet\"}",
+          "result": "pass"
+        },
+        "all_acceptance_criteria_met": true
+      }
+    ],
+    "pending_steps": [],
+    "summary": "Iteration 5 complete. All 5 steps completed and verified via end-to-end tests. Chain A (email→OKKI trail 88050591907961), Chain B (quotation→OKKI trail 88050865152265 for Cable Germany, USD 9730.00), Chain C (gmail unmatched logging), dedup check all passed. Bug fix applied in iteration 5: okki-sync.js quotation handler now supports both top-level and nested data formats (validUntil, date, customer.name, amount). Task is COMPLETE."
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-24T09:56:00+08:00",
+      "action": "review_completed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "任务审阅完成，批准执行。核心风险：公共域名误匹配、venv 依赖路径、重复写入去重。预计 3 次迭代完成。"
+    },
+    {
+      "timestamp": "2026-03-24T10:20:00+08:00",
+      "action": "reset",
+      "agent": "WARDEN",
+      "model": "manual",
+      "notes": "清除残留 lock 文件，重置状态。Iron 超时后 lock 未清理导致任务被跳过。"
+    },
+    {
+      "timestamp": "2026-03-24T11:12:06.428366+08:00",
+      "action": "review_revised",
+      "agent": "WILSON",
+      "model": "manual",
+      "notes": "任务拆分：每次迭代只执行一个 subtask"
+    },
+    {
+      "timestamp": "2026-03-24T11:30:00+08:00",
+      "action": "iteration_1_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "steps_completed": 1,
+      "notes": "Trail type enum confirmed: email=102, quotation=101. Recorded in context.resolved_values."
+    },
+    {
+      "timestamp": "2026-03-24T11:50:00+08:00",
+      "action": "iteration_1_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 1 验收通过。trail_type 枚举值确认正确，来源有据，已记录 resolved_values。current_iteration 推进至 2，指派 Step 2：创建 okki-sync.js hook 模块。关键要求：公共域黑名单、venv 绝对路径、去重机制。"
+    },
+    {
+      "timestamp": "2026-03-24T11:54:00+08:00",
+      "action": "auto_fix",
+      "agent": "WARDEN",
+      "model": "evolution-monitor",
+      "notes": "残留 .lock 文件清理（任务状态=reviewed，非 executing/reviewing）"
+    },
+    {
+      "timestamp": "2026-03-24T12:21:00+08:00",
+      "action": "iteration_2_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "steps_completed": 1,
+      "notes": "Step 2 completed: okki-sync.js created with domain matching (public domain blacklist), vector search fallback, email/quotation trail creation, deduplication, and unmatched logging. All acceptance criteria passed."
+    },
+    {
+      "timestamp": "2026-03-24T12:22:00+08:00",
+      "action": "iteration_2_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 2 验收通过。okki-sync.js 代码审查完毕（582行/15873字节）。所有核心功能实现到位：公共域黑名单（7个域名）、venv 绝对路径（实际路径 vector_store/venv 已验证正确）、去重机制（processed.json）、未匹配日志、smoke test CLI。current_iteration 推进至 3，指派 Step 3：集成到 smtp.js 发件流程。"
+    },
+    {
+      "timestamp": "2026-03-24T12:24:00+08:00",
+      "action": "iteration_3_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "steps_completed": 1,
+      "notes": "Step 3 completed: okki-sync.js integrated into smtp.js. Changes: (1) require added, (2) syncEmailToOkki() called async after sendMail() success, (3) UID format smtp-{timestamp}-{to_hash}, (4) Failures logged as warnings. Syntax validated."
+    },
+    {
+      "timestamp": "2026-03-24T12:31:00+08:00",
+      "action": "auto_fix",
+      "agent": "WARDEN",
+      "model": "evolution-monitor",
+      "notes": "残留 .lock 文件清理（任务状态=pending，非 executing/reviewing）"
+    },
+    {
+      "timestamp": "2026-03-24T12:33:00+08:00",
+      "action": "iteration_3_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 3 验收通过（代码实测确认）。smtp.js L13: require('../okki-sync')；L131+: sendMail()成功后异步调用 syncEmailToOkki()，.then/.catch 包裹，失败仅 console.warn 不阻断流程。所有验收标准达成。current_iteration 推进至 5，指派 Step 4：集成到 quotation-workflow（generate-all.sh）。"
+    },
+    {
+      "timestamp": "2026-03-24T12:40:00+08:00",
+      "action": "iteration_4_executed",
+      "agent": "IRON",
+      "model": "bailian/qwen3.5-plus",
+      "steps_completed": 1,
+      "notes": "Step 4 completed: okki-sync.js integrated into quotation-workflow. Changes: (1) Added 'quotation' CLI entry to okki-sync.js, (2) generate-all.sh calls OKKI sync after generating files. Test passed: trail 88049733418293 created for QT-20260314-001."
+    },
+    {
+      "timestamp": "2026-03-24T12:41:00+08:00",
+      "action": "iteration_4_reviewed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "verdict": "approve",
+      "notes": "Step 4 验收通过（实测确认）。trail 88049733418293 已在 OKKI 创建（QT-20260314-001），报价单编号/产品/金额/有效期均写入跟进记录，generate-all.sh || true 不阻断流程。current_iteration 推进至 7，指派 Step 5（最终轮）：端到端测试。测试三条链路：A) 发邮件→trail_type=102；B) 生成报价单→trail_type=101；C) 公共域名匹配失败→unmatched 日志。"
+    },
+    {
+      "timestamp": "2026-03-24T12:51:00+08:00",
+      "action": "iteration_5_executed",
+      "agent": "WILSON",
+      "model": "aiberm/claude-sonnet-4-6",
+      "steps_completed": 1,
+      "notes": "Step 5 E2E test completed. All 3 chains passed: A) Email trail 88050591907961 created for your-email@example.com; B) Quotation trail 88050865152265 (QT-E2E-002, USD 9730.00, valid 2026-04-14) created for Cable Germany (4603005833); C) gmail.com unmatched log written, process not crashed. Dedup test: duplicate UID returned {success:false,reason:'duplicate'}. Bug fixed: okki-sync.js quotation handler now parses both top-level and nested JSON formats for validUntil/date/customer.name/amount. Task COMPLETE."
+    }
+  ],
+  "packaged_at": "2026-03-24T12:54:00+08:00",
+  "skill_path": "/Users/wilson/.openclaw/workspace/skills/okki-email-sync/"
+}

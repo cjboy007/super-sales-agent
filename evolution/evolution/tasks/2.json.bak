@@ -1,0 +1,41 @@
+{
+  "task_id": 2,
+  "title": "Email Skill P0 - inbound 邮件同步到 OKKI",
+  "description": "在 auto-capture.js 中集成 okki-sync.js，将接收到的 inbound 邮件同步到 OKKI 创建 trail_type=102 跟进记录",
+  "status": "reviewing",
+  "priority": "P0",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T09:25:37.319Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/auto-capture.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/okki-sync.js",
+    "/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_cli.py"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "分析 okki-sync.js 导出函数",
+      "description": "检查 okki-sync.js 中 syncEmailToOkki 函数的参数和调用方式"
+    },
+    {
+      "id": 1,
+      "title": "在 auto-capture.js 中集成 OKKI 同步",
+      "description": "在保存 inbound 邮件后调用 syncEmailToOkki，direction='in'"
+    },
+    {
+      "id": 2,
+      "title": "处理未匹配客户的情况",
+      "description": "如果 inbound 邮件未匹配到 OKKI 客户，记录到 /tmp/okki-unmatched-emails.log"
+    },
+    {
+      "id": 3,
+      "title": "测试 inbound 同步链路",
+      "description": "运行 auto-capture.js check --unseen 验证 OKKI 跟进记录创建"
+    }
+  ],
+  "history": [],
+  "result": null
+}

@@ -1,0 +1,45 @@
+{
+  "task_id": 27,
+  "title": "OKKI Sync Mail P2 - 参数解析库升级",
+  "description": "改用成熟的参数解析库（如 commander 或 yargs），替换原始的 parseArgs",
+  "status": "pending",
+  "priority": "P2",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/package.json"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "安装 commander 库",
+      "description": "npm install commander"
+    },
+    {
+      "id": 1,
+      "title": "重构 smtp.js 参数解析",
+      "description": "使用 commander 替换 parseArgs"
+    },
+    {
+      "id": 2,
+      "title": "实现严格的参数验证",
+      "description": "布尔值、空值、单双破折号、带空格值的严格处理"
+    },
+    {
+      "id": 3,
+      "title": "实现统一的错误处理",
+      "description": "统一错误码、错误类型、用户可恢复建议"
+    },
+    {
+      "id": 4,
+      "title": "测试验证",
+      "description": "确保所有命令正常工作"
+    }
+  ],
+  "history": [],
+  "result": null
+}

@@ -1,0 +1,88 @@
+{
+  "task_id": 13,
+  "title": "OKKI Sync Mail P2 - Shortcut 命令",
+  "description": "实现用户友好的 Shortcut 命令（+triage, +reply, +reply-all, +forward）",
+  "status": "pending",
+  "priority": "P2",
+  "created_at": "2026-03-29T00:20:00+08:00",
+  "updated_at": "2026-03-29T00:20:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.agents/skills/lark-mail/SKILL.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/IMPROVEMENT-PLAN-LARK-REFERENCE.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 +triage 命令",
+      "description": "查看收件箱摘要（最新 10 封邮件，显示发件人/主题/日期）"
+    },
+    {
+      "id": 1,
+      "title": "实现 +reply 命令",
+      "description": "回复发件人（默认草稿），支持 --confirm-send"
+    },
+    {
+      "id": 2,
+      "title": "实现 +reply-all 命令",
+      "description": "回复全部（默认草稿），支持 --confirm-send"
+    },
+    {
+      "id": 3,
+      "title": "实现 +forward 命令",
+      "description": "转发邮件（默认草稿），支持 --confirm-send"
+    },
+    {
+      "id": 4,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加 Shortcut 命令使用说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 +triage 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T02:25:00+08:00",
+      "summary": "triage 命令已实现（check 的增强别名），默认显示最新 10 封邮件（最近 7 天），输出格式化为人类可读表格（日期/发件人/主题/UID），支持 --limit 和 --recent 参数自定义。验证测试通过。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "实现 +reply 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T02:55:00+08:00",
+      "summary": "lark-cli mail +reply 命令已完整实现，支持默认草稿模式（保存为 draft，不发送）和 --confirm-send 参数（需用户确认后发送）。自动处理 Re: 主题前缀、RFC 2822 会话头、默认收件人（原发件人）、引用块拼接。审阅通过，无需修改。"
+    },
+    {
+      "subtask_index": 2,
+      "subtask": "实现 +reply-all 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T02:57:00+08:00",
+      "summary": "lark-cli mail +reply-all 命令已完整实现，支持默认草稿模式和 --confirm-send 参数。自动聚合原邮件发件人+To+Cc，自动排除当前用户，地址去重（大小写不敏感），支持 --remove 参数排除特定邮箱。审阅通过，无需修改。"
+    },
+    {
+      "subtask_index": 3,
+      "subtask": "实现 +forward 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T02:58:00+08:00",
+      "summary": "lark-cli mail +forward 命令已完整实现，支持默认草稿模式和 --confirm-send 参数。自动附加原邮件内容（标准转发区块），自动添加 Fwd: 主题前缀，支持 HTML/纯文本、抄送/密送、附件、内嵌图片。审阅通过，无需修改。"
+    },
+    {
+      "subtask_index": 4,
+      "subtask": "更新 SKILL.md 文档",
+      "status": "success",
+      "completed_at": "2026-03-29T02:58:00+08:00",
+      "summary": "lark-mail/SKILL.md 的 Shortcuts 章节已包含所有 4 个 Shortcut 命令说明（+triage、+reply、+reply-all、+forward），每个命令都有清晰的功能描述、默认行为说明、--confirm-send 标志说明、reference 文档链接。审阅通过，无需修改。"
+    }
+  ],
+  "current_subtask": 5,
+  "result": {
+    "summary": "Shortcut 命令功能完成：✅ +triage（收件箱摘要）、✅ +reply（回复发件人）、✅ +reply-all（回复全部）、✅ +forward（转发邮件）、✅ 文档完整。所有命令支持默认草稿模式（安全兜底）和 --confirm-send 参数（需用户确认后发送）。",
+    "completed_at": "2026-03-29T02:58:00+08:00"
+  },
+  "status": "completed",
+  "updated_at": "2026-03-29T02:58:00+08:00"
+}

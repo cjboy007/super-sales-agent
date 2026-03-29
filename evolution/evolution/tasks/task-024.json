@@ -1,0 +1,46 @@
+{
+  "task_id": 24,
+  "title": "OKKI Sync Mail P1 - 统一日志模块",
+  "description": "统一 send-log.js 和 drafts.js 的日志实现，删除重复代码",
+  "status": "pending",
+  "priority": "P1",
+  "created_at": "2026-03-29T10:00:00+08:00",
+  "updated_at": "2026-03-29T10:00:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/send-log.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/drafts.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "分析重复代码",
+      "description": "找出 send-log.js 和 drafts.js 中重复的 recordSentEmail 实现"
+    },
+    {
+      "id": 1,
+      "title": "统一日志写入接口",
+      "description": "创建 lib/logger.js 统一日志模块"
+    },
+    {
+      "id": 2,
+      "title": "重构 send-log.js",
+      "description": "使用统一日志模块"
+    },
+    {
+      "id": 3,
+      "title": "重构 drafts.js",
+      "description": "使用统一日志模块"
+    },
+    {
+      "id": 4,
+      "title": "测试验证",
+      "description": "确保日志功能正常工作"
+    }
+  ],
+  "history": [],
+  "result": null
+}

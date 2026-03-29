@@ -1,0 +1,76 @@
+{
+  "task_id": 17,
+  "title": "OKKI Sync Mail P0 - 转发功能",
+  "description": "实现 forward 命令，支持转发邮件",
+  "status": "pending",
+  "priority": "P0",
+  "created_at": "2026-03-29T08:30:00+08:00",
+  "updated_at": "2026-03-29T08:30:00+08:00",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.agents/skills/lark-mail/references/lark-mail-forward.md",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/GAP-ANALYSIS-LARK.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现 forward 命令",
+      "description": "node scripts/smtp.js forward --message-id <UID> --to \"third@example.com\" --body \"转发说明\""
+    },
+    {
+      "id": 1,
+      "title": "实现原邮件内容引用",
+      "description": "自动引用原邮件正文（默认草稿模式）"
+    },
+    {
+      "id": 2,
+      "title": "实现附件转发选项",
+      "description": "支持 --forward-attachments 参数转发原邮件附件"
+    },
+    {
+      "id": 3,
+      "title": "更新 SKILL.md 文档",
+      "description": "添加转发功能使用说明"
+    }
+  ],
+  "history": [
+    {
+      "subtask_index": 0,
+      "subtask": "实现 forward 命令",
+      "status": "success",
+      "completed_at": "2026-03-29T08:46:00+08:00",
+      "summary": "审阅完成 (verdict: approve)。forward 命令已完整实现：复用 fetchEmail/downloadAttachments 模块（无重复代码），仅使用已有依赖 nodemailer，自动构建标准转发头（From/Date/Subject/To），支持附件转发（--forward-attachments），支持 dry-run 预览，记录发送日志并追踪投递状态，自动清理临时附件文件。"
+    },
+    {
+      "subtask_index": 1,
+      "subtask": "实现原邮件内容引用",
+      "status": "success",
+      "completed_at": "2026-03-29T09:27:00+08:00",
+      "summary": "已实现（forward.js 行 22-42）：formatForwardedContent 函数自动构建标准转发头（From/Date/To/Cc/Subject）并拼接原邮件正文。转发邮件包含完整的原邮件引用区块。"
+    },
+    {
+      "subtask_index": 2,
+      "subtask": "实现附件转发选项",
+      "status": "success",
+      "completed_at": "2026-03-29T09:28:00+08:00",
+      "summary": "已实现（forward.js 行 45-62/110-112）：collectForwardAttachments 函数下载原邮件附件到临时目录，forwardAttachments 选项控制是否包含附件。支持 --forward-attachments 参数。"
+    },
+    {
+      "subtask_index": 3,
+      "subtask": "更新 SKILL.md 文档",
+      "status": "success",
+      "completed_at": "2026-03-29T09:28:00+08:00",
+      "summary": "SKILL.md 已包含完整的转发功能文档（行 2259-2323+）：命令用法、参数说明、默认草稿模式、附件转发、使用示例、JSON patch 文件格式、注意事项。"
+    }
+  ],
+  "current_subtask": 4,
+  "result": {
+    "summary": "OKKI Sync Mail P0 - 转发功能全部完成：✅ forward 命令实现，✅ 原邮件内容引用（formatForwardedContent 函数），✅ 附件转发选项（--forward-attachments），✅ SKILL.md 完整文档。支持完整转发工作流：读取原邮件 → 构建转发头 → 可选附件 → 草稿/发送。",
+    "completed_at": "2026-03-29T09:28:00+08:00"
+  },
+  "status": "completed",
+  "updated_at": "2026-03-29T09:28:00+08:00"
+}

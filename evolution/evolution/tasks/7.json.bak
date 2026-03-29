@@ -1,0 +1,45 @@
+{
+  "task_id": 7,
+  "title": "Email Skill P2 - 定时发送 + 交互式模式",
+  "description": "实现邮件定时发送和交互式 CLI 模式，提升用户体验",
+  "status": "reviewing",
+  "priority": "P2",
+  "created_at": "2026-03-28T17:15:00+08:00",
+  "updated_at": "2026-03-28T10:25:59.103Z",
+  "current_iteration": 0,
+  "max_iterations": 3,
+  "depends_on": [],
+  "reference_files": [
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js",
+    "/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/SKILL.md"
+  ],
+  "subtasks": [
+    {
+      "id": 0,
+      "title": "实现定时发送功能",
+      "description": "添加 --send-at \"YYYY-MM-DD HH:mm\" 参数，使用 setTimeout 或 cron 调度"
+    },
+    {
+      "id": 1,
+      "title": "创建定时任务管理",
+      "description": "创建 scheduled/ 目录，管理待发送的定时邮件"
+    },
+    {
+      "id": 2,
+      "title": "实现交互式模式",
+      "description": "添加 interactive 命令，提供向导式邮件编写体验"
+    },
+    {
+      "id": 3,
+      "title": "添加邮件预览功能",
+      "description": "check 命令增加 --preview 参数，显示正文前 100 字"
+    },
+    {
+      "id": 4,
+      "title": "更新文档",
+      "description": "在 SKILL.md 中添加定时发送和交互式模式说明"
+    }
+  ],
+  "history": [],
+  "result": null
+}
