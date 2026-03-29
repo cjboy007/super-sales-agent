@@ -28,13 +28,19 @@ test-results/
 coverage/
 scripts/test-reports/
 
+# Generated outputs (keep examples, remove generated files)
+output/
+scripts/output/
+skills/*/output/*.pdf
+skills/*/output/*.xlsx
+skills/*/output/*.html
+skills/*/examples/*.html
+
 # Data files (keep examples, remove large data)
 skills/*/data/*.json.bak
 skills/*/data/*.json.e2e-backup
 skills/*/logs/*.log
 skills/*/cache/*.json
-skills/*/output/*.pdf
-skills/*/output/*.xlsx
 
 # Secrets
 *.env
