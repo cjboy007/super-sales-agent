@@ -4,8 +4,11 @@
  * SMTP Email CLI
  * Send email via SMTP protocol. Works with Gmail, Outlook, 163.com, and any standard SMTP server.
  * Supports attachments, HTML content, multiple recipients, and scheduled sending.
+ * 
+ * Parameter parsing powered by Commander.js with strict validation.
  */
 
+const { Command, Option, InvalidArgumentError } = require('commander');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const os = require('os');
@@ -13,477 +16,235 @@ const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const { recordSentEmail, getStatus } = require('./send-log');
 const { fetchEmail } = require('./imap');
+const { validateReadPath } = require('./path-utils');
+const { sanitizeQuotedContent } = require('../lib/sanitize');
+const { buildReplyAllRecipients, parseAndValidate } = require('../lib/email-parser');
 
 const WORKSPACE_DIR = '/Users/wilson/.openclaw/workspace';
 const SCHEDULED_DIR = path.resolve(__dirname, '../scheduled');
 
-function validateReadPath(inputPath) {
-  let realPath;
-  try {
-    realPath = fs.realpathSync(inputPath);
-  } catch {
-    realPath = path.resolve(inputPath);
+// ═══════════════════════════════════════════════════════════════════════════════
+// Error Codes & Unified Error Handling
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const ErrorCodes = {
+  // Parameter validation errors (100-199)
+  MISSING_REQUIRED_PARAM: 100,
+  INVALID_PARAM_FORMAT: 101,
+  INVALID_EMAIL_FORMAT: 102,
+  INVALID_DATE_FORMAT: 103,
+  INVALID_JSON_FORMAT: 104,
+  FILE_NOT_FOUND: 105,
+  PARAM_CONFLICT: 106,
+  
+  // SMTP errors (200-299)
+  SMTP_CONNECTION_FAILED: 200,
+  SMTP_AUTH_FAILED: 201,
+  SMTP_SEND_FAILED: 202,
+  SMTP_RATE_LIMIT_EXCEEDED: 203,
+  
+  // File system errors (300-399)
+  FILE_READ_FAILED: 300,
+  FILE_WRITE_FAILED: 301,
+  DIRECTORY_NOT_FOUND: 302,
+  
+  // Business logic errors (400-499)
+  DRAFT_NOT_FOUND: 400,
+  EMAIL_NOT_FOUND: 401,
+  SIGNATURE_NOT_FOUND: 402,
+  SCHEDULE_NOT_FOUND: 403,
+  
+  // System errors (500-599)
+  INTERNAL_ERROR: 500,
+  CONFIG_MISSING: 501,
+};
+
+class SMTPError extends Error {
+  constructor(code, message, suggestions = []) {
+    super(message);
+    this.name = 'SMTPError';
+    this.code = code;
+    this.suggestions = suggestions;
+    this.timestamp = new Date().toISOString();
   }
-
-  const allowedDirsStr = process.env.ALLOWED_READ_DIRS;
-  if (!allowedDirsStr) {
-    throw new Error('ALLOWED_READ_DIRS not set in .env. File read operations are disabled.');
-  }
-
-  const allowedDirs = allowedDirsStr.split(',').map(d =>
-    path.resolve(d.trim().replace(/^~/, os.homedir()))
-  );
-
-  const allowed = allowedDirs.some(dir =>
-    realPath === dir || realPath.startsWith(dir + path.sep)
-  );
-
-  if (!allowed) {
-    throw new Error(`Access denied: '${inputPath}' is outside allowed read directories`);
-  }
-
-  return realPath;
-}
-
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const command = args[0];
-  const options = {};
-  const positional = [];
-
-  for (let i = 1; i < args.length; i++) {
-    const arg = args[i];
-    if (arg.startsWith('--')) {
-      const key = arg.slice(2);
-      const value = args[i + 1];
-      options[key] = value || true;
-      if (value && !value.startsWith('--')) i++;
-    } else if (arg.startsWith('-') && arg.length === 2) {
-      // Handle single-dash options like -h
-      const key = arg.slice(1);
-      const value = args[i + 1];
-      options[key] = value || true;
-      if (value && !value.startsWith('-')) i++;
-    } else {
-      positional.push(arg);
+  
+  toString() {
+    let output = `❌ Error [${this.code}]: ${this.message}`;
+    if (this.suggestions.length > 0) {
+      output += '\n\n💡 Suggestions:';
+      this.suggestions.forEach(s => output += `\n   - ${s}`);
     }
-  }
-
-  return { command, options, positional };
-}
-
-/**
- * 显示全局帮助信息
- */
-function showGlobalHelp() {
-  console.log(`
-📧 SMTP Email CLI
-
-用法：node smtp.js <command> [options]
-
-可用命令:
-  send              发送邮件
-  send-due          发送所有到期的定时邮件
-  list-scheduled    列出定时邮件任务
-  test              测试 SMTP 连接
-  list-signatures   列出签名模板
-  show-signature    显示签名详情
-  interactive       交互模式
-  draft             保存草稿
-  draft-create      保存草稿（draft 的别名）
-  draft-send        发送草稿（send-draft 的别名）
-  draft-edit        编辑草稿
-  list-drafts       列出草稿
-  show-draft        显示草稿详情
-  delete-draft      删除草稿
-  reply             回复邮件（自动回复全部）
-  reply-all         回复全部邮件
-  send-status       查询发送状态
-  forward           转发邮件
-
-使用 node smtp.js <command> -h 查看命令详细帮助
-`);
-}
-
-/**
- * 显示命令级帮助
- * @param {string} command - 命令名称
- */
-function showCommandHelp(command) {
-  const helpMap = {
-    'send': `
-📤 send - 发送邮件（默认草稿优先）
-
-⚠️  P0 安全策略：默认保存草稿，不直接发送！
-   使用 --confirm-send 参数才实际发送邮件。
-
-用法：node smtp.js send --to <email> --subject <text> --body <text> [options]
-
-必填参数:
-  --to <email>          收件人邮箱（逗号分隔多个）
-  --subject <text>      邮件主题
-  --body <text>         邮件正文
-
-可选参数:
-  --cc <email>          抄送邮箱
-  --bcc <email>         密送邮箱
-  --signature <name>    使用签名模板（如 en-sales, cn-sales）
-  --attach <file>       附件路径（逗号分隔多个）
-  --html                发送 HTML 格式邮件
-  --body-file <file>    从文件读取正文
-  --reply-to <UID>      回复指定 UID 的邮件
-  --send-at "YYYY-MM-DD HH:mm"  定时发送
-  --dry-run             预览邮件但不发送
-  --confirm-send        ⭐ 确认发送（必需参数，否则只保存草稿）
-  --inline <JSON>       内嵌图片（CID 引用），JSON 数组格式：'[{"cid":"abc123","path":"./logo.png"}]'
-  --plain-text          强制纯文本格式（与 --inline 互斥）
-
-示例:
-  # 保存草稿（默认行为，不实际发送）
-  node smtp.js send --to "customer@example.com" --subject "Quote" --body "Please see attached..." --signature en-sales
-  
-  # 实际发送邮件（需要 --confirm-send）
-  node smtp.js send --to "customer@example.com" --subject "Quote" --body "Please see attached..." --signature en-sales --confirm-send
-  
-  # 发送带附件和抄送的邮件
-  node smtp.js send --to "team@example.com" --subject "Update" --body-file update.txt --cc "manager@example.com" --attach "/path/to/file.pdf" --confirm-send
-  
-  # 预览邮件（不发送，不保存草稿）
-  node smtp.js send --to "customer@example.com" --subject "Re: Inquiry" --reply-to 12345 --dry-run
-  
-  # 定时发送（也需要 --confirm-send）
-  node smtp.js send --to "customer@example.com" --subject "Follow up" --body "Checking in..." --send-at "2026-03-30 09:00" --confirm-send
-  
-  # HTML 邮件带多个附件
-  node smtp.js send --to "client@company.com" --subject "Product Catalog" --html --body-file email.html --attach "catalog.pdf,price-list.xlsx" --signature en-sales --confirm-send
-  
-  # HTML 邮件带内嵌图片（CID 引用）
-  node smtp.js send --to "customer@example.com" --subject "Newsletter" --html --body-file newsletter.html --inline '[{"cid":"logo123","path":"./logo.png"},{"cid":"banner456","path":"./banner.jpg"}]' --confirm-send
-  
-  # 强制纯文本格式（禁用 HTML）
-  node smtp.js send --to "customer@example.com" --subject "Simple" --body "Plain text only" --plain-text --confirm-send
-`,
-    'test': `
-🔍 test - 测试 SMTP 连接
-
-用法：node smtp.js test
-
-测试 SMTP 服务器连接是否正常。
-
-示例:
-  node smtp.js test
-`,
-    'list-signatures': `
-📋 list-signatures - 列出签名模板
-
-用法：node smtp.js list-signatures
-
-列出所有可用的签名模板。
-
-示例:
-  node smtp.js list-signatures
-`,
-    'show-signature': `
-📝 show-signature - 显示签名详情
-
-用法：node smtp.js show-signature <name>
-
-参数:
-  <name>  签名模板名称（如 en-sales, cn-sales）
-
-示例:
-  node smtp.js show-signature en-sales
-`,
-    'send-due': `
-⏰ send-due - 发送到期的定时邮件
-
-用法：node smtp.js send-due
-
-检查 scheduled/ 目录并发送所有到期的定时邮件。
-
-示例:
-  node smtp.js send-due
-`,
-    'list-scheduled': `
-📅 list-scheduled - 列出定时邮件任务
-
-用法：node smtp.js list-scheduled
-
-列出所有待发送的定时邮件。
-
-示例:
-  node smtp.js list-scheduled
-`,
-    'interactive': `
-🎯 interactive - 交互模式
-
-用法：node smtp.js interactive
-
-通过向导式交互编写和发送邮件。
-
-示例:
-  node smtp.js interactive
-`,
-    'draft': `
-📝 draft - 保存草稿
-
-用法：node smtp.js draft --to <email> --subject <text> --body <text> [options]
-
-参数与 send 命令相同，但不实际发送。
-
-示例:
-  # 保存简单草稿
-  node smtp.js draft --to "customer@example.com" --subject "Quote" --body "Draft content..."
-  
-  # 保存带附件的草稿
-  node smtp.js draft --to "client@company.com" --subject "Proposal" --body-file proposal.txt --attach "proposal.pdf"
-  
-  # 从文件读取正文保存草稿
-  node smtp.js draft --to "team@example.com" --subject "Weekly Report" --body-file report.md --signature en-sales
-`,
-    'draft-create': `
-📝 draft-create - 保存草稿（draft 的别名）
-
-用法：node smtp.js draft-create --to <email> --subject <text> --body <text> [options]
-
-与 draft 命令完全相同，为了向后兼容。
-
-示例:
-  node smtp.js draft-create --to "customer@example.com" --subject "Quote" --body "Draft..."
-`,
-    'draft-send': `
-📤 draft-send - 发送草稿（send-draft 的别名）
-
-用法：node smtp.js draft-send <draft-id> [--confirm-send] [--dry-run]
-
-与 send-draft 命令完全相同，为了向后兼容。
-
-示例:
-  node smtp.js draft-send DRAFT-20260324035822-I --confirm-send
-`,
-    'list-drafts': `
-📋 list-drafts - 列出草稿
-
-用法：node smtp.js list-drafts
-
-列出所有草稿。
-
-示例:
-  node smtp.js list-drafts
-`,
-    'send-draft': `
-📤 send-draft - 发送草稿
-
-用法：node smtp.js send-draft <draft-id> [options]
-
-必填参数:
-  <draft-id>            草稿 ID（如 DRAFT-20260324035822-I）
-
-可选参数:
-  --confirm-send        确认发送（草稿需要人工审批时必须）
-  --dry-run             预览邮件但不实际发送
-  --archive             发送后归档草稿到 drafts/sent/
-
-示例:
-  # 发送草稿（需要确认）
-  node smtp.js send-draft DRAFT-20260324035822-I --confirm-send
-  
-  # 预览草稿（不发送）
-  node smtp.js send-draft DRAFT-20260324035822-I --dry-run
-  
-  # 发送并归档
-  node smtp.js send-draft DRAFT-20260324035822-I --confirm-send --archive
-`,
-    'show-draft': `
-📝 show-draft - 显示草稿详情
-
-用法：node smtp.js show-draft <id>
-
-参数:
-  <id>  草稿 ID
-
-示例:
-  node smtp.js show-draft 123
-`,
-    'delete-draft': `
-🗑️ delete-draft - 删除草稿
-
-用法：node smtp.js delete-draft <id>
-
-参数:
-  <id>  草稿 ID
-
-示例:
-  node smtp.js delete-draft 123
-`,
-    'draft-edit': `
-✏️ draft-edit - 编辑草稿
-
-用法：node smtp.js draft-edit <draft-id> [options]
-
-必填参数:
-  <draft-id>            草稿 ID（如 DRAFT-20260329001234-G）
-
-可选参数:
-  --to <email>          更新收件人
-  --subject <text>      更新主题
-  --body <text>         更新正文
-  --body-file <file>    从文件读取新正文
-  --html <content>      更新 HTML 正文
-  --html-file <file>    从文件读取 HTML 正文
-  --cc <email>          更新抄送
-  --bcc <email>         更新密送
-  --attach <file>       更新附件（逗号分隔）
-  --signature <name>    更新签名模板
-  --language <lang>     更新语言
-  --intent <type>       更新意图
-  --notes <text>        更新备注
-  --patch-file <file>   从 JSON 文件读取更新内容
-  --no-approval         移除审批要求
-
-示例:
-  # 更新草稿正文
-  node smtp.js draft-edit DRAFT-123 --body "New body content"
-  
-  # 从文件读取正文更新
-  node smtp.js draft-edit DRAFT-123 --body-file updated-body.txt
-  
-  # 更新多个字段
-  node smtp.js draft-edit DRAFT-123 --subject "New Subject" --to "new@example.com"
-  
-  # 从 JSON 文件读取完整更新
-  node smtp.js draft-edit DRAFT-123 --patch-file updates.json
-  
-  # 添加附件
-  node smtp.js draft-edit DRAFT-123 --attach "/path/to/file.pdf"
-`,
-    'send-status': `
-📬 send-status - 查询发送状态
-
-用法：node smtp.js send-status [query] [mode]
-
-查询模式:
-  （无参数）       显示最近 10 封发送记录
-  <number>         显示指定数量的记录
-  <index> index    按索引查询（0-based）
-  <email> to       按收件人查询
-  <subject> subject 按主题查询
-  <message-id> messageId  按 Message-ID 查询
-
-示例:
-  # 查看最近 10 封发送记录
-  node smtp.js send-status
-  
-  # 查看最近 N 封记录
-  node smtp.js send-status 5
-  
-  # 按索引查询（0-based）
-  node smtp.js send-status 0 index
-  
-  # 按收件人查询
-  node smtp.js send-status "customer@example.com" to
-  
-  # 按主题查询
-  node smtp.js send-status "Product Inquiry" subject
-  
-  # 按 Message-ID 查询
-  node smtp.js send-status "<abc123@mail.server.com>" messageId
-`,
-    'reply': `
-📤 reply - 回复邮件（自动回复全部）
-
-用法：node smtp.js reply --message-id <UID> --body "回复内容" [options]
-
-必填参数:
-  --message-id <UID>    原邮件 UID（通过 imap.js check 获取）
-  --body <text>         回复正文
-
-可选参数:
-  --subject <text>      自定义主题（默认：Re: 原主题）
-  --signature <name>    使用签名模板
-  --remove <email>      排除特定收件人（逗号分隔）
-  --dry-run             预览但不发送
-
-示例:
-  # 回复邮件（自动回复全部）
-  node smtp.js reply --message-id 12345 --body "Thanks for your email..."
-  
-  # 回复并自定义主题
-  node smtp.js reply --message-id 12345 --subject "Re: Your Inquiry" --body "Thank you..."
-  
-  # 回复但排除特定收件人
-  node smtp.js reply --message-id 12345 --body "Hi team..." --remove "noreply@example.com"
-  
-  # 预览回复（不发送）
-  node smtp.js reply --message-id 12345 --body "Thanks!" --dry-run
-`,
-    'reply-all': `
-📤 reply-all - 回复全部邮件
-
-用法：node smtp.js reply-all --message-id <UID> --body "回复内容" [options]
-
-必填参数:
-  --message-id <UID>    原邮件 UID（通过 imap.js check 获取）
-  --body <text>         回复正文
-
-可选参数:
-  --subject <text>      自定义主题（默认：Re: 原主题）
-  --signature <name>    使用签名模板
-  --remove <email>      排除特定收件人（逗号分隔）
-  --dry-run             预览但不发送
-
-示例:
-  # 回复全部邮件
-  node smtp.js reply-all --message-id 12345 --body "Thanks everyone..."
-  
-  # 回复全部并排除特定收件人
-  node smtp.js reply-all --message-id 12345 --body "Hi team..." --remove "mailing-list@example.com"
-  
-  # 预览回复（不发送）
-  node smtp.js reply-all --message-id 12345 --body "Thanks!" --dry-run
-`,
-    'forward': `
-📤 forward - 转发邮件
-
-用法：node smtp.js forward --message-id <UID> --to "email@example.com" [options]
-
-必填参数:
-  --message-id <UID>    原邮件 UID（通过 imap.js check 获取）
-  --to <email>          转发目标邮箱
-
-可选参数:
-  --body <text>         转发说明（默认："Please see the forwarded email below."）
-  --forward-attachments 转发原邮件附件
-  --draft               保存为草稿（默认行为）
-  --confirm-send        直接发送而不是保存草稿
-  --dry-run             预览但不发送
-  --mailbox <name>      原邮件所在文件夹（默认：INBOX）
-
-示例:
-  # 转发邮件（不含附件）
-  node smtp.js forward --message-id 12345 --to "third@example.com" --body "Please see below..."
-  
-  # 转发邮件并附带原附件
-  node smtp.js forward --message-id 12345 --to "colleague@example.com" --forward-attachments
-  
-  # 直接发送转发邮件（不走草稿）
-  node smtp.js forward --message-id 12345 --to "manager@example.com" --confirm-send
-  
-  # 预览转发（不发送）
-  node smtp.js forward --message-id 12345 --to "manager@example.com" --forward-attachments --dry-run
-  
-  # 从指定文件夹转发
-  node smtp.js forward --message-id 67890 --to "team@example.com" --mailbox "Projects" --forward-attachments
-`
-  };
-
-  if (helpMap[command]) {
-    console.log(helpMap[command]);
-  } else {
-    console.error(`❌ 未知命令：${command}`);
-    console.log('使用 node smtp.js -h 查看所有可用命令');
+    return output;
   }
 }
+
+function createError(code, message, suggestions = []) {
+  return new SMTPError(code, message, suggestions);
+}
+
+// Wrap validation functions to throw InvalidArgumentError for Commander.js
+function createValidationError(message, suggestions = []) {
+  const err = new InvalidArgumentError(message);
+  err.code = ErrorCodes.INVALID_EMAIL_FORMAT;
+  err.suggestions = suggestions;
+  return err;
+}
+
+function validateEmail(email, forCommander = false) {
+  if (!email || typeof email !== 'string') {
+    const err = forCommander 
+      ? createValidationError('Email address is required', ['Use --to "user@example.com" format'])
+      : createError(ErrorCodes.INVALID_EMAIL_FORMAT, 'Email address is required', ['Use --to "user@example.com" format']);
+    throw err;
+  }
+  
+  // Simple email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    const err = forCommander
+      ? createValidationError(`Invalid email format: ${email}`, ['Email should be in format: user@domain.com', 'Avoid spaces and special characters'])
+      : createError(ErrorCodes.INVALID_EMAIL_FORMAT, `Invalid email format: ${email}`, ['Email should be in format: user@domain.com', 'Avoid spaces and special characters']);
+    throw err;
+  }
+  return true;
+}
+
+function validateEmailList(emailList, forCommander = false) {
+  if (!emailList || typeof emailList !== 'string') {
+    return [];
+  }
+  
+  const emails = emailList.split(',').map(e => e.trim()).filter(Boolean);
+  emails.forEach(email => validateEmail(email, forCommander));
+  return emails;
+}
+
+function validateFilePath(filePath, description = 'File', forCommander = false) {
+  if (!filePath || typeof filePath !== 'string') {
+    const err = forCommander
+      ? createValidationError(`${description} path is required`, ['Provide a valid file path'])
+      : createError(ErrorCodes.FILE_NOT_FOUND, `${description} path is required`, ['Provide a valid file path']);
+    throw err;
+  }
+  
+  const resolvedPath = validateReadPath(filePath);
+  if (!fs.existsSync(resolvedPath)) {
+    const err = forCommander
+      ? createValidationError(`${description} not found: ${filePath}`, [`Check if the file exists at ${resolvedPath}`, 'Use absolute path or path relative to workspace'])
+      : createError(ErrorCodes.FILE_NOT_FOUND, `${description} not found: ${filePath}`, [`Check if the file exists at ${resolvedPath}`, 'Use absolute path or path relative to workspace']);
+    throw err;
+  }
+  return resolvedPath;
+}
+
+function validateDateFormat(dateStr, forCommander = false) {
+  if (!dateStr || typeof dateStr !== 'string') {
+    const err = forCommander
+      ? createValidationError('Date string is required', ['Use format: "YYYY-MM-DD HH:mm"'])
+      : createError(ErrorCodes.INVALID_DATE_FORMAT, 'Date string is required', ['Use format: "YYYY-MM-DD HH:mm"']);
+    throw err;
+  }
+  
+  const trimmed = dateStr.trim();
+  const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/);
+  if (!match) {
+    const err = forCommander
+      ? createValidationError(`Invalid date format: ${dateStr}`, ['Expected format: "YYYY-MM-DD HH:mm"', 'Example: "2026-03-30 09:00"'])
+      : createError(ErrorCodes.INVALID_DATE_FORMAT, `Invalid date format: ${dateStr}`, ['Expected format: "YYYY-MM-DD HH:mm"', 'Example: "2026-03-30 09:00"']);
+    throw err;
+  }
+  
+  const [, year, month, day, hour, minute, second = '0'] = match;
+  const date = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second),
+    0
+  );
+  
+  if (Number.isNaN(date.getTime())) {
+    const err = forCommander
+      ? createValidationError(`Invalid date value: ${dateStr}`, ['Check if the date values are valid (e.g., month 01-12, hour 00-23)'])
+      : createError(ErrorCodes.INVALID_DATE_FORMAT, `Invalid date value: ${dateStr}`, ['Check if the date values are valid (e.g., month 01-12, hour 00-23)']);
+    throw err;
+  }
+  
+  return date;
+}
+
+function validateJSON(jsonStr, description = 'JSON', forCommander = false) {
+  if (!jsonStr || typeof jsonStr !== 'string') {
+    const err = forCommander
+      ? createValidationError(`${description} string is required`, ['Provide a valid JSON string'])
+      : createError(ErrorCodes.INVALID_JSON_FORMAT, `${description} string is required`, ['Provide a valid JSON string']);
+    throw err;
+  }
+  
+  try {
+    return JSON.parse(jsonStr);
+  } catch (err) {
+    const throwErr = forCommander
+      ? createValidationError(`Invalid ${description} format: ${err.message}`, ['Check JSON syntax (quotes, commas, brackets)', 'Use single quotes for shell strings: \'{"key": "value"}\''])
+      : createError(ErrorCodes.INVALID_JSON_FORMAT, `Invalid ${description} format: ${err.message}`, ['Check JSON syntax (quotes, commas, brackets)', 'Use single quotes for shell strings: \'{"key": "value"}\'']);
+    throw throwErr;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Commander.js Program Setup
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const program = new Command();
+
+program
+  .name('smtp')
+  .description('📧 SMTP Email CLI - Send emails with attachments, HTML, and scheduling')
+  .version('2.0.0')
+  .configureOutput({
+    writeOut: (str) => process.stdout.write(str),
+    writeErr: (str) => process.stderr.write(str),
+    outputError: (str, write) => write(str),
+  })
+  .showHelpAfterError('(Run "node smtp.js -h" for help)')
+  .configureHelp({
+    sortOptions: true,
+    sortSubcommands: true,
+  });
+
+// Helper to create common options
+const commonOptions = {
+  to: new Option('-t, --to <email>', 'Recipient email(s), comma-separated for multiple')
+    .argParser((value) => {
+      validateEmailList(value, true);
+      return value;
+    }),
+  subject: new Option('-s, --subject <text>', 'Email subject'),
+  body: new Option('-b, --body <text>', 'Email body content'),
+  bodyFile: new Option('--body-file <file>', 'Read body from file')
+    .argParser((value) => validateFilePath(value, 'Body file', true)),
+  cc: new Option('--cc <email>', 'CC email(s), comma-separated'),
+  bcc: new Option('--bcc <email>', 'BCC email(s), comma-separated'),
+  signature: new Option('--signature <name>', 'Use signature template (e.g., en-sales, cn-sales)'),
+  attach: new Option('-a, --attach <files>', 'Attach file(s), comma-separated')
+    .argParser((value) => {
+      const files = value.split(',').map(f => f.trim()).filter(Boolean);
+      files.forEach(f => validateFilePath(f, 'Attachment', true));
+      return value;
+    }),
+  html: new Option('--html', 'Send as HTML format'),
+  dryRun: new Option('--dry-run', 'Preview email without sending'),
+  confirmSend: new Option('--confirm-send', 'Confirm sending (required for actual send)'),
+  from: new Option('-f, --from <email>', 'Sender email (overrides default)')
+    .argParser((value) => {
+      validateEmail(value, true);
+      return value;
+    }),
+};
+
+
 
 function loadLog() {
   const LOG_FILE = path.join(WORKSPACE_DIR, 'mail-archive/sent/sent-log.json');
@@ -571,50 +332,46 @@ async function buildMailOptions(options) {
           references = inReplyTo;
         }
 
-        // Build quoted text
+        // Build quoted text (sanitize HTML to prevent XSS/prompt injection)
         const fromName = originalEmail.from || 'Sender';
         const fromDate = originalEmail.date ? new Date(originalEmail.date).toLocaleString() : 'Unknown date';
         const fromAddress = originalEmail.fromAddress || '';
 
-        quotedText = `\n\n────────────────────────────────\nOn ${fromDate}, ${fromName} <${fromAddress}> wrote:\n\n${originalEmail.text || originalEmail.html || ''}`;
+        // Sanitize original email content before quoting
+        let quotedContent = originalEmail.text || originalEmail.html || '';
+        if (originalEmail.html) {
+          quotedContent = sanitizeQuotedContent(originalEmail.html, {
+            stripStyles: true,
+            maxDepth: 2
+          });
+        } else if (originalEmail.text && /<[a-z][\s\S]*>/i.test(originalEmail.text)) {
+          quotedContent = sanitizeQuotedContent(originalEmail.text, {
+            stripStyles: true,
+            maxDepth: 2
+          });
+        }
+
+        quotedText = `\n\n────────────────────────────────\nOn ${fromDate}, ${fromName} <${fromAddress}> wrote:\n\n${quotedContent}`;
 
         // Auto "Reply All" - collect all recipients (original sender + To + Cc)
         const selfEmail = process.env.SMTP_USER;
         
-        // Helper function to add recipient if valid and not self
-        const addRecipient = (email) => {
-          if (!email) return;
-          const normalized = email.toLowerCase().trim();
-          if (normalized === selfEmail?.toLowerCase()) return; // Exclude self
-          if (!replyAllRecipients.some(r => r.toLowerCase() === normalized)) {
-            replyAllRecipients.push(email);
-          }
-        };
-
-        // 1. Add original sender (From)
-        if (fromAddress) {
-          addRecipient(fromAddress);
-        }
-
-        // 2. Add original To recipients
-        if (originalEmail.to) {
-          const toRecipients = originalEmail.to.split(',').map(r => r.trim());
-          toRecipients.forEach(addRecipient);
-        }
-
-        // 3. Add original Cc recipients
-        if (originalEmail.cc) {
-          const ccRecipients = originalEmail.cc.split(',').map(r => r.trim());
-          ccRecipients.forEach(addRecipient);
-        }
-
-        // 4. Handle --remove parameter: exclude specific addresses
-        if (options.remove) {
-          const removeList = options.remove.split(',').map(r => r.toLowerCase().trim());
-          replyAllRecipients = replyAllRecipients.filter(r => 
-            !removeList.some(remove => r.toLowerCase().includes(remove))
-          );
-        }
+        // Parse recipients to remove (if specified)
+        // Remove list can be plain text (e.g., "mailing-list") or email addresses
+        const removeList = options.remove 
+          ? options.remove.split(',').map(r => r.toLowerCase().trim()).filter(Boolean)
+          : [];
+        
+        // Use RFC-compliant email parser to build reply-all recipients
+        replyAllRecipients = buildReplyAllRecipients(
+          {
+            fromAddress: fromAddress,
+            to: originalEmail.to,
+            cc: originalEmail.cc
+          },
+          selfEmail,
+          removeList
+        );
       }
     } catch (err) {
       console.error(`⚠️  Failed to fetch original email (UID: ${options.replyTo}): ${err.message}`);
@@ -1008,7 +765,8 @@ async function processScheduledFile(filePath) {
 }
 
 async function scheduleEmail(options, sendAtInput) {
-  const sendAt = parseSendAt(sendAtInput);
+  // Accept either a Date object or a string
+  const sendAt = sendAtInput instanceof Date ? sendAtInput : parseSendAt(sendAtInput);
   const now = Date.now();
   const delayMs = sendAt.getTime() - now;
 
@@ -1358,124 +1116,221 @@ async function interactiveMode() {
   }
 }
 
-async function main() {
-  const { command, options, positional } = parseArgs();
+// ═══════════════════════════════════════════════════════════════════════════════
+// Commander.js Command Registrations
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  // 检查帮助参数
-  if (command === '-h' || command === '--help' || options.h || options.help) {
-    if (command && command !== '-h' && command !== '--help') {
-      showCommandHelp(command);
-    } else {
-      showGlobalHelp();
-    }
-    return;
-  }
-
-  // 无参数时显示全局帮助
-  if (process.argv.length === 2) {
-    showGlobalHelp();
-    return;
-  }
-
-  try {
-    let result;
-
-    switch (command) {
-      case 'send': {
+/**
+ * Register all subcommands with Commander.js
+ */
+function registerCommands() {
+  // Send command
+  program
+    .command('send')
+    .description('📤 Send email (draft-first mode by default)')
+    .addOption(commonOptions.to.makeOptionMandatory('Recipient email is required'))
+    .addOption(commonOptions.subject.makeOptionMandatory('Email subject is required'))
+    .addOption(commonOptions.body)
+    .addOption(commonOptions.bodyFile)
+    .addOption(commonOptions.cc)
+    .addOption(commonOptions.bcc)
+    .addOption(commonOptions.signature)
+    .addOption(commonOptions.attach)
+    .addOption(commonOptions.html)
+    .addOption(commonOptions.dryRun)
+    .addOption(commonOptions.confirmSend)
+    .addOption(commonOptions.from)
+    .option('--subject-file <file>', 'Read subject from file')
+    .option('--html-file <file>', 'Read HTML body from file')
+    .option('--send-at <datetime>', 'Schedule email for later (format: "YYYY-MM-DD HH:mm")', (value) => {
+      return validateDateFormat(value, true);
+    })
+    .option('--reply-to <uid>', 'Reply to email UID (auto-includes original recipients in CC)')
+    .option('--remove <emails>', 'Exclude specific recipients from reply-all (comma-separated)')
+    .option('--inline <json>', 'Inline images as CID references (JSON array)', (value) => {
+      const parsed = validateJSON(value, 'Inline images', true);
+      if (!Array.isArray(parsed)) {
+        throw createValidationError(
+          '--inline must be a JSON array',
+          ['Format: \'[{"cid":"logo123","path":"./logo.png"}]\'']
+        );
+      }
+      parsed.forEach(img => {
+        if (!img.cid || !img.path) {
+          throw createValidationError(
+            'Each inline image must have "cid" and "path" properties',
+          );
+        }
+        validateFilePath(img.path, 'Inline image', true);
+      });
+      return parsed;
+    })
+    .option('--plain-text', 'Force plain text mode (mutually exclusive with --inline)')
+    .option('--language <lang>', 'Email language (en/cn)', 'en')
+    .option('--intent <type>', 'Email intent (inquiry/reply/followup)')
+    .action(async (options) => {
+      try {
         const prepared = await prepareSendOptions(options);
-        if (prepared['send-at']) {
-          result = await scheduleEmail(prepared, prepared['send-at']);
+        let result;
+        if (options.sendAt) {
+          // options.sendAt is already a Date object from the parser
+          result = await scheduleEmail(prepared, options.sendAt);
         } else {
           result = await sendEmail(prepared);
         }
-        break;
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'send-due':
-        result = await sendDueScheduledEmails();
-        break;
+  // Test command
+  program
+    .command('test')
+    .description('🔍 Test SMTP connection')
+    .action(async () => {
+      try {
+        const result = await testConnection();
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
+      }
+    });
 
-      case 'list-scheduled':
-        result = {
-          success: true,
-          scheduledDir: SCHEDULED_DIR,
-          items: listScheduledEmails(),
-        };
-        break;
-
-      case 'test':
-        result = await testConnection();
-        break;
-
-      case 'list-signatures': {
+  // List signatures command
+  program
+    .command('list-signatures')
+    .description('📋 List available signature templates')
+    .action(() => {
+      try {
         const signaturesDir = path.resolve(__dirname, '../signatures');
         if (!fs.existsSync(signaturesDir)) {
-          console.error('❌ 签名目录不存在:', signaturesDir);
-          process.exit(1);
+          throw createError(
+            ErrorCodes.DIRECTORY_NOT_FOUND,
+            `Signature directory not found: ${signaturesDir}`,
+            ['Check if the signatures folder exists']
+          );
         }
 
         const files = fs.readdirSync(signaturesDir).filter(f => f.endsWith('.json'));
         if (files.length === 0) {
-          console.log('📭 暂无签名模板');
-          process.exit(0);
+          console.log('📭 No signature templates found');
+          return;
         }
 
-        console.log('\n📝 可用签名模板:\n');
+        console.log('\n📝 Available Signature Templates:\n');
         files.forEach(file => {
           const sigData = JSON.parse(fs.readFileSync(path.join(signaturesDir, file), 'utf8'));
           const name = file.replace('signature-', '').replace('.json', '');
           console.log(`  - ${name} (${sigData.language || 'unknown'} / ${sigData.role || 'general'})`);
         });
         console.log('');
-        return;
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'show-signature': {
-        const sigName = positional[0];
-        if (!sigName) {
-          console.error('❌ 缺少参数：签名名称');
-          console.error('用法：show-signature <name>');
-          console.error('示例：show-signature en-sales');
-          process.exit(1);
-        }
-
-        const signaturePath = path.resolve(__dirname, `../signatures/signature-${sigName}.json`);
+  // Show signature command
+  program
+    .command('show-signature <name>')
+    .description('📝 Show signature template details')
+    .action((name) => {
+      try {
+        const signaturePath = path.resolve(__dirname, `../signatures/signature-${name}.json`);
         if (!fs.existsSync(signaturePath)) {
-          console.error(`❌ 签名模板不存在：${signaturePath}`);
-          console.error('可用签名：运行 list-signatures 查看所有模板');
-          process.exit(1);
+          throw createError(
+            ErrorCodes.SIGNATURE_NOT_FOUND,
+            `Signature template not found: ${name}`,
+            ['Run list-signatures to see available templates']
+          );
         }
 
         const sigData = JSON.parse(fs.readFileSync(signaturePath, 'utf8'));
-        console.log('\n📝 签名模板详情:\n');
-        console.log('名称:', sigName);
-        console.log('语言:', sigData.language || '未指定');
-        console.log('角色:', sigData.role || '未指定');
+        console.log('\n📝 Signature Template Details:\n');
+        console.log('Name:', name);
+        console.log('Language:', sigData.language || 'Unspecified');
+        console.log('Role:', sigData.role || 'Unspecified');
         console.log('─────────────────────────────────────────');
-        console.log('问候语:', sigData.greeting);
-        console.log('姓名:', sigData.name_field);
-        console.log('职位:', sigData.title);
-        console.log('公司:', sigData.company);
-        console.log('邮箱:', sigData.email);
-        console.log('电话:', sigData.phone);
-        console.log('网站:', sigData.website);
-        console.log('地址 (中国):', sigData.address_cn);
-        console.log('地址 (越南):', sigData.address_vn);
-        console.log('标语:', sigData.tagline);
+        console.log('Greeting:', sigData.greeting);
+        console.log('Name:', sigData.name_field);
+        console.log('Title:', sigData.title);
+        console.log('Company:', sigData.company);
+        console.log('Email:', sigData.email);
+        console.log('Phone:', sigData.phone);
+        console.log('Website:', sigData.website);
+        console.log('Address (CN):', sigData.address_cn);
+        console.log('Address (VN):', sigData.address_vn);
+        console.log('Tagline:', sigData.tagline);
         console.log('');
-        return;
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'interactive':
+  // List scheduled command
+  program
+    .command('list-scheduled')
+    .description('📅 List scheduled email tasks')
+    .action(() => {
+      try {
+        const result = {
+          success: true,
+          scheduledDir: SCHEDULED_DIR,
+          items: listScheduledEmails(),
+        };
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
+      }
+    });
+
+  // Send due command
+  program
+    .command('send-due')
+    .description('⏰ Send all due scheduled emails')
+    .action(async () => {
+      try {
+        const result = await sendDueScheduledEmails();
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
+      }
+    });
+
+  // Interactive command
+  program
+    .command('interactive')
+    .description('🎯 Interactive email wizard')
+    .action(async () => {
+      try {
         await interactiveMode();
-        return;
+      } catch (err) {
+        handleError(err);
+      }
+    });
 
-      // Draft commands
-      case 'draft':
-      case 'save-draft': {
+  // Draft command
+  program
+    .command('draft')
+    .description('📝 Save email as draft')
+    .addOption(commonOptions.to)
+    .addOption(commonOptions.subject)
+    .addOption(commonOptions.body)
+    .addOption(commonOptions.bodyFile)
+    .addOption(commonOptions.cc)
+    .addOption(commonOptions.bcc)
+    .addOption(commonOptions.signature)
+    .addOption(commonOptions.attach)
+    .option('--language <lang>', 'Draft language', 'en')
+    .option('--intent <type>', 'Draft intent')
+    .option('--template <name>', 'Template used')
+    .option('--notes <text>', 'Draft notes')
+    .option('--no-approval', 'Skip approval requirement')
+    .option('--file <file>', 'Load draft from JSON file')
+    .action((options) => {
+      try {
         const { saveDraft } = require('./drafts');
         
-        // Build draft data from options
         const draftData = {
           to: options.to,
           cc: options.cc,
@@ -1487,61 +1342,71 @@ async function main() {
           language: options.language || 'en',
           intent: options.intent,
           template_used: options.template,
-          requires_human_approval: options['no-approval'] !== true,
+          requires_human_approval: options.approval !== false,
           notes: options.notes,
         };
         
-        // Load body from file if specified
-        if (options['body-file']) {
-          validateReadPath(options['body-file']);
-          draftData.body = fs.readFileSync(options['body-file'], 'utf8');
+        if (options.bodyFile) {
+          draftData.body = fs.readFileSync(options.bodyFile, 'utf8');
         }
         
-        // Handle attachments
         if (options.attach) {
           const attachFiles = options.attach.split(',').map(f => f.trim()).filter(Boolean);
           draftData.attachments = attachFiles.map(f => ({
             filename: path.basename(f),
-            path: validateReadPath(f),
+            path: validateFilePath(f),
           }));
         }
         
-        // Load from file if specified
         if (options.file) {
-          validateReadPath(options.file);
-          const fileData = JSON.parse(fs.readFileSync(options.file, 'utf8'));
+          const fileData = JSON.parse(fs.readFileSync(validateFilePath(options.file), 'utf8'));
           Object.assign(draftData, fileData);
         }
         
-        result = saveDraft(draftData);
-        break;
+        const result = saveDraft(draftData);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'send-draft': {
+  // Send draft command
+  program
+    .command('send-draft <draftId>')
+    .description('📤 Send a draft')
+    .option('--confirm-send', 'Confirm sending')
+    .option('--dry-run', 'Preview without sending')
+    .option('--archive', 'Archive after sending')
+    .action(async (draftId, options) => {
+      try {
         const { sendDraft } = require('./drafts');
-        const draftId = positional[0];
-        
-        if (!draftId) {
-          console.error('❌ Missing draft ID');
-          console.error('Usage: send-draft <draft-id> [--confirm-send] [--dry-run]');
-          process.exit(1);
-        }
-        
-        result = await sendDraft(draftId, {
-          confirmSend: options['confirm-send'],
-          dryRun: options['dry-run'],
+        const result = await sendDraft(draftId, {
+          confirmSend: options.confirmSend,
+          dryRun: options.dryRun,
           archive: options.archive,
         });
-        break;
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'list-drafts': {
+  // List drafts command
+  program
+    .command('list-drafts')
+    .description('📋 List all drafts')
+    .option('--intent <type>', 'Filter by intent')
+    .option('--language <lang>', 'Filter by language')
+    .option('--only-approval', 'Show only drafts requiring approval')
+    .option('--json', 'Output as JSON')
+    .action((options) => {
+      try {
         const { listDrafts } = require('./drafts');
         
         const drafts = listDrafts({
           intent: options.intent,
           language: options.language,
-          onlyApproval: options['only-approval'],
+          onlyApproval: options.onlyApproval,
         });
         
         if (options.json) {
@@ -1563,23 +1428,26 @@ async function main() {
           }
           console.log(`Total: ${drafts.length} draft(s)\n`);
         }
-        return;
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'show-draft': {
+  // Show draft command
+  program
+    .command('show-draft <draftId>')
+    .description('📝 Show draft details')
+    .option('--json', 'Output as JSON')
+    .action((draftId, options) => {
+      try {
         const { loadDraft } = require('./drafts');
-        const draftId = positional[0];
-        
-        if (!draftId) {
-          console.error('❌ Missing draft ID');
-          console.error('Usage: show-draft <draft-id>');
-          process.exit(1);
-        }
-        
         const draft = loadDraft(draftId);
         if (!draft) {
-          console.error(`❌ Draft not found: ${draftId}`);
-          process.exit(1);
+          throw createError(
+            ErrorCodes.DRAFT_NOT_FOUND,
+            `Draft not found: ${draftId}`,
+            ['Run list-drafts to see available drafts']
+          );
         }
         
         if (options.json) {
@@ -1600,45 +1468,74 @@ async function main() {
           console.log(draft.body || draft.html);
           console.log('');
         }
-        return;
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'delete-draft': {
+  // Delete draft command
+  program
+    .command('delete-draft <draftId>')
+    .description('🗑️ Delete a draft')
+    .action((draftId) => {
+      try {
         const { deleteDraft } = require('./drafts');
-        const draftId = positional[0];
-        
-        if (!draftId) {
-          console.error('❌ Missing draft ID');
-          console.error('Usage: delete-draft <draft-id>');
-          process.exit(1);
-        }
-        
-        result = deleteDraft(draftId);
-        break;
+        const result = deleteDraft(draftId);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'draft-edit':
-      case 'edit-draft': {
-        const { editDraft } = require('./drafts');
-        const draftId = positional[0];
+  // Draft edit command
+  program
+    .command('draft-edit <draftId>')
+    .alias('edit-draft')
+    .description('✏️ Edit draft (supports structured patch)')
+    .option('--to <email>', 'Update recipient')
+    .option('--subject <text>', 'Update subject')
+    .option('--body <text>', 'Update body')
+    .option('--body-file <file>', 'Load new body from file')
+    .option('--html <content>', 'Update HTML body')
+    .option('--html-file <file>', 'Load HTML from file')
+    .option('--cc <email>', 'Update CC')
+    .option('--bcc <email>', 'Update BCC')
+    .option('--attach <files>', 'Update attachments')
+    .option('--signature <name>', 'Update signature')
+    .option('--language <lang>', 'Update language')
+    .option('--intent <type>', 'Update intent')
+    .option('--notes <text>', 'Update notes')
+    .option('--patch-file <file>', 'Load structured patch from JSON file')
+    .option('--no-approval', 'Remove approval requirement')
+    .option('--inspect', 'View draft details (read-only)')
+    .option('--print-patch-template', 'Print patch template')
+    .action(async (draftId, options) => {
+      try {
+        const { editDraft, inspectDraft, printPatchTemplate } = require('./drafts');
         
-        if (!draftId) {
-          console.error('❌ Missing draft ID');
-          console.error('Usage: draft-edit <draft-id> [--to <email>] [--subject <text>] [--body <text>] [--patch-file <file>]');
-          process.exit(1);
+        if (options.printPatchTemplate) {
+          const result = printPatchTemplate();
+          console.log(JSON.stringify(result, null, 2));
+          return;
         }
         
-        // Build updates from command-line options
+        if (options.inspect) {
+          const result = inspectDraft(draftId);
+          console.log(JSON.stringify(result, null, 2));
+          return;
+        }
+        
         const updates = {};
         
-        // Support --patch-file for JSON patch
-        if (options['patch-file']) {
-          validateReadPath(options['patch-file']);
-          const patchData = JSON.parse(fs.readFileSync(options['patch-file'], 'utf8'));
-          Object.assign(updates, patchData);
+        if (options.patchFile) {
+          const patchData = JSON.parse(fs.readFileSync(validateFilePath(options.patchFile), 'utf8'));
+          if (patchData.ops && Array.isArray(patchData.ops)) {
+            Object.assign(updates, patchData);
+          } else {
+            Object.assign(updates, patchData);
+          }
         }
         
-        // Support individual field updates
         if (options.to) updates.to = options.to;
         if (options.subject) updates.subject = options.subject;
         if (options.body) updates.body = options.body;
@@ -1649,188 +1546,227 @@ async function main() {
         if (options.language) updates.language = options.language;
         if (options.intent) updates.intent = options.intent;
         if (options.notes) updates.notes = options.notes;
-        if (options['no-approval']) updates.requires_human_approval = false;
+        if (options.approval === false) updates.requires_human_approval = false;
         
-        // Handle --body-file
-        if (options['body-file']) {
-          validateReadPath(options['body-file']);
-          updates.body = fs.readFileSync(options['body-file'], 'utf8');
+        if (options.bodyFile) {
+          updates.body = fs.readFileSync(validateFilePath(options.bodyFile), 'utf8');
         }
         
-        // Handle --html-file
-        if (options['html-file']) {
-          validateReadPath(options['html-file']);
-          updates.html = fs.readFileSync(options['html-file'], 'utf8');
+        if (options.htmlFile) {
+          updates.html = fs.readFileSync(validateFilePath(options.htmlFile), 'utf8');
         }
         
-        // Handle attachments update
         if (options.attach) {
           const attachFiles = options.attach.split(',').map(f => f.trim()).filter(Boolean);
           updates.attachments = attachFiles.map(f => ({
             filename: path.basename(f),
-            path: validateReadPath(f),
+            path: validateFilePath(f),
           }));
         }
         
         if (Object.keys(updates).length === 0) {
-          console.error('❌ No updates provided');
-          console.error('Usage: draft-edit <draft-id> [--to <email>] [--subject <text>] [--body <text>] [--patch-file <file>]');
-          process.exit(1);
+          throw createError(
+            ErrorCodes.MISSING_REQUIRED_PARAM,
+            'No updates provided',
+            ['Use --to, --subject, --body, --patch-file, etc.', 'Run with --inspect to view current draft']
+          );
         }
         
-        result = editDraft(draftId, updates);
-        break;
+        const result = editDraft(draftId, updates);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'send-status':
-      case 'status': {
-        const identifier = positional[0];
-        const field = positional[1] || 'messageId';
-        
+  // Send status command
+  program
+    .command('send-status [identifier] [field]')
+    .alias('status')
+    .description('📬 Check delivery status')
+    .action((identifier, field, options) => {
+      try {
         if (!identifier) {
-          // No identifier provided, show recent statuses
-          const statusLimit = 10;
           const { getAllRecentStatus } = require('./send-log');
-          const statuses = getAllRecentStatus(statusLimit);
+          const statuses = getAllRecentStatus(10);
           console.log(JSON.stringify({
             success: true,
             count: statuses.length,
             statuses,
           }, null, 2));
         } else if (field === 'messageId' && !isNaN(parseInt(identifier))) {
-          // If only a number is provided, treat it as limit for recent statuses
-          const statusLimit = parseInt(identifier);
           const { getAllRecentStatus } = require('./send-log');
-          const statuses = getAllRecentStatus(statusLimit);
+          const statuses = getAllRecentStatus(parseInt(identifier));
           console.log(JSON.stringify({
             success: true,
             count: statuses.length,
             statuses,
           }, null, 2));
         } else {
-          const status = getStatus(identifier, field);
+          const status = getStatus(identifier, field || 'messageId');
           if (!status) {
-            console.error(`Email not found: ${identifier} (field: ${field})`);
-            process.exit(1);
+            throw createError(
+              ErrorCodes.EMAIL_NOT_FOUND,
+              `Email not found: ${identifier}`,
+              ['Check the identifier and field']
+            );
           }
           console.log(JSON.stringify({
             success: true,
             status,
           }, null, 2));
         }
-        return;
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'forward': {
-        const { forwardEmail } = require('./forward');
-        
-        if (!options['message-id']) {
-          console.error('❌ Missing required parameter: --message-id <UID>');
-          console.error('Usage: node smtp.js forward --message-id <UID> --to "email@example.com" [--body "Forward note"] [--forward-attachments]');
-          process.exit(1);
+  // Reply command
+  program
+    .command('reply')
+    .description('📤 Reply to email (auto "Reply All")')
+    .requiredOption('--message-id <uid>', 'Original email UID')
+    .option('--body <text>', 'Reply body')
+    .option('--body-file <file>', 'Load body from file')
+    .option('--subject <text>', 'Custom subject')
+    .option('--signature <name>', 'Use signature template')
+    .option('--remove <emails>', 'Exclude recipients')
+    .option('--dry-run', 'Preview without sending')
+    .action(async (options) => {
+      try {
+        if (!options.body && !options.bodyFile) {
+          throw createError(
+            ErrorCodes.MISSING_REQUIRED_PARAM,
+            'Missing --body or --body-file',
+            ['Provide reply content with --body or --body-file']
+          );
         }
         
-        if (!options.to) {
-          console.error('❌ Missing required parameter: --to <email>');
-          console.error('Usage: node smtp.js forward --message-id <UID> --to "email@example.com" [--body "Forward note"] [--forward-attachments]');
-          process.exit(1);
-        }
-        
-        result = await forwardEmail({
-          uid: options['message-id'],
-          to: options.to,
-          cc: options.cc,
-          bcc: options.bcc,
-          body: options.body || 'Please see the forwarded email below.',
-          signature: options.signature,
-          forwardAttachments: options['forward-attachments'] === true || options['forward-attachments'] === 'true',
-          draft: options.draft !== 'false' && !(options['confirm-send'] === true || options['confirm-send'] === 'true'),
-          confirmSend: options['confirm-send'] === true || options['confirm-send'] === 'true',
-          dryRun: options['dry-run'] === true || options['dry-run'] === 'true',
-          mailbox: options.mailbox,
-        });
-        break;
-      }
-
-      // Reply commands (aligned with lark-mail style)
-      case 'reply': {
-        if (!options['message-id']) {
-          console.error('❌ Missing required parameter: --message-id <UID>');
-          console.error('Usage: node smtp.js reply --message-id <UID> --body "回复内容" [--signature <name>] [--remove <email>]');
-          process.exit(1);
-        }
-        
-        if (!options.body && !options['body-file']) {
-          console.error('❌ Missing required parameter: --body <text> or --body-file <file>');
-          console.error('Usage: node smtp.js reply --message-id <UID> --body "回复内容"');
-          process.exit(1);
-        }
-        
-        // Build reply options
-        const replyOptions = {
-          to: options.to || 'placeholder@reply.local', // Will be overridden by reply-to logic
-          subject: options.subject || `Re: `,
-          body: options.body || '',
-          signature: options.signature,
-          remove: options.remove,
-          dryRun: options['dry-run'],
-        };
-        
-        // Load body from file if specified
-        if (options['body-file']) {
-          validateReadPath(options['body-file']);
-          replyOptions.body = fs.readFileSync(options['body-file'], 'utf8');
-        }
-        
-        // Use send command with reply-to parameter
-        replyOptions['reply-to'] = options['message-id'];
-        
-        const prepared = await prepareSendOptions(replyOptions);
-        result = await sendEmail(prepared);
-        break;
-      }
-
-      case 'reply-all': {
-        if (!options['message-id']) {
-          console.error('❌ Missing required parameter: --message-id <UID>');
-          console.error('Usage: node smtp.js reply-all --message-id <UID> --body "回复内容" [--signature <name>] [--remove <email>]');
-          process.exit(1);
-        }
-        
-        if (!options.body && !options['body-file']) {
-          console.error('❌ Missing required parameter: --body <text> or --body-file <file>');
-          console.error('Usage: node smtp.js reply-all --message-id <UID> --body "回复内容"');
-          process.exit(1);
-        }
-        
-        // Build reply-all options (same as reply, but explicitly enables auto-CC)
         const replyOptions = {
           to: options.to || 'placeholder@reply.local',
           subject: options.subject || `Re: `,
           body: options.body || '',
           signature: options.signature,
           remove: options.remove,
-          dryRun: options['dry-run'],
+          dryRun: options.dryRun,
         };
         
-        // Load body from file if specified
-        if (options['body-file']) {
-          validateReadPath(options['body-file']);
-          replyOptions.body = fs.readFileSync(options['body-file'], 'utf8');
+        if (options.bodyFile) {
+          replyOptions.body = fs.readFileSync(validateFilePath(options.bodyFile), 'utf8');
         }
         
-        // Use send command with reply-to parameter
-        replyOptions['reply-to'] = options['message-id'];
+        replyOptions['reply-to'] = options.messageId;
         
         const prepared = await prepareSendOptions(replyOptions);
-        result = await sendEmail(prepared);
-        break;
+        const result = await sendEmail(prepared);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      // Draft aliases (for backward compatibility)
-      case 'draft-create':
-      case 'create-draft': {
-        // Alias for 'draft' command
+  // Reply all command
+  program
+    .command('reply-all')
+    .description('📤 Reply all to email')
+    .requiredOption('--message-id <uid>', 'Original email UID')
+    .option('--body <text>', 'Reply body')
+    .option('--body-file <file>', 'Load body from file')
+    .option('--subject <text>', 'Custom subject')
+    .option('--signature <name>', 'Use signature template')
+    .option('--remove <emails>', 'Exclude recipients')
+    .option('--dry-run', 'Preview without sending')
+    .action(async (options) => {
+      try {
+        if (!options.body && !options.bodyFile) {
+          throw createError(
+            ErrorCodes.MISSING_REQUIRED_PARAM,
+            'Missing --body or --body-file',
+            ['Provide reply content with --body or --body-file']
+          );
+        }
+        
+        const replyOptions = {
+          to: options.to || 'placeholder@reply.local',
+          subject: options.subject || `Re: `,
+          body: options.body || '',
+          signature: options.signature,
+          remove: options.remove,
+          dryRun: options.dryRun,
+        };
+        
+        if (options.bodyFile) {
+          replyOptions.body = fs.readFileSync(validateFilePath(options.bodyFile), 'utf8');
+        }
+        
+        replyOptions['reply-to'] = options.messageId;
+        
+        const prepared = await prepareSendOptions(replyOptions);
+        const result = await sendEmail(prepared);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
+      }
+    });
+
+  // Forward command
+  program
+    .command('forward')
+    .description('📤 Forward email')
+    .requiredOption('--message-id <uid>', 'Original email UID')
+    .requiredOption('--to <email>', 'Forward to email')
+    .option('--body <text>', 'Forward note', 'Please see the forwarded email below.')
+    .option('--cc <email>', 'CC email')
+    .option('--bcc <email>', 'BCC email')
+    .option('--signature <name>', 'Use signature')
+    .option('--forward-attachments', 'Forward original attachments')
+    .option('--draft', 'Save as draft (default)')
+    .option('--confirm-send', 'Send directly')
+    .option('--dry-run', 'Preview without sending')
+    .option('--mailbox <name>', 'Original email mailbox', 'INBOX')
+    .action(async (options) => {
+      try {
+        const { forwardEmail } = require('./forward');
+        const result = await forwardEmail({
+          uid: options.messageId,
+          to: options.to,
+          cc: options.cc,
+          bcc: options.bcc,
+          body: options.body,
+          signature: options.signature,
+          forwardAttachments: options.forwardAttachments === true,
+          draft: options.draft !== 'false' && !options.confirmSend,
+          confirmSend: options.confirmSend === true,
+          dryRun: options.dryRun === true,
+          mailbox: options.mailbox,
+        });
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
+      }
+    });
+
+  // Draft aliases for backward compatibility
+  program
+    .command('draft-create')
+    .alias('create-draft')
+    .description('📝 Save draft (alias for draft)')
+    .addOption(commonOptions.to)
+    .addOption(commonOptions.subject)
+    .addOption(commonOptions.body)
+    .addOption(commonOptions.bodyFile)
+    .addOption(commonOptions.cc)
+    .addOption(commonOptions.bcc)
+    .addOption(commonOptions.signature)
+    .addOption(commonOptions.attach)
+    .option('--language <lang>', 'Draft language', 'en')
+    .option('--intent <type>', 'Draft intent')
+    .option('--template <name>', 'Template used')
+    .option('--notes <text>', 'Draft notes')
+    .option('--no-approval', 'Skip approval')
+    .option('--file <file>', 'Load from JSON file')
+    .action((options) => {
+      try {
         const { saveDraft } = require('./drafts');
         
         const draftData = {
@@ -1844,110 +1780,77 @@ async function main() {
           language: options.language || 'en',
           intent: options.intent,
           template_used: options.template,
-          requires_human_approval: options['no-approval'] !== true,
+          requires_human_approval: options.approval !== false,
           notes: options.notes,
         };
         
-        if (options['body-file']) {
-          validateReadPath(options['body-file']);
-          draftData.body = fs.readFileSync(options['body-file'], 'utf8');
+        if (options.bodyFile) {
+          draftData.body = fs.readFileSync(options.bodyFile, 'utf8');
         }
         
         if (options.attach) {
           const attachFiles = options.attach.split(',').map(f => f.trim()).filter(Boolean);
           draftData.attachments = attachFiles.map(f => ({
             filename: path.basename(f),
-            path: validateReadPath(f),
+            path: validateFilePath(f),
           }));
         }
         
         if (options.file) {
-          validateReadPath(options.file);
-          const fileData = JSON.parse(fs.readFileSync(options.file, 'utf8'));
+          const fileData = JSON.parse(fs.readFileSync(validateFilePath(options.file), 'utf8'));
           Object.assign(draftData, fileData);
         }
         
-        result = saveDraft(draftData);
-        break;
+        const result = saveDraft(draftData);
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
 
-      case 'draft-send': {
-        // Alias for 'send-draft' command
+  program
+    .command('draft-send <draftId>')
+    .description('📤 Send draft (alias for send-draft)')
+    .option('--confirm-send', 'Confirm sending')
+    .option('--dry-run', 'Preview without sending')
+    .option('--archive', 'Archive after sending')
+    .action(async (draftId, options) => {
+      try {
         const { sendDraft } = require('./drafts');
-        const draftId = positional[0];
-        
-        if (!draftId) {
-          console.error('❌ Missing draft ID');
-          console.error('Usage: draft-send <draft-id> [--confirm-send] [--dry-run]');
-          process.exit(1);
-        }
-        
-        result = await sendDraft(draftId, {
-          confirmSend: options['confirm-send'],
-          dryRun: options['dry-run'],
+        const result = await sendDraft(draftId, {
+          confirmSend: options.confirmSend,
+          dryRun: options.dryRun,
           archive: options.archive,
         });
-        break;
+        console.log(JSON.stringify(result, null, 2));
+      } catch (err) {
+        handleError(err);
       }
+    });
+}
 
-      default:
-        console.error('Unknown command:', command);
-        console.error('Available commands: send, send-due, list-scheduled, test, list-signatures, show-signature, interactive, draft, draft-create, draft-send, send-draft, list-drafts, show-draft, delete-draft, reply, reply-all, send-status');
-        console.error('\nUsage:');
-        console.error('  send                    --to <email> --subject <text> --body <text> [--signature <name>] [--html] [--attach <file>]');
-        console.error('  send                    --to <email> --subject <text> --body-file <file> [--signature <name>] [--html-file <file>] [--attach <file>]');
-        console.error('  send                    --to <email> --subject <text> --body <text> --send-at "YYYY-MM-DD HH:mm"');
-        console.error('  send-due                Send all pending scheduled emails that are due');
-        console.error('  list-scheduled          List scheduled email jobs');
-        console.error('  test                    Test SMTP connection');
-        console.error('  list-signatures         列出所有可用签名模板');
-        console.error('  show-signature <name>   显示指定签名的详细内容');
-        console.error('  interactive             Interactive mode - guided email sending wizard');
-        console.error('\nDraft commands:');
-        console.error('  draft                   Save email as draft (default: requires approval)');
-        console.error('  draft-create            Alias for draft (backward compatibility)');
-        console.error('  draft-send <id>         Alias for send-draft (backward compatibility)');
-        console.error('  list-drafts             List all drafts');
-        console.error('  show-draft <id>         Show draft details');
-        console.error('  send-draft <id>         Send draft (requires --confirm-send)');
-        console.error('  delete-draft <id>       Delete draft');
-        console.error('\nReply commands:');
-        console.error('  reply --message-id <UID>  Reply to email (auto "Reply All")');
-        console.error('  reply-all --message-id <UID>  Reply all to email');
-        console.error('\nDraft options:');
-        console.error('  --to <email>            Recipient email');
-        console.error('  --subject <text>        Email subject');
-        console.error('  --body <text>           Email body');
-        console.error('  --body-file <file>      Load body from file');
-        console.error('  --attach <file>         Attach file(s)');
-        console.error('  --signature <name>      Use signature template');
-        console.error('  --language <lang>       Draft language (en/cn)');
-        console.error('  --intent <type>         Draft intent (inquiry/reply/followup)');
-        console.error('  --no-approval           Skip approval requirement');
-        console.error('  --confirm-send          Confirm sending (required for send-draft)');
-        console.error('  --dry-run               Preview without sending');
-        console.error('  --json                  Output as JSON');
-        console.error('\nStatus commands:');
-        console.error('  send-status [id] [field]  Check delivery status (default: recent 10)');
-        console.error('  status [id] [field]       Alias for send-status');
-        console.error('\nStatus examples:');
-        console.error('  node smtp.js send-status                          - Show recent 10 statuses');
-        console.error('  node smtp.js send-status 5 index                  - Show 5th email status');
-        console.error('  node smtp.js send-status "customer@example.com" to - Show status by recipient');
-        console.error('  node smtp.js send-status "Product Inquiry" subject - Show status by subject');
-        process.exit(1);
-    }
-
-    console.log(JSON.stringify(result, null, 2));
-  } catch (err) {
-    console.error('Error:', err.message);
+/**
+ * Unified error handler for Commander.js
+ */
+function handleError(err) {
+  if (err instanceof SMTPError) {
+    console.error(err.toString());
+    process.exit(1);
+  } else if (err instanceof InvalidArgumentError) {
+    console.error(`❌ Invalid argument: ${err.message}`);
+    process.exit(1);
+  } else {
+    console.error(`❌ Unexpected error: ${err.message}`);
+    console.error('Stack:', err.stack);
     process.exit(1);
   }
 }
 
-if (require.main === module) {
-  main();
-}
+// Register all commands
+registerCommands();
+
+// Parse and execute
+program.parse(process.argv);
 
 module.exports = {
   parseSendAt,
