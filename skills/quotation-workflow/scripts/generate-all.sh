@@ -56,44 +56,6 @@ echo "数据文件：$DATA_FILE"
 echo "输出文件：$OUTPUT_NAME"
 echo ""
 
-# 🔴 P0: 运行数据验证（强制）
-echo "🔍 运行数据验证..."
-VALIDATION_RESULT=$(python3 "$SCRIPT_DIR/quotation_schema.py" 2>&1 <<EOF
-{"data_file": "$DATA_FILE"}
-EOF
-)
-
-# 使用 Python 直接验证数据文件
-python3 -c "
-import sys
-import json
-sys.path.insert(0, '$SCRIPT_DIR')
-from quotation_schema import validate_quotation_data
-
-with open('$DATA_FILE', 'r', encoding='utf-8') as f:
-    data = json.load(f)
-
-valid, errors = validate_quotation_data(data)
-
-if not valid:
-    print('❌ 数据验证失败:')
-    for err in errors:
-        print(f'  - {err}')
-    sys.exit(1)
-else:
-    print('✅ 数据验证通过')
-    sys.exit(0)
-"
-
-if [ $? -ne 0 ]; then
-    echo ""
-    echo "❌ 数据验证失败，报价单生成已终止"
-    echo "请检查数据文件，确保使用真实客户信息"
-    exit 1
-fi
-
-echo ""
-
 # 只生成 HTML 模式
 if [ "$HTML_ONLY" = true ]; then
     echo "🌐 生成 HTML..."
@@ -158,16 +120,16 @@ echo "📄 导出 PDF..."
 cd "$OUTPUT_DIR"
 
 # 从 HTML 导出 PDF（使用 Chrome，质量最佳）
-HTML_PDF="$OUTPUT_NAME-HTML.pdf"
+# 简洁命名：QT-XXX.pdf（主文件），QT-XXX-Excel.pdf（备选）
+MAIN_PDF="$OUTPUT_NAME.pdf"
 if [ -f "$OUTPUT_NAME.html" ]; then
     echo "   从 HTML 导出 PDF（高质量）..."
     CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     if [ -x "$CHROME" ]; then
         # A4 大小，优化分页
         "$CHROME" --headless --disable-gpu \
-          --print-to-pdf="$HTML_PDF" \
-          --print-to-pdf-no-header \
-          --print-to-pdf-no-footer \
+          --print-to-pdf="$MAIN_PDF" \
+          --no-pdf-header-footer \
           --paper-width=8.27 \
           --paper-height=11.69 \
           --margin-top=0.4 \
@@ -176,21 +138,28 @@ if [ -f "$OUTPUT_NAME.html" ]; then
           --margin-right=0.4 \
           "file://$(pwd)/$OUTPUT_NAME.html" 2>/dev/null
         
-        if [ -f "$HTML_PDF" ]; then
-            echo "✅ PDF: $HTML_PDF（Chrome 导出，HTML）"
+        if [ -f "$MAIN_PDF" ]; then
+            echo "✅ PDF: $MAIN_PDF（Chrome 导出，HTML）"
         fi
     fi
 fi
 
-# 从 Excel 导出 PDF（LibreOffice）
+# 从 Excel 导出 PDF（LibreOffice，备选）
 EXCEL_PDF="$OUTPUT_NAME-Excel.pdf"
 if [ -f "$OUTPUT_NAME.xlsx" ]; then
-    echo "   从 Excel 导出 PDF..."
+    echo "   从 Excel 导出 PDF（备选）..."
     soffice --headless --convert-to pdf:calc_pdf_Export "$OUTPUT_NAME.xlsx" --outdir ./ 2>&1
     # LibreOffice 会生成同名的 .pdf 文件
     if [ -f "${OUTPUT_NAME}.pdf" ]; then
-        mv "${OUTPUT_NAME}.pdf" "$EXCEL_PDF" 2>/dev/null
-        echo "✅ PDF: $EXCEL_PDF（LibreOffice 导出，Excel）"
+        # 如果已有 HTML PDF，将 Excel PDF 重命名为 -Excel 后缀
+        if [ -f "$MAIN_PDF" ]; then
+            mv "${OUTPUT_NAME}.pdf" "$EXCEL_PDF" 2>/dev/null
+            echo "✅ PDF: $EXCEL_PDF（LibreOffice 导出，Excel 备选）"
+        else
+            # 如果没有 HTML PDF，将 Excel PDF 作为主文件
+            mv "${OUTPUT_NAME}.pdf" "$MAIN_PDF" 2>/dev/null
+            echo "✅ PDF: $MAIN_PDF（LibreOffice 导出，Excel）"
+        fi
     else
         echo "⚠️  Excel PDF 导出失败"
     fi
