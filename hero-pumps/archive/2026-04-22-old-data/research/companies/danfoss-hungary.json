@@ -1,0 +1,30 @@
+{
+  "company": "Danfoss Hungary",
+  "country": "匈牙利",
+  "website": "danfoss.hu",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "hheatingnews@danfoss.hu",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "heatingnews@danfoss.hu",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:49.235621+00:00",
+    "query": "Danfoss Hungary 匈牙利 HVAC pump distributor manufacturer",
+    "summary": "OEM customers - Danfoss https://www. danfoss. com/en/products/dcs/compressors/danfoss-turbocor/turbocor/oem-customers/ Danfoss serves large HVAC chiller manufacturers (OEMs) with the Danfoss Turbocor® portfolio of compressors.",
+    "sources": [
+      "https://www.danfoss.com/en/products/dcs/compressors/danfoss-turbocor/turbocor/oem-customers/",
+      "https://www.danfoss.com/en/about-danfoss/our-businesses/high-pressure-pumps/",
+      "https://www.danfoss.com/en/contact-us/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

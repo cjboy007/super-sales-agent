@@ -1,0 +1,12 @@
+{
+  "company": "KSB Group",
+  "country": "德国",
+  "website": "ksb.com",
+  "tier": "Tier1",
+  "summary": "KSB Group is a leading global pump and valve manufacturer founded in 1871, headquartered in Frankenthal, Germany. Major player in HVAC building services with comprehensive range of heating, cooling, and water supply pumps. Known for Etaline Pro and other high-efficiency heating pumps. Competes with Grundfos/Wilo in the circulator pump market. Strong European presence with subsidiaries across Eastern Europe. Revenue ~€2.3 billion, 16,000+ employees globally. Key contact: Colleen Mace (colleen.mace@ksb.com).",
+  "contacts": [
+    {"name": "Colleen Mace", "email": "colleen.mace@ksb.com", "role": "unknown"}
+  ],
+  "research_date": "2026-04-29",
+  "notes": "Direct competitor in circulating pump space but much larger scale. Potential distribution angle: they focus on industrial/large building pumps, may not cover residential/small commercial. Our variable frequency pumps at lower price point could complement their portfolio for cost-sensitive segments."
+}

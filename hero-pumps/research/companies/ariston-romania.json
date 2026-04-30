@@ -1,0 +1,21 @@
+{
+  "company": "Ariston Romania",
+  "country": "罗马尼亚",
+  "website": "ariston.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Dung Van",
+      "email": "dung.van@ariston.com",
+      "position": "未确认（待补充）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:52:00.000Z",
+    "query": "Ariston Romania water heater HVAC manufacturer",
+    "summary": "Ariston 是意大利热水器和暖通制造商，在罗马尼亚有业务。Dung Van 可能是越南名字，与罗马尼亚邮箱不太匹配，待确认。",
+    "sources": []
+  },
+  "outreach_notes": "意大利热水器/暖通制造商，罗马尼亚业务。"
+}

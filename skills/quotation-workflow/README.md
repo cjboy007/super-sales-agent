@@ -8,7 +8,7 @@
 ## ✅ 已完成功能
 
 ### 1. Excel 报价单生成
-**脚本位置：** `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py`
+**脚本位置：** `/path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py`
 
 ```bash
 # 创建空白模板
@@ -32,7 +32,7 @@ python3 generate_quotation.py --data quotation_data.json --output /path/to/QT-20
 - ✅ 日期处理（Excel 序列号转换）
 
 ### 2. Excel 读取功能
-**脚本位置：** `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py`
+**脚本位置：** `/path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py`
 
 ```bash
 # 读取 Excel 文件
@@ -57,7 +57,7 @@ python3 read_excel.py "file.xlsx" --format json
 - ✅ 中文文件名编码兼容
 
 ### 3. Word 报价单生成
-**脚本位置：** `/Users/wilson/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py`
+**脚本位置：** `/path/to/your/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py`
 
 ```bash
 # 创建空白模板
@@ -78,7 +78,7 @@ python3 generate_quotation_docx.py --data quotation_data.json --output /path/to/
 - ✅ 签名区域
 
 ### 4. Word 读取功能
-**脚本位置：** `/Users/wilson/.openclaw/workspace/skills/read-docx/read-docx.py`
+**脚本位置：** `/path/to/your/.openclaw/workspace/skills/read-docx/read-docx.py`
 
 ```bash
 # 读取 DOCX 文件（支持通配符）
@@ -101,7 +101,7 @@ soffice --headless --convert-to pdf QT-20260314-001.xlsx --outdir ./output/
 soffice --headless --convert-to pdf QT-20260314-001.docx --outdir ./output/
 
 # 批量转换（使用脚本）
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/convert-to-pdf.sh *.xlsx *.docx
+/path/to/your/.openclaw/workspace/skills/quotation-workflow/scripts/convert-to-pdf.sh *.xlsx *.docx
 
 # 指定输出目录
 OUTPUT_DIR=/path/to/output ./convert-to-pdf.sh QT-20260314-001.xlsx
@@ -226,7 +226,7 @@ skills/read-docx/
 
 ### 快速测试
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts
+cd /path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts
 
 # 生成 Excel 报价单
 python3 generate_quotation.py --output /tmp/test.xlsx --quick-test

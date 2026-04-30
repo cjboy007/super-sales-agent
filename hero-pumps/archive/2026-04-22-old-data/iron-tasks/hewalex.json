@@ -1,0 +1,57 @@
+{
+  "company": "Hewalex",
+  "country": "波兰",
+  "contacts": [
+    {
+      "name": "Leszek Skiba",
+      "email": "leszek.skiba@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "justyna.rychta@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "karolina.firuzek@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Adrian Piotrowski",
+      "email": "adrian.piotrowski@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Grzegorz Szewczak",
+      "email": "grzegorz.szewczak@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Dariusz Klonowski",
+      "email": "dariusz.klonowski@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Marcin Zaborowski",
+      "email": "marcin.zaborowski@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "serwis@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Pawel Waligorski",
+      "email": "pawel.waligorski@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Patrycja Adamska",
+      "email": "patrycja.adamska@hewalex.pl",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Hewalex 写开发信。\n\n## 公司背景\n- **公司：** Hewalex（波兰）\n- **网站：** hewalex.pl\n- **行业：** HVAC\n- **调研：** About us – Kolektory słoneczne, pompy ciepła, fotowoltaika Hewalex  hewalex. pl/en/about-us/ Hewalex is a family-run company, established 35 years ago, long before the renewable energies` market start\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Leszek Skiba | leszek.skiba@hewalex.pl | N/A\n2. justyna.rychta@hewalex.pl | justyna.rychta@hewalex.pl | N/A\n3. karolina.firuzek@hewalex.pl | karolina.firuzek@hewalex.pl | N/A\n4. Adrian Piotrowski | adrian.piotrowski@hewalex.pl | N/A\n5. Grzegorz Szewczak | grzegorz.szewczak@hewalex.pl | N/A\n6. Dariusz Klonowski | dariusz.klonowski@hewalex.pl | N/A\n7. Marcin Zaborowski | marcin.zaborowski@hewalex.pl | N/A\n8. serwis@hewalex.pl | serwis@hewalex.pl | N/A\n9. Pawel Waligorski | pawel.waligorski@hewalex.pl | N/A\n10. Patrycja Adamska | patrycja.adamska@hewalex.pl | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

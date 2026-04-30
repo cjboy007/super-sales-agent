@@ -1,0 +1,52 @@
+{
+  "company": "Qvantum Energi",
+  "country": "区域",
+  "contacts": [
+    {
+      "name": "Eleonor Green",
+      "email": "eleonor.green@qvantum.com",
+      "position": "ERP Manager"
+    },
+    {
+      "name": "Lina Simonsson",
+      "email": "lina.simonsson@qvantum.com",
+      "position": "Marketing Director"
+    },
+    {
+      "name": "Lars Bierlein",
+      "email": "lars.bierlein@qvantum.com",
+      "position": "Director of New Markets"
+    },
+    {
+      "name": "Jon Persson",
+      "email": "jon.persson@qvantum.com",
+      "position": "Head of Market Development"
+    },
+    {
+      "name": "Philip Ord",
+      "email": "philip.ord@qvantum.com",
+      "position": "CEO"
+    },
+    {
+      "name": "Thomas Nowak",
+      "email": "thomas.nowak@qvantum.com",
+      "position": "Vice President of Government Relations"
+    },
+    {
+      "name": "Wolfgang Herold",
+      "email": "wolfgang.herold@qvantum.com",
+      "position": ""
+    },
+    {
+      "name": "Fredrik Rosenqvist",
+      "email": "fredrik.rosenqvist@qvantum.com",
+      "position": ""
+    },
+    {
+      "name": "Federico Rosales",
+      "email": "federico.rosales@qvantum.com",
+      "position": "Chief Operating Officer"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Qvantum Energi 写开发信。\n\n## 公司背景\n- **公司：** Qvantum Energi（区域）\n- **网站：** qvantum.com\n- **行业：** HVAC\n- **调研：** New distributors in Czech Republic, Spain and Portugal - Qvantum  qvantum. com/new-distributors-in-czech-republic-spain-and-portugal/ Swedish heat pump manufacturer Qvantum is rapidly expanding its di\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Eleonor Green | eleonor.green@qvantum.com | ERP Manager\n2. Eleonor Green | eleonor.green@qvantum.com | ERP Manager\n3. Anette Leijonberg | anette.leijonberg@qvantum.com | Director of Finance\n4. Lina Simonsson | lina.simonsson@qvantum.com | Marketing Director\n5. Lars Bierlein | lars.bierlein@qvantum.com | Director of New Markets\n6. Anette Leijonberg | anette.leijonberg@qvantum.com | Director of Finance\n7. Lina Simonsson | lina.simonsson@qvantum.com | Marketing Director\n8. Lars Bierlein | lars.bierlein@qvantum.com | Director of New Markets\n9. Jon Persson | jon.persson@qvantum.com | Head of Market Development\n10. Jon Persson | jon.persson@qvantum.com | Head of Market Development\n11. Philip Ord | philip.ord@qvantum.com | CEO\n12. Philip Ord | philip.ord@qvantum.com | CEO\n13. Thomas Nowak | thomas.nowak@qvantum.com | Vice President of Government Relations\n14. Wolfgang Herold | wolfgang.herold@qvantum.com | N/A\n15. Fredrik Rosenqvist | fredrik.rosenqvist@qvantum.com | N/A\n16. Federico Rosales | federico.rosales@qvantum.com | Chief Operating Officer\n17. Thomas Nowak | thomas.nowak@qvantum.com | Vice President of Government Relations\n18. Wolfgang Herold | wolfgang.herold@qvantum.com | N/A\n19. Fredrik Rosenqvist | fredrik.rosenqvist@qvantum.com | N/A\n20. Federico Rosales | federico.rosales@qvantum.com | Chief Operating Officer\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

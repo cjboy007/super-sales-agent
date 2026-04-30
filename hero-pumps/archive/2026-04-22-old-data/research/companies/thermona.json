@@ -1,0 +1,45 @@
+{
+  "company": "Thermona",
+  "country": "捷克",
+  "website": "thermona.cz",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Martin Novak",
+      "email": "novak@thermona.cz",
+      "position": ""
+    },
+    {
+      "name": "Dusan Zaloudek",
+      "email": "zaloudek@thermona.cz",
+      "position": ""
+    },
+    {
+      "name": "Dominik Novacek",
+      "email": "novacekd@thermona.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "viktorin@thermona.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "obchod@thermona.cz",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:35.769111+00:00",
+    "query": "Thermona 捷克 HVAC pump distributor manufacturer",
+    "summary": "Thermona, spol. | Exhibitor ISH 2025 https://ish. messefrankfurt. com/frankfurt/en/exhibitor-search. detail. html/thermona-spol-sro. html Thermona, spol. is a traditional Czech manufacturer of condensing gas boilers, conventional gas wall-mounted boilers, electric boilers and heat pumps 2.",
+    "sources": [
+      "https://ish.messefrankfurt.com/frankfurt/en/exhibitor-search.detail.html/thermona-spol-sro.html",
+      "https://www.mcexpocomfort.it/en-gb/exhibitor-directory.html?page=15",
+      "https://www.thermona.eu/getattachment/Plynove-kotle/Plynove-kondenzacni-kotle/Pouze-pro-topeni/Kotel-THERM-90-KD-A/installation_user_manual_90-120_KDA_AJ_2022-09.pdf"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

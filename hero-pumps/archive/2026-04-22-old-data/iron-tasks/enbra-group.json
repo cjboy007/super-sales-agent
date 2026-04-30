@@ -1,0 +1,57 @@
+{
+  "company": "Enbra Group",
+  "country": "捷克",
+  "contacts": [
+    {
+      "name": "Jakub Záruba",
+      "email": "zaruba@enbra.cz",
+      "position": "Product Sales Manager"
+    },
+    {
+      "name": "Patrik Prokes",
+      "email": "prokes@enbra.cz",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Matěj Holyszewski",
+      "email": "holyszewskim@enbra.cz",
+      "position": "Product Manager"
+    },
+    {
+      "name": "Miroslav Klíma",
+      "email": "klima@enbra.cz",
+      "position": "Director of Controlling and IT"
+    },
+    {
+      "name": "Barbora Maněnová",
+      "email": "manenova@enbra.cz",
+      "position": "Marketing Specialist"
+    },
+    {
+      "name": "Hana Chutná",
+      "email": "chutna@enbra.cz",
+      "position": "Marketing Specialist"
+    },
+    {
+      "name": "Ivo Muller",
+      "email": "muller@enbra.cz",
+      "position": ""
+    },
+    {
+      "name": "Jan Blecha",
+      "email": "blecha@enbra.cz",
+      "position": ""
+    },
+    {
+      "name": "Tomas Kolin",
+      "email": "kolin@enbra.cz",
+      "position": ""
+    },
+    {
+      "name": "Marcela Cerna",
+      "email": "cerna@enbra.cz",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Enbra Group 写开发信。\n\n## 公司背景\n- **公司：** Enbra Group（捷克）\n- **网站：** enbra.cz\n- **行业：** HVAC\n- **调研：** Enbra, A. Company Profile - Czech Republic - EMIS  com/php/company-profile/CZ/Enbra_AS_en_1420156. html Enbra, A. is a company in Czech Republic, with a head office in Brno. The enterprise operates in\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Jakub Záruba | zaruba@enbra.cz | Product Sales Manager\n2. Patrik Prokes | prokes@enbra.cz | Sales Director\n3. Matěj Holyszewski | holyszewskim@enbra.cz | Product Manager\n4. Miroslav Klíma | klima@enbra.cz | Director of Controlling and IT\n5. Barbora Maněnová | manenova@enbra.cz | Marketing Specialist\n6. Hana Chutná | chutna@enbra.cz | Marketing Specialist\n7. Ivo Muller | muller@enbra.cz | N/A\n8. Jan Blecha | blecha@enbra.cz | N/A\n9. Tomas Kolin | kolin@enbra.cz | N/A\n10. Marcela Cerna | cerna@enbra.cz | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

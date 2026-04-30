@@ -140,7 +140,7 @@ skills/pi-workflow/
 ├── scripts/
 │   └── generate_pi.py          # PI 生成脚本
 └── examples/
-    └── farreach_sample.json    # Farreach 产品示例
+    └── sample.json    # Your Company 产品示例
 ```
 
 ## 相关文档

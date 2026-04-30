@@ -1,0 +1,19 @@
+{
+  "company": "Xylem/Lowara",
+  "country": "捷克",
+  "website": "xylem.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [],
+  "research": {
+    "searched_at": "2026-04-20T15:51:57.183152+00:00",
+    "query": "Xylem/Lowara 捷克 HVAC pump distributor manufacturer",
+    "summary": "Xylem's Lowara brand is a leading pump manufacturer providing pumping and circulating solutions for water supply, wastewater, HVAC and fire protection. Products include clean/wastewater pumps, pressure boosting systems, and monitoring solutions. Notable projects include London's tallest residential tower and world's tallest building. Lowara offers replacement pump database (XylemPump.ID) and focuses on low life cycle cost.",
+    "sources": [
+      "https://www.xylem.com/en-bg/brand/lowara/",
+      "https://www.xylem.com/en-uk/brands/lowara/lowara-products/",
+      "https://www.xylem.com/bg-bg/brand/lowara/"
+    ]
+  },
+  "outreach_notes": "⚠️ Xylem/Lowara 本身是泵制造商，不是分销商。这是直接竞争对手而非潜在客户。不建议作为销售目标。可关注其供应链机会（如阀门、管件等配套产品），但不适合推销循环泵本体。"
+}

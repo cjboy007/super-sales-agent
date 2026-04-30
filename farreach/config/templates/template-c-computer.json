@@ -1,0 +1,7 @@
+{
+  "id": "template-c-computer",
+  "name": "Computer & IT Equipment",
+  "industry_keywords": ["computer", "it", "technology", "data center", "networking", "server", "workstation", "pc"],
+  "subject": "Cable specs for your IT catalog",
+  "body": "Hi {contact_name},\n\n{company_name} has a solid IT product lineup. One thing we help system integrators with — enterprise-grade cables at factory-direct pricing, with full certification docs your customers actually need.\n\nHDMI 2.1/2.2, DP 2.1 (80Gbps), USB4 (80Gbps), CAT6A/CAT8 — all TDR and eye-diagram tested before shipment. Trusted by IT distributors across Europe.\n\nWant me to send over spec sheets and a sample quote? No obligation — just for comparison.\n\n"
+}

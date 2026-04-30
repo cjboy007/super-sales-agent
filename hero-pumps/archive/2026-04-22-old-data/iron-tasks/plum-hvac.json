@@ -1,0 +1,47 @@
+{
+  "company": "Plum HVAC",
+  "country": "波兰",
+  "contacts": [
+    {
+      "name": "Magda Turecka",
+      "email": "magda.turecka@plum.pl",
+      "position": "Marketing Manager"
+    },
+    {
+      "name": "Marcin Groman",
+      "email": "marcin.groman@plum.pl",
+      "position": "Project Manager"
+    },
+    {
+      "name": "Mariusz Sawicki",
+      "email": "mariusz.sawicki@plum.pl",
+      "position": "Project Manager"
+    },
+    {
+      "name": "Katarzyna Kacprzak",
+      "email": "katarzyna.kacprzak@plum.pl",
+      "position": "Manager"
+    },
+    {
+      "name": "Monika Roszkowska",
+      "email": "monika.roszkowska@plum.pl",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "Anna Ogilba",
+      "email": "anna.ogilba@plum.pl",
+      "position": "Marketing Specialist"
+    },
+    {
+      "name": "Adriana Bojczuk",
+      "email": "adriana.bojczuk@plum.pl",
+      "position": "Content Creator"
+    },
+    {
+      "name": "Martyna Sakowicz",
+      "email": "martyna.sakowicz@plum.pl",
+      "position": "Content Creator"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Plum HVAC 写开发信。\n\n## 公司背景\n- **公司：** Plum HVAC（波兰）\n- **网站：** plum.pl\n- **行业：** HVAC\n- **调研：** get to know us - Plum  pl/en/about-us/ We are a manufacturer of industrial electronics, including controllers for heat pumps, boiler controllers, ventilation and underfloor heating controllers, sensor\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Magda Woźniak | magda.wozniak@plum.pl | HR Manager\n2. Magda Turecka | magda.turecka@plum.pl | Marketing Manager\n3. Marcin Groman | marcin.groman@plum.pl | Project Manager\n4. Mariusz Sawicki | mariusz.sawicki@plum.pl | Project Manager\n5. Katarzyna Kacprzak | katarzyna.kacprzak@plum.pl | Manager\n6. Monika Roszkowska | monika.roszkowska@plum.pl | Chief Financial Officer\n7. Anna Ogilba | anna.ogilba@plum.pl | Marketing Specialist\n8. Paulina Borys | paulina.borys@plum.pl | Senior HR Specialist\n9. Adriana Bojczuk | adriana.bojczuk@plum.pl | Content Creator\n10. Martyna Sakowicz | martyna.sakowicz@plum.pl | Content Creator\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

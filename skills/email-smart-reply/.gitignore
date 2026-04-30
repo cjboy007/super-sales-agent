@@ -1,7 +1,0 @@
-node_modules/
-test-results/
-captured/
-scripts/drafts/
-drafts/
-*.log
-.env

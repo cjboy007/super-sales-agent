@@ -1,0 +1,57 @@
+{
+  "company": "Termet",
+  "country": "波兰",
+  "contacts": [
+    {
+      "name": "Kamil Milczarek",
+      "email": "kamil.milczarek@termet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Artur Stawiarski",
+      "email": "artur.stawiarski@termet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Artur Jakubczak",
+      "email": "artur.jakubczak@termet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Krzysztof Lisiecki",
+      "email": "krzysztof.lisiecki@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Marcin Burek",
+      "email": "marcin.burek@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Joanna Wrobel",
+      "email": "joanna.wrobel@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Monika Targosz",
+      "email": "monika.targosz@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Pawel Nowak",
+      "email": "pawel.nowak@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Mateusz Szulc",
+      "email": "mateusz.szulc@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Dusan Pisarcik",
+      "email": "dusan.pisarcik@termet.com.pl",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Termet 写开发信。\n\n## 公司背景\n- **公司：** Termet（波兰）\n- **网站：** termet.com.pl\n- **行业：** HVAC\n- **调研：**  termet. pl/en/company/6 TERMET S. is a leading manufacturer of heating equipment in Poland - gas boilers of various types, water heaters and solutions based on renewable energy 2. Termet S.\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Kamil Milczarek | kamil.milczarek@termet.com.pl | Regional Sales Manager\n2. Artur Stawiarski | artur.stawiarski@termet.com.pl | Regional Sales Manager\n3. Artur Jakubczak | artur.jakubczak@termet.com.pl | Regional Sales Manager\n4. Krzysztof Lisiecki | krzysztof.lisiecki@termet.com.pl | N/A\n5. Marcin Burek | marcin.burek@termet.com.pl | N/A\n6. Joanna Wrobel | joanna.wrobel@termet.com.pl | N/A\n7. Monika Targosz | monika.targosz@termet.com.pl | N/A\n8. Pawel Nowak | pawel.nowak@termet.com.pl | N/A\n9. Mateusz Szulc | mateusz.szulc@termet.com.pl | N/A\n10. Dusan Pisarcik | dusan.pisarcik@termet.com.pl | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

@@ -1,0 +1,260 @@
+{
+  "_meta": {
+    "version": "2.0.0",
+    "description": "Your Company 产品详细成本表 v2.0 - 支持细粒度成本分解",
+    "updated_at": "2026-03-30T17:22:00+08:00",
+    "updated_by": "phoenix",
+    "exchange_rate": 7.0,
+    "notes": [
+      "cost_breakdown: 详细成本分解（人民币）",
+      "cable_cost_per_m: 每米线材成本（含导体/绝缘/屏蔽/外被）",
+      "connector_cost: 单个接头成本",
+      "housing_cost: 单个外壳成本",
+      "packaging: 包装成本（彩盒/胶袋/贴纸等）",
+      "processing_cost: 加工费（含锡丝/热缩套管/扎带等辅助材料）",
+      "transport_cost: 运输费用分摊",
+      "royalty_fee: 权益金/认证费",
+      "length_costs: 不同长度的总成本（用于快速查询）"
+    ]
+  },
+  "products": [
+    {
+      "sku": "HDMI-2.0-Premium-1M",
+      "model": "Cab-HDMI2_0-120B-3.3FT",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable 4K 60Hz",
+      "specification": "18Gbps, 4K@60Hz, 3D, 2160P, HDR, ARC, OD6.0mm",
+      "default_length_m": 1,
+      "copper_weight_kg": 0.040,
+      "cost_breakdown": {
+        "cable_cost_per_m": 1.74,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.58,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 0.08,
+          "bag_cost": 0.00,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.80,
+          "tin_plate_cost": 0.11,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 1.80,
+        "packaging_fee": 0.25,
+        "transport_cost": 0.09,
+        "royalty_fee": 0.33
+      },
+      "total_cost_rmb": 8.22,
+      "moq": 500
+    },
+    {
+      "sku": "HDMI-2.0-Premium-2M",
+      "model": "Cab-HDMI2_0-120B-6FT",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable 4K 60Hz",
+      "specification": "18Gbps, 4K@60Hz, 3D, 2160P, HDR, ARC, OD6.0mm",
+      "default_length_m": 2,
+      "copper_weight_kg": 0.065,
+      "cost_breakdown": {
+        "cable_cost_per_m": 2.85,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.58,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 0.10,
+          "bag_cost": 0.00,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.80,
+          "tin_plate_cost": 0.11,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 1.80,
+        "packaging_fee": 0.25,
+        "transport_cost": 0.16,
+        "royalty_fee": 0.33
+      },
+      "total_cost_rmb": 10.05,
+      "moq": 500
+    },
+    {
+      "sku": "HDMI-2.0-Premium-3M",
+      "model": "Cab-HDMI2_0-120B-10FT",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable 4K 60Hz",
+      "specification": "18Gbps, 4K@60Hz, 3D, 2160P, HDR, ARC, OD6.0mm",
+      "default_length_m": 3,
+      "copper_weight_kg": 0.095,
+      "cost_breakdown": {
+        "cable_cost_per_m": 2.85,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.58,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 0.33,
+          "bag_cost": 0.10,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.80,
+          "tin_plate_cost": 0.11,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 1.70,
+        "packaging_fee": 0.50,
+        "transport_cost": 0.27,
+        "royalty_fee": 0.33
+      },
+      "total_cost_rmb": 13.42,
+      "moq": 500
+    },
+    {
+      "sku": "HDMI-2.0-Premium-5M",
+      "model": "Cab-HDMI2_0-120B-16FT",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable 4K 60Hz",
+      "specification": "18Gbps, 4K@60Hz, 3D, 2160P, HDR, ARC, OD6.0mm",
+      "default_length_m": 5,
+      "copper_weight_kg": 0.150,
+      "cost_breakdown": {
+        "cable_cost_per_m": 2.85,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.58,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 0.63,
+          "bag_cost": 0.10,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.80,
+          "tin_plate_cost": 0.11,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 2.75,
+        "packaging_fee": 0.50,
+        "transport_cost": 0.62,
+        "royalty_fee": 0.33
+      },
+      "total_cost_rmb": 25.54,
+      "moq": 500
+    },
+    {
+      "sku": "HDMI-2.0-Premium-7.6M",
+      "model": "Cab-HDMI2_0-120B-25FT",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable 4K 60Hz",
+      "specification": "18Gbps, 4K@60Hz, 3D, 2160P, HDR, ARC, OD6.0mm",
+      "default_length_m": 7.6,
+      "copper_weight_kg": 0.220,
+      "cost_breakdown": {
+        "cable_cost_per_m": 2.85,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.00,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 1.21,
+          "bag_cost": 0.10,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.80,
+          "tin_plate_cost": 0.16,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 4.70,
+        "packaging_fee": 0.60,
+        "transport_cost": 0.93,
+        "royalty_fee": 0.33
+      },
+      "total_cost_rmb": 39.88,
+      "moq": 500
+    },
+    {
+      "sku": "HDMI-2.0-Premium-10M",
+      "model": "Cab-HDMI2_0-120B-33FT-CCS",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable CCS 80% Braided",
+      "specification": "4K 60Hz, 3D, 2160P, CCS 19+1 80 Braided, OD7.3mm",
+      "default_length_m": 10,
+      "copper_weight_kg": 0.280,
+      "cost_breakdown": {
+        "cable_cost_per_m": 2.40,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.00,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 1.50,
+          "bag_cost": 0.10,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.00,
+          "tin_plate_cost": 0.16,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 3.00,
+        "packaging_fee": 0.60,
+        "transport_cost": 0.93,
+        "royalty_fee": 0.00
+      },
+      "total_cost_rmb": 33.72,
+      "moq": 500
+    },
+    {
+      "sku": "HDMI-2.0-Premium-15M",
+      "model": "Cab-HDMI2_0-120B-50FT-CCS-Parallel",
+      "category": "HDMI",
+      "description": "HDMI 2.0 Premium Cable CCS 80% Braided Parallel",
+      "specification": "4K 60Hz, CCS 19+1 80 Braided, Parallel, OD8.0mm",
+      "default_length_m": 15,
+      "copper_weight_kg": 0.400,
+      "cost_breakdown": {
+        "cable_cost_per_m": 3.60,
+        "connector_cost_per_pc": 0.50,
+        "connector_qty": 2,
+        "dust_cap_cost_per_pc": 0.01,
+        "dust_cap_qty": 2,
+        "housing_cost_per_pc": 0.00,
+        "housing_qty": 2,
+        "mesh_cost": 0.38,
+        "packaging": {
+          "box_cost": 1.80,
+          "bag_cost": 0.10,
+          "label_cost": 0.05,
+          "label_qty": 2,
+          "premium_label_cost": 0.00,
+          "tin_plate_cost": 0.16,
+          "tin_plate_qty": 2
+        },
+        "processing_cost": 8.00,
+        "packaging_fee": 0.60,
+        "transport_cost": 0.93,
+        "royalty_fee": 0.00
+      },
+      "total_cost_rmb": 70.02,
+      "moq": 500
+    }
+  ]
+}

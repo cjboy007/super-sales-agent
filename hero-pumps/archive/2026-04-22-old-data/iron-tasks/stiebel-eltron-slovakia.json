@@ -1,0 +1,57 @@
+{
+  "company": "Stiebel Eltron Slovakia",
+  "country": "斯洛伐克",
+  "contacts": [
+    {
+      "name": "Ondrej Tabák",
+      "email": "ondrej.tabak@stiebel-eltron.sk",
+      "position": "Welding Process Engineer"
+    },
+    {
+      "name": "Ivana Radosavljevic",
+      "email": "ivana.radosavljevic@stiebel-eltron.sk",
+      "position": "Accounts Payable Clerk"
+    },
+    {
+      "name": "Michal Berecky",
+      "email": "michal.berecky@stiebel-eltron.sk",
+      "position": "Welding Technician"
+    },
+    {
+      "name": "Ladislav Belán",
+      "email": "ladislav.belan@stiebel-eltron.sk",
+      "position": "CNC Programmer"
+    },
+    {
+      "name": "Libor Novak",
+      "email": "libor.novak@stiebel-eltron.sk",
+      "position": "Laboratory Development Specialist"
+    },
+    {
+      "name": "Michal Choma",
+      "email": "michal.choma@stiebel-eltron.sk",
+      "position": ""
+    },
+    {
+      "name": "Juraj Roth",
+      "email": "juraj.roth@stiebel-eltron.sk",
+      "position": ""
+    },
+    {
+      "name": "Daniel Cech",
+      "email": "daniel.cech@stiebel-eltron.sk",
+      "position": ""
+    },
+    {
+      "name": "Patrik Prihoda",
+      "email": "patrik.prihoda@stiebel-eltron.sk",
+      "position": ""
+    },
+    {
+      "name": "Pavol Stasak",
+      "email": "pavol.stasak@stiebel-eltron.sk",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Stiebel Eltron Slovakia 写开发信。\n\n## 公司背景\n- **公司：** Stiebel Eltron Slovakia（斯洛伐克）\n- **网站：** stiebel-eltron.sk\n- **行业：** HVAC\n- **调研：** Stiebel Eltron Slovakia, S. - Poprad 058 01 (Okres Poprad), Hlavná  kompass. com/en/c/stiebel-eltron-slovakia-s-r-o/sk009589/ Importers and exporters · Importers-exporters, heating, ventilation and ai\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Ondrej Tabák | ondrej.tabak@stiebel-eltron.sk | Welding Process Engineer\n2. Ivana Radosavljevic | ivana.radosavljevic@stiebel-eltron.sk | Accounts Payable Clerk\n3. Michal Berecky | michal.berecky@stiebel-eltron.sk | Welding Technician\n4. Ladislav Belán | ladislav.belan@stiebel-eltron.sk | CNC Programmer\n5. Libor Novak | libor.novak@stiebel-eltron.sk | Laboratory Development Specialist\n6. Michal Choma | michal.choma@stiebel-eltron.sk | N/A\n7. Juraj Roth | juraj.roth@stiebel-eltron.sk | N/A\n8. Daniel Cech | daniel.cech@stiebel-eltron.sk | N/A\n9. Patrik Prihoda | patrik.prihoda@stiebel-eltron.sk | N/A\n10. Pavol Stasak | pavol.stasak@stiebel-eltron.sk | N/A\n11. Ondrej Tabák | ondrej.tabak@stiebel-eltron.sk | Welding Process Engineer\n12. Ivana Radosavljevic | ivana.radosavljevic@stiebel-eltron.sk | Accounts Payable Clerk\n13. Michal Berecky | michal.berecky@stiebel-eltron.sk | Welding Technician\n14. Ladislav Belán | ladislav.belan@stiebel-eltron.sk | CNC Programmer\n15. Libor Novak | libor.novak@stiebel-eltron.sk | Laboratory Development Specialist\n16. Michal Choma | michal.choma@stiebel-eltron.sk | N/A\n17. Juraj Roth | juraj.roth@stiebel-eltron.sk | N/A\n18. Daniel Cech | daniel.cech@stiebel-eltron.sk | N/A\n19. Patrik Prihoda | patrik.prihoda@stiebel-eltron.sk | N/A\n20. Pavol Stasak | pavol.stasak@stiebel-eltron.sk | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

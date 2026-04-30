@@ -1,0 +1,45 @@
+{
+  "company": "Protherm",
+  "country": "捷克",
+  "website": "protherm.cz",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Frantisek Srp",
+      "email": "frantisek.srp@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Vavrina",
+      "email": "vavrinaj@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Hoffmann",
+      "email": "hoffmannj@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Michal Cerny",
+      "email": "michal.cerny@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Jirasek",
+      "email": "jiri.jirasek@protherm.cz",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:01.377377+00:00",
+    "query": "Protherm 捷克 HVAC pump distributor manufacturer",
+    "summary": "ProTherm AH50050R Tube Process Air Heater, 400W, Ø1/2 x. - eBay https://www. com/itm/334973243103 Next Day Automation is NOT an authorized distributor for ProTherm Industries. The Original Manufacturer's warranty does not apply.",
+    "sources": [
+      "https://www.ebay.com/itm/334973243103",
+      "https://www.alibaba.com/showroom/protherm-boilers.html",
+      "https://www.freeboilermanuals.com/assets/pdf/protherm/Tiger-24-12-KTZ-24-12-KOZ.pdf"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

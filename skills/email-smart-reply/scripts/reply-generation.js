@@ -8,7 +8,7 @@
  * 模块规范：
  * - 单一公开入口：async function generateReply({email, intentResult, kbResults})
  * - 从 intent-schema.json 读取 reply_template_id
- * - 调用 OpenRouter API (anthropic/claude-sonnet-4)
+ * - 调用百炼 DashScope API (qwen-plus)
  * - 低置信度 < 0.75 返回 needs_manual: true
  * - spam 直接过滤
  * - complaint 标记 escalate: true
@@ -21,7 +21,7 @@ const { execFile } = require('child_process');
 
 const CONFIG_DIR = path.join(__dirname, '..', 'config');
 const INTENT_SCHEMA_PATH = path.join(CONFIG_DIR, 'intent-schema.json');
-const DRAFTS_DIR = process.env.DRAFTS_DIR || path.join(__dirname, '..', 'drafts');
+const DRAFTS_DIR = path.join(__dirname, 'drafts');
 const TEMPLATE_DIR = path.join(__dirname, 'templates');
 
 /**
@@ -77,13 +77,23 @@ async function generateReply({ email, intentResult, kbResults }) {
   const intentPrefix = intent.split('-').map(p => p[0].toUpperCase()).join('').slice(0, 3);
   const draft_id = `DRAFT-${timestamp}-${intentPrefix}`;
 
-  // 6. 调用 LLM 生成回复
-  const language = detectLanguage(email.body);
-  let replyContent = await callLLM(email, intent, kbResults, language, templateId);
+  // 6. 语言检测 - 必须匹配客户语言
+  const customerLanguage = detectLanguage(email.body);
+  const customerCountry = extractCountry(email.body);
+  
+  // 美国/英国/加拿大/澳洲客户默认用英文
+  const replyLanguage = (customerCountry && ['US', 'UK', 'CA', 'AU', 'NZ'].includes(customerCountry)) 
+    ? 'en' 
+    : customerLanguage;
+  
+  console.log(`   客户语言：${customerLanguage}, 国家：${customerCountry || '未知'}, 回复语言：${replyLanguage}`);
+  
+  // 7. 调用 LLM 生成回复（使用客户语言）
+  let replyContent = await callLLM(email, intent, kbResults, replyLanguage, templateId);
 
   if (!replyContent) {
     // LLM 失败，使用模板降级
-    const fallbackResult = generateTemplateFallback(intent, email);
+    const fallbackResult = generateTemplateFallback(intent, email, replyLanguage);
     if (!fallbackResult.success) {
       return {
         draft: null,
@@ -95,12 +105,19 @@ async function generateReply({ email, intentResult, kbResults }) {
     replyContent = fallbackResult.reply;
   }
 
-  // 7. 构建回复对象
+  // 8. 强制验证 - 检查是否违反核心原则
+  const validationErrors = validateDraft(replyContent, email, replyLanguage, intent);
+  if (validationErrors.length > 0) {
+    console.error(`❌ 草稿验证失败：${validationErrors.join(', ')}`);
+    throw new Error(`Draft validation failed: ${validationErrors.join(', ')}`);
+  }
+
+  // 9. 构建回复对象
   const draft = {
     draft_id,
     subject: buildSubject(email.subject, intent),
     body: replyContent,
-    language: language === 'zh' ? 'en' : 'en', // 始终用英文回复
+    language: replyLanguage,
     template_used: templateId,
     intent,
     confidence,
@@ -177,20 +194,18 @@ async function callLLM(email, intent, kbResults, language, templateId) {
   const prompt = buildPrompt(email, intent, kbResults, language, templateId);
 
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://coding.dashscope.aliyuncs.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://farreach-electronic.com',
-        'X-Title': 'FarreachEmailReply'
+        'Authorization': `Bearer ${process.env.DASHSCOPE_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4',
+        model: 'qwen3.6-plus',
         messages: [
           {
             role: 'system',
-            content: `You are a professional B2B sales representative for Farreach Electronic (HDMI/DP/USB cables).
+            content: `You are a professional B2B sales representative for Your Company (HDMI/DP/USB cables).
 Write concise, professional email replies following these rules:
 - NO "not...but" sentence structures
 - NO em dashes (—— / —)
@@ -270,13 +285,13 @@ Generate the reply:`;
 /**
  * 模板降级方案
  */
-function generateTemplateFallback(intent, email) {
+function generateTemplateFallback(intent, email, language = 'en') {
   const templates = {
     'inquiry': `Dear Valued Customer,
 
-Thank you for your interest in Farreach Electronic products.
+Thank you for your interest in Your Company products.
 
-We specialize in HDMI, DisplayPort, and USB cables with competitive pricing and reliable quality.
+Please find attached our product catalog and price list for your reference.
 
 Could you please share more details about your requirements?
 - Product type and specifications
@@ -287,7 +302,7 @@ This will help us provide an accurate quotation.
 
 Best regards,
 Jaden
-Farreach Electronic Co., Ltd.`,
+Your Company Name, Ltd.`,
 
     'delivery-chase': `Dear Valued Customer,
 
@@ -299,7 +314,7 @@ Once confirmed, I will check with our production team and update you promptly.
 
 Best regards,
 Jaden
-Farreach Electronic Co., Ltd.`,
+Your Company Name, Ltd.`,
 
     'complaint': `Dear Valued Customer,
 
@@ -316,7 +331,7 @@ We will investigate and propose a solution within 24 hours.
 
 Best regards,
 Jaden
-Farreach Electronic Co., Ltd.`,
+Your Company Name, Ltd.`,
 
     'technical': `Dear Valued Customer,
 
@@ -331,7 +346,7 @@ Our engineering team will review and respond with detailed specifications.
 
 Best regards,
 Jaden
-Farreach Electronic Co., Ltd.`,
+Your Company Name, Ltd.`,
 
     'partnership': `Dear Valued Customer,
 
@@ -346,7 +361,7 @@ I will forward this to our management team for review.
 
 Best regards,
 Jaden
-Farreach Electronic Co., Ltd.`,
+Your Company Name, Ltd.`,
 
     'spam': null
   };
@@ -394,6 +409,85 @@ function saveDraft(draft_id, draft) {
   } catch (err) {
     console.error(`⚠️  保存草稿失败：${err.message}`);
   }
+}
+
+/**
+ * 强制验证草稿 - 检查是否违反核心原则
+ * @param {string} replyContent - 回复内容
+ * @param {Object} originalEmail - 原始邮件
+ * @param {string} replyLanguage - 回复语言
+ * @param {string} intent - 意图类型
+ * @returns {string[]} 错误列表（空数组表示通过验证）
+ */
+function validateDraft(replyContent, originalEmail, replyLanguage, intent) {
+  const errors = [];
+  
+  // 检查 1: 语言匹配
+  const draftLanguage = detectLanguage(replyContent);
+  if (draftLanguage !== replyLanguage) {
+    errors.push(`语言不匹配：客户使用${replyLanguage}，草稿使用${draftLanguage}`);
+  }
+  
+  // 检查 2: 禁止混用语言（中英文混用）
+  const hasChinese = /[\u4e00-\u9fa5]/.test(replyContent);
+  const hasEnglish = /[a-zA-Z]/.test(replyContent);
+  if (hasChinese && hasEnglish && replyLanguage === 'en') {
+    errors.push('禁止在英文回复中混入中文');
+  }
+  
+  // 检查 3: 询价/样品确认必须有 PDF 附件说明
+  if (['inquiry', 'sample-confirmation'].includes(intent)) {
+    if (!replyContent.includes('attached') && !replyContent.includes('attachment')) {
+      errors.push('询价/样品确认邮件必须提及附件');
+    }
+  }
+  
+  // 检查 4: 正文长度（应该简短，引导查看附件）
+  if (replyContent.length > 1500 && ['inquiry', 'sample-confirmation'].includes(intent)) {
+    errors.push('正文过长 - 应该简短并引导查看附件');
+  }
+  
+  return errors;
+}
+
+/**
+ * 检测语言
+ * @param {string} text - 文本内容
+ * @returns {string} 'en' 或 'zh'
+ */
+function detectLanguage(text) {
+  if (!text) return 'en';
+  
+  // 检查中文字符比例
+  const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const totalChars = text.length;
+  const chineseRatio = totalChars > 0 ? chineseChars / totalChars : 0;
+  
+  return chineseRatio > 0.3 ? 'zh' : 'en';
+}
+
+/**
+ * 提取国家信息
+ * @param {string} text - 文本内容
+ * @returns {string|null} 国家代码（US/UK/CA/AU 等）或 null
+ */
+function extractCountry(text) {
+  const countryPatterns = {
+    'US': /USA|United States|America|US\b/gi,
+    'UK': /UK|United Kingdom|Britain|England|GB\b/gi,
+    'CA': /Canada|Canadian/gi,
+    'AU': /Australia|Australian/gi,
+    'NZ': /New Zealand/gi,
+    'DE': /Germany|German/gi,
+    'FR': /France|French/gi,
+    'ES': /Spain|Spanish/gi,
+    'IT': /Italy|Italian/gi
+  };
+  
+  for (const [country, pattern] of Object.entries(countryPatterns)) {
+    if (pattern.test(text)) return country;
+  }
+  return null;
 }
 
 /**

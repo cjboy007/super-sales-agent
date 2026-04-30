@@ -72,7 +72,7 @@ xdg-open QT-001.html
 
 **1. 运行导出脚本**
 ```bash
-python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/html_to_pdf.py \
+python3 /path/to/your/.openclaw/workspace/skills/quotation-workflow/scripts/html_to_pdf.py \
   QT-20260314-001.html
 ```
 
@@ -251,8 +251,8 @@ open QT-001.html
 ## 📁 示例文件
 
 ```
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples/
-├── QT-20260314-008-Farreach-Premium.html    # HTML 源文件 ⭐
+/path/to/your/.openclaw/workspace/skills/quotation-workflow/examples/
+├── QT-20260314-008-Your Company-Premium.html    # HTML 源文件 ⭐
 └── (用浏览器打开 → 导出 PDF)
 ```
 

@@ -1,0 +1,25 @@
+{
+  "company": "Vaillant Slovakia",
+  "country": "斯洛伐克",
+  "website": "vaillant.sk",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "vaillant@vaillant.sk",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:43.810637+00:00",
+    "query": "Vaillant Slovakia 斯洛伐克 HVAC pump distributor manufacturer",
+    "summary": "German manufacturer opens heat pump factory in Slovakia – pv magazine International https://www. pv-magazine. com/2023/03/15/german-manufacturer-opens-heat-pump-factory-in-slovakia/ German manufacturer opens heat pump factory in Slovakia.",
+    "sources": [
+      "https://www.pv-magazine.com/2023/03/15/german-manufacturer-opens-heat-pump-factory-in-slovakia/",
+      "https://www.emis.com/php/company-profile/SK/Vaillant_Group_Heat_Pump_Production_SRO_en_17016546.html",
+      "https://www.northdata.com/Vaillant%20Group%20Heat%20Pump%20Production%20s%C2%B7r%C2%B7o%C2%B7,%20Skalica,%20SK/_c4729838883045376"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

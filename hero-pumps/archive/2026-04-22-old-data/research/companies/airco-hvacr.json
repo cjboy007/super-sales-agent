@@ -1,0 +1,40 @@
+{
+  "company": "Airco HVACR",
+  "country": "波兰",
+  "website": "airco.com.pl",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Artur Gondek",
+      "email": "a.gondek@airco.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Krystian Gondek",
+      "email": "k.gondek@airco.com.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "p.jasiewicz@airco.com.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "biuro@airco.com.pl",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:48:56.981196+00:00",
+    "query": "Airco HVACR 波兰 HVAC pump distributor manufacturer",
+    "summary": "About us https://www. pl/en/about-us Your trusted business partner. AIRCO HVACR Sp. is a dynamically developing company dedicated to wholesale for companies from the HVACR industry and a distributor of EHS SAMSUNG heat pumps.",
+    "sources": [
+      "https://www.airco.com.pl/en/about-us",
+      "https://www.aireco.com/",
+      "https://www.airco.com.pl/en/home"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

@@ -1,0 +1,45 @@
+{
+  "company": "Purmo Group",
+  "country": "芬兰",
+  "website": "purmogroup.com",
+  "tier": "Tier1-Nordic",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Julio Sequeira",
+      "email": "julio.sequeira@purmogroup.com",
+      "position": "Director of Product Management"
+    },
+    {
+      "name": "Johan Werbrouck",
+      "email": "johan.werbrouck@purmogroup.com",
+      "position": "Chief Transformation Officer"
+    },
+    {
+      "name": "Robert Cibulka",
+      "email": "robert.cibulka@purmogroup.com",
+      "position": "Head of Product Management"
+    },
+    {
+      "name": "Uwe Hofstädter",
+      "email": "uwe.hofstaedter@purmogroup.com",
+      "position": "Director of Market and Applications"
+    },
+    {
+      "name": "Chris Hone",
+      "email": "chris.hone@purmogroup.com",
+      "position": "Sales Director"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:06.203427+00:00",
+    "query": "Purmo Group 芬兰 HVAC pump distributor manufacturer",
+    "summary": "Offering and brands - Purmo Group https://www. purmogroup. com/offering-and-brands/ It is a leading supplier of systems for heat and water distribution to all types of homes and premises. The company manufactures and supplies customised and pre 2.",
+    "sources": [
+      "https://www.purmogroup.com/offering-and-brands/",
+      "https://www.cbinsights.com/company/purmo-group/alternatives-competitors",
+      "https://funnelfeedr.com/en/company/fi/purmo-group-finland-oy-ab-33811029"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-Nordic重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

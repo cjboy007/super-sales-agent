@@ -1,0 +1,14 @@
+{
+  "draft_id": "draft-2026-04-05T01-02-27-427Z-okki_003",
+  "customer_id": "okki_003",
+  "customer_name": "Global Tech Inc",
+  "customer_email": "purchasing@globaltech.com",
+  "stage": "sample_sent",
+  "template_id": "template-sample-001",
+  "intent": "tracking_notify",
+  "subject": "",
+  "follow_up_day": 1,
+  "created_at": "2026-04-05T01:02:27.427Z",
+  "status": "draft",
+  "owner": "wilson"
+}

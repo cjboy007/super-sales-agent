@@ -1,0 +1,21 @@
+{
+  "company": "Thermona",
+  "country": "捷克",
+  "website": "thermona.cz",
+  "tier": "Tier2",
+  "industry": "HVAC/锅炉",
+  "contacts": [
+    {
+      "name": "Milan Novak",
+      "email": "novak@thermona.cz",
+      "position": "采购/技术负责人"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "Thermona Czech gas boiler manufacturer",
+    "summary": "Thermona 是捷克燃气锅炉/暖通设备制造商，主要产品包括燃气冷凝锅炉和热泵系统。",
+    "sources": ["https://thermona.cz"]
+  },
+  "outreach_notes": "捷克本土锅炉制造商，需要循环泵配套。切入点：锅炉系统配套泵供应。"
+}

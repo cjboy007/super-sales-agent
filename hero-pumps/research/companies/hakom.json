@@ -1,0 +1,45 @@
+{
+  "company": "HAKOM",
+  "country": "波兰",
+  "website": "hakom.pl",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Dane Beda",
+      "email": "dane@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "d.langfort@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "szkolenia@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "mm@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "praca@hakom.pl",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:20.925174+00:00",
+    "query": "HAKOM 波兰 HVAC pump distributor manufacturer",
+    "summary": "About us - Info - HAKOM https://www. pl/en/aboutus/about-us HAKOM is a manufacturing, trading and service firm in the ventilation and air conditioning industry. Our main activity is the manufacture and sale of equipment.",
+    "sources": [
+      "https://www.hakom.pl/en/aboutus/about-us",
+      "https://www.facebook.com/groups/194818599720144/posts/675243008344365/",
+      "https://www.hakom.pl/en/home"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

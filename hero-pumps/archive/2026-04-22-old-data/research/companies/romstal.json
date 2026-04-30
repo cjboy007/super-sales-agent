@@ -1,0 +1,45 @@
+{
+  "company": "Romstal",
+  "country": "罗马尼亚",
+  "website": "romstal.ro",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "comenzionline@romstal.ro",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "office@romstal.ro",
+      "position": ""
+    },
+    {
+      "name": "Andrei Bejan",
+      "email": "andrei.bejan@romstal.ro",
+      "position": ""
+    },
+    {
+      "name": "Mare Mai",
+      "email": "mare@romstal.ro",
+      "position": ""
+    },
+    {
+      "name": "Constanta Din",
+      "email": "constanta@romstal.ro",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:21.640143+00:00",
+    "query": "Romstal 罗马尼亚 HVAC pump distributor manufacturer",
+    "summary": "Romstal - Wikipedia https://en. wikipedia. org/wiki/Romstal Romstal. **Romstal** is a Romanian company specialized in the sale of installation equipment for construction. The company's portfolio is grouped into 6 categories of interest, managed by specialized divisions - Thermo, Klima, Hydro, Sanni, Electro and Ceramic, and the product offer includes over 20,000 items characterized by a world-recognized quality, which Romstal adopts as a policy of the market.",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Romstal",
+      "https://www.zoominfo.com/c/romstal-group/372840887",
+      "https://lb.kompass.com/c/romstal-imex-srl/ro001675/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

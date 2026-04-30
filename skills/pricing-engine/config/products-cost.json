@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0.0",
-    "description": "Farreach 产品基础成本表。铜用量系数 copper_weight_kg 为每条线缆的铜用量（kg），用于动态铜价计算。",
+    "description": "Your Company 产品基础成本表。铜用量系数 copper_weight_kg 为每条线缆的铜用量（kg），用于动态铜价计算。",
     "updated_at": "2026-03-25T01:40:00+08:00",
     "updated_by": "iron",
     "notes": [
@@ -13,6 +13,19 @@
     ]
   },
   "products": [
+    {
+      "sku": "HDMI-2.1-8K-1M",
+      "model": "5001-11B-1M",
+      "category": "HDMI",
+      "description": "HDMI 2.1 Ultra High Speed Cable 8K@60Hz",
+      "specification": "48Gbps, 1m",
+      "default_length_m": 1,
+      "copper_weight_kg": 0.040,
+      "base_material_cost_usd": 1.50,
+      "processing_cost_usd": 1.10,
+      "length_cost_factor_per_m": 0.35,
+      "moq": 500
+    },
     {
       "sku": "HDMI-2.1-8K-2M",
       "model": "5001-11B",

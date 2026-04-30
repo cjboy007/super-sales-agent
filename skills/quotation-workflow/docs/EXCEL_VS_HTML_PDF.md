@@ -79,7 +79,7 @@
    - 你的 HTML PDF 脱颖而出
    - 显得更"国际化"
 
-3. **Farreach 定位**
+3. **Your Company 定位**
    - 18 年经验 + 现代工厂
    - 中越双基地（国际化）
    - HDMI 认证会员（高端）
@@ -122,12 +122,12 @@
 
 ---
 
-## 🎯 Farreach 最佳策略
+## 🎯 Your Company 最佳策略
 
 ### 主推：HTML → PDF ⭐
 
 **原因：**
-1. Farreach 是**高端线材制造商**
+1. Your Company 是**高端线材制造商**
 2. 有 HDMI 认证、ISO 认证
 3. 中越双基地（规模大）
 4. **应该展示专业形象**
@@ -159,7 +159,7 @@
 ```
 用 HTML → PDF ⭐
 
-邮件主题：Quotation QT-20260314-001 - Farreach Electronic
+邮件主题：Quotation QT-20260314-001 - Your Company
 
 正文：
 Dear [Name],
@@ -180,7 +180,7 @@ Best regards,
 [Your Name]
 ```
 
-**附件：** `QT-20260314-001-Farreach.pdf`（HTML 导出）
+**附件：** `QT-20260314-001-Your Company.pdf`（HTML 导出）
 
 ---
 
@@ -229,7 +229,7 @@ soffice --headless --convert-to pdf QT-001.xlsx
 
 ## 💡 我的最终建议
 
-### 对 Farreach：
+### 对 Your Company：
 
 **默认用 HTML → PDF** ⭐
 
@@ -251,7 +251,7 @@ soffice --headless --convert-to pdf QT-001.xlsx
 | 问题 | 答案 |
 |------|------|
 | **默认发哪个？** | **HTML → PDF** ⭐ |
-| **为什么？** | 现代、专业、匹配 Farreach 定位 |
+| **为什么？** | 现代、专业、匹配 Your Company 定位 |
 | **什么时候用 Excel？** | 保守客户/明确要求/快速报价 |
 | **文件大小重要吗？** | 不重要（150KB 很小） |
 | **客户会 care 吗？** | 90% 不会，10% 会觉得"很专业" |

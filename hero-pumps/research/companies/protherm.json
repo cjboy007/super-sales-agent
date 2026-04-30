@@ -1,0 +1,34 @@
+{
+  "company": "Protherm",
+  "country": "捷克",
+  "website": "protherm.cz",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Frantisek Srp",
+      "email": "frantisek.srp@protherm.cz",
+      "position": "未确认（待补充）"
+    },
+    {
+      "name": "Jiri Vavrina",
+      "email": "vavrinaj@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Hoffmann",
+      "email": "hoffmannj@protherm.cz",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:01.377377+00:00",
+    "query": "Protherm 捷克 HVAC pump distributor manufacturer",
+    "summary": "ProTherm AH50050R Tube Process Air Heater, 400W, Ø1/2 x. - eBay https://www. com/itm/334973243103 Next Day Automation is NOT an authorized distributor for ProTherm Industries. The Original Manufacturer's warranty does not apply.",
+    "sources": [
+      "https://www.ebay.com/itm/334973243103",
+      "https://www.alibaba.com/showroom/protherm-boilers.html"
+    ]
+  },
+  "outreach_notes": "Daikin 子公司，壁挂炉/热泵制造商。关注循环泵配套采购。"
+}

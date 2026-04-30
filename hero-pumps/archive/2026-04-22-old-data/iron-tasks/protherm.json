@@ -1,0 +1,57 @@
+{
+  "company": "Protherm",
+  "country": "捷克",
+  "contacts": [
+    {
+      "name": "Frantisek Srp",
+      "email": "frantisek.srp@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Vavrina",
+      "email": "vavrinaj@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Hoffmann",
+      "email": "hoffmannj@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Michal Cerny",
+      "email": "michal.cerny@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Jirasek",
+      "email": "jiri.jirasek@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "protherm@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Malinsky",
+      "email": "jiri.malinsky@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "schneidv@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "jan.priplata@protherm.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "marketa.drabova@protherm.cz",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Protherm 写开发信。\n\n## 公司背景\n- **公司：** Protherm（捷克）\n- **网站：** protherm.cz\n- **行业：** HVAC\n- **调研：** ProTherm AH50050R Tube Process Air Heater, 400W, Ø1/2 x. - eBay  com/itm/334973243103 Next Day Automation is NOT an authorized distributor for ProTherm Industries. The Original Manufacturer's warranty\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Frantisek Srp | frantisek.srp@protherm.cz | N/A\n2. Jiri Vavrina | vavrinaj@protherm.cz | N/A\n3. Jiri Hoffmann | hoffmannj@protherm.cz | N/A\n4. Michal Cerny | michal.cerny@protherm.cz | N/A\n5. Jiri Jirasek | jiri.jirasek@protherm.cz | N/A\n6. protherm@protherm.cz | protherm@protherm.cz | N/A\n7. Jiri Malinsky | jiri.malinsky@protherm.cz | N/A\n8. schneidv@protherm.cz | schneidv@protherm.cz | N/A\n9. jan.priplata@protherm.cz | jan.priplata@protherm.cz | N/A\n10. marketa.drabova@protherm.cz | marketa.drabova@protherm.cz | N/A\n11. Frantisek Srp | frantisek.srp@protherm.cz | N/A\n12. Jiri Vavrina | vavrinaj@protherm.cz | N/A\n13. Jiri Hoffmann | hoffmannj@protherm.cz | N/A\n14. Michal Cerny | michal.cerny@protherm.cz | N/A\n15. Jiri Jirasek | jiri.jirasek@protherm.cz | N/A\n16. protherm@protherm.cz | protherm@protherm.cz | N/A\n17. Jiri Malinsky | jiri.malinsky@protherm.cz | N/A\n18. schneidv@protherm.cz | schneidv@protherm.cz | N/A\n19. jan.priplata@protherm.cz | jan.priplata@protherm.cz | N/A\n20. marketa.drabova@protherm.cz | marketa.drabova@protherm.cz | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

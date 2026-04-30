@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "generated_at": "2026-04-29T09:40:19Z",
+    "input_count": 1,
+    "search_provider": "searxng",
+    "llm_mode": "never",
+    "llm_model": null
+  },
+  "summary": {
+    "fit_counts": {
+      "high": 1,
+      "medium": 0,
+      "low": 0
+    },
+    "scoring_methods": {
+      "llm_batch": 0,
+      "heuristic": 1
+    },
+    "search_error_companies": 0,
+    "llm_errors": []
+  },
+  "results": [
+    {
+      "company_name": "EVROLAN",
+      "email": "gerenski@eurolan.net",
+      "website": "https://eurolan.net",
+      "domain": "eurolan.net",
+      "fit_rating": "high",
+      "quality_score": 100,
+      "confidence": "medium",
+      "summary": "Heuristic rating high; detected signals: cable, cables, wire, wires, wiring. Top result: Shore Llc - Global Trade Intelligence Platform for Smarter Business Growth",
+      "evidence_urls": [
+        "https://www.marketinsidedata.com/en/company/shore-llc/ec25aaf8e46550a2e0f2498d077af2c2",
+        "https://www.eve-electronics.com/",
+        "https://support.microsoft.com/en-us/contactus"
+      ],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "high",
+        "score": 429,
+        "reasons": [
+          "+30:cable",
+          "+30:cables",
+          "+21:wire",
+          "+14:wires",
+          "+6:wiring",
+          "+48:hdmi",
+          "+28:displayport",
+          "+36:usb",
+          "+24:usb-c",
+          "+36:fiber",
+          "+16:optical",
+          "+24:lan cable",
+          "+5:adapter",
+          "+8:connector",
+          "+27:distributor",
+          "+24:wholesale",
+          "+15:av",
+          "+7:networking",
+          "+18:oem",
+          "+12:odm"
+        ]
+      },
+      "queries": [
+        "\"EVROLAN\" company products distributor cable electronics",
+        "EVROLAN HDMI USB cable distributor"
+      ],
+      "search_results": [
+        {
+          "title": "Shore Llc - Global Trade Intelligence Platform for Smarter Business Growth",
+          "url": "https://www.marketinsidedata.com/en/company/shore-llc/ec25aaf8e46550a2e0f2498d077af2c2",
+          "snippet": "The company's major import commodities include products classified under HS Code 8544492000 (Cables ... Evrolan Llc of 1.92 Mn, Anlan Llc of 1.59 Mn, Ereg Llc of ...",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "electronics distributor | Connectors - Electronic Components - Cable assembly - EVE GmbH",
+          "url": "https://www.eve-electronics.com/",
+          "snippet": "Our assortment of electronic components also contains various types of batteries, power supplies, tools and cables as well as equipment for the connection technology. Depending on the branch, if you are a manufacturer, developer, a trading partner, a prefabricator or working for a public institution, we can offer you an individual concept for a perfect disposition and thus the base to an economic fabrication of your products.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Contact Us - Microsoft Support",
+          "url": "https://support.microsoft.com/en-us/contactus",
+          "snippet": "Contact Microsoft Support. Find solutions to common problems, or get help from a support agent.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Supply Chain Data Of Llc Evrolan Company Profile | Trademo",
+          "url": "https://www.trademo.com/companies/llc-evrolan/44346488",
+          "snippet": "Trademo collects Llc Evrolan's import-export shipments data from a variety of public and private sources including Bill of Lading, Customs Declarations of several countries etc. After collecting Llc Evrolan import-export transactional data, it is a standardized and normalized to build a 360-degree trade profile of the company.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "opticom.bg alternatives | Top 47 similar sites like opticom.bg",
+          "url": "https://www.sitelike.org/similar/opticom.bg/",
+          "snippet": "If you're searching for similar sites, the top 5 opticom.bg alternatives are danimpex.com, evrolan.net, ic-intracom.bg, kabeli.eu, opticom-bg.com. This ...",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Arrow Electronics: Connect with Electronic Components | Arrow.com",
+          "url": "https://www.arrow.com/",
+          "snippet": "Arrow’s supply chain solutions help you gain more control, resilience and visibility across your global electronics supply chain.More about Supply Chain Solutions ... We help source, build and launch products that improve the quality of life for people around the world.",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Microsoft Support",
+          "url": "https://support.microsoft.com/en-us",
+          "snippet": "Microsoft Support is here to help you with Microsoft products. Find how-to articles, videos, and training for Microsoft Copilot, Microsoft 365, Windows 11, Surface, and more.",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "EVROLAN BG EOOD Company Profile - Dun & Bradstreet",
+          "url": "https://www.dnb.com/business-directory/company-profiles.evrolan_bg_eood.87f7d45c0f5427ae987d8f71d1797060.html",
+          "snippet": "Find company research, competitor information, contact details & financial data for EVROLAN BG EOOD of Montana. Get the latest business insights from Dun & Bradstreet.",
+          "source": "searxng",
+          "score": 0.5
+        }
+      ],
+      "errors": [],
+      "extra": {}
+    }
+  ]
+}

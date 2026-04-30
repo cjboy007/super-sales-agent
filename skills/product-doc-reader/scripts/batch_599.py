@@ -10,9 +10,9 @@ from pathlib import Path
 from datetime import datetime
 
 # 配置
-WORKSPACE = os.getenv("WORKSPACE", Path(__file__).parent.parent.parent)
-TEMP_DIR = Path(WORKSPACE) / "temp/599-batch"
-KB_DIR = Path(WORKSPACE) / "obsidian-vault/Farreach 知识库/02-产品目录/599 系列"
+WORKSPACE = "/path/to/your/.openclaw/workspace"
+TEMP_DIR = Path(WORKSPACE + "/temp/599-batch")
+KB_DIR = Path(WORKSPACE + "/obsidian-vault/Your Company 知识库/02-产品目录/599 系列")
 
 # 599 系列 PDF 文件 ID（17 个）
 PDF_FILES = {

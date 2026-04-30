@@ -1,0 +1,45 @@
+{
+  "company": "Ahlsell Group",
+  "country": "瑞典",
+  "website": "ahlsell.com",
+  "tier": "Tier1-Nordic",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Mika Miettinen",
+      "email": "mika.miettinen@ahlsell.com",
+      "position": ""
+    },
+    {
+      "name": "Johan Nilsson",
+      "email": "johan.nilsson@ahlsell.com",
+      "position": "CEO"
+    },
+    {
+      "name": "",
+      "email": "info@ahlsell.com",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "supplier.support@ahlsell.com",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "datarequests@ahlsell.com",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:48:54.025640+00:00",
+    "query": "Ahlsell Group 瑞典 HVAC pump distributor manufacturer",
+    "summary": "Ahlsell acquires specialist in pump technology in Norway. https://www. ahlsell. no/om-ahlsell/pressemeldinger/2022/ahlsell-acquires-specialist-in-pump-technology-in-norway/ Er du sikker på at du vil tømme listen? Er du sikker på at du vil tømme innkjøpslisten? Ahlsell has signed an agreement to acquire all shares in Intec Pumper AS.",
+    "sources": [
+      "https://www.ahlsell.no/om-ahlsell/pressemeldinger/2022/ahlsell-acquires-specialist-in-pump-technology-in-norway/",
+      "https://www.ahlsellgroup.com/sv/om-ahlsell/historia",
+      "https://www.ahlsell.se/en/about-ahlsell/company-facts/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-Nordic重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

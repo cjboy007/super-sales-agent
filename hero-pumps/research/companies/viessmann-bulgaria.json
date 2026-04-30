@@ -1,0 +1,23 @@
+{
+  "company": "Viessmann Bulgaria",
+  "country": "保加利亚",
+  "website": "viessmann.bg",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Alexandru Lupu",
+      "email": "a.lupu@viessmann.bg",
+      "position": "Country Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Viessmann Bulgaria HVAC heat pump manufacturer Carrier acquisition",
+    "summary": "Viessmann 是德国暖通巨头，已被 Carrier 收购。Alexandru Lupu 是保加利亚国家经理，是当地最高决策人。大型采购可能由德国总部集中采购。",
+    "sources": [
+      "https://linkedin.com/in/alexandru-lupu-viessmann"
+    ]
+  },
+  "outreach_notes": "德国暖通巨头（已被 Carrier 收购）。Alexandru 是保加利亚国家经理，当地最高决策人。"
+}

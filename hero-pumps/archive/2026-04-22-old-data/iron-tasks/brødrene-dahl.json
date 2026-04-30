@@ -1,0 +1,52 @@
+{
+  "company": "Brødrene Dahl",
+  "country": "北欧",
+  "contacts": [
+    {
+      "name": "Charlene Thommessen",
+      "email": "charlene.thommessen@dahl.no",
+      "position": "Sales Industry"
+    },
+    {
+      "name": "Henning Nordbotn",
+      "email": "henning.nordbotn@dahl.no",
+      "position": "Sales Associate"
+    },
+    {
+      "name": "Svein Landro",
+      "email": "svein.landro@dahl.no",
+      "position": "Sales Manager"
+    },
+    {
+      "name": "Edwin Bekkevold",
+      "email": "edwin.bekkevold@dahl.no",
+      "position": "Key Account Manager"
+    },
+    {
+      "name": "Monica Persen",
+      "email": "monica.persen@dahl.no",
+      "position": "Training Manager"
+    },
+    {
+      "name": "Trond Thoresen",
+      "email": "trond.thoresen@dahl.no",
+      "position": "Regional Manager"
+    },
+    {
+      "name": "Anders Gran",
+      "email": "anders.gran@dahl.no",
+      "position": "Chief Marketing Officer"
+    },
+    {
+      "name": "Therese Thorèn",
+      "email": "therese.thoren@dahl.no",
+      "position": "Lead Assistant"
+    },
+    {
+      "name": "Michelle Raz",
+      "email": "michelle.raz@dahl.no",
+      "position": "Project Coordinator"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Brødrene Dahl 写开发信。\n\n## 公司背景\n- **公司：** Brødrene Dahl（北欧）\n- **网站：** dahl.no\n- **行业：** HVAC\n- **调研：** Brødrene Dahl AS Information  co/brodrene-dahl-as-profile_b5f6e4b7f42e8f68 Company Information. # Brødrene Dahl AS Information. Brødrene Dahl AS was established in Norway in 1917, and is the country's\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Charlene Thommessen | charlene.thommessen@dahl.no | Sales Industry\n2. Henning Nordbotn | henning.nordbotn@dahl.no | Sales Associate\n3. Svein Landro | svein.landro@dahl.no | Sales Manager\n4. Edwin Bekkevold | edwin.bekkevold@dahl.no | Key Account Manager\n5. Monica Persen | monica.persen@dahl.no | Training Manager\n6. Trond Thoresen | trond.thoresen@dahl.no | Regional Manager\n7. Anders Gran | anders.gran@dahl.no | Chief Marketing Officer\n8. Linda Skodje | linda.skodje@dahl.no | HR Business Partner\n9. Therese Thorèn | therese.thoren@dahl.no | Lead Assistant\n10. Michelle Raz | michelle.raz@dahl.no | Project Coordinator\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

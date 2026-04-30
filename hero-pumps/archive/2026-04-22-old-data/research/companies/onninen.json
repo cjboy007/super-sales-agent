@@ -1,0 +1,45 @@
+{
+  "company": "Onninen",
+  "country": "芬兰",
+  "website": "onninen.com",
+  "tier": "Tier1-Nordic",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Dariusz Rojek",
+      "email": "dariusz.rojek@onninen.com",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "Sakari Manninen",
+      "email": "sakari.manninen@onninen.com",
+      "position": "Director of HVAC"
+    },
+    {
+      "name": "Jacek Szymański",
+      "email": "jacek.szymanski@onninen.com",
+      "position": "Supply Chain Director"
+    },
+    {
+      "name": "Timo Ainasoja",
+      "email": "timo.ainasoja@onninen.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Peter Söderholm",
+      "email": "peter.soederholm@onninen.com",
+      "position": "Director of Sourcing"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:51.579542+00:00",
+    "query": "Onninen 芬兰 HVAC pump distributor manufacturer",
+    "summary": "Onninen Oy - ESBE https://esbe. eu/group/contact/europe/finland/onninen-oy The products are used for the heat distribution and temperature control. Direct supply, constant temperature control with thermostatic mixing valve, or mixing 2.",
+    "sources": [
+      "https://esbe.eu/group/contact/europe/finland/onninen-oy",
+      "https://automa.net/company/onninen-oy?srsltid=AfmBOoqJTwi_m4BtW6fd5TxqN_YkQE0S7tztdFFlv4bwDcHmGcjhIJRP",
+      "https://www.onninen.fi/en/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-Nordic重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

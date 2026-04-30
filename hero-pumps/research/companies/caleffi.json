@@ -1,0 +1,45 @@
+{
+  "company": "Caleffi",
+  "country": "意大利",
+  "website": "caleffi.com",
+  "tier": "Tier1-EU",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Max Rohr",
+      "email": "max.rohr@caleffi.com",
+      "position": "Director of Education"
+    },
+    {
+      "name": "Giorgio Galliano",
+      "email": "giorgio.galliano@caleffi.com",
+      "position": "Quality Director"
+    },
+    {
+      "name": "Fabrizio Ferretti",
+      "email": "fabrizio.ferretti@caleffi.com",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "Serkan Sungun",
+      "email": "serkan.sungun@caleffi.com",
+      "position": "Managing Director"
+    },
+    {
+      "name": "Davide Bellora",
+      "email": "davide.bellora@caleffi.com",
+      "position": "Process Engineer"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:36.885128+00:00",
+    "query": "Caleffi 意大利 HVAC pump distributor manufacturer",
+    "summary": "Caleffi Group | Caleffi S. https://www. caleffi. com/en-us/company/caleffi-group Caleffi Group. Caleffi is the industrial holding of an international group of 17 subsidiary companies and 3 affiliated companies.",
+    "sources": [
+      "https://www.caleffi.com/en-us/company/caleffi-group",
+      "https://www.instagram.com/reel/DV8fLrOjO7c/",
+      "https://www.caleffi.com/sites/default/files/media/external-file/03313_EN_COMPONENTS%20FOR%20HEAT%20PUMP%20SYSTEMS.pdf"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-EU重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

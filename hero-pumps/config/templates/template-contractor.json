@@ -1,0 +1,7 @@
+{
+  "id": "template-contractor",
+  "name": "Hero Pumps — Plumbing / Engineering Contractor",
+  "industry_keywords": ["plumbing", "engineering", "contractor", "mep", "installation", "building services", "mechanical"],
+  "subject": "Pump specs for your next project",
+  "body": "Hi {contact_name},\n\nSaw {company_name} has been handling some solid commercial HVAC projects in {country}. Thought our circulator pumps might be worth a look.\n\nWe're a direct factory in China — ErP compliant (EEI ≤ 0.23), TÜV certified. Our European contractor clients typically save 30%+ on pump costs vs. buying through local distributors.\n\nWant me to send over a quick spec sheet for your current project?\n\n"
+}

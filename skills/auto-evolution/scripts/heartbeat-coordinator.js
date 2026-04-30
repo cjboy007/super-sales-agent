@@ -23,12 +23,71 @@
 
 const fs = require('fs');
 const path = require('path');
+const { classifyTask, extractTaskPattern } = require('./utils/classify');
 
 // Workspace resolution
 const WORKSPACE = process.env.OPENCLAW_WORKSPACE || process.env.WORKSPACE || path.join(require('os').homedir(), '.openclaw', 'agents', 'main', 'workspace');
 const TASKS_DIR = process.env.EVOLUTION_TASKS_DIR || path.join(WORKSPACE, 'evolution', 'tasks');
+const EVOLUTION_DIR = path.join(WORKSPACE, 'evolution');
+const CAPSULE_INDEX_FILE = path.join(EVOLUTION_DIR, 'capsules', 'capsule-index.json');
 const LOCK_FILE = path.join(TASKS_DIR, '.coordinator.lock');
 const LOCK_TIMEOUT_MS = 10 * 60 * 1000;
+
+function ensureMetadata(task) {
+  if (!task.metadata) {
+    task.metadata = {
+      category: classifyTask(task.goal),
+      task_pattern: extractTaskPattern(task.goal),
+      complexity_score: task.context?.complexity_score ?? null,
+      blast_radius: null,
+      confidence_score: null,
+      validation_commands: null,
+      related_capsules: null,
+      diff_summary: null
+    };
+  }
+  return task;
+}
+
+// ==================== Capsule Matching (v2 Phase 3) ====================
+
+function loadCapsuleIndex() {
+  try {
+    if (fs.existsSync(CAPSULE_INDEX_FILE)) {
+      return JSON.parse(fs.readFileSync(CAPSULE_INDEX_FILE, 'utf8'));
+    }
+  } catch { /* ignore */ }
+  return { capsules: [] };
+}
+
+function matchRelatedCapsules(task) {
+  const index = loadCapsuleIndex();
+  if (!index.capsules || index.capsules.length === 0) return [];
+
+  const goal = (task.goal || '').toLowerCase();
+  const keywords = goal.split(/\s+/).filter(w => w.length > 2);
+  const category = task.metadata?.category || classifyTask(task.goal);
+
+  const scored = index.capsules.map(c => {
+    let score = 0;
+    // Category match (40%)
+    if (c.category === category) score += 0.4;
+    // Pattern/keyword match (40%)
+    const text = ((c.task_pattern || '') + ' ' + (c.goal_summary || '')).toLowerCase();
+    for (const kw of keywords) {
+      if (text.includes(kw)) { score += 0.4 / keywords.length; break; }
+    }
+    // Complexity proximity (20%)
+    const diff = Math.abs((c.complexity_score || 12) - (task.metadata?.complexity_score || 12));
+    if (diff <= 5) score += 0.2;
+    return { ...c, match_score: score };
+  });
+
+  return scored
+    .filter(c => c.match_score > 0.3)
+    .sort((a, b) => b.match_score - a.match_score)
+    .slice(0, 3);
+}
 
 // ==================== Lock ====================
 
@@ -74,21 +133,27 @@ function scanTasks() {
   return tasks;
 }
 
-function selectNextTask(tasks) {
+function selectNextTask(tasks, filterPhase) {
+  // Optional phase filter for CLI --phase flag
+  const statusForPhase = { review: 'pending', execute: 'reviewed', audit: 'executing' };
+  const filtered = filterPhase && statusForPhase[filterPhase]
+    ? tasks.filter(t => t.status === statusForPhase[filterPhase])
+    : tasks;
+  
   // Priority: reviewed (needs exec) > pending (needs review) > executing (needs audit)
-  const reviewed = tasks.filter(t => t.status === 'reviewed');
+  const reviewed = filtered.filter(t => t.status === 'reviewed');
   if (reviewed.length > 0) {
     reviewed.sort((a, b) => a.task_id.localeCompare(b.task_id));
     return { task: reviewed[0], phase: 'execute' };
   }
   
-  const executing = tasks.filter(t => t.status === 'executing');
+  const executing = filtered.filter(t => t.status === 'executing');
   if (executing.length > 0) {
     executing.sort((a, b) => a.task_id.localeCompare(b.task_id));
     return { task: executing[0], phase: 'audit' };
   }
   
-  const pending = tasks.filter(t => t.status === 'pending');
+  const pending = filtered.filter(t => t.status === 'pending');
   if (pending.length > 0) {
     const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
     pending.sort((a, b) => {
@@ -108,60 +173,50 @@ function selectNextTask(tasks) {
 function buildReviewPrompt(task) {
   const iteration = (task.current_iteration || 0) + 1;
   const subtasks = task.context?.subtasks || [];
+  const execPlan = task.context?.execution_plan || [];
   const lastResult = task.result || {};
   const completedStep = lastResult.subtask_completed || 0;
   const nextStep = completedStep + 1;
-  
+
+  // Ensure metadata
+  ensureMetadata(task);
+
+  // Find related capsules
+  const relatedCapsules = matchRelatedCapsules(task);
+
+  const steps = execPlan.length > 0
+    ? execPlan.map(s => `${s.step}. ${s.action}${s.validation ? ' [verify: ' + s.validation.join(', ') + ']' : ''}`)
+    : subtasks.map((s, i) => `${i + 1}. ${s}`);
+
   let prompt = `You are a Reviewer for the auto-evolution system.
 
 ## Task
 - **ID:** ${task.task_id}
 - **Goal:** ${task.goal}
+- **Category:** ${task.metadata.category}
+- **Pattern:** ${task.metadata.task_pattern}
 - **Iteration:** ${iteration} / ${task.max_iterations}
-- **Progress:** ${completedStep} / ${subtasks.length} subtasks
+- **Progress:** ${completedStep} / ${Math.max(subtasks.length, execPlan.length)} steps
 
-## Subtasks
-${subtasks.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+## Steps
+${steps.join('\n')}
 
 ## Previous Result
 ${lastResult.summary || '(First iteration)'}
 `;
 
-  if (completedStep >= subtasks.length) {
-    prompt += `
-## All subtasks completed — finalize
-Set verdict to "complete" and summarize the outcome.
-`;
-  } else {
-    prompt += `
-## Your Job
-1. Review previous result (if any)
-2. Decide: approve / revise / reject
-3. Write specific instructions for subtask ${nextStep}
-4. Define acceptance criteria
-
-## Output (strict JSON)
-\`\`\`json
-{
-  "verdict": "approve",
-  "feedback": "Review comments",
-  "next_instructions": {
-    "summary": "Iteration ${iteration}: Step ${nextStep}",
-    "current_step": ${nextStep},
-    "total_steps": ${subtasks.length},
-    "step": {
-      "step": ${nextStep},
-      "action": "${subtasks[nextStep - 1] || ''}",
-      "detail": "Implementation details..."
-    },
-    "acceptance_criteria": ["Criterion 1", "Criterion 2"]
+  // Inject historical capsule references
+  if (relatedCapsules.length > 0) {
+    prompt += `\n## Historical Reference (${relatedCapsules.length} similar capsules)\n`;
+    for (const c of relatedCapsules) {
+      prompt += `- **${c.capsule_id}** (${c.category}) — ${c.goal_summary} | Score: ${c.outcome_score} | Pattern: ${c.task_pattern}\n`;
+    }
+    prompt += '\nReference these historical capsules when planning.\n';
+    // Store related capsules in metadata
+    task.metadata.related_capsules = relatedCapsules.map(c => c.capsule_id);
   }
-}
-\`\`\`
 
-Output only JSON.
-`;
-  }
+  prompt += `\n## Output Requirements\n1. Include "validation_commands": array of shell commands to verify the result\n2. Include "strategy": ordered execution steps\n\n## Output (strict JSON)\n\`\`\`json\n{\n  "verdict": "approve",\n  "feedback": "Review comments",\n  "validation_commands": ["npm test"],\n  "strategy": ["Step 1 description", "Step 2 description"],\n  "next_instructions": {\n    "summary": "Iteration ${iteration}: Step ${nextStep}",\n    "current_step": ${nextStep},\n    "total_steps": ${Math.max(subtasks.length, execPlan.length)},\n    "step": {\n      "step": ${nextStep},\n      "action": "${(execPlan[nextStep - 1]?.action || subtasks[nextStep - 1] || '')}",\n      "detail": "Implementation details..."\n    },\n    "acceptance_criteria": ["Criterion 1", "Criterion 2"]\n  }\n}\n\`\`\`\n\nOutput only JSON.\n`;
 
   return prompt;
 }
@@ -173,8 +228,9 @@ function applyReview(task, reviewResult) {
   
   let review;
   try {
+    // Lazy JSON extraction: try fenced block first, then smallest {..} containing "verdict"
     const jsonMatch = reviewResult.match(/```json\s*([\s\S]*?)\s*```/) || 
-                      reviewResult.match(/\{[\s\S]*"verdict"[\s\S]*\}/);
+                      reviewResult.match(/\{[^{}]*"verdict"[^{}]*\}/);
     const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : reviewResult;
     review = JSON.parse(jsonStr);
   } catch (err) {
@@ -194,8 +250,13 @@ function applyReview(task, reviewResult) {
       feedback: review.feedback || '',
       next_instructions: review.next_instructions || null
     };
+
+    // v2: Save validation_commands and strategy to metadata
+    if (!data.metadata) data.metadata = {};
+    if (review.validation_commands) data.metadata.validation_commands = review.validation_commands;
+    if (review.strategy) data.metadata._reviewer_strategy = review.strategy;
   }
-  
+
   data.updated_at = now;
   if (!data.history) data.history = [];
   data.history.push({
@@ -263,7 +324,7 @@ function applyExecution(task, execResult) {
   let result;
   try {
     const jsonMatch = execResult.match(/```json\s*([\s\S]*?)\s*```/) || 
-                      execResult.match(/\{[\s\S]*"subtask_completed"[\s\S]*\}/);
+                      execResult.match(/\{[^{}]*"subtask_completed"[^{}]*\}/);
     const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : execResult;
     result = JSON.parse(jsonStr);
   } catch (err) {
@@ -345,7 +406,7 @@ function applyAudit(task, auditResult) {
   let audit;
   try {
     const jsonMatch = auditResult.match(/```json\s*([\s\S]*?)\s*```/) || 
-                      auditResult.match(/\{[\s\S]*"verdict"[\s\S]*\}/);
+                      auditResult.match(/\{[^{}]*"verdict"[^{}]*\}/);
     const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : auditResult;
     audit = JSON.parse(jsonStr);
   } catch (err) {
@@ -386,7 +447,7 @@ function applyAudit(task, auditResult) {
 
 // ==================== Main ====================
 
-async function main() {
+async function main(filterPhase) {
   console.log(`\n🔄 Coordinator @ ${new Date().toISOString()}`);
   
   if (!acquireLock()) return;
@@ -401,7 +462,7 @@ async function main() {
     }
     console.log(`📊 Status:`, JSON.stringify(statusCounts));
     
-    const selection = selectNextTask(tasks);
+    const selection = selectNextTask(tasks, filterPhase);
     if (!selection) {
       console.log('✅ No tasks to process');
       return;
@@ -412,6 +473,18 @@ async function main() {
     
     if (phase === 'review') {
       const prompt = buildReviewPrompt(task);
+
+      // Persist related_capsules metadata to task file
+      if (task.metadata && task.metadata.related_capsules && task.metadata.related_capsules.length > 0 && task.file) {
+        const filePath = path.join(TASKS_DIR, task.file);
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        data.metadata = data.metadata || {};
+        data.metadata.related_capsules = task.metadata.related_capsules;
+        data.updated_at = new Date().toISOString();
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        console.log(`🔗 Linked ${task.metadata.related_capsules.length} capsule(s) to ${task.task_id}`);
+      }
+
       console.log('\n--- REVIEW_PROMPT_START ---');
       console.log(JSON.stringify({
         task_id: task.task_id,
@@ -450,7 +523,16 @@ async function main() {
 }
 
 // CLI sub-commands
-const [,, cmd, taskFile, resultFile] = process.argv;
+let phaseFilter = null;
+let cmdIdx = 2;
+// Parse --phase flag
+if (process.argv[2] === '--phase' && process.argv[3]) {
+  phaseFilter = process.argv[3];
+  cmdIdx = 4;
+}
+const cmd = process.argv[cmdIdx];
+const taskFile = process.argv[cmdIdx + 1];
+const resultFile = process.argv[cmdIdx + 2];
 
 if (cmd === 'apply-review' && taskFile && resultFile) {
   const task = JSON.parse(fs.readFileSync(path.join(TASKS_DIR, taskFile), 'utf8'));
@@ -468,10 +550,10 @@ if (cmd === 'apply-review' && taskFile && resultFile) {
   applyAudit(task, fs.readFileSync(resultFile, 'utf8'));
 
 } else {
-  main().catch(err => {
+  main(phaseFilter).catch(err => {
     console.error('❌ Error:', err);
     releaseLock();
   });
 }
 
-module.exports = { scanTasks, selectNextTask, buildReviewPrompt, buildExecutePrompt, buildAuditPrompt, applyReview, applyExecution, applyAudit };
+module.exports = { scanTasks, selectNextTask, buildReviewPrompt, buildExecutePrompt, buildAuditPrompt, applyReview, applyExecution, applyAudit, classifyTask, extractTaskPattern, matchRelatedCapsules };

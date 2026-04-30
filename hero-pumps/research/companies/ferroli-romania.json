@@ -1,0 +1,23 @@
+{
+  "company": "Ferroli Romania",
+  "country": "罗马尼亚",
+  "website": "ferroli.ro",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Paolo Nicoletti",
+      "email": "paolo.nicoletti@ferroli.com",
+      "position": "Technical Purchasing Director, Global Category Management"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Ferroli Romania HVAC boiler manufacturer pump procurement",
+    "summary": "Ferroli Group 是欧洲主要暖通制造商。Paolo Nicoletti 负责集团技术采购（约 1.5 亿欧元品类），是循环泵采购的关键决策人。",
+    "sources": [
+      "https://it.linkedin.com/in/paolo-nicoletti-71841812"
+    ]
+  },
+  "outreach_notes": "集团级技术采购负责人（约 1.5 亿欧元品类），直接决策人。"
+}

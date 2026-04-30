@@ -1,3 +1,12 @@
+---
+name: sales-dashboard
+description: '销售仪表盘，渐进式数据概览 + 周报月报'
+metadata:
+  {
+    "openclaw": { "emoji": "📈", "requires": { "anyBins": ["node"] } },
+  }
+---
+
 # Sales Dashboard 销售仪表盘
 
 ## 描述

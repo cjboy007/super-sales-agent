@@ -1,0 +1,40 @@
+{
+  "company": "BDR Thermea Hungary",
+  "country": "匈牙利",
+  "website": "bdrthermea.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Oscar Mogro",
+      "email": "oscar.mogro@bdrthermea.com",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "info@bdrthermea.com",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "contactus@bdrthermea.com",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "dorien.souman@bdrthermea.com",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:07.609640+00:00",
+    "query": "BDR Thermea Hungary 匈牙利 HVAC pump distributor manufacturer",
+    "summary": "BDR Thermea - Wikipedia https://en. wikipedia. org/wiki/BDR_Thermea The BDR Thermea Group is a European manufacturer and distributor of domestic and commercial water and space heating systems. Its brands include Baxi, 2.",
+    "sources": [
+      "https://en.wikipedia.org/wiki/BDR_Thermea",
+      "https://www.hvacinformed.com/companies/bdr-thermea-group.html",
+      "https://solarheateurope.eu/map/bdr-thermea/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

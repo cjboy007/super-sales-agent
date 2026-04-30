@@ -1,7 +1,0 @@
-node_modules/
-drafts/
-test-results/
-reviews-pending/
-*.log
-.env
-quadnet_email.txt

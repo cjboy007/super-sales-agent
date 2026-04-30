@@ -1,0 +1,14 @@
+{
+  "draft_id": "draft-2026-04-22T01-48-27-130Z-okki_002",
+  "customer_id": "okki_002",
+  "customer_name": "XYZ Electronics",
+  "customer_email": "sales@xyzelec.com",
+  "stage": "quoted",
+  "template_id": "template-quote-002",
+  "intent": "price_negotiation",
+  "subject": "Re: Quotation QT-2026-0042 - Your Company",
+  "follow_up_day": 5,
+  "created_at": "2026-04-22T01:48:27.130Z",
+  "status": "draft",
+  "owner": "wilson"
+}

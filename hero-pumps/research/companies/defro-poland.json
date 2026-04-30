@@ -1,0 +1,23 @@
+{
+  "company": "Defro Poland",
+  "country": "波兰",
+  "website": "defro.pl",
+  "tier": "Tier2",
+  "industry": "HVAC/锅炉",
+  "contacts": [
+    {
+      "name": "通用邮箱",
+      "email": "info@defro.pl",
+      "position": "待确认（需补充）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "Defro Poland boiler manufacturer heat pump",
+    "summary": "Defro 是波兰锅炉/热泵制造商，主要产品包括固体燃料锅炉、燃气锅炉和热泵系统。",
+    "sources": [
+      "https://defro.pl"
+    ]
+  },
+  "outreach_notes": "波兰本土锅炉/热泵制造商，需要循环泵配套。需找到具体采购负责人。"
+}

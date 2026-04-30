@@ -1,0 +1,30 @@
+{
+  "company": "Dakon",
+  "country": "捷克",
+  "website": "dakon.cz",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "dakon@dakon.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "servis@dakon.cz",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:46.008888+00:00",
+    "query": "Dakon 捷克 HVAC pump distributor manufacturer",
+    "summary": "The Engineering Search - Czech Republic https://www. cz/index. php/search::cat/category::1330/page::151/ Deliveries and installation of compressor stations, thermal pumps, heating, Hvac systems, air-conditioning, wiring, design activities 2.",
+    "sources": [
+      "https://www.sjn.co.cz/index.php/search::cat/category::1330/page::151/",
+      "https://en.firmy.cz/tag/kotle-na-plyn/kraj-olomoucky/prerov/104-hranice",
+      "https://kotly.com.pl/en_US/p/DAKON-FB-26-D-24-kW/327?srsltid=AfmBOop7NSoBcQOCThil6aYL7835D4VcEpoVoSpnlFF8ZIprzApysyDt"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

@@ -35,12 +35,12 @@ def generate_pi_html(output_path, data):
             print(f'  - {e}')
         sys.exit(1)
 
-    # 公司信息（Farreach）
+    # 公司信息（Your Company）
     company_name = data.get('company_name', 'FARREACH ELECTRONIC CO LIMITED')
     company_address = data.get('company_address', 'No. 6, Chuangye Road East, Shuanglinpian, Liangang Industrial Zone, Zhuhai, China')
     company_phone = data.get('company_phone', 'YOUR-PHONE')
     company_fax = data.get('company_fax', 'YOUR-FAX')
-    company_website = data.get('company_website', 'www.farreach-cable.com')
+    company_website = data.get('company_website', 'www.your-domain.com')
     company_email = data.get('company_email', 'your-email')
     
     # 客户信息

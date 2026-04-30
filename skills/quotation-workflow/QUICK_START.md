@@ -18,10 +18,10 @@
 
 复制示例文件并修改：
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples
+cd /path/to/your/.openclaw/workspace/skills/quotation-workflow/examples
 
 # 复制示例
-cp farreach_sample.json my_quotation.json
+cp your-company_sample.json my_quotation.json
 
 # 编辑数据
 code my_quotation.json  # 或用你喜欢的编辑器
@@ -64,7 +64,7 @@ EOF
 ## 2️⃣ 生成 Excel 报价单
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts
+cd /path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts
 
 python3 generate_quotation.py \
   --data ../../quotation-workflow/examples/my_quotation.json \
@@ -78,7 +78,7 @@ python3 generate_quotation.py \
 ## 3️⃣ 生成 Word 报价单
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/word-docx/scripts
+cd /path/to/your/.openclaw/workspace/skills/word-docx/scripts
 
 python3 generate_quotation_docx.py \
   --data ../../quotation-workflow/examples/my_quotation.json \
@@ -92,7 +92,7 @@ python3 generate_quotation_docx.py \
 ## 4️⃣ 导出 PDF
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples
+cd /path/to/your/.openclaw/workspace/skills/quotation-workflow/examples
 
 # 单个文件
 soffice --headless --convert-to pdf QT-20260314-002.xlsx --outdir ./
@@ -124,17 +124,17 @@ open QT-20260314-002.pdf
 
 ```bash
 # 设置变量
-DATA_FILE="/Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples/my_quotation.json"
-OUTPUT_DIR="/Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples"
+DATA_FILE="/path/to/your/.openclaw/workspace/skills/quotation-workflow/examples/my_quotation.json"
+OUTPUT_DIR="/path/to/your/.openclaw/workspace/skills/quotation-workflow/examples"
 OUTPUT_NAME="QT-20260314-002"
 
 # 生成 Excel
-python3 /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py \
+python3 /path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py \
   --data "$DATA_FILE" \
   --output "$OUTPUT_DIR/$OUTPUT_NAME.xlsx"
 
 # 生成 Word
-python3 /Users/wilson/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py \
+python3 /path/to/your/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py \
   --data "$DATA_FILE" \
   --output "$OUTPUT_DIR/$OUTPUT_NAME.docx"
 
@@ -191,7 +191,7 @@ ls -lh "$OUTPUT_DIR"/$OUTPUT_NAME.*
 
 ### 查看 Excel 内容
 ```bash
-python3 /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py \
+python3 /path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py \
   "QT-20260314-002.xlsx" --format table
 ```
 
@@ -213,13 +213,13 @@ python3 read_excel.py test.xlsx --format table
 
 | 文件类型 | 路径 |
 |---------|------|
-| **Excel 生成脚本** | `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py` |
-| **Excel 读取脚本** | `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py` |
-| **Word 生成脚本** | `/Users/wilson/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py` |
-| **Word 读取脚本** | `/Users/wilson/.openclaw/workspace/skills/read-docx/read-docx.py` |
-| **PDF 转换脚本** | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/convert-to-pdf.sh` |
-| **示例数据** | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples/` |
-| **数据模板** | `/Users/wilson/.openclaw/workspace/skills/quotation-workflow/quotation_data_template.json` |
+| **Excel 生成脚本** | `/path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation.py` |
+| **Excel 读取脚本** | `/path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/read_excel.py` |
+| **Word 生成脚本** | `/path/to/your/.openclaw/workspace/skills/word-docx/scripts/generate_quotation_docx.py` |
+| **Word 读取脚本** | `/path/to/your/.openclaw/workspace/skills/read-docx/read-docx.py` |
+| **PDF 转换脚本** | `/path/to/your/.openclaw/workspace/skills/quotation-workflow/scripts/convert-to-pdf.sh` |
+| **示例数据** | `/path/to/your/.openclaw/workspace/skills/quotation-workflow/examples/` |
+| **数据模板** | `/path/to/your/.openclaw/workspace/skills/quotation-workflow/quotation_data_template.json` |
 
 ---
 

@@ -14,14 +14,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const { execFile } = require('child_process');
 
 // ==================== 配置 ====================
 
 const CONFIG = {
   // OKKI CLI 路径
-  okkiCliPath: process.env.OKKI_CLI_PATH || path.join(os.homedir(), '.openclaw', 'workspace', 'xiaoman-okki', 'api', 'okki.py'),
+  okkiCliPath: '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki.py',
   
   // 草稿目录
   draftsDir: path.join(__dirname, '..', 'drafts'),
@@ -30,7 +29,7 @@ const CONFIG = {
   logsDir: path.join(__dirname, '..', 'logs'),
   
   // 同步记录文件（去重用）
-  syncRecordFile: process.env.OKKI_SYNC_RECORD_FILE || path.join(os.tmpdir(), 'follow-up-okki-sync-processed.json'),
+  syncRecordFile: '/tmp/follow-up-okki-sync-processed.json',
   
   // Trail 类型
   TRAIL_TYPE: {

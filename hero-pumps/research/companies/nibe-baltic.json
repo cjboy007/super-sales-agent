@@ -1,0 +1,23 @@
+{
+  "company": "NIBE Baltic",
+  "country": "区域（波罗的海）",
+  "website": "nibe.eu",
+  "tier": "Tier1",
+  "industry": "HVAC/热泵",
+  "contacts": [
+    {
+      "name": "Leif Nystrom",
+      "email": "leif@nibe.eu",
+      "position": "CEO"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "NIBE AB heat pump manufacturer Europe",
+    "summary": "NIBE 是瑞典热泵/暖通集团，欧洲最大热泵制造商之一。Leif Nyström 是 NIBE AB CEO，决策人。注意：NIBE 自产热泵和循环泵，是竞品关系。",
+    "sources": [
+      "https://se.linkedin.com/in/leif-nyström"
+    ]
+  },
+  "outreach_notes": "欧洲最大热泵制造商之一。CEO 级别直接决策人。但 NIBE 自产热泵/泵，注意竞品关系。"
+}

@@ -61,11 +61,17 @@ function main() {
         notes: `Skill 打包完成，路径: ${skillDir}/`
       });
       
-      // 归档
-      fs.writeFileSync(path.join(ARCHIVE_DIR, file), JSON.stringify(data, null, 2));
-      
-      // 从活跃目录移除
-      fs.unlinkSync(path.join(TASKS_DIR, file));
+      // 归档 — write first, verify, then delete
+      const archivePath = path.join(ARCHIVE_DIR, file);
+      fs.writeFileSync(archivePath, JSON.stringify(data, null, 2));
+      // Verify archive file is valid JSON before removing source
+      try {
+        JSON.parse(fs.readFileSync(archivePath, 'utf8'));
+        fs.unlinkSync(path.join(TASKS_DIR, file));
+      } catch (verifyErr) {
+        console.error(`❌ Archive verification failed for ${data.task_id}, keeping source file`);
+        continue;
+      }
       
       console.log(`✅ ${data.task_id} 已打包并归档`);
       

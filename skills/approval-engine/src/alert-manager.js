@@ -9,7 +9,7 @@ const http = require('http');
 const { logException, getExceptions, getStats } = require('./exception-logger');
 
 // Discord 配置
-const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || 'your-discord-bot-token-here';
+const DISCORD_BOT_TOKEN = 'YOUR_DISCORD_BOT_TOKEN';
 const DISCORD_CHANNELS = {
   'approval-requests': '1234567890123456789',
   'order-alerts': '1234567890123456790',

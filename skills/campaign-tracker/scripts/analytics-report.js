@@ -27,7 +27,7 @@ const CONFIG = {
   archiveDir: path.join(__dirname, '..', 'archive'),
   replyTrackingDir: path.join(__dirname, '..', 'reply-tracking'),
   logsDir: path.join(__dirname, '..', 'logs', 'analytics'),
-  obsidianDir: process.env.OBSIDIAN_VAULT ? path.join(process.env.OBSIDIAN_VAULT, 'Farreach 知识库/业务分析/开发信效果') : '<path-to-obsidian-vault>/Farreach 知识库/业务分析/开发信效果',
+  obsidianDir: '/path/to/your/obsidian-vault/Your Company 知识库/业务分析/开发信效果',
   outputDir: path.join(__dirname, '..', 'reports')
 };
 

@@ -1,17 +1,139 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "evolution-task",
-  "title": "Evolution Task",
+  "title": "Evolution Task v2",
+  "description": "Evolution Task schema v2. New fields (metadata, capsule, execution_plan) are optional. See references/task-example.json for examples. Note: v1 tasks using 'title'/'description'/'subtasks' at root level need migration to v2 fields ('goal'/'context.subtasks').",
   "type": "object",
   "required": ["task_id", "status", "goal", "created_at", "current_iteration", "max_iterations"],
   "properties": {
-    "task_id": { "type": "string", "pattern": "^task-\\d{3,}$" },
+    "task_id": { "type": "string", "pattern": "^task-\\d+$" },
     "status": { "type": "string", "enum": ["pending", "reviewing", "reviewed", "executing", "completed", "packaged"] },
     "goal": { "type": "string" },
     "created_at": { "type": "string", "format": "date-time" },
     "updated_at": { "type": "string", "format": "date-time" },
     "current_iteration": { "type": "integer", "minimum": 0 },
     "max_iterations": { "type": "integer", "minimum": 1, "default": 10 },
-    "assigned_to": { "type": "string", "enum": ["wilson", "iron", "shadow", "oracle", "warden"] }
-  }
+    "assigned_to": { "type": "string", "enum": ["wilson", "iron", "shadow", "oracle", "warden"] },
+    "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+
+    "context": {
+      "type": "object",
+      "properties": {
+        "background": { "type": "string" },
+        "constraints": { "type": "array", "items": { "type": "string" } },
+        "reference_files": { "type": "array", "items": { "type": "string" } },
+        "subtasks": { "type": "array", "items": { "type": "string" } },
+        "execution_plan": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": { "type": "integer", "minimum": 1 },
+              "action": { "type": "string" },
+              "validation": { "type": "array", "items": { "type": "string" } },
+              "estimated_complexity": { "type": "integer", "minimum": 1, "maximum": 5 }
+            },
+            "required": ["step", "action"],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "review": { "type": ["object", "null"] },
+    "result": { "type": ["object", "null"] },
+    "history": { "type": "array" },
+
+    "metadata": {
+      "type": ["object", "null"],
+      "description": "v2 optional — task classification and outcome tracking",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["build", "refactor", "optimize", "repair", "test", "integrate"],
+          "description": "Task category"
+        },
+        "task_pattern": {
+          "type": "string",
+          "description": "Task pattern label for experience matching"
+        },
+        "complexity_score": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 25,
+          "description": "5-dimension complexity total (existing logic)"
+        },
+        "blast_radius": {
+          "type": ["object", "null"],
+          "properties": {
+            "files": { "type": "integer", "minimum": 0 },
+            "lines": { "type": "integer", "minimum": 0 },
+            "dependencies": { "type": "integer", "minimum": 0 },
+            "systems_affected": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "confidence_score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Filled by Auditor after execution"
+        },
+        "validation_commands": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "description": "Validation commands from Reviewer"
+        },
+        "related_capsules": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "description": "Related historical capsule IDs"
+        },
+        "diff_summary": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "Change summary from Executor"
+        }
+      },
+      "additionalProperties": { "description": "Underscore-prefixed fields (e.g. _reviewer_strategy) are allowed for agent-internal metadata" }
+    },
+
+    "capsule": {
+      "type": ["object", "null"],
+      "description": "v2 optional — auto-generated capsule summary on task completion",
+      "properties": {
+        "capsule_id": { "type": "string", "pattern": "^capsule-\\d+$" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "git_commit": { "type": "string" },
+        "category": { "type": "string" },
+        "task_pattern": { "type": "string" },
+        "goal_summary": { "type": "string" },
+        "strategy": { "type": "array", "items": { "type": "string" } },
+        "outcome": {
+          "type": "object",
+          "properties": {
+            "status": { "type": "string" },
+            "score": { "type": "number", "minimum": 0, "maximum": 1 },
+            "iterations": { "type": "integer", "minimum": 1 },
+            "validation_passed": { "type": "boolean" }
+          },
+          "required": ["status", "score"]
+        },
+        "blast_radius": {
+          "type": "object",
+          "properties": {
+            "files": { "type": "integer" },
+            "lines": { "type": "integer" },
+            "dependencies": { "type": "integer" }
+          }
+        },
+        "output_location": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "packaged_at": { "type": ["string", "null"], "format": "date-time" },
+    "packaged_skill": { "type": ["string", "null"] },
+    "packaged_location": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
 }

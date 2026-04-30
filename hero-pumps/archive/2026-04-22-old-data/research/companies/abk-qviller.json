@@ -1,0 +1,45 @@
+{
+  "company": "ABK-Qviller",
+  "country": "挪威",
+  "website": "abkqviller.no",
+  "tier": "Tier1-Nordic",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Daniel Kristensen",
+      "email": "kristensen@abkqviller.no",
+      "position": "CEO"
+    },
+    {
+      "name": "Ailinn Staurvik",
+      "email": "am@abkqviller.no",
+      "position": "B2B Marketer"
+    },
+    {
+      "name": "Ragnhild Tjore",
+      "email": "rt@abkqviller.no",
+      "position": "Regional Manager"
+    },
+    {
+      "name": "Hilde Eriksen",
+      "email": "he@abkqviller.no",
+      "position": "Marketing Manager"
+    },
+    {
+      "name": "",
+      "email": "post@abkqviller.no",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:48:50.839945+00:00",
+    "query": "ABK-Qviller 挪威 HVAC pump distributor manufacturer",
+    "summary": "ABK-Qviller - Crunchbase Company Profile & Funding https://www. crunchbase. com/organization/abk-qviller ABK-Qviller is a company specializing in the import and distribution of heat pumps, heat uptake, and air conditioning products.",
+    "sources": [
+      "https://www.crunchbase.com/organization/abk-qviller",
+      "https://www.abkqviller.no/om-abk-qviller/about-us/",
+      "https://www.linkedin.com/company/abkqviller"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-Nordic重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

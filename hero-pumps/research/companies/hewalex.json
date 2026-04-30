@@ -1,0 +1,45 @@
+{
+  "company": "Hewalex",
+  "country": "波兰",
+  "website": "hewalex.pl",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Leszek Skiba",
+      "email": "leszek.skiba@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "justyna.rychta@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "karolina.firuzek@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Adrian Piotrowski",
+      "email": "adrian.piotrowski@hewalex.pl",
+      "position": ""
+    },
+    {
+      "name": "Grzegorz Szewczak",
+      "email": "grzegorz.szewczak@hewalex.pl",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:27.752821+00:00",
+    "query": "Hewalex 波兰 HVAC pump distributor manufacturer",
+    "summary": "About us – Kolektory słoneczne, pompy ciepła, fotowoltaika Hewalex https://www. hewalex. pl/en/about-us/ Hewalex is a family-run company, established 35 years ago, long before the renewable energies` market started to develop in Poland.",
+    "sources": [
+      "https://www.hewalex.pl/en/about-us/",
+      "https://www.poland-export.com/company/30854-hewalex-sp-z-oo-spk",
+      "https://www.enfsolar.com/hewalex"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

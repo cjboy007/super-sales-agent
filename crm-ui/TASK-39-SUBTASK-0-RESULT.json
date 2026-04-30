@@ -1,0 +1,96 @@
+{
+  "status": "success",
+  "summary": "物流追踪模块实现完成，包含数据库模式扩展、API 路由、物流集成工具、UI 组件和订单详情页集成。",
+  "files_modified": [
+    "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/db/migrations/002-add-logistics-payments.sql",
+    "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/orders/[orderId]/logistics/route.ts",
+    "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/lib/utils/logistics-integration.ts",
+    "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/LogisticsCard.tsx",
+    "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/LogisticsTimeline.tsx",
+    "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/orders/[orderId]/page.tsx"
+  ],
+  "details": {
+    "step_1_database": {
+      "file": "002-add-logistics-payments.sql",
+      "tables_created": [
+        "order_logistics (物流追踪表)",
+        "order_logistics_events (物流事件时间线表)",
+        "order_payments (回款记录表)"
+      ],
+      "indexes_created": 18,
+      "triggers_created": 2,
+      "views_created": 2
+    },
+    "step_2_api": {
+      "file": "app/api/orders/[orderId]/logistics/route.ts",
+      "endpoints": [
+        "GET /api/orders/[orderId]/logistics - 获取订单物流信息（含事件时间线）",
+        "POST /api/orders/[orderId]/logistics - 录入/更新物流信息"
+      ],
+      "features": [
+        "自动状态流转（pending_production → ready_to_ship）",
+        "17Track 同步预留接口",
+        "订单存在性验证"
+      ]
+    },
+    "step_3_integration": {
+      "file": "lib/utils/logistics-integration.ts",
+      "functions": [
+        "identifyCarrier - 识别承运商",
+        "getCarrierInfo - 获取承运商信息",
+        "registerTrackings - 批量注册运单到 17Track",
+        "getTrackingInfo - 批量查询物流状态",
+        "formatTrackingResponse - 格式化 17Track 响应",
+        "shouldRefresh - 智能刷新判断",
+        "getNextCheckTime - 计算下次查询时间",
+        "batchTrackings - 分批处理",
+        "filterForRefresh - 过滤需要刷新的运单"
+      ],
+      "supported_carriers": ["dhl", "fedex", "ups", "usps", "sf", "ems", "aramex", "tnt"],
+      "status_machine": ["pending", "in_transit", "customs_clearance", "out_for_delivery", "delivered", "returning", "returned", "lost", "customer_rejected"]
+    },
+    "step_4_ui_components": {
+      "LogisticsCard": {
+        "file": "components/orders/LogisticsCard.tsx",
+        "features": [
+          "物流状态显示（9 种状态颜色/图标）",
+          "承运商和运单号展示",
+          "预计/实际送达日期",
+          "17Track 追踪链接",
+          "刷新按钮"
+        ]
+      },
+      "LogisticsTimeline": {
+        "file": "components/orders/LogisticsTimeline.tsx",
+        "features": [
+          "时间线可视化",
+          "事件按时间倒序排列",
+          "状态图标和颜色",
+          "地点、时间、描述展示",
+          "加载状态支持"
+        ]
+      }
+    },
+    "step_5_integration": {
+      "file": "app/(dashboard)/orders/[orderId]/page.tsx",
+      "changes": [
+        "导入 LogisticsCard 和 LogisticsTimeline 组件",
+        "添加物流数据加载逻辑",
+        "添加物流信息区域（支持加载状态）",
+        "集成物流时间线展示",
+        "支持手动刷新物流信息"
+      ]
+    },
+    "step_6_validation": {
+      "command": "npx tsc --noEmit",
+      "result": "新创建文件无类型错误",
+      "note": "项目现有错误与本次修改无关"
+    }
+  },
+  "next_steps": [
+    "配置 17Track API Key（环境变量：SEVERTEEN_TRACK_API_KEY）",
+    "运行数据库迁移：sqlite3 crm.db < db/migrations/002-add-logistics-payments.sql",
+    "测试物流 API：GET/POST /api/orders/[orderId]/logistics",
+    "集成 logistics-tracker scheduler 自动刷新物流状态"
+  ]
+}

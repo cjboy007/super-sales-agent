@@ -1,0 +1,29 @@
+{
+  "company": "BDR Thermea Hungary",
+  "country": "匈牙利",
+  "website": "bdrthermea.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Oscar Mogro",
+      "email": "oscar.mogro@bdrthermea.com",
+      "position": "Manager R&D Solar Competence Center"
+    },
+    {
+      "name": "",
+      "email": "info@bdrthermea.com",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:07.609640+00:00",
+    "query": "BDR Thermea Hungary 匈牙利 HVAC pump distributor manufacturer",
+    "summary": "BDR Thermea Group 是欧洲主要暖通制造商，旗下有 Baxi、De Dietrich 等品牌。Oscar Mogro Leon 负责太阳能/热泵研发中心（Barcelona），有 20 年 HVAC 研发经验。",
+    "sources": [
+      "https://en.wikipedia.org/wiki/BDR_Thermea",
+      "https://es.linkedin.com/in/oscar-mogro-leon-b027ba17b"
+    ]
+  },
+  "outreach_notes": "欧洲最大暖通集团之一。Oscar Mogro 负责太阳能/热泵研发，切入点：热泵配套泵技术合作。"
+}

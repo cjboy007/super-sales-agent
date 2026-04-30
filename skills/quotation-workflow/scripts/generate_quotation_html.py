@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""生成 HTML 报价单 - 现代设计，支持打印/PDF 导出
-
-集成多层次验证：
-1. quotation_schema.py - 完整数据验证（客户/产品/条款/日期）
-2. 示例数据检测 - 防止使用测试/占位符数据
-3. 强制失败 - 验证失败立即终止，无交互确认
-"""
+"""生成 HTML 报价单 - 现代设计，支持打印/PDF 导出"""
 
 import sys
 import json
@@ -13,32 +7,10 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
-# 导入验证模块
-from quotation_schema import validate_quotation_data
-
-
-def generate_html_quotation(output_path, data, skip_validation=False):
+def generate_html_quotation(output_path, data):
     """生成 HTML 报价单（基于提供的模板优化）"""
     
-    # 🔴 P0: 完整数据验证（强制，无交互确认）
-    if not skip_validation:
-        print("🔍 验证报价单数据...")
-        valid, errors = validate_quotation_data(data)
-        
-        if not valid:
-            print("❌ 数据验证失败，报价单生成已终止:")
-            print()
-            for i, err in enumerate(errors, start=1):
-                print(f"  {i}. {err}")
-            print()
-            print("请检查数据文件，确保使用真实客户信息。")
-            print("如需要测试，请使用 --skip-validation 参数（仅限开发环境）")
-            sys.exit(1)
-        
-        print("✅ 数据验证通过")
-        print()
-    
-    # 输入校验（基础检查）
+    # 输入校验
     errors = []
     customer = data.get('customer', {})
     customer_name = customer.get('company_name', customer.get('name', ''))
@@ -63,12 +35,12 @@ def generate_html_quotation(output_path, data, skip_validation=False):
             print(f'  - {e}')
         sys.exit(1)
 
-    # 公司信息（Farreach）
-    company_name = data.get('company_name', 'Farreach Electronic Co., Ltd.')
+    # 公司信息（Your Company）
+    company_name = data.get('company_name', 'Your Company Name, Ltd.')
     company_tagline = data.get('company_tagline', 'Premium Connectivity Solutions')
     company_address = data.get('company_address', 'No. 123, Technology Road, Zhuhai, Guangdong, China')
-    company_email = data.get('company_email', 'your-email')
-    company_website = data.get('company_website', 'www.farreach-electronic.com')
+    company_email = data.get('company_email', 'sale@your-domain.com')
+    company_website = data.get('company_website', 'www.your-domain.com')
     
     # 客户信息（支持多种字段名）
     customer = data.get('customer', {})
@@ -100,41 +72,13 @@ def generate_html_quotation(output_path, data, skip_validation=False):
     tax = data.get('tax', 0)
     total = subtotal + freight + tax
     
-    # 银行信息（从统一配置加载，防止硬编码）
-    # 优先使用数据文件中的 bank_info，否则从本 skill 的 config 目录加载
-    import os
-    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'bank-accounts.json')
-    default_bank_info = {}
-    try:
-        with open(config_path, 'r', encoding='utf-8') as f:
-            import json
-            config = json.load(f)
-            if config.get('primary') and config['primary'].get('active'):
-                default_bank_info = config['primary']
-    except (FileNotFoundError, json.JSONDecodeError):
-        # 配置文件不存在时，回退到主 config 目录
-        main_config_path = os.path.join(
-            os.path.dirname(__file__),
-            '..', '..', '..',
-            'config', 'bank-accounts.json'
-        )
-        try:
-            with open(main_config_path, 'r', encoding='utf-8') as f:
-                import json
-                config = json.load(f)
-                if config.get('primary') and config['primary'].get('active'):
-                    default_bank_info = config['primary']
-        except:
-            # 最后备用：硬编码默认值
-            default_bank_info = {
-                'beneficiary': 'FARREACH ELECTRONIC CO LIMITED',
-                'bank_name': 'HSBC Hong Kong',
-                'account_no': '411-758097-838',
-                'swift_code': 'HSBCHKHHHKH',
-                'bank_address': "No.1 Queen's Road Central,Central, Hong Kong"
-            }
-    
-    bank_info = data.get('bank_info', default_bank_info)
+    # 银行信息
+    bank_info = data.get('bank_info', {
+        'beneficiary': 'Your Company Name, Ltd.',
+        'bank_name': 'Standard Chartered Bank',
+        'account_no': '1234 5678 9012',
+        'swift_code': 'SCBLHKHH'
+    })
     
     # 条款（支持字典和列表两种格式）
     terms_data = data.get('terms', {})
@@ -231,6 +175,12 @@ def generate_html_quotation(output_path, data, skip_validation=False):
         @page {{
             size: A4;
             margin: 10mm 15mm;  /* 上下 左右 */
+            @top-left {{ content: none; }}
+            @top-center {{ content: none; }}
+            @top-right {{ content: none; }}
+            @bottom-left {{ content: none; }}
+            @bottom-center {{ content: none; }}
+            @bottom-right {{ content: none; }}
         }}
         @media print {{
             body {{
@@ -295,6 +245,13 @@ def generate_html_quotation(output_path, data, skip_validation=False):
     </style>
 </head>
 <body class="text-slate-800 font-sans">
+
+    <!-- Action Bar (Hidden on Print) -->
+    <div class="no-print fixed top-4 right-4 flex gap-4">
+        <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded-lg font-medium shadow-lg transition-colors flex items-center gap-2">
+            <i data-lucide="printer" class="w-4 h-4"></i> Export to PDF
+        </button>
+    </div>
 
     <!-- Quotation Document -->
     <div class="a4-container rounded-xl">
@@ -447,7 +404,6 @@ def generate_html_quotation(output_path, data, skip_validation=False):
                     <p><span class="font-medium text-slate-900">Bank Name:</span> {bank_info.get('bank_name', '')}</p>
                     <p><span class="font-medium text-slate-900">Account No:</span> {bank_info.get('account_no', '')}</p>
                     <p><span class="font-medium text-slate-900">SWIFT Code:</span> {bank_info.get('swift_code', '')}</p>
-                    <p><span class="font-medium text-slate-900">Bank Address:</span> {bank_info.get('bank_address', '')}</p>
                 </div>
 
                 <!-- 签名区域（暂时移除，待确认） -->
@@ -495,15 +451,13 @@ def main():
   # 在浏览器打开
   open QT-20260314-001.html
   
-  # 跳过验证（仅限开发环境测试）
-  python3 generate_quotation_html.py --data test.json --output test.html --skip-validation
+  # 导出 PDF（在浏览器中点击 "Export to PDF" 按钮）
         '''
     )
     
     parser.add_argument('--data', '-d', help='报价数据 JSON 文件路径')
     parser.add_argument('--output', '-o', help='输出文件路径')
     parser.add_argument('--quick-test', action='store_true', help='使用测试数据快速生成')
-    parser.add_argument('--skip-validation', action='store_true', help='跳过数据验证（仅限开发环境，生产环境禁止使用）')
     
     args = parser.parse_args()
     
@@ -515,11 +469,11 @@ def main():
                 data = json.load(f)
         elif args.quick_test:
             data = {
-                'company_name': 'Farreach Electronic Co., Ltd.',
+                'company_name': 'Your Company Name, Ltd.',
                 'company_tagline': 'Premium Connectivity Solutions',
                 'company_address': 'No. 123, Technology Road, Zhuhai, Guangdong, China',
-                'company_email': 'your-email',
-                'company_website': 'www.farreach-electronic.com',
+                'company_email': 'sale@your-domain.com',
+                'company_website': 'www.your-domain.com',
                 'customer': {
                     'company_name': 'Best Buy Electronics Inc.',
                     'contact': 'Michael Johnson',
@@ -558,7 +512,7 @@ def main():
                 'freight': 350.00,
                 'tax': 0,
                 'bank_info': {
-                    'beneficiary': 'Farreach Electronic Co., Ltd.',
+                    'beneficiary': 'Your Company Name, Ltd.',
                     'bank_name': 'Standard Chartered Bank',
                     'account_no': '1234 5678 9012',
                     'swift_code': 'SCBLHKHH'
@@ -569,41 +523,9 @@ def main():
             print("❌ 请提供 --data 或 --quick-test", file=sys.stderr)
             sys.exit(1)
         
-        # 跳过验证模式（仅限开发环境）
-        if args.skip_validation:
-            # 安全检查：必须设置环境变量
-            import os
-            if os.environ.get('QUOTATION_DEV_ENV') != 'true':
-                print("❌ 错误：--skip-validation 仅限开发环境")
-                print("请设置环境变量：export QUOTATION_DEV_ENV=true")
-                print()
-                print("⚠️  生产环境禁止跳过数据验证")
-                sys.exit(1)
-            
-            print("⚠️  警告：开发环境，跳过数据验证")
-            print()
-        
-        output = generate_html_quotation(args.output, data, skip_validation=args.skip_validation)
+        output = generate_html_quotation(args.output, data)
         print(f"✅ HTML 报价单已生成：{output}")
-        
-        # 如果输出是 HTML，自动生成 PDF（去掉页眉页脚）
-        if str(output).endswith('.html'):
-            import subprocess
-            pdf_output = str(output).replace('.html', '.pdf')
-            try:
-                subprocess.run([
-                    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-                    '--headless=new',
-                    '--disable-gpu',
-                    f'--print-to-pdf={pdf_output}',
-                    '--no-pdf-header-footer',
-                    '--paper-width=8.27',
-                    '--paper-height=11.69',
-                    f'file://{output}'
-                ], check=True, capture_output=True)
-                print(f"✅ PDF 已生成：{pdf_output} (已去掉页眉页脚)")
-            except Exception as e:
-                print(f"⚠️  PDF 生成失败：{e}")
+        print(f"💡 提示：在浏览器打开并点击 'Export to PDF' 按钮")
         return
     
     parser.print_help()

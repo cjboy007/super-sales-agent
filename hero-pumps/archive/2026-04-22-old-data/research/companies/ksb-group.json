@@ -1,0 +1,45 @@
+{
+  "company": "KSB Group",
+  "country": "区域",
+  "website": "ksb.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Colleen Mace",
+      "email": "colleen.mace@ksb.com",
+      "position": "Vice President"
+    },
+    {
+      "name": "Sabine Müller",
+      "email": "sabine.mueller@ksb.com",
+      "position": "Vice President of Innovation"
+    },
+    {
+      "name": "Sebastian Lang",
+      "email": "sebastian.lang@ksb.com",
+      "position": "Product Owner"
+    },
+    {
+      "name": "Suman Malik",
+      "email": "suman.malik@ksb.com",
+      "position": "Senior Service Executive"
+    },
+    {
+      "name": "Ivan Morales",
+      "email": "ivan.morales@ksb.com",
+      "position": "Head of Shipping"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:45.391997+00:00",
+    "query": "KSB Group Europe HVAC pump distributor manufacturer",
+    "summary": "Heating and Cooling Supply - KSB https://www. com/en-ke/applications/building-services/heating-and-cooling-supply KSB is the only supplier on the market to offer a complete range of heating, air-conditioning and ventilation systems comprising pumps and valves alongside 2.",
+    "sources": [
+      "https://www.ksb.com/en-ke/applications/building-services/heating-and-cooling-supply",
+      "https://www.ksb.com/en-sk/company",
+      "https://www.tecnicaindustriale.com/ksb/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

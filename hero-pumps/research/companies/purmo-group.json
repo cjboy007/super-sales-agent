@@ -1,0 +1,23 @@
+{
+  "company": "Purmo Group",
+  "country": "芬兰",
+  "website": "purmogroup.com",
+  "tier": "Tier2",
+  "industry": "暖通/散热器",
+  "contacts": [
+    {
+      "name": "通用邮箱",
+      "email": "info@purmogroup.com",
+      "position": "待确认（需补充）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "Purmo Group radiator HVAC manufacturer Europe",
+    "summary": "Purmo Group 是欧洲领先的散热器/暖通设备制造商，总部位于芬兰。",
+    "sources": [
+      "https://purmogroup.com"
+    ]
+  },
+  "outreach_notes": "散热器制造商，热泵系统需要循环泵配套。需找到具体采购负责人。"
+}

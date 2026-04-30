@@ -1,0 +1,47 @@
+{
+  "company": "Termovent",
+  "country": "塞尔维亚",
+  "contacts": [
+    {
+      "name": "Jovana Djordjic",
+      "email": "jovana.djordjic@termovent.rs",
+      "position": "Marketing Manager"
+    },
+    {
+      "name": "Dragan Spasojevic",
+      "email": "dragan.spasojevic@termovent.rs",
+      "position": "Director of Research and Development"
+    },
+    {
+      "name": "Ivan Jankovic",
+      "email": "ivan.jankovic@termovent.rs",
+      "position": "Head Of Kladovo Plant"
+    },
+    {
+      "name": "Stevan Miric",
+      "email": "stevan.miric@termovent.rs",
+      "position": "Chief Executive Officer"
+    },
+    {
+      "name": "Katarina Mijucić",
+      "email": "katarina.mijucic@termovent.rs",
+      "position": "Business Intelligence Analyst"
+    },
+    {
+      "name": "Marija Popović",
+      "email": "marija.popovic@termovent.rs",
+      "position": "Procurement Specialist"
+    },
+    {
+      "name": "Dejan Stanić",
+      "email": "dejan.stanic@termovent.rs",
+      "position": "Service Engineer"
+    },
+    {
+      "name": "Denis Dacic",
+      "email": "denis.dacic@termovent.rs",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Termovent 写开发信。\n\n## 公司背景\n- **公司：** Termovent（塞尔维亚）\n- **网站：** termovent.rs\n- **行业：** HVAC\n- **调研：** Manufacturer based in Belgrade and Kladovo in Serbia  com/en/about-termovent/ Main products of company Termovent are: manufacturing of Air Handling Units (HVAC equipment), Clean Rooms and service Engi\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Jovana Djordjic | jovana.djordjic@termovent.rs | Marketing Manager\n2. Jovana Djordjic | jovana.djordjic@termovent.rs | Marketing Manager\n3. Dragan Spasojevic | dragan.spasojevic@termovent.rs | Director of Research and Development\n4. Dragan Spasojevic | dragan.spasojevic@termovent.rs | Director of Research and Development\n5. Ivan Jankovic | ivan.jankovic@termovent.rs | Head Of Kladovo Plant\n6. Ivan Jankovic | ivan.jankovic@termovent.rs | Head Of Kladovo Plant\n7. Aleksandra Tomic | aleksandra.tomic@termovent.rs | Senior HR Business Partner\n8. Stevan Miric | stevan.miric@termovent.rs | Chief Executive Officer\n9. Katarina Mijucić | katarina.mijucic@termovent.rs | Business Intelligence Analyst\n10. Marija Popović | marija.popovic@termovent.rs | Procurement Specialist\n11. Dejan Stanić | dejan.stanic@termovent.rs | Service Engineer\n12. Denis Dacic | denis.dacic@termovent.rs | N/A\n13. Jelena Rudinac | jelena.rudinac@termovent.rs | Senior Finance Controller\n14. Aleksandra Tomic | aleksandra.tomic@termovent.rs | Senior HR Business Partner\n15. Stevan Miric | stevan.miric@termovent.rs | Chief Executive Officer\n16. Katarina Mijucić | katarina.mijucic@termovent.rs | Business Intelligence Analyst\n17. Marija Popović | marija.popovic@termovent.rs | Procurement Specialist\n18. Dejan Stanić | dejan.stanic@termovent.rs | Service Engineer\n19. Denis Dacic | denis.dacic@termovent.rs | N/A\n20. Jelena Rudinac | jelena.rudinac@termovent.rs | Senior Finance Controller\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

@@ -1,0 +1,12 @@
+{
+  "okki_record_id": "okki_fu_1776822507130",
+  "customer_id": "okki_003",
+  "type": "email_draft",
+  "status": "draft",
+  "content": {
+    "subject": "Re: Sample Shipped (Tracking: SF1234567890) - Your Company",
+    "template_id": "template-sample-001"
+  },
+  "scheduled_date": "2026-04-22T01:48:27.130Z",
+  "owner": "wilson"
+}

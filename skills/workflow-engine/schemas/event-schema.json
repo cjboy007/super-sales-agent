@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema#",
+  "$id": "https://super-sales-agent/workflow-engine/schemas/event-schema.json",
+  "title": "Workflow Engine Event Schema",
+  "description": "事件类型定义 - 支持 5 种核心业务事件",
+  "type": "object",
+  "required": ["type", "payload", "metadata"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "email_received",
+        "quotation_sent",
+        "customer_created",
+        "order_updated",
+        "trail_created"
+      ],
+      "description": "事件类型标识符"
+    },
+    "payload": {
+      "type": "object",
+      "description": "事件携带的数据结构",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "timestamp": {"type": "string", "format": "date-time"},
+        "source": {"type": "string"},
+        "correlation_id": {"type": "string"}
+      },
+      "required": ["timestamp"]
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Email Received",
+      "properties": {
+        "type": {"const": "email_received"},
+        "payload": {
+          "type": "object",
+          "properties": {
+            "from": {"type": "string", "format": "email"},
+            "to": {"type": "string"},
+            "subject": {"type": "string"},
+            "body": {"type": "string"},
+            "attachments": {"type": "array", "items": {"type": "object"}},
+            "intent": {"type": "string", "enum": ["inquiry", "delivery-chase", "complaint", "technical", "partnership", "spam"]},
+            "keywords": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["from", "subject"]
+        }
+      }
+    },
+    {
+      "title": "Quotation Sent",
+      "properties": {
+        "type": {"const": "quotation_sent"},
+        "payload": {
+          "type": "object",
+          "properties": {
+            "quotation_no": {"type": "string"},
+            "customer_id": {"type": "string"},
+            "amount": {"type": "number"},
+            "currency": {"type": "string"},
+            "items": {"type": "array"},
+            "sent_at": {"type": "string", "format": "date-time"}
+          },
+          "required": ["quotation_no", "customer_id"]
+        }
+      }
+    },
+    {
+      "title": "Customer Created",
+      "properties": {
+        "type": {"const": "customer_created"},
+        "payload": {
+          "type": "object",
+          "properties": {
+            "customer_id": {"type": "string"},
+            "name": {"type": "string"},
+            "email": {"type": "string", "format": "email"},
+            "company": {"type": "string"},
+            "source": {"type": "string"},
+            "created_at": {"type": "string", "format": "date-time"}
+          },
+          "required": ["customer_id", "name"]
+        }
+      }
+    },
+    {
+      "title": "Order Updated",
+      "properties": {
+        "type": {"const": "order_updated"},
+        "payload": {
+          "type": "object",
+          "properties": {
+            "order_id": {"type": "string"},
+            "customer_id": {"type": "string"},
+            "status": {"type": "string"},
+            "amount": {"type": "number"},
+            "updated_fields": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["order_id", "status"]
+        }
+      }
+    },
+    {
+      "title": "Trail Created",
+      "properties": {
+        "type": {"const": "trail_created"},
+        "payload": {
+          "type": "object",
+          "properties": {
+            "trail_id": {"type": "string"},
+            "customer_id": {"type": "string"},
+            "trail_type": {"type": "integer"},
+            "content": {"type": "string"},
+            "created_by": {"type": "string"}
+          },
+          "required": ["trail_id", "customer_id", "trail_type"]
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

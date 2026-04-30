@@ -1,0 +1,45 @@
+{
+  "company": "Defro",
+  "country": "波兰",
+  "website": "defro.pl",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Piotr Cynkier",
+      "email": "piotr.cynkier@defro.pl",
+      "position": "CFO"
+    },
+    {
+      "name": "Marcin Dyjach",
+      "email": "marcin.dyjach@defro.pl",
+      "position": "Quality Manager"
+    },
+    {
+      "name": "Mariusz Zaborowicz",
+      "email": "mariusz.zaborowicz@defro.pl",
+      "position": "Engineering Manager"
+    },
+    {
+      "name": "Jolanta Wieczorek",
+      "email": "jolanta.wieczorek@defro.pl",
+      "position": "Online Marketing Specialist"
+    },
+    {
+      "name": "Karol Sroka",
+      "email": "karol.sroka@defro.pl",
+      "position": "Product Development Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:55.626487+00:00",
+    "query": "Defro 波兰 HVAC pump distributor manufacturer",
+    "summary": "Heat Pumps - Defro Czyste ciepło https://www. pl/en/heat-pumps-en/ Defro is not just a manufacturer, but above all a partner that delivers reliable and modern solutions. Polish quality. Our heat pumps are manufactured in Poland 2.",
+    "sources": [
+      "https://www.defro.pl/en/heat-pumps-en/",
+      "https://defrohome.com/about-us/about-the-company/",
+      "https://www.defro.pl/en/about-us/about-company/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

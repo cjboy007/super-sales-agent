@@ -1,0 +1,12 @@
+{
+  "okki_record_id": "okki_fu_1776822507129",
+  "customer_id": "okki_001",
+  "type": "email_draft",
+  "status": "draft",
+  "content": {
+    "subject": "Re: HDMI Cable Inquiry - Your Company",
+    "template_id": "template-inquiry-001"
+  },
+  "scheduled_date": "2026-04-22T01:48:27.129Z",
+  "owner": "wilson"
+}

@@ -1,0 +1,440 @@
+{
+  "verdict": "approve",
+  "task_id": 40,
+  "subtask_id": 0,
+  "title": "订单管理 - 订单分析报表",
+  "reviewed_at": "2026-04-03T12:20:00+08:00",
+  "reviewer": "Revolution System Reviewer",
+  
+  "technical_review": {
+    "database_foundation": {
+      "status": "approved",
+      "comments": "订单数据库设计完善（migration 001），包含 21 个字段的 orders 主表 + order_status_history 状态历史表。11 个索引优化查询性能，包含常用组合查询索引（status+created_at、company_id+status）。视图 orders_with_status_count 提供基础统计能力。数据基础已就绪，可直接支持分析报表。"
+    },
+    "schema_alignment": {
+      "status": "approved",
+      "comments": "订单 Schema (order-schema.json) 定义完整，包含 quotation_no、okki_company_id 等集成字段。OrderStatus 枚举定义 6 个状态 + 流转规则 + 颜色标签，与 UI 展示需求对齐。product_list JSON 数组支持产品级分析。"
+    },
+    "report_types_analysis": {
+      "status": "approved_with_recommendations",
+      "recommended_reports": [
+        {
+          "name": "订单概览仪表板",
+          "priority": "P0",
+          "metrics": ["订单总数", "总金额", "平均订单价值", "成交率"],
+          "charts": ["关键指标卡片", "趋势图"],
+          "sql_complexity": "低"
+        },
+        {
+          "name": "订单状态分布",
+          "priority": "P0",
+          "metrics": ["各状态订单数", "占比", "平均停留时长"],
+          "charts": ["饼图/环形图", "堆叠柱状图"],
+          "sql_complexity": "低"
+        },
+        {
+          "name": "销售趋势分析",
+          "priority": "P0",
+          "metrics": ["日/周/月订单数", "金额趋势", "同比/环比"],
+          "charts": ["折线图", "面积图", "柱状图"],
+          "sql_complexity": "中"
+        },
+        {
+          "name": "客户订单分析",
+          "priority": "P1",
+          "metrics": ["客户订单数排名", "客户贡献金额", "复购率"],
+          "charts": ["排行榜", "散点图"],
+          "sql_complexity": "中"
+        },
+        {
+          "name": "产品热销分析",
+          "priority": "P1",
+          "metrics": ["SKU 销量排名", "产品类别分布", "单价分析"],
+          "charts": ["柱状图", "热力图"],
+          "sql_complexity": "高（需解析 product_list JSON）"
+        },
+        {
+          "name": "交期达成率分析",
+          "priority": "P1",
+          "metrics": ["准时交付率", "平均延迟天数", "逾期订单列表"],
+          "charts": ["仪表盘", "时间线"],
+          "sql_complexity": "中"
+        }
+      ]
+    },
+    "chart_library_recommendation": {
+      "status": "approved",
+      "recommended": "Recharts",
+      "reasons": [
+        "React 原生支持，与 Next.js 技术栈一致",
+        "声明式 API，学习曲线低",
+        "TypeScript 类型支持完善",
+        "轻量级（~50KB gzipped）",
+        "丰富的图表类型（折线/柱状/饼图/面积/散点）",
+        "响应式设计，移动端友好",
+        "社区活跃，文档完善"
+      ],
+      "alternatives": [
+        {
+          "name": "Chart.js",
+          "pros": ["更轻量", "Canvas 渲染性能好"],
+          "cons": ["非 React 原生", "配置复杂"]
+        },
+        {
+          "name": "Apache ECharts",
+          "pros": ["功能最强大", "图表类型丰富"],
+          "cons": ["体积大（~500KB）", "学习曲线陡峭"]
+        }
+      ],
+      "installation": "npm install recharts"
+    },
+    "export_formats": {
+      "status": "approved",
+      "recommended_formats": [
+        {
+          "format": "PDF",
+          "use_case": "正式报表、打印、归档",
+          "library": "@react-pdf/renderer 或 html2pdf.js",
+          "priority": "P0"
+        },
+        {
+          "format": "Excel (XLSX)",
+          "use_case": "数据二次分析、财务对账",
+          "library": "xlsx (SheetJS) 或 exceljs",
+          "priority": "P0"
+        },
+        {
+          "format": "CSV",
+          "use_case": "数据导入其他系统、快速导出",
+          "library": "原生 JavaScript 或 PapaParse",
+          "priority": "P1"
+        },
+        {
+          "format": "PNG/SVG",
+          "use_case": "单图导出、PPT 插入",
+          "library": "recharts 内置支持 + html2canvas",
+          "priority": "P2"
+        }
+      ]
+    },
+    "tech_stack_consistency": {
+      "status": "approved",
+      "comments": "技术栈与 task-38/39 保持一致：Next.js App Router + TypeScript + React + SQLite。可复用现有代码模式（API 路由、组件结构、数据库访问层）。"
+    },
+    "api_design": {
+      "status": "approved",
+      "recommended_endpoints": [
+        {
+          "endpoint": "GET /api/analytics/overview",
+          "description": "获取概览仪表板数据（关键指标）",
+          "response_example": {
+            "total_orders": 150,
+            "total_revenue": 450000,
+            "avg_order_value": 3000,
+            "conversion_rate": 0.68,
+            "period": "last_30_days"
+          }
+        },
+        {
+          "endpoint": "GET /api/analytics/status-distribution",
+          "description": "获取订单状态分布数据",
+          "response_example": {
+            "distribution": [
+              {"status": "pending_production", "count": 12, "percentage": 0.08},
+              {"status": "in_production", "count": 45, "percentage": 0.30}
+            ]
+          }
+        },
+        {
+          "endpoint": "GET /api/analytics/sales-trend",
+          "description": "获取销售趋势数据（日/周/月）",
+          "query_params": ["interval=day|week|month", "start_date", "end_date"],
+          "response_example": {
+            "trend": [
+              {"date": "2026-03-01", "orders": 5, "revenue": 15000},
+              {"date": "2026-03-02", "orders": 8, "revenue": 24000}
+            ]
+          }
+        },
+        {
+          "endpoint": "GET /api/analytics/customer-ranking",
+          "description": "获取客户订单排名",
+          "query_params": ["limit=20", "metric=orders|revenue"],
+          "response_example": {
+            "ranking": [
+              {"customer": "JEM Global", "orders": 25, "revenue": 75000},
+              {"customer": "ABC Corp", "orders": 18, "revenue": 54000}
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/analytics/export",
+          "description": "导出报表（PDF/Excel/CSV）",
+          "body": {"format": "pdf|xlsx|csv", "report_type": "overview|trend|customer", "period": "last_30_days"},
+          "response": "文件下载（Content-Disposition: attachment）"
+        }
+      ]
+    }
+  },
+  
+  "instructions": {
+    "phase_1_setup": {
+      "priority": "P0",
+      "estimated_hours": 2,
+      "tasks": [
+        {
+          "id": "1.1",
+          "task": "安装图表和导出库",
+          "command": "npm install recharts xlsx @react-pdf/renderer html2canvas",
+          "files": ["/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/package.json"]
+        },
+        {
+          "id": "1.2",
+          "task": "创建分析 API 路由目录结构",
+          "files": [
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/api/analytics/overview/route.ts",
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/api/analytics/status-distribution/route.ts",
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/api/analytics/sales-trend/route.ts",
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/api/analytics/customer-ranking/route.ts",
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/api/analytics/export/route.ts"
+          ]
+        },
+        {
+          "id": "1.3",
+          "task": "创建分析服务层",
+          "files": [
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/lib/analytics/analytics-service.ts",
+            "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/lib/analytics/sql-queries.ts"
+          ],
+          "implementation": "封装 SQL 查询逻辑，提供类型安全的分析方法。包含：getOverviewMetrics(), getStatusDistribution(), getSalesTrend(), getCustomerRanking() 等函数。"
+        }
+      ]
+    },
+    
+    "phase_2_backend_api": {
+      "priority": "P0",
+      "estimated_hours": 6,
+      "tasks": [
+        {
+          "id": "2.1",
+          "task": "实现概览指标 API",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/analytics/overview/route.ts",
+          "implementation": "查询 orders 表，计算总订单数、总金额、平均订单价值、成交率（completed/cancelled 比例）。支持时间范围筛选（last_7_days/last_30_days/last_90_days/custom）。使用 db.prepare 执行聚合查询。"
+        },
+        {
+          "id": "2.2",
+          "task": "实现状态分布 API",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/analytics/status-distribution/route.ts",
+          "implementation": "GROUP BY status 查询各状态订单数和占比，关联 order_status_history 计算平均停留时长。返回数组：[{status, count, percentage, avg_days_in_status}]."
+        },
+        {
+          "id": "2.3",
+          "task": "实现销售趋势 API",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/analytics/sales-trend/route.ts",
+          "implementation": "按日/周/月分组（strftime 函数），查询订单数和金额趋势。支持同比/环比计算。返回数组：[{date, orders, revenue, growth_rate}]."
+        },
+        {
+          "id": "2.4",
+          "task": "实现客户排名 API",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/analytics/customer-ranking/route.ts",
+          "implementation": "按 customer_company 或 customer_email 分组，统计订单数和总金额。支持按 orders/revenue 排序。返回前 N 名客户。"
+        },
+        {
+          "id": "2.5",
+          "task": "实现产品分析 API（可选）",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/analytics/product-analysis/route.ts",
+          "implementation": "解析 product_list JSON 字段（json_each 函数），统计 SKU 销量。SQLite 需 3.38+ 支持 JSON 函数。如不支持，改用应用层解析。"
+        },
+        {
+          "id": "2.6",
+          "task": "实现导出 API",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/analytics/export/route.ts",
+          "implementation": "根据 format 参数生成不同格式文件：PDF 使用@react-pdf/renderer 生成报表布局，Excel 使用 xlsx 库创建工作表，CSV 使用原生拼接。返回文件流（Content-Type: application/pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|text/csv）。"
+        }
+      ]
+    },
+    
+    "phase_3_frontend_charts": {
+      "priority": "P0",
+      "estimated_hours": 8,
+      "tasks": [
+        {
+          "id": "3.1",
+          "task": "创建概览仪表板页面",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/analytics/page.tsx",
+          "implementation": "主分析页面，包含时间范围选择器（7/30/90 天/自定义），关键指标卡片网格（4 列），趋势图主视觉。使用 useAnalytics hook 获取数据。"
+        },
+        {
+          "id": "3.2",
+          "task": "创建指标卡片组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/analytics/MetricCard.tsx",
+          "implementation": "显示单个指标（标题、数值、环比变化%、趋势图标）。支持颜色编码（正增长=绿色，负增长=红色）。"
+        },
+        {
+          "id": "3.3",
+          "task": "创建销售趋势图组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/analytics/SalesTrendChart.tsx",
+          "implementation": "使用 Recharts AreaChart 或 LineChart，双 Y 轴（订单数 + 金额），支持缩放、工具提示、图例切换。"
+        },
+        {
+          "id": "3.4",
+          "task": "创建状态分布图组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/analytics/StatusDistributionChart.tsx",
+          "implementation": "使用 Recharts PieChart 或 DonutChart，显示各状态占比。点击扇区可筛选订单列表。颜色使用 OrderStatusColors。"
+        },
+        {
+          "id": "3.5",
+          "task": "创建客户排名组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/analytics/CustomerRankingTable.tsx",
+          "implementation": "表格展示 Top 20 客户，包含排名、客户名、订单数、总金额、平均订单价值。支持导出、排序、搜索。"
+        },
+        {
+          "id": "3.6",
+          "task": "创建产品热销图组件（可选）",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/analytics/ProductSalesChart.tsx",
+          "implementation": "使用 Recharts BarChart 显示 Top 10 SKU 销量。支持按数量/金额排序。"
+        },
+        {
+          "id": "3.7",
+          "task": "创建导出按钮组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/analytics/ExportButton.tsx",
+          "implementation": "下拉菜单选择导出格式（PDF/Excel/CSV），调用 POST /api/analytics/export，触发浏览器下载。显示加载状态和成功提示。"
+        }
+      ]
+    },
+    
+    "phase_4_integration_testing": {
+      "priority": "P0",
+      "estimated_hours": 3,
+      "tasks": [
+        {
+          "id": "4.1",
+          "task": "编写 API 单元测试",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/analytics-api.test.ts",
+          "implementation": "测试各 API 端点的数据准确性、时间范围筛选、边界条件（空数据、单日数据）。"
+        },
+        {
+          "id": "4.2",
+          "task": "编写导出功能测试",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/export-functionality.test.ts",
+          "implementation": "测试 PDF/Excel/CSV 生成，验证文件内容正确性、格式完整性、大数据量性能。"
+        },
+        {
+          "id": "4.3",
+          "task": "E2E 测试脚本",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/e2e/analytics-flow.sh",
+          "implementation": "完整流程：访问分析页面 → 切换时间范围 → 查看各图表 → 导出报表 → 验证下载文件。"
+        }
+      ]
+    }
+  },
+  
+  "acceptance_criteria": {
+    "概览仪表板": {
+      "status": "pending",
+      "verification": "显示 4 个关键指标卡片（订单总数、总金额、平均订单价值、成交率），支持时间范围切换（7/30/90 天），数据准确无误。"
+    },
+    "销售趋势图": {
+      "status": "pending",
+      "verification": "折线图/面积图展示日/周/月趋势，双 Y 轴（订单数 + 金额），支持缩放和工具提示，可切换时间粒度。"
+    },
+    "状态分布图": {
+      "status": "pending",
+      "verification": "饼图/环形图显示 6 状态占比，颜色与 OrderStatusColors 一致，点击扇区可筛选订单列表。"
+    },
+    "客户排名": {
+      "status": "pending",
+      "verification": "Top 20 客户排行榜，支持按订单数/金额排序，可导出为 Excel/CSV。"
+    },
+    "报表导出": {
+      "status": "pending",
+      "verification": "支持 PDF/Excel/CSV 三种格式，导出文件内容完整、格式正确，大数据量（1000+ 订单）下性能良好（<10 秒）。"
+    }
+  },
+  
+  "dependencies": {
+    "existing_modules": [
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/db/migrations/001-create-orders-table.sql - orders 表（已创建）",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/schemas/order-schema.json - 订单 Schema",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/enums/order-status.ts - 状态枚举",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/orders/route.ts - API 路由参考",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/OrderListTable.tsx - 表格组件参考"
+    ],
+    "new_modules_needed": [
+      "Recharts 图表库（新安装）",
+      "XLSX 导出库（新安装）",
+      "@react-pdf/renderer（新安装）",
+      "分析 API 路由（新创建 5-6 个）",
+      "分析服务层（新创建）",
+      "分析 UI 组件（新创建 7-8 个）",
+      "分析主页面（新创建）"
+    ]
+  },
+  
+  "risks_and_mitigation": {
+    "sqlite_json_support": {
+      "risk": "SQLite 版本 < 3.38 不支持 JSON 函数，无法直接解析 product_list 字段",
+      "mitigation": "方案 A：升级 SQLite 到 3.38+；方案 B：在应用层解析 JSON（Node.js JSON.parse）；方案 C：将产品分析列为 P1 优先级，后续迭代实现。"
+    },
+    "large_dataset_performance": {
+      "risk": "订单量 > 10000 时，聚合查询可能变慢",
+      "mitigation": "1) 使用现有索引（status、created_at、company_id）；2) 添加物化视图或预计算表（daily_stats）；3) 限制最大查询范围（最多 90 天）；4) 分页加载。"
+    },
+    "pdf_export_complexity": {
+      "risk": "@react-pdf/renderer 学习曲线陡峭，布局复杂",
+      "mitigation": "方案 A：使用 html2pdf.js（基于 html2canvas+jsPDF，简单但质量略低）；方案 B：后端生成（Puppeteer 渲染 HTML 转 PDF，质量高但依赖 Chrome）；推荐方案 A 快速上线。"
+    },
+    "real_time_data_sync": {
+      "risk": "分析数据与订单数据不同步（缓存导致）",
+      "mitigation": "1) 不缓存，实时查询（订单量 < 10000 可接受）；2) 添加刷新按钮手动刷新；3) 订单创建/更新后触发分析数据更新（webhook 或事件驱动）。"
+    }
+  },
+  
+  "feedback": "技术方案清晰可行，数据库基础已就绪（task-38 完成），可直接开始开发。推荐技术栈：Recharts（图表）+ XLSX（Excel 导出）+ html2pdf.js（PDF 导出），均为成熟库，文档完善。关键设计决策：1) 优先实现 P0 报表（概览/状态分布/销售趋势），P1 报表（客户/产品分析）可延后；2) 导出功能先支持 Excel/CSV（简单），PDF 可迭代优化；3) 产品分析依赖 JSON 解析，如 SQLite 版本受限，改用应用层解析。建议开发顺序：Phase 1（安装依赖 + API 框架）→ Phase 2（后端 API）→ Phase 3（前端图表）→ Phase 4（测试），与 task-39 回款模块并行开发时注意代码复用（API 路由模式、组件结构）。",
+  
+  "next_steps": [
+    "1. 安装依赖：npm install recharts xlsx html2pdf.js",
+    "2. 创建分析服务层：lib/analytics/analytics-service.ts",
+    "3. 实现 GET /api/analytics/overview 接口",
+    "4. 实现 GET /api/analytics/status-distribution 接口",
+    "5. 实现 GET /api/analytics/sales-trend 接口",
+    "6. 创建分析主页面：app/(dashboard)/analytics/page.tsx",
+    "7. 创建 MetricCard 组件",
+    "8. 创建 SalesTrendChart 组件（Recharts）",
+    "9. 创建 StatusDistributionChart 组件",
+    "10. 实现导出功能（Excel/CSV 优先，PDF 后续）",
+    "11. 编写单元测试和 E2E 测试",
+    "12. 验证 5 个验收标准"
+  ],
+  
+  "estimated_total_hours": 19,
+  "recommended_priority": "P0 - 核心数据分析功能，与销售仪表板直接相关，支持业务决策",
+  "blocking_issues": [],
+  
+  "optional_enhancements": [
+    {
+      "name": "实时数据更新",
+      "description": "使用 WebSocket 或 Server-Sent Events 实现实时数据推送",
+      "priority": "P2",
+      "effort": "高"
+    },
+    {
+      "name": "自定义报表构建器",
+      "description": "用户自定义指标、维度、筛选条件，生成个性化报表",
+      "priority": "P2",
+      "effort": "高"
+    },
+    {
+      "name": "邮件定时发送",
+      "description": "每周一自动发送上周销售报表到销售团队邮箱",
+      "priority": "P1",
+      "effort": "中"
+    },
+    {
+      "name": "数据下钻",
+      "description": "点击图表可下钻查看明细数据（如点击状态扇区 → 查看该状态订单列表）",
+      "priority": "P1",
+      "effort": "中"
+    }
+  ]
+}

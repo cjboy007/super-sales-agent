@@ -176,16 +176,16 @@ soffice --headless --convert-to pdf QT-001.xlsx
 ### 一键生成（Excel V2 + HTML V2）
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills
+cd /path/to/your/.openclaw/workspace/skills
 
 # Excel V2
 python3 excel-xlsx/scripts/generate_quotation_v2.py \
-  --data quotation-workflow/examples/farreach_sample.json \
+  --data quotation-workflow/examples/your-company_sample.json \
   --output quotation-workflow/examples/QT-20260314-012.xlsx
 
 # HTML V2
 python3 quotation-workflow/scripts/generate_quotation_html.py \
-  --data quotation-workflow/examples/farreach_sample.json \
+  --data quotation-workflow/examples/your-company_sample.json \
   --output quotation-workflow/examples/QT-20260314-012.html
 ```
 

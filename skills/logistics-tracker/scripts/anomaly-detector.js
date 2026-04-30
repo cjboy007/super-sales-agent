@@ -693,7 +693,7 @@ function _buildAlertEmailHtml(anomaly) {
       </p>
     </div>
     <div class="footer">
-      <p>Farreach Electronic Co., Ltd</p>
+      <p>Your Company Name, Ltd</p>
       <p>Generated at ${new Date().toISOString()}</p>
     </div>
   </div>
@@ -709,7 +709,7 @@ function _buildAlertEmailHtml(anomaly) {
  * Read shipped orders from order-tracker and create tracking tasks
  * in shipment-store for orders not yet tracked.
  *
- * Reads: /Users/wilson/.openclaw/workspace/skills/order-tracker/data/orders.json
+ * Reads: /path/to/your/.openclaw/workspace/skills/order-tracker/data/orders.json
  * Filters: status === 'shipped' with tracking info in status_history notes
  *
  * @param {object} [opts]

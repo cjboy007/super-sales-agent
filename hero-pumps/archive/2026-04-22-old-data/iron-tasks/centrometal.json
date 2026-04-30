@@ -1,0 +1,52 @@
+{
+  "company": "Centrometal",
+  "country": "克罗地亚",
+  "contacts": [
+    {
+      "name": "",
+      "email": "komercijala@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "Danijel Novak",
+      "email": "danijel.novak@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "servis@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "prodaja@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "tehnicki.ured@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "server.web@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "nabava@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "export@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "sarajevo@centrometal.hr",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Centrometal 写开发信。\n\n## 公司背景\n- **公司：** Centrometal（克罗地亚）\n- **网站：** centrometal.hr\n- **行业：** HVAC\n- **调研：** Heat pumps - Centrometal - termometal. hr  hr/en/products/manufacturers/centrometal/renewable-energy-sources/heat-pumps/ No. 1 for HVAC systems. Receive for free by email. promotional offers; special \n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. komercijala@centrometal.hr | komercijala@centrometal.hr | N/A\n2. Danijel Novak | danijel.novak@centrometal.hr | N/A\n3. servis@centrometal.hr | servis@centrometal.hr | N/A\n4. prodaja@centrometal.hr | prodaja@centrometal.hr | N/A\n5. tehnicki.ured@centrometal.hr | tehnicki.ured@centrometal.hr | N/A\n6. server.web@centrometal.hr | server.web@centrometal.hr | N/A\n7. racunovodstvo@centrometal.hr | racunovodstvo@centrometal.hr | N/A\n8. nabava@centrometal.hr | nabava@centrometal.hr | N/A\n9. export@centrometal.hr | export@centrometal.hr | N/A\n10. sarajevo@centrometal.hr | sarajevo@centrometal.hr | N/A\n11. komercijala@centrometal.hr | komercijala@centrometal.hr | N/A\n12. Danijel Novak | danijel.novak@centrometal.hr | N/A\n13. servis@centrometal.hr | servis@centrometal.hr | N/A\n14. prodaja@centrometal.hr | prodaja@centrometal.hr | N/A\n15. tehnicki.ured@centrometal.hr | tehnicki.ured@centrometal.hr | N/A\n16. server.web@centrometal.hr | server.web@centrometal.hr | N/A\n17. racunovodstvo@centrometal.hr | racunovodstvo@centrometal.hr | N/A\n18. nabava@centrometal.hr | nabava@centrometal.hr | N/A\n19. export@centrometal.hr | export@centrometal.hr | N/A\n20. sarajevo@centrometal.hr | sarajevo@centrometal.hr | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

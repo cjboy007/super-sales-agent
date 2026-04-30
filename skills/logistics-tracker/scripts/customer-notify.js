@@ -342,7 +342,7 @@ function buildEmailHtml(templateName, data) {
     </div>
     <div class="footer">
       <p>Thank you for your business!</p>
-      <p>Farreach Electronic Co., Ltd (SKW)</p>
+      <p>Your Company Name, Ltd (SKW)</p>
     </div>
   </div>
 </body>
@@ -381,7 +381,7 @@ function buildEmailHtml(templateName, data) {
     </div>
     <div class="footer">
       <p>Thank you for choosing us!</p>
-      <p>Farreach Electronic Co., Ltd (SKW)</p>
+      <p>Your Company Name, Ltd (SKW)</p>
     </div>
   </div>
 </body>
@@ -419,7 +419,7 @@ function buildEmailHtml(templateName, data) {
     </div>
     <div class="footer">
       <p>We appreciate your patience.</p>
-      <p>Farreach Electronic Co., Ltd (SKW)</p>
+      <p>Your Company Name, Ltd (SKW)</p>
     </div>
   </div>
 </body>
@@ -453,7 +453,7 @@ function buildEmailHtml(templateName, data) {
     </div>
     <div class="footer">
       <p>Thank you for your business!</p>
-      <p>Farreach Electronic Co., Ltd (SKW)</p>
+      <p>Your Company Name, Ltd (SKW)</p>
     </div>
   </div>
 </body>

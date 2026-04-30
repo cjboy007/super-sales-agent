@@ -70,7 +70,7 @@ function generateReport(period) {
   let md = '';
   
   // 标题
-  md += `# 📊 Farreach 销售${periodLabel}\n\n`;
+  md += `# 📊 Your Company 销售${periodLabel}\n\n`;
   md += `**周期:** ${range.start || '?'} ~ ${range.end || '?'}\n`;
   md += `**生成时间:** ${new Date().toISOString().replace('T', ' ').split('.')[0]}\n`;
   md += `**数据源:** ${sources.join(', ') || 'N/A'}\n\n`;
@@ -95,6 +95,8 @@ function generateReport(period) {
     { key: 'order_count', label: '订单', unit: '份' },
     { key: 'order_amount', label: '订单金额', unit: 'USD' },
     { key: 'conversion_rate', label: '报价转化率', unit: '%' },
+    { key: 'repeat_purchase_rate', label: '复购率', unit: '%' },
+    { key: 'repeat_purchase_cycle_days', label: '平均复购周期', unit: '天' },
     { key: 'email_sent', label: '邮件发送', unit: '封' },
     { key: 'email_reply_rate', label: '回复率', unit: '%' }
   ];
@@ -119,6 +121,33 @@ function generateReport(period) {
     }
   }
   
+  // 复购分析
+  const repeatPurchase = data.repeat_purchase || {};
+  const monthlyTrend = repeatPurchase.monthly_trend || [];
+  const top10Customers = repeatPurchase.top10_customers || [];
+
+  if (monthlyTrend.length > 0 || top10Customers.length > 0) {
+    md += `## 🔁 复购分析\n\n`;
+    md += `**复购率:** ${fmtNum(kpis.repeat_purchase_rate, '%')}\n\n`;
+    md += `**平均复购周期:** ${fmtNum(kpis.repeat_purchase_cycle_days, '天')}\n\n`;
+
+    if (monthlyTrend.length > 0) {
+      md += `### 月度复购趋势\n\n`;
+      for (const item of monthlyTrend) {
+        md += `- **${item.month}:** ${item.repeat_purchase_rate}% (${item.repeat_customers}/${item.total_customers})\n`;
+      }
+      md += `\n`;
+    }
+
+    if (top10Customers.length > 0) {
+      md += `### TOP10 复购客户\n\n`;
+      top10Customers.forEach((customer, index) => {
+        md += `${index + 1}. **${customer.customer_name}** - ${customer.order_count} 单 / ${fmtNum(customer.total_amount, 'USD')} / 最近下单 ${customer.last_order_date}\n`;
+      });
+      md += `\n`;
+    }
+  }
+
   // 建议
   md += `## 💡 建议\n\n`;
   
@@ -133,6 +162,9 @@ function generateReport(period) {
   }
   if (alerts.some(a => a.type === 'leads_no_opportunity')) {
     md += `4. 线索转商机率低，建议：加快线索初筛和首次响应速度\n\n`;
+  }
+  if (alerts.some(a => a.type === 'low_repeat_purchase_rate')) {
+    md += `5. 复购率偏低，建议：梳理已成交客户清单，针对沉默老客做二次营销与定向回访\n\n`;
   }
   if (alerts.length === 0) {
     md += `各项指标正常，继续保持当前节奏。\n\n`;

@@ -1,0 +1,222 @@
+{
+  "verdict": "approve",
+  "task_id": 39,
+  "subtask_id": 1,
+  "title": "回款管理模块",
+  "reviewed_at": "2026-04-03T11:57:00+08:00",
+  "reviewer": "Revolution System Reviewer",
+  
+  "technical_review": {
+    "database_design": {
+      "status": "approved",
+      "comments": "order_payments 表设计完整，包含 16 个字段覆盖回款记录核心需求。支持多种支付方式（tt/lc/paypal/western_union/credit_card/alipay/wechat_pay/other），汇率转换，银行信息。6 个状态（pending/confirmed/partial/overpaid/refunded/cancelled）覆盖回款全生命周期。8 个索引优化查询性能，触发器自动更新 updated_at，视图 payments_by_order 提供订单回款汇总。"
+    },
+    "schema_alignment": {
+      "status": "approved",
+      "comments": "与订单 Schema 对齐良好，order_id 外键关联 orders 表，支持一对多回款记录（分期付款场景）。currency 字段与订单 Schema 保持一致（3 字母大写），amount_in_usd 便于统一统计。"
+    },
+    "okki_integration": {
+      "status": "approved_with_notes",
+      "comments": "OKKI API 客户端已有 create_trail 方法支持 trail_type=102（关联邮件备注），可用于回款记录同步。但 OKKI 支付相关 API 端点需进一步调研（/v1/payment/*），建议先实现本地回款管理，后续迭代集成 OKKI 支付模块。"
+    },
+    "tech_stack_consistency": {
+      "status": "approved",
+      "comments": "技术栈与 task-38 subtask-1（订单创建）保持一致：Next.js App Router API 路由 + better-sqlite3 + TypeScript + React 组件。可直接复用物流模块的代码模式（LogisticsCard → PaymentCard, logistics/route.ts → payments/route.ts）。"
+    }
+  },
+  
+  "instructions": {
+    "phase_1_backend_api": {
+      "priority": "P0",
+      "estimated_hours": 5,
+      "tasks": [
+        {
+          "id": "1.1",
+          "task": "创建回款录入 API 端点",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/orders/[orderId]/payments/route.ts",
+          "implementation": "GET 查询订单回款记录（含汇总），POST 录入新回款，PATCH 更新回款状态。参考 logistics/route.ts 模式，使用 db.prepare 执行 SQL。"
+        },
+        {
+          "id": "1.2",
+          "task": "创建回款计划 API 端点",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/orders/[orderId]/payment-plan/route.ts",
+          "implementation": "POST 创建回款计划（分期设置：期数/金额/日期），GET 查询计划执行进度。可复用 order_payments 表，通过 notes 字段标记计划信息，或新建 payment_plans 表。"
+        },
+        {
+          "id": "1.3",
+          "task": "创建逾期检测服务",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/lib/utils/payment-monitor.ts",
+          "implementation": "查询 order_payments 表中 status='pending' 且 payment_date < now() 的记录，计算逾期天数，返回逾期列表。支持定时任务调用（Cron 每小时执行）。"
+        },
+        {
+          "id": "1.4",
+          "task": "创建 OKKI 跟进记录写入模块",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/utils/okki-payment-trail.ts",
+          "implementation": "封装 execFile 调用 okki-sync.js，写入 trail_type=102 跟进记录（回款确认）。参考 okki-trail-writer.ts 模式。"
+        }
+      ]
+    },
+    
+    "phase_2_frontend_ui": {
+      "priority": "P0",
+      "estimated_hours": 6,
+      "tasks": [
+        {
+          "id": "2.1",
+          "task": "创建回款信息卡片组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/PaymentCard.tsx",
+          "implementation": "参考 LogisticsCard.tsx，显示回款汇总（已回/未回/逾期金额），状态标签（颜色区分），支持展开查看回款明细。"
+        },
+        {
+          "id": "2.2",
+          "task": "创建回款录入表单组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/PaymentEntryForm.tsx",
+          "implementation": "表单字段：回款日期（日期选择器）、金额（数字输入）、币种（下拉：USD/CNY/EUR/GBP）、支付方式（下拉：T/T、L/C、PayPal 等）、银行参考号、备注。提交后调用 POST /api/orders/[orderId]/payments。"
+        },
+        {
+          "id": "2.3",
+          "task": "创建回款计划设置组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/PaymentPlanSetup.tsx",
+          "implementation": "支持添加多期回款计划（动态行），每期包含：期数、计划金额、计划日期、备注。保存后调用 POST /api/orders/[orderId]/payment-plan。"
+        },
+        {
+          "id": "2.4",
+          "task": "创建回款进度展示组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/PaymentProgress.tsx",
+          "implementation": "进度条显示已回款比例，列表展示每期回款状态（已确认/待确认/逾期），逾期记录标红显示，支持筛选（全部/已回/未回/逾期）。"
+        },
+        {
+          "id": "2.5",
+          "task": "集成到订单详情页",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/(dashboard)/orders/[orderId]/page.tsx",
+          "implementation": "在订单详情页添加「回款管理」区块，包含 PaymentCard（摘要）、PaymentProgress（进度）、PaymentEntryForm（录入）三个组件。"
+        }
+      ]
+    },
+    
+    "phase_3_overdue_alerts": {
+      "priority": "P1",
+      "estimated_hours": 3,
+      "tasks": [
+        {
+          "id": "3.1",
+          "task": "创建逾期提醒 API 端点",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/payments/overdue/route.ts",
+          "implementation": "GET 查询所有逾期回款（按逾期天数排序），支持筛选（客户/订单/逾期时长）。返回逾期列表含客户联系方式，便于催款。"
+        },
+        {
+          "id": "3.2",
+          "task": "创建逾期提醒邮件模板",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/templates/payment-reminder-email.html",
+          "implementation": "邮件模板包含：订单编号、逾期金额、逾期天数、付款账户信息、联系方式。支持变量替换（客户名/订单号/金额）。"
+        },
+        {
+          "id": "3.3",
+          "task": "创建定时任务（Cron）",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/cron/payment-monitor.ts",
+          "implementation": "每小时执行一次 payment-monitor.ts，调用 payment-monitor.ts 检测逾期，发送提醒邮件（内部销售），更新订单详情页逾期标记。通过 OpenClaw Cron 注册：openclaw cron add --name 'payment-overdue-check' --schedule '0 * * * *' --agent wilson --message '检查逾期回款'"
+        }
+      ]
+    },
+    
+    "phase_4_integration_testing": {
+      "priority": "P0",
+      "estimated_hours": 2,
+      "tasks": [
+        {
+          "id": "4.1",
+          "task": "编写回款录入单元测试",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/payment-entry.test.ts",
+          "implementation": "测试数据验证（金额>0/日期格式/币种）、数据库写入、状态更新、OKKI 跟进记录同步。"
+        },
+        {
+          "id": "4.2",
+          "task": "编写 E2E 测试脚本",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/e2e/payment-flow.sh",
+          "implementation": "完整流程：创建订单 → 设置回款计划 → 录入回款 → 验证进度展示 → 模拟逾期 → 验证提醒。"
+        },
+        {
+          "id": "4.3",
+          "task": "验收标准验证",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/docs/TASK-39-SUBTASK-1-ACCEPTANCE.md",
+          "implementation": "逐项验证 4 个验收标准，记录测试结果和截图。"
+        }
+      ]
+    }
+  },
+  
+  "acceptance_criteria_checklist": {
+    "回款计划设置_分期_金额_日期": {
+      "status": "pending",
+      "verification": "PaymentPlanSetup 组件支持添加多期回款计划，每期包含金额/日期/备注，保存后可查询，进度展示关联计划执行状态。"
+    },
+    "回款记录录入_日期_金额_方式_备注": {
+      "status": "pending",
+      "verification": "PaymentEntryForm 表单包含所有必填字段，提交后写入 order_payments 表，返回成功提示，可选同步到 OKKI 跟进记录。"
+    },
+    "回款进度展示_已回_未回_逾期": {
+      "status": "pending",
+      "verification": "PaymentProgress 组件显示进度条（已回/未回比例），列表展示每期状态（颜色区分：已确认=绿色/待确认=黄色/逾期=红色），支持筛选。"
+    },
+    "逾期提醒_超期未回款标红": {
+      "status": "pending",
+      "verification": "payment-monitor.ts 每小时检测逾期，订单详情页逾期记录标红，/api/payments/overdue 返回逾期列表，邮件提醒内部销售。"
+    }
+  },
+  
+  "dependencies": {
+    "existing_modules": [
+      "/Users/wilson/.openclaw/workspace/skills/okki-email-sync/scripts/okki-sync.js - OKKI 跟进记录写入（trail_type=102）",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/db/migrations/002-add-logistics-payments.sql - order_payments 表（已创建）",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/app/api/orders/[orderId]/logistics/route.ts - API 路由参考",
+      "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/orders/LogisticsCard.tsx - UI 组件参考"
+    ],
+    "new_modules_needed": [
+      "回款管理 API 路由（新创建）",
+      "回款计划 API 路由（新创建）",
+      "逾期检测服务（新创建）",
+      "回款 UI 组件（PaymentCard/PaymentEntryForm/PaymentPlanSetup/PaymentProgress）",
+      "逾期提醒邮件模板（新创建）",
+      "定时任务（OpenClaw Cron 注册）"
+    ]
+  },
+  
+  "risks_and_mitigation": {
+    "okki_payment_api_unknown": {
+      "risk": "OKKI 支付相关 API 端点不明确，可能无法双向同步",
+      "mitigation": "优先实现本地回款管理，通过 okki-sync.js 写入跟进记录（trail_type=102）作为临时方案。后续调研 OKKI /v1/payment/* API 端点，迭代集成。"
+    },
+    "exchange_rate_fluctuation": {
+      "risk": "汇率波动导致 USD 折算金额不准确",
+      "mitigation": "录入回款时记录当时汇率（exchange_rate 字段），锁定折算金额。后续可集成汇率 API（如 exchangerate-api.com）自动获取历史汇率。"
+    },
+    "partial_payment_complexity": {
+      "risk": "部分回款场景复杂（多期/多币种/超额付款）",
+      "mitigation": "status 字段支持 partial/overpaid 状态，通过 payment_count 和 total_paid_usd 视图字段自动计算。前端提供清晰的状态标签和筛选功能。"
+    },
+    "overdue_alert_fatigue": {
+      "risk": "频繁逾期提醒导致用户忽略",
+      "mitigation": "智能提醒策略：逾期 1-3 天每天提醒一次，逾期 4-7 天每 3 天提醒一次，逾期>7 天每周提醒一次。提供「标记为已处理」功能。"
+    }
+  },
+  
+  "feedback": "技术方案设计优秀，数据库 Schema 已就绪（migration 002），可直接开始开发。回款管理模块与物流模块架构高度对称，建议复用物流模块的代码模式，加快开发进度。关键差异点：1) 回款支持一对多记录（分期付款），需在设计时考虑；2) 逾期提醒需要定时任务（Cron），建议用 OpenClaw Cron 而非系统 crontab；3) 汇率转换需记录历史汇率，避免后续波动影响统计。OKKI 集成采用渐进式策略：先实现跟进记录写入（trail_type=102），后续再调研 OKKI 支付 API 深度集成。建议优先级：Phase 1（后端 API）→ Phase 2（前端 UI）→ Phase 4（测试）→ Phase 3（逾期提醒），确保核心功能先上线。",
+  
+  "next_steps": [
+    "1. 创建 POST /api/orders/[orderId]/payments 回款录入接口",
+    "2. 创建 GET /api/orders/[orderId]/payments 回款查询接口（含汇总）",
+    "3. 创建 PaymentCard 组件（回款摘要）",
+    "4. 创建 PaymentEntryForm 组件（回款录入表单）",
+    "5. 创建 PaymentProgress 组件（回款进度展示）",
+    "6. 集成到订单详情页",
+    "7. 创建 payment-monitor.ts 逾期检测服务",
+    "8. 注册 OpenClaw Cron 定时任务（每小时检查逾期）",
+    "9. 创建逾期提醒邮件模板",
+    "10. 编写单元测试和 E2E 测试",
+    "11. 验证 4 个验收标准"
+  ],
+  
+  "estimated_total_hours": 16,
+  "recommended_priority": "P0 - 核心财务功能，与订单创建同等重要",
+  "blocking_issues": []
+}

@@ -1,0 +1,45 @@
+{
+  "company": "Armatec",
+  "country": "瑞典",
+  "website": "armatec.com",
+  "tier": "Tier1-Nordic",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Anne Sammalisto",
+      "email": "anne.sammalisto@armatec.com",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "Tommi Hannula",
+      "email": "tommi.hannula@armatec.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Janne Kiviniemi",
+      "email": "janne.kiviniemi@armatec.com",
+      "position": "Area Manager"
+    },
+    {
+      "name": "Ossi Kosunen",
+      "email": "ossi.kosunen@armatec.com",
+      "position": "Sales Specialist"
+    },
+    {
+      "name": "Eila Helminen",
+      "email": "eila.helminen@armatec.com",
+      "position": "Finance Assistant"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:04.469974+00:00",
+    "query": "Armatec 瑞典 HVAC pump distributor manufacturer",
+    "summary": "Search - Armatec COM https://www. armatec. com/en/search/?page=23 Reflex and Armatec launch cooperation in Sweden & Denmark. Armatec becomes the main distributor of Reflex's products for pressure maintenance, as well as air 2.",
+    "sources": [
+      "https://www.armatec.com/en/search/?page=23",
+      "https://ensun.io/search/coolant-pump/norway",
+      "https://www.armatec.com/en/about-armatec/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-Nordic重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

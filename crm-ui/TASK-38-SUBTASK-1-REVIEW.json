@@ -1,0 +1,187 @@
+{
+  "verdict": "approve",
+  "task_id": 38,
+  "subtask_id": 1,
+  "title": "订单创建功能",
+  "reviewed_at": "2026-04-03T11:30:00+08:00",
+  "reviewer": "Revolution System Reviewer",
+  
+  "technical_review": {
+    "schema_design": {
+      "status": "approved",
+      "comments": "订单 Schema 设计完整，包含 21 个字段，覆盖报价单关联、OKKI 集成、状态管理等核心需求。quotation_no、okki_order_id、okki_company_id 字段扩展合理。"
+    },
+    "database_design": {
+      "status": "approved",
+      "comments": "SQLite 表结构设计良好，包含 11 个索引优化查询性能，触发器自动更新 updated_at，视图提供统计功能。"
+    },
+    "status_enum": {
+      "status": "approved",
+      "comments": "6 状态枚举清晰（pending_production → in_production → ready_to_ship → shipped → completed / cancelled），流转规则完整，TypeScript 类型安全。"
+    },
+    "okki_integration": {
+      "status": "approved",
+      "comments": "已有成熟的 OKKI 跟进记录写入模块（okki-sync.js），支持 trail_type=101（报价单）和 trail_type=102（邮件），可直接复用。"
+    }
+  },
+  
+  "instructions": {
+    "phase_1_backend_api": {
+      "priority": "P0",
+      "estimated_hours": 4,
+      "tasks": [
+        {
+          "id": "1.1",
+          "task": "创建订单编号生成器",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/utils/order-number-generator.ts",
+          "implementation": "实现 ORD-YYYYMMDD-XXX 格式，支持查询当日序号（查询 orders 表 COUNT + 1）"
+        },
+        {
+          "id": "1.2",
+          "task": "创建 OKKI 客户匹配器",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/utils/okki-company-matcher.ts",
+          "implementation": "封装域名匹配 + 向量搜索逻辑，调用 okki-sync.js 的 matchCustomer 函数"
+        },
+        {
+          "id": "1.3",
+          "task": "创建订单创建 API 端点",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/server/routes/orders.ts",
+          "implementation": "POST /api/orders - 接收报价单编号或手动订单数据，执行验证、生成编号、匹配 OKKI 客户、写入数据库"
+        },
+        {
+          "id": "1.4",
+          "task": "创建报价单转订单 API 端点",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/server/routes/quotation-to-order.ts",
+          "implementation": "POST /api/quotation-to-order - 接收 quotation_no，读取报价单 JSON 文件，转换为订单数据，调用创建 API"
+        },
+        {
+          "id": "1.5",
+          "task": "创建 OKKI 跟进记录写入模块",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/utils/okki-trail-writer.ts",
+          "implementation": "封装 execFile 调用 okki-sync.js 的 createQuotationTrail 函数，写入 trail_type=101 跟进记录"
+        }
+      ]
+    },
+    
+    "phase_2_frontend_ui": {
+      "priority": "P0",
+      "estimated_hours": 6,
+      "tasks": [
+        {
+          "id": "2.1",
+          "task": "创建手动创建订单表单组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/OrderCreateForm.tsx",
+          "implementation": "包含客户选择（搜索 OKKI 客户）、产品添加（动态行）、价格/数量输入、交期选择、收货地址表单"
+        },
+        {
+          "id": "2.2",
+          "task": "创建报价单转订单按钮组件",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/components/QuotationToOrderButton.tsx",
+          "implementation": "在报价单详情页添加「转换为订单」按钮，点击后调用 API 并显示进度"
+        },
+        {
+          "id": "2.3",
+          "task": "创建订单列表页",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/pages/orders/index.tsx",
+          "implementation": "展示订单列表（表格），支持按状态/客户/交期筛选，显示订单编号、客户、金额、状态"
+        },
+        {
+          "id": "2.4",
+          "task": "创建订单详情页",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/pages/orders/[orderId].tsx",
+          "implementation": "展示订单完整信息、状态历史时间线、产品清单、收货地址、物流信息"
+        }
+      ]
+    },
+    
+    "phase_3_integration_testing": {
+      "priority": "P0",
+      "estimated_hours": 3,
+      "tasks": [
+        {
+          "id": "3.1",
+          "task": "编写订单创建单元测试",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/order-create.test.ts",
+          "implementation": "测试订单编号生成、数据验证、OKKI 客户匹配、数据库写入"
+        },
+        {
+          "id": "3.2",
+          "task": "编写 E2E 测试脚本",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/tests/e2e/order-flow.sh",
+          "implementation": "完整流程：创建报价单 → 转换为订单 → 验证 OKKI 跟进记录 → 查询订单列表"
+        },
+        {
+          "id": "3.3",
+          "task": "验收标准验证",
+          "file": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/crm-ui/docs/TASK-38-SUBTASK-1-ACCEPTANCE.md",
+          "implementation": "逐项验证 4 个验收标准，记录测试结果和截图"
+        }
+      ]
+    }
+  },
+  
+  "acceptance_criteria_checklist": {
+    "从报价单创建订单_一键转换": {
+      "status": "pending",
+      "verification": "POST /api/quotation-to-order 接收 quotation_no，返回 order_id，前端显示成功提示"
+    },
+    "手动创建订单表单": {
+      "status": "pending",
+      "verification": "OrderCreateForm 组件包含客户搜索、产品添加、价格/数量输入、交期选择、提交按钮"
+    },
+    "订单号自动生成规则": {
+      "status": "pending",
+      "verification": "订单编号格式 ORD-YYYYMMDD-XXX，当日序号自动递增，无重复"
+    },
+    "订单创建后写入 OKKI 跟进记录": {
+      "status": "pending",
+      "verification": "调用 okki-sync.js createQuotationTrail，写入 trail_type=101 跟进记录，返回 trail_id"
+    }
+  },
+  
+  "dependencies": {
+    "existing_modules": [
+      "/Users/wilson/.openclaw/workspace/skills/okki-email-sync/scripts/okki-sync.js - OKKI 客户匹配 + 跟进记录写入",
+      "/Users/wilson/.openclaw/workspace/vector_store/search-customers.py - 客户向量搜索",
+      "/Users/wilson/.openclaw/workspace/skills/quotation-workflow/ - 报价单生成工作流"
+    ],
+    "new_modules_needed": [
+      "订单编号生成器（新创建）",
+      "OKKI 客户匹配器 TypeScript 封装（新创建）",
+      "订单 API 路由（新创建）",
+      "订单表单 UI 组件（新创建）"
+    ]
+  },
+  
+  "risks_and_mitigation": {
+    "okki_customer_match_failure": {
+      "risk": "自动匹配 OKKI 客户失败",
+      "mitigation": "前端提供手动选择客户功能，标记为待关联状态，后续手动同步"
+    },
+    "order_number_collision": {
+      "risk": "并发创建订单时编号重复",
+      "mitigation": "数据库加 UNIQUE 约束，生成时加锁查询，失败重试"
+    },
+    "quotation_data_incomplete": {
+      "risk": "报价单数据不完整导致转换失败",
+      "mitigation": "转换前执行完整数据验证，提示用户补充缺失字段"
+    }
+  },
+  
+  "feedback": "技术方案整体优秀，subtask 0 已完成的数据模型设计为 subtask 1 打下坚实基础。建议优先实现后端 API（phase 1），再开发前端 UI（phase 2），最后进行集成测试（phase 3）。OKKI 跟进记录写入可直接复用 okki-sync.js 模块，无需重复开发。订单编号生成需注意并发场景下的唯一性保证。",
+  
+  "next_steps": [
+    "1. 创建 order-number-generator.ts 工具函数",
+    "2. 创建 okki-company-matcher.ts 封装客户匹配逻辑",
+    "3. 实现 POST /api/orders 订单创建接口",
+    "4. 实现 POST /api/quotation-to-order 报价单转订单接口",
+    "5. 创建 OrderCreateForm 前端表单组件",
+    "6. 创建 QuotationToOrderButton 组件",
+    "7. 编写单元测试和 E2E 测试",
+    "8. 验证 4 个验收标准"
+  ],
+  
+  "estimated_total_hours": 13,
+  "recommended_priority": "P0 - 核心功能，优先完成",
+  "blocking_issues": []
+}

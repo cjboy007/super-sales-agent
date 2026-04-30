@@ -1,6 +1,10 @@
 ---
 name: pricing-engine
-description: 动态定价引擎 — 根据 LME 铜价、数量阶梯、客户等级、实时汇率自动计算报价，集成 quotation-workflow 生成报价单
+description: '动态定价引擎，铜价/数量阶梯/客户等级/汇率计算'
+metadata:
+  {
+    "openclaw": { "emoji": "💰", "requires": { "anyBins": ["python3"] } },
+  }
 ---
 
 # pricing-engine
@@ -74,7 +78,7 @@ pricing-engine/
 
 **CLI 用法：**
 ```bash
-cd <pricing-engine-root>/scripts
+cd /path/to/your/.openclaw/workspace/skills/pricing-engine/scripts
 
 # 单品报价（SKU 数量 客户等级 [币种]）
 node pricing-engine.js quote HDMI-2.1-8K-2M 1000 B USD
@@ -115,7 +119,7 @@ const batch = await calculateBatch([
 
 **CLI 用法：**
 ```bash
-cd <pricing-engine-root>/scripts
+cd /path/to/your/.openclaw/workspace/skills/pricing-engine/scripts
 
 # 生成完整报价单（含 PDF）
 node quotation-integration.js generate \
@@ -169,7 +173,7 @@ const preview = await previewQuotation({ customerId, customerGrade, currency, it
 
 **CLI 用法：**
 ```bash
-cd <pricing-engine-root>/scripts
+cd /path/to/your/.openclaw/workspace/skills/pricing-engine/scripts
 
 # 查看当前所有汇率（base: USD）
 node exchange-rate.js rates
@@ -201,7 +205,7 @@ const cny = await convertAmount(100, 'USD', 'CNY'); // → 725.0
 
 **CLI 用法：**
 ```bash
-cd <pricing-engine-root>/scripts
+cd /path/to/your/.openclaw/workspace/skills/pricing-engine/scripts
 
 # 查看最新铜价
 node copper-price-adapter.js price
@@ -236,7 +240,7 @@ JSONL 追加存储，支持按客户/SKU/日期范围查询。每条记录自动
 
 **CLI 用法：**
 ```bash
-cd <pricing-engine-root>/scripts
+cd /path/to/your/.openclaw/workspace/skills/pricing-engine/scripts
 
 # 手动记录一次报价
 node price-history.js record '{"sku":"HDMI-2.1-8K-2M","quantity":1000,"unitPrice":4.46,"currency":"USD","customerId":"CUST-001"}'
@@ -326,7 +330,7 @@ const history = await queryHistory({ customerId: 'CUST-001', limit: 10 });
 ## Quick Start
 
 ```bash
-SKILL_DIR=<pricing-engine-root>
+SKILL_DIR=/path/to/your/.openclaw/workspace/skills/pricing-engine
 cd $SKILL_DIR/scripts
 
 # 1. 测试模式（无需真实铜价/汇率数据）

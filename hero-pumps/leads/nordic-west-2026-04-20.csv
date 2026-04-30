@@ -1,0 +1,70 @@
+company,contact_name,email,website,country,industry,source,tier,position,department,confidence,verification_status
+Ahlsell Group,Mika Miettinen,mika.miettinen@ahlsell.com,ahlsell.com,瑞典,HVAC,hunter.io,Tier1-Nordic,,,94%,
+Ahlsell Group,Johan Nilsson,johan.nilsson@ahlsell.com,ahlsell.com,瑞典,HVAC,hunter.io,Tier1-Nordic,CEO,executive,93%,
+Ahlsell Group,,info@ahlsell.com,ahlsell.com,瑞典,HVAC,hunter.io,Tier1-Nordic,,support,78%,
+Onninen,Sakari Manninen,sakari.manninen@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Director of HVAC,management,99%,
+Onninen,Jacek Szymański,jacek.szymanski@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Supply Chain Director,operations,99%,
+Onninen,Timo Ainasoja,timo.ainasoja@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Sales Director,sales,99%,
+Onninen,Peter Söderholm,peter.soederholm@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Director of Sourcing,management,99%,
+Onninen,Pertti Tuomi,pertti.tuomi@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Director of Operations,executive,99%,valid
+Onninen,Martti Forss,martti.forss@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Managing Director,executive,99%,
+Onninen,Tommi Paasonen,tommi.paasonen@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Sales Director,sales,98%,valid
+Onninen,Pasi Pitko,pasi.pitko@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Sales Director,sales,98%,
+Onninen,Erpo Ervasti,erpo.ervasti@onninen.com,onninen.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Sales Director,sales,98%,
+Brødrene Dahl,Anders Gran,anders.gran@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Chief Marketing Officer,marketing,99%,
+Brødrene Dahl,Charlene Thommessen,charlene.thommessen@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Sales Industry,sales,99%,
+Brødrene Dahl,Therese Thorèn,therese.thoren@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Lead Assistant,management,99%,
+Brødrene Dahl,Henning Nordbotn,henning.nordbotn@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Sales Associate,sales,99%,
+Brødrene Dahl,Svein Landro,svein.landro@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Sales Manager,sales,99%,
+Brødrene Dahl,Michelle Raz,michelle.raz@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Project Coordinator,operations,99%,
+Brødrene Dahl,Edwin Bekkevold,edwin.bekkevold@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Key Account Manager,sales,99%,
+Brødrene Dahl,Monica Persen,monica.persen@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Training Manager,education,99%,
+Brødrene Dahl,Trond Thoresen,trond.thoresen@dahl.no,dahl.no,北欧,HVAC,hunter.io,Tier1-Nordic,Regional Manager,management,99%,
+Purmo Group,Julio Sequeira,julio.sequeira@purmogroup.com,purmogroup.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Director of Product Management,management,99%,valid
+Purmo Group,Johan Werbrouck,johan.werbrouck@purmogroup.com,purmogroup.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Chief Transformation Officer,executive,99%,valid
+Purmo Group,Robert Cibulka,robert.cibulka@purmogroup.com,purmogroup.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Head of Product Management,management,99%,
+Purmo Group,Uwe Hofstädter,uwe.hofstaedter@purmogroup.com,purmogroup.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Director of Market and Applications,it,99%,
+Purmo Group,Santeri Brunila,santeri.brunila@purmogroup.com,purmogroup.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Head of Compensation and Benefits,hr,99%,
+Purmo Group,Jonas Keto,jonas.keto@purmogroup.com,purmogroup.com,芬兰,HVAC,hunter.io,Tier1-Nordic,Director of Business Control,sales,98%,
+Bravida,Trond-Lauritz Larsen,trond.larsen@bravida.se,bravida.se,瑞典,HVAC,hunter.io,Tier1-Nordic,Regional Director,executive,94%,accept_all
+Bravida,Peter Norstrom,peter.norstrom@bravida.se,bravida.se,瑞典,HVAC,hunter.io,Tier1-Nordic,Director of Investor Relations,communication,94%,accept_all
+Bravida,Andreas Alsén,andreas.alsen@bravida.se,bravida.se,瑞典,HVAC,hunter.io,Tier1-Nordic,Chief Operating Officer,executive,93%,accept_all
+Bravida,Charlotta Andersson,charlotta.andersson@bravida.se,bravida.se,瑞典,HVAC,hunter.io,Tier1-Nordic,Communications Manager,communication,93%,
+Bravida,Toni Salonen,toni.salonen@bravida.se,bravida.se,瑞典,HVAC,hunter.io,Tier1-Nordic,Unit Head,management,93%,
+Bravida,Petra Dahlgren,petra.dahlgren@bravida.se,bravida.se,瑞典,HVAC,hunter.io,Tier1-Nordic,Corporate Communications Manager,communication,92%,
+Instalco,,info@instalco.se,instalco.se,瑞典,HVAC,hunter.io,Tier1-Nordic,,,,
+GC-Gruppe,Thorsten Ludewig,thorsten.ludewig@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Head of Master Data Management,it,99%,valid
+GC-Gruppe,Mario Deibel,mario.deibel@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Product Manager,it,99%,valid
+GC-Gruppe,Nico Schulze,nico.schulze@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Branch Manager,management,99%,valid
+GC-Gruppe,Petra Schmidt,petra.schmidt@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Marketing Manager,marketing,99%,valid
+GC-Gruppe,Marina Maurer,marina.maurer@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Executive Assistant,operations,98%,valid
+GC-Gruppe,Frank Zaplata,frank.zaplata@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Sales Manager,sales,97%,valid
+GC-Gruppe,David Heinemann,david.heinemann@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Managing Partner,management,97%,valid
+GC-Gruppe,Hannah Eul,hannah.eul@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Training Assistant,education,91%,valid
+GC-Gruppe,Markus Muggenhamer,markus.muggenhamer@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,Sales Representative,support,84%,valid
+GC-Gruppe,Guido Genzmer,guido.genzmer@gc-gruppe.de,gc-gruppe.de,德国,HVAC,hunter.io,Tier1-EU,IT Recruiter,it,84%,valid
+ABK-Qviller,Daniel Kristensen,kristensen@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,CEO,executive,94%,accept_all
+ABK-Qviller,Ailinn Staurvik,am@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,B2B Marketer,marketing,89%,accept_all
+ABK-Qviller,Ragnhild Tjore,rt@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,Regional Manager,management,84%,accept_all
+ABK-Qviller,Hilde Eriksen,he@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,Marketing Manager,marketing,83%,accept_all
+ABK-Qviller,,post@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,,,90%,accept_all
+ABK-Qviller,,bab@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,,,86%,accept_all
+ABK-Qviller,,nas@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,,,85%,accept_all
+ABK-Qviller,,kundesenter@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,,,81%,accept_all
+ABK-Qviller,,ph@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,,,80%,accept_all
+ABK-Qviller,,ams@abkqviller.no,abkqviller.no,挪威,HVAC,hunter.io,Tier1-Nordic,,,79%,accept_all
+Caleffi,Giorgio Galliano,giorgio.galliano@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Quality Director,management,93%,valid
+Caleffi,Serkan Sungun,serkan.sungun@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Managing Director,executive,83%,valid
+Caleffi,Davide Bellora,davide.bellora@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Process Engineer,operations,94%,valid
+Caleffi,Mike Köhler,mike.koehler@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Regional Manager,management,94%,valid
+Caleffi,Luca Brocato,luca.brocato@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Maintenance Technician,operations,94%,
+Caleffi,Matteo Canzano,matteo.canzano@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Laboratory Technician,health,94%,
+Caleffi,Laura Righini,laura.righini@caleffi.com,caleffi.com,意大利,HVAC,hunter.io,Tier1-EU,Advertising Manager,marketing,94%,
+Armatec,Tommi Hannula,tommi.hannula@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,Sales Director,sales,96%,valid
+Armatec,Janne Kiviniemi,janne.kiviniemi@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,Area Manager,management,99%,
+Armatec,Ossi Kosunen,ossi.kosunen@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,Sales Specialist,sales,97%,
+Armatec,Heidi Suomalainen,heidi.suomalainen@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,Marketing Coordinator,marketing,84%,valid
+Armatec,Mika Miettinen,mika.miettinen@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,,,99%,
+Armatec,Klas Blom,klas.blom@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,CEO,executive,98%,valid
+Armatec,Harri Honkanen,harri.honkanen@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,Sales Manager,sales,97%,
+Armatec,Johan Backstrom,johan.backstrom@armatec.com,armatec.com,瑞典,HVAC,hunter.io,Tier1-Nordic,Senior Advisor Customer,support,96%,

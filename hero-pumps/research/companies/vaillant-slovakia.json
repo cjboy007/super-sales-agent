@@ -1,0 +1,29 @@
+{
+  "company": "Vaillant Slovakia",
+  "country": "斯洛伐克",
+  "website": "vaillant.sk",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Stanislav Praskac",
+      "email": "stanislav.praskac@vaillant.com",
+      "position": "Head of Procurement plant Skalica"
+    },
+    {
+      "name": "Pavol Kucak",
+      "email": "pavol.kucak@vaillant.com",
+      "position": "Supply Chain Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Vaillant Slovakia Skalica plant procurement pump",
+    "summary": "Vaillant Group 在斯洛伐克斯卡利察设有工厂。Stanislav Praskac 是工厂采购负责人，Pavol Kucak 是供应链经理。",
+    "sources": [
+      "https://sk.linkedin.com/in/stanislav-praskac-7b0867181",
+      "https://sk.linkedin.com/in/pavol-kucak-53a49062"
+    ]
+  },
+  "outreach_notes": "德国暖通巨头，斯卡利察工厂。Stanislav 是采购负责人，直接决策人。"
+}

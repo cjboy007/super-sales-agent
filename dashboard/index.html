@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Sales Agent — Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#0a0f1a;color:#e2e8f0;overflow-x:hidden}
+.glass{background:rgba(30,41,59,.65);backdrop-filter:blur(12px);border:1px solid rgba(148,163,184,.08);border-radius:16px}
+.card{transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.glow-blue{box-shadow:0 0 20px rgba(59,130,246,.15)}.glow-green{box-shadow:0 0 20px rgba(34,197,94,.15)}
+.glow-amber{box-shadow:0 0 20px rgba(245,158,11,.15)}.glow-purple{box-shadow:0 0 20px rgba(168,85,247,.15)}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes countUp{from{opacity:0}to{opacity:1}}
+.fade-up{animation:fadeUp .6s ease-out forwards;opacity:0}
+.fade-up-1{animation-delay:.1s}.fade-up-2{animation-delay:.2s}.fade-up-3{animation-delay:.3s}.fade-up-4{animation-delay:.4s}
+.fade-up-5{animation-delay:.5s}.fade-up-6{animation-delay:.6s}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.tag-inquiry{background:rgba(59,130,246,.15);color:#60a5fa}
+.tag-chase{background:rgba(245,158,11,.15);color:#fbbf24}
+.tag-complaint{background:rgba(239,68,68,.15);color:#f87171}
+.tag-tech{background:rgba(168,85,247,.15);color:#c084fc}
+.tag-partner{background:rgba(34,197,94,.15);color:#4ade80}
+.tag-spam{background:rgba(100,116,139,.15);color:#94a3b8}
+.status-auto{color:#22c55e}.status-pending{color:#f59e0b}.status-forwarded{color:#60a5fa}
+.timeline-dot{width:10px;height:10px;border-radius:50%;border:2px solid #3b82f6;background:#0a0f1a;flex-shrink:0}
+.timeline-line{width:2px;background:rgba(59,130,246,.2);flex-shrink:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(148,163,184,.2);border-radius:4px}
+.btn-generate{background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;color:#fff;padding:12px 32px;border-radius:12px;font-weight:600;font-size:15px;cursor:pointer;transition:all .3s}
+.btn-generate:hover{transform:scale(1.03);box-shadow:0 4px 24px rgba(59,130,246,.4)}
+.progress-bar{height:4px;border-radius:2px;background:rgba(59,130,246,.15);overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#22c55e);transition:width 1.5s ease}
+.email-row{padding:12px 16px;border-bottom:1px solid rgba(148,163,184,.06);cursor:pointer;transition:background .15s}
+.email-row:hover{background:rgba(59,130,246,.05)}
+.email-row:last-child{border-bottom:none}
+.cal-cell{min-height:80px;border:1px solid rgba(148,163,184,.06);border-radius:8px;padding:8px;transition:background .15s}
+.cal-cell:hover{background:rgba(59,130,246,.05)}
+.cal-today{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05)}
+.cal-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700}
+.chart-wrap{position:relative;height:260px}
+.chart-wrap.chart-wrap-sm{height:260px}
+.chart-wrap canvas{width:100%!important;height:100%!important}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="fixed top-0 left-0 right-0 z-50 glass" style="border-radius:0;border-top:none;border-left:none;border-right:none">
+<div class="max-w-[1920px] mx-auto px-6 h-14 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">S</div>
+    <span class="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Super Sales Agent</span>
+    <span class="text-xs text-slate-500 ml-2">v1.0 · Dashboard</span>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 text-xs text-slate-400"><div class="pulse-dot"></div>系统运行中</div>
+    <div class="text-xs text-slate-500" id="clock"></div>
+  </div>
+</div>
+</nav>
+
+<main class="max-w-[1920px] mx-auto px-6 pt-20 pb-10">
+
+<!-- KPI CARDS -->
+<div class="grid grid-cols-4 gap-4 mb-6">
+  <div class="glass card p-5 glow-blue fade-up fade-up-1">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs text-slate-400 font-medium">今日处理邮件</span>
+      <span class="text-xs text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">📧 邮件</span>
+    </div>
+    <div class="flex items-end gap-2">
+      <span class="text-3xl font-extrabold text-white" id="kpi-email">0</span><span class="text-slate-400 text-sm">封</span>
+    </div>
+    <div class="flex items-center gap-1 mt-2 text-xs"><span class="text-green-400">↑ 12%</span><span class="text-slate-500">vs 昨天</span></div>
+  </div>
+  <div class="glass card p-5 glow-green fade-up fade-up-2">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs text-slate-400 font-medium">本周报价单</span>
+      <span class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">💰 报价</span>
+    </div>
+    <div class="flex items-end gap-2">
+      <span class="text-3xl font-extrabold text-white" id="kpi-quote">0</span><span class="text-slate-400 text-sm">份</span>
+    </div>
+    <div class="flex items-center gap-1 mt-2 text-xs"><span class="text-green-400">节省 16h</span><span class="text-slate-500">人工时间</span></div>
+  </div>
+  <div class="glass card p-5 glow-amber fade-up fade-up-3">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs text-slate-400 font-medium">待跟进客户</span>
+      <span class="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">🎯 跟进</span>
+    </div>
+    <div class="flex items-end gap-2">
+      <span class="text-3xl font-extrabold text-white" id="kpi-follow">0</span><span class="text-slate-400 text-sm">家</span>
+    </div>
+    <div class="flex items-center gap-1 mt-2 text-xs"><span class="text-red-400">3 家紧急</span><span class="text-slate-500">需今日处理</span></div>
+  </div>
+  <div class="glass card p-5 glow-purple fade-up fade-up-4">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs text-slate-400 font-medium">本月转化率</span>
+      <span class="text-xs text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full">📊 转化</span>
+    </div>
+    <div class="flex items-end gap-2">
+      <span class="text-3xl font-extrabold text-white" id="kpi-convert">0</span><span class="text-slate-400 text-sm">%</span>
+    </div>
+    <div class="flex items-center gap-1 mt-2 text-xs"><span class="text-green-400">↑ 5.2%</span><span class="text-slate-500">vs 上月</span></div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="grid grid-cols-3 gap-4 mb-6">
+
+  <!-- EMAIL PANEL -->
+  <div class="col-span-2 glass card fade-up fade-up-5" style="max-height:480px;display:flex;flex-direction:column">
+    <div class="p-4 pb-2 flex items-center justify-between border-b border-slate-700/30">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-semibold">📧 邮件自动处理</span>
+        <span class="text-xs text-slate-500">实时</span>
+      </div>
+      <div class="flex gap-3 text-xs text-slate-400">
+        <span>询盘 <b class="text-blue-400" id="cnt-inquiry">0</b></span>
+        <span>催货 <b class="text-amber-400" id="cnt-chase">0</b></span>
+        <span>投诉 <b class="text-red-400" id="cnt-complaint">0</b></span>
+        <span>技术 <b class="text-purple-400" id="cnt-tech">0</b></span>
+      </div>
+    </div>
+    <div class="overflow-y-auto flex-1" id="email-list"></div>
+  </div>
+
+  <!-- FOLLOW-UP CALENDAR -->
+  <div class="glass card fade-up fade-up-6" style="max-height:480px;display:flex;flex-direction:column">
+    <div class="p-4 pb-2 border-b border-slate-700/30">
+      <span class="text-sm font-semibold">🎯 本周跟进日历</span>
+      <span class="text-xs text-slate-500 ml-2" id="week-range"></span>
+    </div>
+    <div class="p-3 flex-1 overflow-y-auto" id="calendar-grid"></div>
+  </div>
+</div>
+
+<!-- BOTTOM ROW -->
+<div class="grid grid-cols-3 gap-4">
+
+  <!-- QUOTE GENERATOR -->
+  <div class="col-span-2 glass card p-5 fade-up fade-up-5">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-sm font-semibold">💰 报价单一键生成</span>
+      <span class="text-xs text-slate-500">传统流程 2 小时 → 现在 5 分钟</span>
+    </div>
+    <div class="flex items-center gap-6 mb-4" id="quote-steps">
+      <div class="flex-1 text-center" id="step-1"><div class="w-10 h-10 mx-auto rounded-full bg-slate-700/50 flex items-center justify-center text-lg mb-1">👤</div><div class="text-xs text-slate-500">选择客户</div></div>
+      <div class="text-slate-600">→</div>
+      <div class="flex-1 text-center" id="step-2"><div class="w-10 h-10 mx-auto rounded-full bg-slate-700/50 flex items-center justify-center text-lg mb-1">📦</div><div class="text-xs text-slate-500">选择产品</div></div>
+      <div class="text-slate-600">→</div>
+      <div class="flex-1 text-center" id="step-3"><div class="w-10 h-10 mx-auto rounded-full bg-slate-700/50 flex items-center justify-center text-lg mb-1">🔢</div><div class="text-xs text-slate-500">计算价格</div></div>
+      <div class="text-slate-600">→</div>
+      <div class="flex-1 text-center" id="step-4"><div class="w-10 h-10 mx-auto rounded-full bg-slate-700/50 flex items-center justify-center text-lg mb-1">📄</div><div class="text-xs text-slate-500">生成 PDF</div></div>
+      <div class="text-slate-600">→</div>
+      <div class="flex-1 text-center" id="step-5"><div class="w-10 h-10 mx-auto rounded-full bg-slate-700/50 flex items-center justify-center text-lg mb-1">✅</div><div class="text-xs text-slate-500">同步 OKKI</div></div>
+    </div>
+    <div class="progress-bar mb-4"><div class="progress-fill" id="quote-progress" style="width:0%"></div></div>
+    <div class="flex items-center justify-between">
+      <div class="text-xs text-slate-500" id="quote-status">点击按钮开始演示</div>
+      <button class="btn-generate" id="btn-gen" onclick="runQuoteDemo()">⚡ 一键生成报价单</button>
+    </div>
+  </div>
+
+  <!-- AGENT STATUS -->
+  <div class="glass card p-5 fade-up fade-up-6">
+    <div class="text-sm font-semibold mb-4">🤖 AI Agent 状态</div>
+    <div class="space-y-3">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-800/40">
+        <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm">🧠</div>
+        <div class="flex-1"><div class="text-xs font-medium">Wilson · 协调</div><div class="text-xs text-green-400">运行中 · 已处理 47 封邮件</div></div>
+        <div class="pulse-dot"></div>
+      </div>
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-800/40">
+        <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-sm">⚡</div>
+        <div class="flex-1"><div class="text-xs font-medium">Revolution · 自动开发</div><div class="text-xs text-green-400">运行中 · 3 个 skill 已完成</div></div>
+        <div class="pulse-dot"></div>
+      </div>
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-800/40">
+        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-sm">💰</div>
+        <div class="flex-1"><div class="text-xs font-medium">Pricing Engine · 定价</div><div class="text-xs text-slate-400">待命中 · LME 铜价 $9,200/吨</div></div>
+        <div class="w-2 h-2 rounded-full bg-slate-500"></div>
+      </div>
+    </div>
+    <div class="mt-4 pt-3 border-t border-slate-700/30">
+      <div class="text-xs text-slate-500 mb-2">最近执行</div>
+      <div class="space-y-1.5 text-xs">
+        <div class="flex justify-between"><span class="text-slate-400">回复 ABC Trading 询盘</span><span class="text-slate-600">2 分钟前</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">生成 QT-20260401-003</span><span class="text-slate-600">15 分钟前</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">同步 OKKI 跟进记录 ×5</span><span class="text-slate-600">1 小时前</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONVERSION CHART -->
+<div class="grid grid-cols-3 gap-4 mt-4">
+  <div class="col-span-2 glass card p-5 fade-up fade-up-5">
+    <div class="text-sm font-semibold mb-3">📊 转化漏斗（本月）</div>
+    <div class="chart-wrap"><canvas id="funnelChart"></canvas></div>
+  </div>
+  <div class="glass card p-5 fade-up fade-up-6">
+    <div class="text-sm font-semibold mb-3">⏱ 效率对比</div>
+    <div class="chart-wrap chart-wrap-sm"><canvas id="effChart"></canvas></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// Clock
+function updateClock(){const d=new Date();document.getElementById('clock').textContent=d.toLocaleString('zh-CN',{hour12:false})}
+setInterval(updateClock,1000);updateClock();
+
+// Animate counters
+function animateCount(el,target,suffix='',duration=1500){
+  const start=performance.now();const startVal=0;
+  function tick(now){
+    const p=Math.min((now-start)/duration,1);
+    const eased=1-Math.pow(1-p,3);
+    el.textContent=Math.round(startVal+(target-startVal)*eased)+(suffix||'');
+    if(p<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+setTimeout(()=>{
+  animateCount(document.getElementById('kpi-email'),47);
+  animateCount(document.getElementById('kpi-quote'),8);
+  animateCount(document.getElementById('kpi-follow'),12);
+  animateCount(document.getElementById('kpi-convert'),23.5,'',(el)=>{});
+},300);
+// Fix decimal for convert
+setTimeout(()=>{
+  let el=document.getElementById('kpi-convert');
+  const start=performance.now();
+  function tick(now){
+    const p=Math.min((now-start)/1500,1);const eased=1-Math.pow(1-p,3);
+    el.textContent=(23.5*eased).toFixed(1);
+    if(p<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+},300);
+
+// Email data
+const emails=[
+  {from:'Mike Johnson',company:'ABC Trading Ltd',subject:'Inquiry - HDMI 2.1 Cable 8K 2M x5000pcs',time:'09:12',tag:'inquiry',status:'auto',statusText:'已自动回复',reply:'Dear Mike, Thank you for your inquiry. We can offer HDMI 2.1 8K cables at $4.15/pc for 5000pcs with 15-day lead time...'},
+  {from:'Sarah Chen',company:'XYZ Electronics',subject:'RE: Where is our order ORD-20260328?',time:'08:55',tag:'chase',status:'auto',statusText:'已同步物流',reply:'Dear Sarah, Your order ORD-20260328 shipped via DHL on Mar 29. Tracking: 1234567890. ETA: Apr 5...'},
+  {from:'Hans Mueller',company:'EuroTech GmbH',subject:'⚠️ Quality issue with CAT6A batch',time:'08:30',tag:'complaint',status:'forwarded',statusText:'已转人工',reply:'[高优转人工] 客户反馈 CAT6A 批次质量问题，需要技术团队介入...'},
+  {from:'Lisa Wang',company:'Global Tech Inc',subject:'Technical specs for DP 2.1 UHBR20?',time:'08:15',tag:'tech',status:'pending',statusText:'待确认',reply:'Dear Lisa, DP 2.1 specs: UHBR20 80Gbps, supports 16K@60Hz / 4K@240Hz. Cable length up to 2M passive...'},
+  {from:'Roberto Silva',company:'BrazilConnect',subject:'Partnership proposal - Latin America distributor',time:'07:45',tag:'partner',status:'pending',statusText:'待确认',reply:'Dear Roberto, Thank you for your interest in distributing Farreach products in Latin America...'},
+  {from:'Tom Brown',company:'Quick Parts Ltd',subject:'RE: USB-C Hub quotation follow up',time:'07:20',tag:'inquiry',status:'auto',statusText:'已自动回复',reply:'Dear Tom, Following up on our USB-C Hub quotation. Price valid until Apr 15. MOQ 300pcs...'},
+  {from:'unknown@spam.co',company:'Unknown',subject:'🔄 You won a prize! Click here',time:'06:30',tag:'spam',status:'auto',statusText:'已归档',reply:'[垃圾邮件，已自动归档]'},
+  {from:'Anna Kowalski',company:'PolTech Solutions',subject:'RFQ - Cat6 Patch Cables 10,000pcs',time:'23:15',tag:'inquiry',status:'auto',statusText:'已自动回复',reply:'Dear Anna, Thank you for the RFQ. CAT6 patch cables 2M: $1.85/pc for 10,000pcs. Lead time 10 days...'}
+];
+
+// Render emails
+const el=document.getElementById('email-list');
+let counts={inquiry:0,chase:0,complaint:0,tech:0,partner:0,spam:0};
+emails.forEach(e=>counts[e.tag]=(counts[e.tag]||0)+1);
+document.getElementById('cnt-inquiry').textContent=counts.inquiry;
+document.getElementById('cnt-chase').textContent=counts.chase;
+document.getElementById('cnt-complaint').textContent=counts.complaint;
+document.getElementById('cnt-tech').textContent=counts.tech;
+
+emails.forEach((e,i)=>{
+  const tagLabels={inquiry:'询盘',chase:'催货',complaint:'投诉',tech:'技术',partner:'合作',spam:'垃圾'};
+  const statusClass={auto:'status-auto',pending:'status-pending',forwarded:'status-forwarded'};
+  const row=document.createElement('div');
+  row.className='email-row';
+  row.innerHTML=`
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 flex-shrink-0">${e.from[0]}</div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-slate-200 truncate">${e.from}</span>
+            <span class="text-xs text-slate-600">${e.company}</span>
+          </div>
+          <div class="text-xs text-slate-400 truncate">${e.subject}</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 flex-shrink-0 ml-3">
+        <span class="tag tag-${e.tag}">${tagLabels[e.tag]}</span>
+        <span class="text-xs ${statusClass[e.status]}">${e.statusText}</span>
+        <span class="text-xs text-slate-600">${e.time}</span>
+      </div>
+    </div>
+    <div class="hidden mt-2 ml-11 p-3 rounded-lg bg-slate-800/50 text-xs text-slate-300 leading-relaxed reply-box">${e.reply}</div>
+  `;
+  row.onclick=()=>{const rb=row.querySelector('.reply-box');rb.classList.toggle('hidden')};
+  el.appendChild(row);
+});
+
+// Calendar
+const today=new Date();
+const monday=new Date(today);monday.setDate(today.getDate()-today.getDay()+1);
+const days=['周一','周二','周三','周四','周五','周六','周日'];
+const followUps=[
+  {day:0,clients:[{name:'ABC Trading',stage:'报价后 3 天未回复',urgency:'high'},{name:'XYZ Electronics',stage:'样品已签收',urgency:'medium'}]},
+  {day:1,clients:[{name:'Global Tech Inc',stage:'30 天未联系',urgency:'low'},{name:'BrazilConnect',stage:'新询盘跟进',urgency:'medium'},{name:'PolTech Solutions',stage:'报价确认',urgency:'high'}]},
+  {day:2,clients:[{name:'EuroTech GmbH',stage:'投诉处理跟进',urgency:'high'}]},
+  {day:3,clients:[{name:'Quick Parts Ltd',stage:'USB-C Hub 样品反馈',urgency:'medium'},{name:'Metro Cables AU',stage:'定期维护',urgency:'low'}]},
+  {day:4,clients:[{name:'TechStore Japan',stage:'大货验收确认',urgency:'high'},{name:'Nordic Connect',stage:'新产品推荐',urgency:'low'},{name:'MidEast Trading',stage:'付款提醒',urgency:'medium'}]}
+];
+const cg=document.getElementById('calendar-grid');
+const wr=document.getElementById('week-range');
+const endOfWeek=new Date(monday);endOfWeek.setDate(monday.getDate()+6);
+wr.textContent=`${monday.getMonth()+1}/${monday.getDate()} - ${endOfWeek.getMonth()+1}/${endOfWeek.getDate()}`;
+
+let calHTML='<div class="grid grid-cols-1 gap-2">';
+for(let i=0;i<5;i++){
+  const d=new Date(monday);d.setDate(monday.getDate()+i);
+  const isToday=d.toDateString()===today.toDateString();
+  const fu=followUps.find(f=>f.day===i);
+  const count=fu?fu.clients.length:0;
+  const urgentCount=fu?fu.clients.filter(c=>c.urgency==='high').length:0;
+  calHTML+=`<div class="cal-cell ${isToday?'cal-today':''}">
+    <div class="flex items-center justify-between mb-1">
+      <span class="text-xs font-medium ${isToday?'text-blue-400':'text-slate-400'}">${days[i]} ${d.getDate()}日</span>
+      ${count>0?`<span class="cal-badge ${urgentCount>0?'bg-red-500/20 text-red-400':'bg-blue-500/20 text-blue-400'}">${count}</span>`:''}
+    </div>`;
+  if(fu){
+    fu.clients.forEach(c=>{
+      const uColor={high:'text-red-400',medium:'text-amber-400',low:'text-slate-500'};
+      calHTML+=`<div class="text-xs mb-0.5 flex items-center gap-1"><span class="${uColor[c.urgency]}">●</span><span class="text-slate-300">${c.name}</span><span class="text-slate-600">· ${c.stage}</span></div>`;
+    });
+  }else{
+    calHTML+=`<div class="text-xs text-slate-600">无跟进任务</div>`;
+  }
+  calHTML+=`</div>`;
+}
+calHTML+='</div>';
+cg.innerHTML=calHTML;
+
+// Quote demo
+let quoteRunning=false;
+function runQuoteDemo(){
+  if(quoteRunning)return;quoteRunning=true;
+  const btn=document.getElementById('btn-gen');btn.disabled=true;btn.textContent='⏳ 生成中...';
+  const steps=['step-1','step-2','step-3','step-4','step-5'];
+  const labels=['正在匹配客户...','选择产品 HDMI 2.1 8K...','计算价格 $4.15/pc × 5000...','生成 PDF 报价单...','同步 OKKI 跟进记录...'];
+  const prog=document.getElementById('quote-progress');
+  const status=document.getElementById('quote-status');
+  let i=0;
+  function next(){
+    if(i>=steps.length){
+      prog.style.width='100%';
+      status.innerHTML='<span class="text-green-400">✅ QT-20260401-003.pdf 已生成！报价单 + OKKI 记录已同步</span>';
+      btn.textContent='⚡ 一键生成报价单';btn.disabled=false;quoteRunning=false;
+      return;
+    }
+    steps.forEach((s,j)=>{
+      const el=document.getElementById(s);
+      el.querySelector('div').classList.remove('bg-blue-500/30','bg-green-500/30');
+      el.querySelector('div').classList.add('bg-slate-700/50');
+    });
+    const el=document.getElementById(steps[i]);
+    el.querySelector('div').classList.remove('bg-slate-700/50');
+    el.querySelector('div').classList.add('bg-blue-500/30');
+    status.textContent=labels[i];
+    prog.style.width=((i+1)/steps.length*100)+'%';
+    i++;
+    setTimeout(next,800);
+  }
+  next();
+}
+
+// Charts - wait for DOM + Chart.js
+window.addEventListener('load',()=>{
+  // Funnel
+  new Chart(document.getElementById('funnelChart'),{
+    type:'bar',
+    data:{
+      labels:['线索','询盘','报价','样品','订单','回款'],
+      datasets:[{
+        data:[120,85,42,28,18,15],
+        backgroundColor:['rgba(59,130,246,.6)','rgba(59,130,246,.5)','rgba(34,197,94,.5)','rgba(34,197,94,.4)','rgba(168,85,247,.5)','rgba(168,85,247,.4)'],
+        borderRadius:6,barPercentage:.6
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+' 个'}}},
+      scales:{x:{grid:{color:'rgba(148,163,184,.06)'},ticks:{color:'#94a3b8',font:{size:11}}},y:{grid:{display:false},ticks:{color:'#e2e8f0',font:{size:12}}}}
+    }
+  });
+  // Efficiency
+  new Chart(document.getElementById('effChart'),{
+    type:'bar',
+    data:{
+      labels:['邮件处理','报价单','客户跟进'],
+      datasets:[
+        {label:'传统',data:[180,120,60],backgroundColor:'rgba(239,68,68,.4)',borderRadius:6,barPercentage:.5},
+        {label:'AI 自动化',data:[30,5,10],backgroundColor:'rgba(34,197,94,.6)',borderRadius:6,barPercentage:.5}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw+' 分钟/天'}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#e2e8f0',font:{size:11}}},y:{grid:{color:'rgba(148,163,184,.06)'},ticks:{color:'#94a3b8',font:{size:11},callback:v=>v+'min'}}}
+    }
+  });
+});
+</script>
+</body>
+</html>

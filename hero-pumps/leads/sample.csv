@@ -1,0 +1,3 @@
+company,contact_name,email,website,country,industry,source
+Example HVAC GmbH,Hans Mueller,hans@example-hvac.de,https://example-hvac.de,Germany,HVAC Distributor,hunter.io
+Example Plumbing Ltd,John Smith,john@example-plumbing.co.uk,https://example-plumbing.co.uk,United Kingdom,Plumbing Contractor,web-scrape

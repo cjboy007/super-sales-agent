@@ -1,0 +1,169 @@
+{
+  "metadata": {
+    "generated_at": "2026-04-29T07:22:00Z",
+    "input_count": 5,
+    "search_provider": "tavily",
+    "llm_mode": "never",
+    "llm_model": null
+  },
+  "summary": {
+    "fit_counts": {
+      "high": 0,
+      "medium": 0,
+      "low": 5
+    },
+    "scoring_methods": {
+      "llm_batch": 0,
+      "heuristic": 5
+    },
+    "search_error_companies": 5,
+    "llm_errors": []
+  },
+  "results": [
+    {
+      "company_name": "EVROLAN",
+      "email": "gerenski@eurolan.net",
+      "website": "https://eurolan.net",
+      "domain": "eurolan.net",
+      "fit_rating": "low",
+      "quality_score": 0,
+      "confidence": "low",
+      "summary": "No useful web evidence found; rated low by heuristic.",
+      "evidence_urls": [],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "low",
+        "score": -10,
+        "reasons": [
+          "-10:no-search-results"
+        ]
+      },
+      "queries": [
+        "\"EVROLAN\" company products distributor cable electronics",
+        "EVROLAN HDMI USB cable distributor"
+      ],
+      "search_results": [],
+      "errors": [
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}",
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}"
+      ],
+      "extra": {}
+    },
+    {
+      "company_name": "ALTACOM TELECOMUNICAÇÕES",
+      "email": "contato@altacom.com.br",
+      "website": "https://altacom.com.br",
+      "domain": "altacom.com.br",
+      "fit_rating": "low",
+      "quality_score": 0,
+      "confidence": "low",
+      "summary": "No useful web evidence found; rated low by heuristic.",
+      "evidence_urls": [],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "low",
+        "score": -10,
+        "reasons": [
+          "-10:no-search-results"
+        ]
+      },
+      "queries": [
+        "\"ALTACOM TELECOMUNICAÇÕES\" company products distributor cable electronics",
+        "ALTACOM TELECOMUNICAÇÕES HDMI USB cable distributor"
+      ],
+      "search_results": [],
+      "errors": [
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}",
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}"
+      ],
+      "extra": {}
+    },
+    {
+      "company_name": "AFRASTELECOM",
+      "email": "afras@afrastelecom.com.br",
+      "website": "https://afrastelecom.com.br",
+      "domain": "afrastelecom.com.br",
+      "fit_rating": "low",
+      "quality_score": 0,
+      "confidence": "low",
+      "summary": "No useful web evidence found; rated low by heuristic.",
+      "evidence_urls": [],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "low",
+        "score": -10,
+        "reasons": [
+          "-10:no-search-results"
+        ]
+      },
+      "queries": [
+        "\"AFRASTELECOM\" company products distributor cable electronics",
+        "AFRASTELECOM HDMI USB cable distributor"
+      ],
+      "search_results": [],
+      "errors": [
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}",
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}"
+      ],
+      "extra": {}
+    },
+    {
+      "company_name": "GOOD 42 IT-SOLUTIONS",
+      "email": "bestellung@good42.de",
+      "website": "https://good42.de",
+      "domain": "good42.de",
+      "fit_rating": "low",
+      "quality_score": 0,
+      "confidence": "low",
+      "summary": "No useful web evidence found; rated low by heuristic.",
+      "evidence_urls": [],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "low",
+        "score": -10,
+        "reasons": [
+          "-10:no-search-results"
+        ]
+      },
+      "queries": [
+        "\"GOOD 42 IT-SOLUTIONS\" company products distributor cable electronics",
+        "GOOD 42 IT-SOLUTIONS HDMI USB cable distributor"
+      ],
+      "search_results": [],
+      "errors": [
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}",
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}"
+      ],
+      "extra": {}
+    },
+    {
+      "company_name": "X-GEN NETWORKS",
+      "email": "partners@x-gennetworks.com.au",
+      "website": "https://x-gennetworks.com.au",
+      "domain": "x-gennetworks.com.au",
+      "fit_rating": "low",
+      "quality_score": 0,
+      "confidence": "low",
+      "summary": "No useful web evidence found; rated low by heuristic.",
+      "evidence_urls": [],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "low",
+        "score": -10,
+        "reasons": [
+          "-10:no-search-results"
+        ]
+      },
+      "queries": [
+        "\"X-GEN NETWORKS\" company products distributor cable electronics",
+        "X-GEN NETWORKS HDMI USB cable distributor"
+      ],
+      "search_results": [],
+      "errors": [
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}",
+        "HTTP 432: {\"detail\":{\"error\":\"This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com\"}}"
+      ],
+      "extra": {}
+    }
+  ]
+}

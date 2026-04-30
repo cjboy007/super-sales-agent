@@ -1,0 +1,45 @@
+{
+  "company": "Termovent",
+  "country": "塞尔维亚",
+  "website": "termovent.rs",
+  "tier": "Tier3",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Aleksandra Tomic",
+      "email": "aleksandra.tomic@termovent.rs",
+      "position": "Senior HR Business Partner"
+    },
+    {
+      "name": "Stevan Miric",
+      "email": "stevan.miric@termovent.rs",
+      "position": "Chief Executive Officer"
+    },
+    {
+      "name": "Ivan Jankovic",
+      "email": "ivan.jankovic@termovent.rs",
+      "position": "Head Of Kladovo Plant"
+    },
+    {
+      "name": "Dragan Spasojevic",
+      "email": "dragan.spasojevic@termovent.rs",
+      "position": "Director of Research and Development"
+    },
+    {
+      "name": "Katarina Mijucić",
+      "email": "katarina.mijucic@termovent.rs",
+      "position": "Business Intelligence Analyst"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:31.894392+00:00",
+    "query": "Termovent 塞尔维亚 HVAC pump distributor manufacturer",
+    "summary": "Manufacturer based in Belgrade and Kladovo in Serbia https://termovent. com/en/about-termovent/ Main products of company Termovent are: manufacturing of Air Handling Units (HVAC equipment), Clean Rooms and service Engineering.",
+    "sources": [
+      "https://termovent.com/en/about-termovent/",
+      "https://www.coolingpost.com/world-news/arbonia-to-buy-serbian-manufacturer-termovent/",
+      "https://www.linkedin.com/company/grupa-termovent-sp-z-o-o"
+    ]
+  },
+  "outreach_notes": "该公司为Tier3目标。先建立初步联系，了解其采购需求和现有供应商情况。"
+}

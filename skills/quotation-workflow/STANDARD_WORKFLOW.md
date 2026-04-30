@@ -27,10 +27,10 @@
 ### 方式 1：一键生成（最简单 ⭐）
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/quotation-workflow
+cd /path/to/your/.openclaw/workspace/skills/quotation-workflow
 
 # 一键生成所有格式
-./scripts/generate-all.sh examples/farreach_sample.json QT-20260314-001
+./scripts/generate-all.sh examples/your-company_sample.json QT-20260314-001
 ```
 
 **生成文件：**
@@ -46,7 +46,7 @@ cd /Users/wilson/.openclaw/workspace/skills/quotation-workflow
 
 ```bash
 # 1. 准备数据
-cp examples/farreach_sample.json my_quotation.json
+cp examples/your-company_sample.json my_quotation.json
 
 # 2. 生成 HTML
 python3 scripts/generate_quotation_html.py \
@@ -93,11 +93,11 @@ python3 scripts/generate_quotation_html.py \
 
 ```json
 {
-  "company_name": "Farreach Electronic Co., Ltd.",
+  "company_name": "Your Company Name, Ltd.",
   "company_tagline": "Premium Connectivity Solutions",
   "company_address": "No. 123, Technology Road, Zhuhai, Guangdong, China",
-  "company_email": "your-email",
-  "company_website": "www.farreach-electronic.com",
+  "company_email": "sale@your-domain.com",
+  "company_website": "www.your-domain.com",
   "customer": {
     "company_name": "Best Buy Electronics Inc.",
     "contact": "Michael Johnson",
@@ -125,7 +125,7 @@ python3 scripts/generate_quotation_html.py \
   "payment_terms": "T/T 30% deposit, 70% before shipment",
   "freight": 350.00,
   "bank_info": {
-    "beneficiary": "Farreach Electronic Co., Ltd.",
+    "beneficiary": "Your Company Name, Ltd.",
     "bank_name": "Standard Chartered Bank",
     "account_no": "1234 5678 9012",
     "swift_code": "SCBLHKHH"

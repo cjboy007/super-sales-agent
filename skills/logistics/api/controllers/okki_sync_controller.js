@@ -10,13 +10,13 @@ const path = require('path');
 // ==================== 配置 ====================
 const CONFIG = {
   // OKKI CLI 路径
-  okkiCliPath: '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_cli.py',
+  okkiCliPath: '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki_cli.py',
   
   // OKKI Python 客户端路径
-  okkiClientPath: '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_client.py',
+  okkiClientPath: '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki_client.py',
   
   // 物流模块路径（用于通过订单号查找客户）
-  logisticsModulePath: '/Users/wilson/.openclaw/workspace/skills/logistics',
+  logisticsModulePath: '/path/to/your/.openclaw/workspace/skills/logistics',
   
   // Trail 类型
   TRAIL_TYPE: {
@@ -231,7 +231,7 @@ async function createShippingTrailViaPython(companyId, logisticsData) {
     // 创建临时 Python 脚本调用 OKKI 客户端
     const tempScript = `
 import sys
-sys.path.insert(0, '/Users/wilson/.openclaw/workspace/xiaoman-okki/api')
+sys.path.insert(0, '/path/to/your/.openclaw/workspace/xiaoman-okki/api')
 from okki_client import OKKIClient
 import json
 

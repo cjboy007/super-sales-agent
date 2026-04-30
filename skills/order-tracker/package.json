@@ -1,7 +1,7 @@
 {
   "name": "order-tracker-skill",
   "version": "1.0.0",
-  "description": "Order tracking and management skill for Farreach Electronic",
+  "description": "Order tracking and management skill for Your Company",
   "main": "scripts/update-order-status.js",
   "scripts": {
     "update-status": "node scripts/update-order-status.js",
@@ -17,6 +17,6 @@
     "management",
     "skill"
   ],
-  "author": "Farreach Electronic",
+  "author": "Your Company",
   "license": "MIT"
 }

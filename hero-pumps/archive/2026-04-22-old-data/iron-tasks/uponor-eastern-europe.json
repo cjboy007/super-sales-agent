@@ -1,0 +1,57 @@
+{
+  "company": "Uponor Eastern Europe",
+  "country": "区域",
+  "contacts": [
+    {
+      "name": "Tim Botten",
+      "email": "tim.botten@uponor.com",
+      "position": "Manager"
+    },
+    {
+      "name": "Terje Andersen",
+      "email": "terje.andersen@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "Mary Armbruster",
+      "email": "mary.armbruster@uponor.com",
+      "position": "Public Works"
+    },
+    {
+      "name": "James Griffiths",
+      "email": "james.griffiths@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "Gabor Bernath",
+      "email": "gabor.bernath@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "Krisztina Pap",
+      "email": "krisztina.pap@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "Richard Prate",
+      "email": "richard.prate@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "David Keller",
+      "email": "david.keller@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "Gretchen Desutter",
+      "email": "gretchen.desutter@uponor.com",
+      "position": ""
+    },
+    {
+      "name": "Zoltan Jonas",
+      "email": "zoltan.jonas@uponor.com",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Uponor Eastern Europe 写开发信。\n\n## 公司背景\n- **公司：** Uponor Eastern Europe（区域）\n- **网站：** uponor.com\n- **行业：** HVAC\n- **调研：** Uponor Oyj is a Finnish company specializing in plumbing, radiant heating/cooling, and indoor climate solutions for residential and commercial buildings. Listed on Helsinki Stock Exchange. Products so\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Tim Botten | tim.botten@uponor.com | Manager\n2. Tim Botten | tim.botten@uponor.com | Manager\n3. Terje Andersen | terje.andersen@uponor.com | N/A\n4. Mary Armbruster | mary.armbruster@uponor.com | Public Works\n5. James Griffiths | james.griffiths@uponor.com | N/A\n6. Gabor Bernath | gabor.bernath@uponor.com | N/A\n7. Krisztina Pap | krisztina.pap@uponor.com | N/A\n8. Richard Prate | richard.prate@uponor.com | N/A\n9. David Keller | david.keller@uponor.com | N/A\n10. Gretchen Desutter | gretchen.desutter@uponor.com | N/A\n11. Zoltan Jonas | zoltan.jonas@uponor.com | N/A\n12. Terje Andersen | terje.andersen@uponor.com | N/A\n13. Mary Armbruster | mary.armbruster@uponor.com | Public Works\n14. James Griffiths | james.griffiths@uponor.com | N/A\n15. Gabor Bernath | gabor.bernath@uponor.com | N/A\n16. Krisztina Pap | krisztina.pap@uponor.com | N/A\n17. Richard Prate | richard.prate@uponor.com | N/A\n18. David Keller | david.keller@uponor.com | N/A\n19. Gretchen Desutter | gretchen.desutter@uponor.com | N/A\n20. Zoltan Jonas | zoltan.jonas@uponor.com | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

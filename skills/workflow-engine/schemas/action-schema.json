@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema#",
+  "$id": "https://super-sales-agent/workflow-engine/schemas/action-schema.json",
+  "title": "Workflow Engine Action Schema",
+  "description": "动作类型定义 - 支持 8 种核心动作",
+  "type": "object",
+  "required": ["type", "config"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "send_email",
+        "create_okki_trail",
+        "generate_quotation",
+        "update_customer",
+        "call_api",
+        "wait",
+        "branch",
+        "loop"
+      ],
+      "description": "动作类型标识符"
+    },
+    "config": {
+      "type": "object",
+      "description": "动作配置参数",
+      "additionalProperties": true
+    },
+    "retry_policy": {
+      "type": "object",
+      "properties": {
+        "max_retries": {"type": "integer", "minimum": 0, "default": 3},
+        "delay_seconds": {"type": "integer", "minimum": 0, "default": 60},
+        "backoff_multiplier": {"type": "number", "minimum": 1, "default": 2}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Send Email",
+      "properties": {
+        "type": {"const": "send_email"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "to": {"type": "string"},
+            "cc": {"type": "string"},
+            "template": {"type": "string"},
+            "variables": {"type": "object"},
+            "attachments": {"type": "array"}
+          },
+          "required": ["to", "template"]
+        }
+      }
+    },
+    {
+      "title": "Create OKKI Trail",
+      "properties": {
+        "type": {"const": "create_okki_trail"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "customer_id": {"type": "string"},
+            "trail_type": {"type": "integer"},
+            "content": {"type": "string"},
+            "attachments": {"type": "array"}
+          },
+          "required": ["customer_id", "trail_type", "content"]
+        }
+      }
+    },
+    {
+      "title": "Generate Quotation",
+      "properties": {
+        "type": {"const": "generate_quotation"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "customer_id": {"type": "string"},
+            "template": {"type": "string"},
+            "items": {"type": "array"},
+            "pricing_rules": {"type": "object"}
+          },
+          "required": ["customer_id", "template"]
+        }
+      }
+    },
+    {
+      "title": "Update Customer",
+      "properties": {
+        "type": {"const": "update_customer"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "customer_id": {"type": "string"},
+            "fields": {"type": "object"},
+            "merge_strategy": {"type": "string", "enum": ["overwrite", "merge"], "default": "merge"}
+          },
+          "required": ["customer_id", "fields"]
+        }
+      }
+    },
+    {
+      "title": "Call API",
+      "properties": {
+        "type": {"const": "call_api"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "url": {"type": "string", "format": "uri"},
+            "method": {"type": "string", "enum": ["GET", "POST", "PUT", "DELETE"], "default": "GET"},
+            "headers": {"type": "object"},
+            "body": {"type": "object"},
+            "timeout": {"type": "integer", "minimum": 1000, "default": 30000}
+          },
+          "required": ["url"]
+        }
+      }
+    },
+    {
+      "title": "Wait",
+      "properties": {
+        "type": {"const": "wait"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "duration_minutes": {"type": "integer", "minimum": 1},
+            "until_condition": {"type": "string"}
+          }
+        }
+      }
+    },
+    {
+      "title": "Branch",
+      "properties": {
+        "type": {"const": "branch"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "condition": {"type": "string"},
+            "true_actions": {"type": "array", "items": {"$ref": "#"}},
+            "false_actions": {"type": "array", "items": {"$ref": "#"}}
+          },
+          "required": ["condition", "true_actions"]
+        }
+      }
+    },
+    {
+      "title": "Loop",
+      "properties": {
+        "type": {"const": "loop"},
+        "config": {
+          "type": "object",
+          "properties": {
+            "items": {"type": "array"},
+            "action": {"$ref": "#"},
+            "max_iterations": {"type": "integer", "minimum": 1, "default": 100}
+          },
+          "required": ["items", "action"]
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

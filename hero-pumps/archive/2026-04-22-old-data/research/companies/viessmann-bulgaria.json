@@ -1,0 +1,25 @@
+{
+  "company": "Viessmann Bulgaria",
+  "country": "保加利亚",
+  "website": "viessmann.bg",
+  "tier": "Tier3",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "info-bg@viessmann.bg",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:46.842152+00:00",
+    "query": "Viessmann Bulgaria 保加利亚 HVAC pump distributor manufacturer",
+    "summary": "Viessmann | Bgbc https://www. bg/viessmann Viessmann is one of the leading international manufacturers of heating, industrial and refrigeration systems. We have a strong international outlook, 2. Viessmann in Sofia - information, contacts and products http://btcatalogue.",
+    "sources": [
+      "https://www.bgbc.bg/viessmann",
+      "http://btcatalogue.bg/katalog-firmieng.aspx?comp=1273&city=Sofia&n=viessmann",
+      "https://www.viessmann-climatesolutions.com/en.html"
+    ]
+  },
+  "outreach_notes": "该公司为Tier3目标。先建立初步联系，了解其采购需求和现有供应商情况。"
+}

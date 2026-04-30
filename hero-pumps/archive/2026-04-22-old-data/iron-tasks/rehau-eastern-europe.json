@@ -1,0 +1,52 @@
+{
+  "company": "REHAU Eastern Europe",
+  "country": "区域",
+  "contacts": [
+    {
+      "name": "Morne Smuts",
+      "email": "morne.smuts@rehau.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Boris Muntyan",
+      "email": "boris.muntyan@rehau.com",
+      "position": "Deputy Director of Sales"
+    },
+    {
+      "name": "Michael Stocker",
+      "email": "michael.stocker@rehau.com",
+      "position": "Head of Product"
+    },
+    {
+      "name": "Fabian Leppert",
+      "email": "fabian.leppert@rehau.com",
+      "position": "Infrastructure Director"
+    },
+    {
+      "name": "Thomas Graf",
+      "email": "thomas.graf@rehau.com",
+      "position": "Executive Director"
+    },
+    {
+      "name": "Joaquim Moreira",
+      "email": "joaquim.moreira@rehau.com",
+      "position": "Commercial Director"
+    },
+    {
+      "name": "Jan Hoppe",
+      "email": "jan.hoppe@rehau.com",
+      "position": "Head of Supply Chain Management"
+    },
+    {
+      "name": "Iris Kaiser",
+      "email": "iris.kaiser@rehau.com",
+      "position": "Head of E-Commerce"
+    },
+    {
+      "name": "Manuel Sureda",
+      "email": "manuel.sureda@rehau.com",
+      "position": "Chairman"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 REHAU Eastern Europe 写开发信。\n\n## 公司背景\n- **公司：** REHAU Eastern Europe（区域）\n- **网站：** rehau.com\n- **行业：** HVAC\n- **调研：** REHAU Industrial Solutions  com/en-en REHAU Industrial Solutions. Our partners are as diverse as the industries we serve with our systems and solutions. Famous international manufacturers value us for\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Morne Smuts | morne.smuts@rehau.com | Sales Director\n2. Boris Muntyan | boris.muntyan@rehau.com | Deputy Director of Sales\n3. Morne Smuts | morne.smuts@rehau.com | Sales Director\n4. Boris Muntyan | boris.muntyan@rehau.com | Deputy Director of Sales\n5. Michael Stocker | michael.stocker@rehau.com | Head of Product\n6. Michael Stocker | michael.stocker@rehau.com | Head of Product\n7. Fabian Leppert | fabian.leppert@rehau.com | Infrastructure Director\n8. Thomas Graf | thomas.graf@rehau.com | Executive Director\n9. Joaquim Moreira | joaquim.moreira@rehau.com | Commercial Director\n10. Fabian Leppert | fabian.leppert@rehau.com | Infrastructure Director\n11. Thomas Graf | thomas.graf@rehau.com | Executive Director\n12. Joaquim Moreira | joaquim.moreira@rehau.com | Commercial Director\n13. Jan Hoppe | jan.hoppe@rehau.com | Head of Supply Chain Management\n14. Iris Kaiser | iris.kaiser@rehau.com | Head of E-Commerce\n15. Jan Hoppe | jan.hoppe@rehau.com | Head of Supply Chain Management\n16. Iris Kaiser | iris.kaiser@rehau.com | Head of E-Commerce\n17. Pravin Jadhav | pravin.jadhav@rehau.com | Finance Executive\n18. Manuel Sureda | manuel.sureda@rehau.com | Chairman\n19. Pravin Jadhav | pravin.jadhav@rehau.com | Finance Executive\n20. Manuel Sureda | manuel.sureda@rehau.com | Chairman\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

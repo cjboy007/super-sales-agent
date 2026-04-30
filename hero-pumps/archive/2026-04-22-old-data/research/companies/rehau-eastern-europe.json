@@ -1,0 +1,45 @@
+{
+  "company": "REHAU Eastern Europe",
+  "country": "区域",
+  "website": "rehau.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Morne Smuts",
+      "email": "morne.smuts@rehau.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Boris Muntyan",
+      "email": "boris.muntyan@rehau.com",
+      "position": "Deputy Director of Sales"
+    },
+    {
+      "name": "Fabian Leppert",
+      "email": "fabian.leppert@rehau.com",
+      "position": "Infrastructure Director"
+    },
+    {
+      "name": "Michael Stocker",
+      "email": "michael.stocker@rehau.com",
+      "position": "Head of Product"
+    },
+    {
+      "name": "Jan Hoppe",
+      "email": "jan.hoppe@rehau.com",
+      "position": "Head of Supply Chain Management"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:16.941097+00:00",
+    "query": "REHAU Eastern Europe Europe HVAC pump distributor manufacturer",
+    "summary": "REHAU Industrial Solutions https://industrial. com/en-en REHAU Industrial Solutions. Our partners are as diverse as the industries we serve with our systems and solutions. Famous international manufacturers value us for our focus on innovation, reliability and customer satisfaction.",
+    "sources": [
+      "https://industrial.rehau.com/en-en",
+      "https://www.rehau.com/id-en/radiant-heating-cooling",
+      "https://industrial.rehau.com/en-en/about-us"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}
