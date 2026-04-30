@@ -8,7 +8,7 @@
 ## 📁 一键生成所有文件
 
 ```bash
-./generate-all.sh farreach_sample.json QT-20260314-001
+./generate-all.sh your-company_sample.json QT-20260314-001
 ```
 
 **生成文件：**
@@ -61,10 +61,10 @@ QT-20260314-001-Excel.pdf     (161KB)   PDF（Excel 导出，备用）
 ### 方式 1：一键生成（推荐）
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/quotation-workflow
+cd /path/to/your/.openclaw/workspace/skills/quotation-workflow
 
 # 生成所有格式
-./scripts/generate-all.sh examples/farreach_sample.json QT-20260314-001
+./scripts/generate-all.sh examples/your-company_sample.json QT-20260314-001
 
 # 完成！5 个文件全部生成
 ```
@@ -74,7 +74,7 @@ cd /Users/wilson/.openclaw/workspace/skills/quotation-workflow
 ```bash
 # 生成 HTML
 python3 scripts/generate_quotation_html.py \
-  --data examples/farreach_sample.json \
+  --data examples/your-company_sample.json \
   --output examples/QT-001.html
 
 # 导出 PDF
@@ -86,7 +86,7 @@ python3 scripts/generate_quotation_html.py \
 ```bash
 # 生成 Excel
 python3 ../excel-xlsx/scripts/generate_quotation_traditional.py \
-  --data examples/farreach_sample.json \
+  --data examples/your-company_sample.json \
   --output examples/QT-001.xlsx
 
 # 导出 PDF
@@ -146,7 +146,7 @@ soffice --headless --convert-to pdf examples/QT-001.xlsx
 ## 📧 发送邮件示例
 
 ```
-Subject: Quotation QT-20260314-001 - Farreach Electronic
+Subject: Quotation QT-20260314-001 - Your Company
 
 Dear [Customer Name],
 
@@ -168,9 +168,9 @@ Should you need any clarification, please feel free to contact us.
 Best regards,
 [Your Name]
 Sales Manager
-Farreach Electronic Co., Ltd.
-📧 your-email
-🌐 www.farreach-electronic.com
+Your Company Name, Ltd.
+📧 sale@your-domain.com
+🌐 www.your-domain.com
 ```
 
 **附件：** `QT-20260314-001-HTML.pdf` ⭐

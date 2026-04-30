@@ -1,0 +1,21 @@
+{
+  "company": "Bosch Thermotechnology",
+  "country": "区域",
+  "website": "bosch-thermotechnology.com",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "info",
+      "email": "info@bosch-thermotechnology.com",
+      "position": "General Inquiry（请转采购）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Bosch Thermotechnology procurement purchasing manager",
+    "summary": "Bosch Thermotechnology 是 Bosch 集团暖通部门，全球性大企业。采购体系可能集中化，通用邮箱效率较低。",
+    "sources": []
+  },
+  "outreach_notes": "Bosch 暖通部门，全球大企业。通用邮箱，邮件中请转交采购负责人。"
+}

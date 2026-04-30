@@ -1,0 +1,23 @@
+{
+  "company": "Stiebel Eltron Slovakia",
+  "country": "斯洛伐克",
+  "website": "stiebel-eltron.sk",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Ondrej Tabák",
+      "email": "ondrej.tabak@stiebel-eltron.sk",
+      "position": "Process Engineer - Welding Technologies"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Stiebel Eltron Slovakia heat pump manufacturer",
+    "summary": "Stiebel Eltron 是德国热泵/电热水器制造商，在斯洛伐克设有工厂。Ondrej Tabák 是焊接工艺工程师，负责生产工艺。",
+    "sources": [
+      "https://sk.linkedin.com/in/ondrej-tabák-011663b4"
+    ]
+  },
+  "outreach_notes": "德国热泵/电热水器制造商，斯洛伐克有工厂。Ondrej 是工艺工程师，切入点：热泵产线配套泵组件适配。"
+}

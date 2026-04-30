@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://farreach.local/schemas/order.json",
+  "$id": "https://your-company.local/schemas/order.json",
   "title": "订单数据模型 (Order Data Schema)",
   "description": "本地订单跟踪系统的数据结构定义，用于 task-005 订单管理模块",
   "type": "object",

@@ -1,0 +1,130 @@
+[
+  {
+    "id": "vip-customer-created",
+    "name": "VIP 客户创建通知",
+    "description": "当创建 VIP 等级客户时，自动通知销售总监",
+    "priority": 80,
+    "enabled": true,
+    "trigger": {
+      "event_type": "customer_created",
+      "conditions": {
+        "type": "all",
+        "checks": [
+          {
+            "field": "payload.tier",
+            "operator": "equals",
+            "value": "vip"
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "type": "send_email",
+        "config": {
+          "to": "sales-director@your-domain.com",
+          "template": "vip-customer-notify",
+          "variables": {
+            "customer_name": "${payload.name}",
+            "company": "${payload.company}",
+            "email": "${payload.email}"
+          }
+        }
+      },
+      {
+        "type": "update_customer",
+        "config": {
+          "customer_id": "${payload.customer_id}",
+          "fields": {
+            "tags": ["vip", "priority"],
+            "priority_level": 1
+          },
+          "merge_strategy": "merge"
+        }
+      }
+    ]
+  },
+  {
+    "id": "customer-dormant-reminder",
+    "name": "休眠客户提醒",
+    "description": "当客户超过 30 天未联系时，创建跟进提醒",
+    "priority": 60,
+    "enabled": true,
+    "trigger": {
+      "event_type": "trail_created",
+      "conditions": {
+        "type": "all",
+        "checks": [
+          {
+            "field": "daysSince(payload.customer.last_contact)",
+            "operator": "greater_than",
+            "value": 30
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "type": "create_okki_trail",
+        "config": {
+          "customer_id": "${payload.customer_id}",
+          "trail_type": 105,
+          "content": "⏰ 客户已超过 30 天未联系，建议主动跟进"
+        }
+      },
+      {
+        "type": "send_email",
+        "config": {
+          "to": "${payload.sales_email}",
+          "template": "dormant-customer-reminder",
+          "variables": {
+            "customer_name": "${payload.customer.name}",
+            "days_since_contact": "30+"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "high-value-order-alert",
+    "name": "大额订单告警",
+    "description": "当订单金额超过 10 万时，通知财务和销售总监",
+    "priority": 85,
+    "enabled": true,
+    "trigger": {
+      "event_type": "order_updated",
+      "conditions": {
+        "type": "all",
+        "checks": [
+          {
+            "field": "payload.amount",
+            "operator": "greater_than",
+            "value": 100000
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "type": "send_email",
+        "config": {
+          "to": "finance@your-domain.com,sales-director@your-domain.com",
+          "template": "high-value-order-alert",
+          "variables": {
+            "order_id": "${payload.order_id}",
+            "amount": "${payload.amount}",
+            "customer_name": "${payload.customer.name}"
+          }
+        }
+      },
+      {
+        "type": "create_okki_trail",
+        "config": {
+          "customer_id": "${payload.customer_id}",
+          "trail_type": 104,
+          "content": "💰 大额订单（$" + "${payload.amount}" + "），需要重点关注"
+        }
+      }
+    ]
+  }
+]

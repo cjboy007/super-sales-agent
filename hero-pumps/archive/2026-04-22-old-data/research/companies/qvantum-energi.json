@@ -1,0 +1,45 @@
+{
+  "company": "Qvantum Energi",
+  "country": "区域",
+  "website": "qvantum.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Anette Leijonberg",
+      "email": "anette.leijonberg@qvantum.com",
+      "position": "Director of Finance"
+    },
+    {
+      "name": "Lina Simonsson",
+      "email": "lina.simonsson@qvantum.com",
+      "position": "Marketing Director"
+    },
+    {
+      "name": "Thomas Nowak",
+      "email": "thomas.nowak@qvantum.com",
+      "position": "Vice President of Government Relations"
+    },
+    {
+      "name": "Lars Bierlein",
+      "email": "lars.bierlein@qvantum.com",
+      "position": "Director of New Markets"
+    },
+    {
+      "name": "Eleonor Green",
+      "email": "eleonor.green@qvantum.com",
+      "position": "ERP Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:11.982723+00:00",
+    "query": "Qvantum Energi Europe HVAC pump distributor manufacturer",
+    "summary": "New distributors in Czech Republic, Spain and Portugal - Qvantum https://www. qvantum. com/new-distributors-in-czech-republic-spain-and-portugal/ Swedish heat pump manufacturer Qvantum is rapidly expanding its distribution network with new distributors in Czechia, Spain and Portugal.",
+    "sources": [
+      "https://www.qvantum.com/new-distributors-in-czech-republic-spain-and-portugal/",
+      "https://www.qvantum.com/qvantum-goes-south/",
+      "https://www.qvantum.com/about/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

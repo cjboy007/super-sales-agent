@@ -14,11 +14,19 @@ const path = require('path');
 const { execFile } = require('child_process');
 
 // 配置
-const CONFIG_PATH = path.join(__dirname, '..', 'config', 'discord-config.json');
-const DRAFTS_DIR = process.env.DRAFTS_DIR || path.join(__dirname, '..', 'drafts');
+const CONFIG_PATH = path.join(__dirname, 'config', 'discord-config.json');
+const DRAFTS_DIR = path.join(__dirname, 'drafts');
+const ENV_PATH = path.join(__dirname, '..', '..', '.env');
 
 // 加载 Discord Bot Token
 function loadDiscordToken() {
+  if (fs.existsSync(ENV_PATH)) {
+    const envContent = fs.readFileSync(ENV_PATH, 'utf8');
+    const match = envContent.match(/^DISCORD_BOT_TOKEN=(.+)$/m);
+    if (match) {
+      return match[1].trim();
+    }
+  }
   return process.env.DISCORD_BOT_TOKEN;
 }
 
@@ -476,7 +484,7 @@ We offer a wide range of HDMI solutions including:
 Please let us know your specific requirements (length, quantity, connector type) so we can provide an accurate quotation.
 
 Best regards,
-Farreach Electronic Team`,
+Your Company Team`,
     wordCount: 67,
     created_at: new Date().toISOString()
   };

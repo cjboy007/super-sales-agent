@@ -47,7 +47,7 @@ def create_quotation_excel(output_path, data=None):
     # ============ 第 1 部分：标题 ============
     # 合并 A1:D1 - 公司名
     ws.merge_cells('A1:D1')
-    ws['A1'] = company.get('company_name', 'Farreach Electronic Co., Ltd.')
+    ws['A1'] = company.get('company_name', 'Your Company Name, Ltd.')
     ws['A1'].font = Font(bold=True, size=18)
     ws['A1'].alignment = Alignment(horizontal='center')
     
@@ -253,7 +253,7 @@ def create_quotation_excel(output_path, data=None):
     
     bank_info = company.get('bank_info', {})
     bank_data = [
-        ('Beneficiary:', bank_info.get('beneficiary', 'Farreach Electronic Co., Ltd.')),
+        ('Beneficiary:', bank_info.get('beneficiary', 'Your Company Name, Ltd.')),
         ('Bank Name:', bank_info.get('bank_name', 'Standard Chartered Bank')),
         ('Account No:', bank_info.get('account_no', '1234 5678 9012')),
         ('SWIFT Code:', bank_info.get('swift_code', 'SCBLHKHH'))
@@ -313,7 +313,7 @@ def main():
                 data = json.load(f)
         elif args.quick_test:
             data = {
-                'company_name': 'Farreach Electronic Co., Ltd.',
+                'company_name': 'Your Company Name, Ltd.',
                 'company_tagline': 'Premium Connectivity Solutions',
                 'customer': {
                     'company_name': 'Best Buy Electronics Inc.',
@@ -344,7 +344,7 @@ def main():
                 'lead_time': '15-20 days',
                 'freight': 350.00,
                 'bank_info': {
-                    'beneficiary': 'Farreach Electronic Co., Ltd.',
+                    'beneficiary': 'Your Company Name, Ltd.',
                     'bank_name': 'Standard Chartered Bank',
                     'account_no': '1234 5678 9012',
                     'swift_code': 'SCBLHKHH'

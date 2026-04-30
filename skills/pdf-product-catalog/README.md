@@ -15,10 +15,10 @@ pip3 install docling openpyxl
 ### 2. 运行提取
 
 ```bash
-cd /Users/wilson/.openclaw/workspace
+cd /path/to/your/.openclaw/workspace
 
 python3 skills/pdf-product-catalog/scripts/extract.py \
-  --pdf-dir "/Users/wilson/Library/CloudStorage/GoogleDrive-your-email@gmail.com/我的云端硬盘/Job/产品资料/599" \
+  --pdf-dir "/path/to/your/Library/CloudStorage/GoogleDrive-cjboy0756@gmail.com/我的云端硬盘/Job/产品资料/599" \
   --output-dir "./knowledge-base/客户/599" \
   --verbose
 ```

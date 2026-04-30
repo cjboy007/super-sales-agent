@@ -109,7 +109,8 @@ function scanOKKICustomers() {
       last_contact_date: '2026-03-20',
       follow_up_count: 0,
       owner: 'wilson',
-      product_interest: 'HDMI Cable'
+      product_interest: 'HDMI Cable',
+      last_email_subject: 'HDMI Cable Inquiry - Your Company'
     },
     {
       id: 'okki_002',
@@ -120,7 +121,8 @@ function scanOKKICustomers() {
       follow_up_count: 1,
       owner: 'wilson',
       quote_number: 'QT-2026-0042',
-      product_interest: 'DP Cable'
+      product_interest: 'DP Cable',
+      last_email_subject: 'Quotation QT-2026-0042 - Your Company'
     },
     {
       id: 'okki_003',
@@ -131,7 +133,8 @@ function scanOKKICustomers() {
       follow_up_count: 0,
       owner: 'wilson',
       tracking_number: 'SF1234567890',
-      product_interest: 'USB-C Cable'
+      product_interest: 'USB-C Cable',
+      last_email_subject: 'Sample Shipped (Tracking: SF1234567890) - Your Company'
     }
   ];
   
@@ -139,13 +142,53 @@ function scanOKKICustomers() {
   return mockCustomers;
 }
 
+// 根据客户阶段和上下文生成跟进邮件主题
+// 核心原则：Follow-up 邮件使用 Re: [原主题] 保持邮件线程连续
+function generateFollowUpSubject(customer, template) {
+  // 优先使用客户记录的原始邮件主题（last_email_subject）
+  const originalSubject = customer.last_email_subject || '';
+  
+  if (originalSubject) {
+    // 如果已经有原始主题，确保只加一次 Re: 前缀
+    if (originalSubject.startsWith('Re:') || originalSubject.startsWith('Re ')) {
+      return originalSubject;
+    }
+    return `Re: ${originalSubject}`;
+  }
+  
+  // 没有原始主题时，根据阶段和模板意图生成合理的主题
+  const productName = customer.product_interest || 'our products';
+  const companyName = customer.name;
+  
+  switch (customer.stage) {
+    case 'new_inquiry':
+      return `Re: Your Inquiry about ${productName} - Your Company`;
+    case 'quoted':
+      return customer.quote_number
+        ? `Re: Quotation ${customer.quote_number} - Your Company`
+        : `Re: Your ${productName} Quotation - Your Company`;
+    case 'sample_sent':
+      return customer.tracking_number
+        ? `Re: Sample Shipped (Tracking: ${customer.tracking_number}) - Your Company`
+        : `Re: Sample ${productName} for ${companyName} - Your Company`;
+    case 'order_confirmed':
+      return customer.order_number
+        ? `Re: Order ${customer.order_number} - Your Company`
+        : `Re: Your Order Update - Your Company`;
+    default:
+      return `Re: Follow-up from Your Company`;
+  }
+}
+
 // 生成邮件草稿
 function generateEmailDraft(customer, template, strategy) {
   const now = new Date();
   const draftId = `draft-${now.toISOString().replace(/[:.]/g, '-')}-${customer.id}`;
   
-  // 替换模板变量（安全替换，处理未定义变量）
-  let subject = template.subject || '';
+  // 生成邮件主题（Follow-up 使用 Re: 格式保持线程连续）
+  const subject = generateFollowUpSubject(customer, template);
+  
+  // 替换模板变量（用于邮件正文）
   const replacements = {
     '{product_name}': customer.product_interest || 'our products',
     '{company_name}': customer.name,
@@ -159,10 +202,6 @@ function generateEmailDraft(customer, template, strategy) {
     '{new_product_name}': '',
     '{seasonal_promotion}': ''
   };
-  
-  for (const [placeholder, value] of Object.entries(replacements)) {
-    subject = subject.split(placeholder).join(value);
-  }
   
   const draft = {
     draft_id: draftId,

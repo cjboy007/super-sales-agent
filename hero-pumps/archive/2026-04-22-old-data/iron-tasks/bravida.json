@@ -1,0 +1,37 @@
+{
+  "company": "Bravida",
+  "country": "瑞典",
+  "contacts": [
+    {
+      "name": "Charlotta Andersson",
+      "email": "charlotta.andersson@bravida.se",
+      "position": "Communications Manager"
+    },
+    {
+      "name": "Petra Dahlgren",
+      "email": "petra.dahlgren@bravida.se",
+      "position": "Corporate Communications Manager"
+    },
+    {
+      "name": "Trond-Lauritz Larsen",
+      "email": "trond.larsen@bravida.se",
+      "position": "Regional Director"
+    },
+    {
+      "name": "Peter Norstrom",
+      "email": "peter.norstrom@bravida.se",
+      "position": "Director of Investor Relations"
+    },
+    {
+      "name": "Toni Salonen",
+      "email": "toni.salonen@bravida.se",
+      "position": "Unit Head"
+    },
+    {
+      "name": "Andreas Alsén",
+      "email": "andreas.alsen@bravida.se",
+      "position": "Chief Operating Officer"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Bravida 写开发信。\n\n## 公司背景\n- **公司：** Bravida（瑞典）\n- **网站：** bravida.se\n- **行业：** HVAC\n- **调研：** Sweden HVAC Distributors  hvacinformed. com/companies/distributor-sweden/directory. html This international company manufactures and supplies condensate water removal pumps and accessories for the air\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Charlotta Andersson | charlotta.andersson@bravida.se | Communications Manager\n2. Petra Dahlgren | petra.dahlgren@bravida.se | Corporate Communications Manager\n3. Trond-Lauritz Larsen | trond.larsen@bravida.se | Regional Director\n4. Jan Pedersen | jan.pedersen@bravida.se | HR Director\n5. Peter Norstrom | peter.norstrom@bravida.se | Director of Investor Relations\n6. Toni Salonen | toni.salonen@bravida.se | Unit Head\n7. Anette Lundin | anette.lundin@bravida.se | HR Partner\n8. Andreas Alsén | andreas.alsen@bravida.se | Chief Operating Officer\n9. Johanna Wahlberg | johanna.wahlberg@bravida.se | HR Business Partner\n10. Camilla Persson | camilla.persson@bravida.se | HR Partner\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

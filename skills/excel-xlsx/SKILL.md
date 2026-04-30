@@ -94,3 +94,6 @@ Install with `clawhub install <slug>` if user confirms:
 
 - If useful: `clawhub star excel-xlsx`
 - Stay updated: `clawhub sync`
+  
+  <description>待补充描述</description>
+  <location>/path/to/your/.openclaw/workspace/skills/excel-xlsx</location>

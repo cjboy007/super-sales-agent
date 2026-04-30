@@ -2,11 +2,11 @@
   "status": "success",
   "summary": "E2E 测试成功完成。所有 7 个步骤均通过验证。测试流程：订单发货→报关单据→提单→客户通知→OKKI 同步。全流程数据一致性验证通过。",
   "files_created": [
-    "/Users/wilson/.openclaw/workspace/skills/logistics/test/e2e_test.js",
-    "/Users/wilson/.openclaw/workspace/skills/logistics/test/fixtures/e2e_test_data.json",
-    "/Users/wilson/.openclaw/workspace/skills/logistics/test/e2e_test_report.md",
-    "/Users/wilson/.openclaw/workspace/skills/logistics/test/output/LG-1774534864215_BOL_MOCK.pdf",
-    "/Users/wilson/.openclaw/workspace/skills/logistics/bill_of_lading/LG-1774534864215_BOL.pdf"
+    "/path/to/your/.openclaw/workspace/skills/logistics/test/e2e_test.js",
+    "/path/to/your/.openclaw/workspace/skills/logistics/test/fixtures/e2e_test_data.json",
+    "/path/to/your/.openclaw/workspace/skills/logistics/test/e2e_test_report.md",
+    "/path/to/your/.openclaw/workspace/skills/logistics/test/output/LG-1774534864215_BOL_MOCK.pdf",
+    "/path/to/your/.openclaw/workspace/skills/logistics/bill_of_lading/LG-1774534864215_BOL.pdf"
   ],
   "test_results": {
     "total_steps": 7,
@@ -63,7 +63,7 @@
     "start_time": "2026-03-26T14:21:04.213Z",
     "end_time": "2026-03-26T14:21:04.298Z",
     "duration_ms": 85,
-    "workspace": "/Users/wilson/.openclaw/workspace/skills/logistics"
+    "workspace": "/path/to/your/.openclaw/workspace/skills/logistics"
   },
   "notes": [
     "OKKI 同步在测试环境中因无真实客户而跳过，这是预期行为",

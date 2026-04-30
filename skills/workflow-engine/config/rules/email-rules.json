@@ -1,0 +1,136 @@
+[
+  {
+    "id": "vip-inquiry-auto-reply",
+    "name": "VIP 客户询盘自动回复",
+    "description": "当 VIP 客户发送询盘邮件时，自动创建报价单草稿并通知销售总监",
+    "priority": 90,
+    "enabled": true,
+    "trigger": {
+      "event_type": "email_received",
+      "conditions": {
+        "type": "all",
+        "checks": [
+          {
+            "field": "payload.intent",
+            "operator": "equals",
+            "value": "inquiry"
+          },
+          {
+            "field": "payload.customer.tier",
+            "operator": "equals",
+            "value": "vip"
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "type": "generate_quotation",
+        "config": {
+          "customer_id": "${payload.customer.id}",
+          "template": "vip-standard",
+          "items": "${payload.inquiry.items}"
+        }
+      },
+      {
+        "type": "send_email",
+        "config": {
+          "to": "${payload.from}",
+          "template": "vip-inquiry-ack",
+          "variables": {
+            "customer_name": "${payload.customer.name}"
+          }
+        }
+      },
+      {
+        "type": "create_okki_trail",
+        "config": {
+          "customer_id": "${payload.customer.id}",
+          "trail_type": 105,
+          "content": "VIP 客户询盘，已自动生成报价单草稿"
+        }
+      }
+    ]
+  },
+  {
+    "id": "complaint-escalation",
+    "name": "投诉邮件升级处理",
+    "description": "当收到投诉邮件时，自动创建高优跟进记录并通知客服经理",
+    "priority": 95,
+    "enabled": true,
+    "trigger": {
+      "event_type": "email_received",
+      "conditions": {
+        "type": "all",
+        "checks": [
+          {
+            "field": "payload.intent",
+            "operator": "equals",
+            "value": "complaint"
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "type": "create_okki_trail",
+        "config": {
+          "customer_id": "${payload.customer.id}",
+          "trail_type": 106,
+          "content": "⚠️ 客户投诉，需要紧急处理"
+        }
+      },
+      {
+        "type": "send_email",
+        "config": {
+          "to": "support-manager@your-domain.com",
+          "template": "complaint-notify",
+          "variables": {
+            "customer_name": "${payload.customer.name}",
+            "complaint_content": "${payload.body}"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "new-customer-welcome",
+    "name": "新客户欢迎邮件",
+    "description": "当新客户首次联系时，发送欢迎邮件并创建跟进任务",
+    "priority": 70,
+    "enabled": true,
+    "trigger": {
+      "event_type": "email_received",
+      "conditions": {
+        "type": "all",
+        "checks": [
+          {
+            "field": "payload.customer.is_new",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "type": "send_email",
+        "config": {
+          "to": "${payload.from}",
+          "template": "welcome-email",
+          "variables": {
+            "customer_name": "${payload.customer.name}"
+          }
+        }
+      },
+      {
+        "type": "create_okki_trail",
+        "config": {
+          "customer_id": "${payload.customer.id}",
+          "trail_type": 101,
+          "content": "新客户首次联系，已发送欢迎邮件"
+        }
+      }
+    ]
+  }
+]

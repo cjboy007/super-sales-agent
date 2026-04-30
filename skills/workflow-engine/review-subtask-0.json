@@ -1,0 +1,45 @@
+{
+  "subtask_id": "subtask-0",
+  "subtask_name": "数据结构设计与 Schema 定义",
+  "reviewer": "WILSON (Revolution Reviewer)",
+  "review_date": "2026-04-02T21:12:00+08:00",
+  "verdict": "approve",
+  "confidence": "high",
+  
+  "design_review": {
+    "strengths": [
+      "参考了 follow-up-engine 的成熟配置结构",
+      "事件类型覆盖完整（5 种核心业务事件）",
+      "动作类型设计全面（8 种，包含基础动作和控制流）",
+      "Schema 分离清晰（规则/事件/动作独立定义）",
+      "扩展性好（支持未来添加新事件和动作类型）"
+    ],
+    "considerations": [
+      "需要定义清晰的 JSON Schema 验证规则",
+      "动作类型中的 branch 和 loop 需要明确控制流语义",
+      "事件 payload 结构需要标准化",
+      "规则优先级和冲突解决机制需要文档化"
+    ],
+    "risk_assessment": "low"
+  },
+  
+  "instructions": "# Subtask 0 执行指令\n\n## 目标\n创建工作流引擎的核心数据结构定义（JSON Schema + 文档）\n\n## 输出文件\n1. `schemas/rule-schema.json` - 规则结构定义\n2. `schemas/event-schema.json` - 事件类型定义\n3. `schemas/action-schema.json` - 动作类型定义\n4. `docs/data-model.md` - 数据模型文档\n\n## 详细步骤\n\n### Step 1: 创建 schemas/event-schema.json\n\n定义 5 种事件类型，每个事件包含：\n- `type`: 事件类型标识符\n- `payload`: 事件携带的数据结构\n- `metadata`: 元数据（时间戳、来源等）\n\n**事件类型：**\n1. `email_received` - 收到邮件\n   - payload: { from, to, subject, body, attachments, intent, keywords }\n2. `quotation_sent` - 报价单已发送\n   - payload: { quotation_no, customer_id, amount, currency, items, sent_at }\n3. `customer_created` - 客户创建\n   - payload: { customer_id, name, email, company, source, created_at }\n4. `order_updated` - 订单更新\n   - payload: { order_id, customer_id, status, amount, updated_fields }\n5. `trail_created` - OKKI 跟进记录创建\n   - payload: { trail_id, customer_id, trail_type, content, created_by }\n\n**参考：** follow-up-engine 的 trigger 结构\n\n### Step 2: 创建 schemas/action-schema.json\n\n定义 8 种动作类型，每个动作包含：\n- `type`: 动作类型标识符\n- `config`: 动作配置参数\n- `retry_policy`: 重试策略（可选）\n\n**动作类型：**\n1. `send_email` - 发送邮件\n   - config: { to, template, variables, attachments }\n2. `create_okki_trail` - 创建 OKKI 跟进记录\n   - config: { customer_id, trail_type, content, attachments }\n3. `generate_quotation` - 生成报价单\n   - config: { customer_id, template, items, pricing_rules }\n4. `update_customer` - 更新客户信息\n   - config: { customer_id, fields, merge_strategy }\n5. `call_api` - 调用外部 API\n   - config: { url, method, headers, body, timeout }\n6. `wait` - 等待（延迟执行）\n   - config: { duration_minutes, until_condition }\n7. `branch` - 条件分支\n   - config: { condition, true_actions, false_actions }\n8. `loop` - 循环执行\n   - config: { items, action, max_iterations }\n\n**参考：** follow-up-engine 的 action 字段\n\n### Step 3: 创建 schemas/rule-schema.json\n\n定义规则结构，包含：\n- `id`: 规则唯一标识符\n- `name`: 规则名称（中英文）\n- `description`: 规则描述\n- `priority`: 优先级（1-100，数字越大优先级越高）\n- `enabled`: 是否启用\n- `trigger`: 触发条件\n  - `event_type`: 触发事件类型\n  - `conditions`: 触发条件列表（AND/OR 逻辑）\n- `actions`: 动作列表（按顺序执行）\n- `metadata`: 元数据（创建时间、修改时间、作者等）\n\n**条件结构：**\n```json\n{\n  \"type\": \"all\" | \"any\",\n  \"checks\": [\n    {\n      \"field\": \"字段路径（支持嵌套，如 payload.customer.status）\",\n      \"operator\": \"equals\" | \"not_equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"regex\",\n      \"value\": \"比较值\"\n    }\n  ]\n}\n```\n\n**参考：** follow-up-engine 的 rules 数组结构\n\n### Step 4: 创建 docs/data-model.md\n\n文档内容包含：\n\n1. **概述**\n   - 工作流引擎的设计目标\n   - 核心概念（事件、规则、动作）\n\n2. **事件模型**\n   - 5 种事件类型的详细说明\n   - 事件生命周期\n   - 事件 payload 示例\n\n3. **动作模型**\n   - 8 种动作类型的详细说明\n   - 动作执行顺序\n   - 错误处理和重试机制\n\n4. **规则模型**\n   - 规则结构说明\n   - 优先级和冲突解决\n   - 条件表达式语法\n\n5. **控制流**\n   - branch（分支）的语义和示例\n   - loop（循环）的语义和示例\n   - 嵌套控制流的处理\n\n6. **扩展性设计**\n   - 如何添加新事件类型\n   - 如何添加新动作类型\n   - 插件机制（预留）\n\n7. **示例**\n   - 完整的规则配置示例\n   - 常见业务场景的规则编写\n\n### Step 5: 验证\n\n```bash\n# 安装 ajv-cli（如果未安装）\nnpm install -g ajv-cli\n\n# 验证 Schema 文件格式\najv compile -s schemas/event-schema.json\najv compile -s schemas/action-schema.json\najv compile -s schemas/rule-schema.json\n\n# 验证示例配置文件（如果有）\najv validate -s schemas/rule-schema.json -d examples/sample-rule.json\n```\n\n## 验收标准\n\n- [ ] 3 个 Schema 文件创建完成，格式正确\n- [ ] Schema 文件可以通过 ajv 验证\n- [ ] data-model.md 文档完整，包含所有必需章节\n- [ ] 事件类型覆盖 5 种：email_received, quotation_sent, customer_created, order_updated, trail_created\n- [ ] 动作类型覆盖 8 种：send_email, create_okki_trail, generate_quotation, update_customer, call_api, wait, branch, loop\n- [ ] 规则结构参考了 follow-up-engine 的设计\n- [ ] 文档中包含至少 2 个完整的规则示例\n\n## 注意事项\n\n1. **JSON Schema 版本：** 使用 JSON Schema Draft 2020-12\n2. **命名规范：** 使用 snake_case（与 follow-up-engine 保持一致）\n3. **扩展性：** 所有 Schema 应支持 additionalProperties（预留扩展字段）\n4. **文档格式：** Markdown，使用清晰的标题层级和代码块\n5. **示例数据：** 确保示例数据真实可用（参考 OKKI CRM 的实际数据结构）\n\n## 参考资料\n\n- `/path/to/your/.openclaw/workspace/skills/follow-up-engine/config/follow-up-rules.json`\n- `/path/to/your/.openclaw/workspace/skills/follow-up-engine/config/follow-up-strategies.json`\n- JSON Schema 官方文档: https://json-schema.org/\n- OKKI CRM API 文档: `/path/to/your/.openclaw/workspace/xiaoman-okki/docs/`",
+  
+  "feedback": "设计完整且实用。参考了 follow-up-engine 的成熟经验，事件和动作类型覆盖了核心业务场景。建议在实现时重点关注控制流（branch/loop）的语义定义，确保规则引擎的执行逻辑清晰可预测。",
+  
+  "technical_review": {
+    "architecture": "Schema 设计采用分离式架构，规则/事件/动作独立定义，符合单一职责原则。",
+    "scalability": "支持通过添加新的事件类型和动作类型来扩展功能，无需修改核心引擎。",
+    "maintainability": "JSON Schema 提供了清晰的数据契约，便于验证和文档生成。",
+    "performance": "规则匹配可以通过索引优化（按事件类型和优先级），预计性能良好。",
+    "security": "需要在 call_api 动作中添加安全限制（白名单、超时、速率限制）。"
+  },
+  
+  "next_steps": [
+    "执行者按照指令创建 4 个文件",
+    "提交代码后触发 Subtask 1（规则引擎核心实现）",
+    "审计员验证输出文件的完整性和正确性"
+  ],
+  
+  "estimated_effort": "2-3 小时（包含文档编写和示例创建）"
+}

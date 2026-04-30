@@ -1,0 +1,454 @@
+company,contact_name,email,website,country,industry,source,tier,position,department,confidence,verification_status
+Defro,Piotr Cynkier,piotr.cynkier@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,CFO,executive,98%,
+Defro,Marcin Dyjach,marcin.dyjach@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Quality Manager,management,99%,valid
+Defro,Mariusz Zaborowicz,mariusz.zaborowicz@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Engineering Manager,management,99%,valid
+Defro,Jolanta Wieczorek,jolanta.wieczorek@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Online Marketing Specialist,marketing,99%,valid
+Defro,Karol Sroka,karol.sroka@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Product Development Manager,management,99%,valid
+Defro,Sylwester Gruszczyński,sylwester.gruszczynski@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Production Optimization Specialist,operations,98%,
+Defro,Artur Parzych,artur.parzych@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Regional Manager,management,98%,valid
+Defro,Grzegorz Węglarz,grzegorz.weglarz@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Financial Analyst,finance,97%,
+Defro,Kacper Cierpica,kacper.cierpica@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Technical Advisor,operations,97%,
+Defro,Monika Zych,monika.zych@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Export Manager,management,97%,valid
+Thermona,Martin Novak,novak@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,94%,invalid
+Thermona,Dusan Zaloudek,zaloudek@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,93%,invalid
+Thermona,Dominik Novacek,novacekd@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,92%,invalid
+Thermona,,viktorin@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,91%,invalid
+Thermona,,obchod@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,90%,invalid
+Thermona,,export@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,89%,unknown
+Thermona,,kubicek@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,88%,invalid
+Thermona,,galat@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,84%,invalid
+Thermona,,prochazka@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,83%,unknown
+Thermona,,foralova@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,82%,unknown
+Protherm,Frantisek Srp,frantisek.srp@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,94%,
+Protherm,Jiri Vavrina,vavrinaj@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,94%,
+Protherm,Jiri Hoffmann,hoffmannj@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,93%,
+Protherm,Michal Cerny,michal.cerny@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,92%,
+Protherm,Jiri Jirasek,jiri.jirasek@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,91%,
+Protherm,,protherm@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,communication,90%,
+Protherm,Jiri Malinsky,jiri.malinsky@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,89%,
+Protherm,,schneidv@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,85%,
+Protherm,,jan.priplata@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,80%,
+Protherm,,marketa.drabova@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,79%,
+Dakon,,dakon@dakon.cz,dakon.cz,捷克,HVAC,hunter.io,Tier2,,,94%,
+Dakon,,servis@dakon.cz,dakon.cz,捷克,HVAC,hunter.io,Tier2,,,79%,
+HALTON,Jude Caddy,jude.caddy@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Head of Human Resources,hr,94%,
+HALTON,Christopher Gentry,christopher.gentry@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Global Service Director,management,94%,accept_all
+HALTON,Andro Nasution,andro.nasution@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Representative Office Head,support,94%,accept_all
+HALTON,Salla Ahlberg,salla.ahlberg@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Director of Marketing,marketing,94%,accept_all
+HALTON,Penny Tong,penny.tong@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,,,93%,accept_all
+HALTON,Marcelo Vale,marcelo.vale@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Managing Director,executive,93%,
+HALTON,Derek Shen,derek.shen@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Sales Director,sales,93%,
+HALTON,Philipp Missbach,philipp.missbach@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Head of Sales,sales,93%,accept_all
+HALTON,Shuresh Maran,shuresh.maran@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Executive Vice President,executive,93%,accept_all
+HALTON,Kai Konola,kai.konola@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,,,93%,accept_all
+BDR Thermea Hungary,Oscar Mogro,oscar.mogro@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,,93%,
+BDR Thermea Hungary,,info@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,support,79%,
+BDR Thermea Hungary,,contactus@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,support,75%,
+BDR Thermea Hungary,,dorien.souman@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,,10%,
+Belimo,Marco Marchetti,marco.marchetti@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+Belimo,Sebastian Weibel,sebastian.weibel@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Logistics,management,94%,accept_all
+Belimo,Christoph Hoenig,christoph.hoenig@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Global Head of Product Management,management,94%,accept_all
+Belimo,Luca Pauletti,luca.pauletti@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+Belimo,Cornelia Zahner,cornelia.zahner@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Executive Assistant,operations,94%,accept_all
+Belimo,Vivian Wang,vivian.wang@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Logistics,operations,94%,accept_all
+Belimo,Andreas Marty,andreas.marty@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Product Management,management,94%,
+Belimo,Dominic Frutiger,dominic.frutiger@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Product Engineering,management,94%,
+Belimo,Jing Wang,jing.wang@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Product,management,94%,accept_all
+Belimo,Sven Maushake,sven.maushake@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Chief Information Officer,it,94%,accept_all
+Ferroli Romania,,office@ferroli.ro,ferroli.ro,罗马尼亚,HVAC,hunter.io,Tier2,,,83%,accept_all
+Ariston Romania,Dung Van,dung.van@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+Ariston Romania,Sofia Tram,sofia.tram@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Marketing Director,marketing,94%,accept_all
+Ariston Romania,Ahmed Shehata,ahmed.shehata@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Sales Director,sales,93%,accept_all
+Ariston Romania,Hoang Phong,hoang.phong@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Marketing Director,marketing,93%,accept_all
+Ariston Romania,Thomas Ceulaer,thomas.ceulaer@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Sales and Marketing Director,sales,84%,accept_all
+Ariston Romania,Alexander Koshlay,alexander.koshlay@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Commercial Director,management,84%,accept_all
+Ariston Romania,Marcin Pierog,marcin.pierog@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,,,94%,accept_all
+Ariston Romania,Angelo Mancini,angelo.mancini@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,,,94%,accept_all
+Ariston Romania,Victor Yanez,victor.yanez@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Quality Management,management,93%,accept_all
+Ariston Romania,Erica Furin,erica.furin@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Account Manager,sales,93%,accept_all
+Vaillant Slovakia,,vaillant@vaillant.sk,vaillant.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,99%,valid
+Stiebel Eltron Slovakia,Ondrej Tabák,ondrej.tabak@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Welding Process Engineer,,99%,valid
+Stiebel Eltron Slovakia,Ivana Radosavljevic,ivana.radosavljevic@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Accounts Payable Clerk,finance,99%,valid
+Stiebel Eltron Slovakia,Michal Berecky,michal.berecky@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Welding Technician,operations,99%,valid
+Stiebel Eltron Slovakia,Ladislav Belán,ladislav.belan@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,CNC Programmer,it,99%,valid
+Stiebel Eltron Slovakia,Libor Novak,libor.novak@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Laboratory Development Specialist,health,98%,
+Stiebel Eltron Slovakia,Michal Choma,michal.choma@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,99%,valid
+Stiebel Eltron Slovakia,Juraj Roth,juraj.roth@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Stiebel Eltron Slovakia,Daniel Cech,daniel.cech@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Stiebel Eltron Slovakia,Patrik Prihoda,patrik.prihoda@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Stiebel Eltron Slovakia,Pavol Stasak,pavol.stasak@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+KSB Group,Colleen Mace,colleen.mace@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Vice President,executive,94%,accept_all
+KSB Group,Sabine Müller,sabine.mueller@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Vice President of Innovation,executive,94%,accept_all
+KSB Group,Sebastian Lang,sebastian.lang@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Product Owner,executive,94%,accept_all
+KSB Group,Suman Malik,suman.malik@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Senior Service Executive,executive,94%,accept_all
+KSB Group,Ivan Morales,ivan.morales@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Head of Shipping,management,94%,accept_all
+KSB Group,Vanessa Völker,vanessa.voelker@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Director of Corporate Functions,management,94%,accept_all
+KSB Group,Christof Lindner,christof.lindner@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Vice President of Sales,sales,94%,accept_all
+KSB Group,Christian Ehm,christian.ehm@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Treasurer,finance,94%,accept_all
+KSB Group,Helmut Lammers,helmut.lammers@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Regional Director,executive,94%,accept_all
+KSB Group,Verena Späth,verena.spaeth@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,HR Business Partner,sales,94%,accept_all
+Qvantum Energi,Anette Leijonberg,anette.leijonberg@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Director of Finance,finance,99%,valid
+Qvantum Energi,Lina Simonsson,lina.simonsson@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Marketing Director,marketing,99%,valid
+Qvantum Energi,Thomas Nowak,thomas.nowak@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Vice President of Government Relations,communication,99%,valid
+Qvantum Energi,Lars Bierlein,lars.bierlein@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Director of New Markets,management,99%,valid
+Qvantum Energi,Eleonor Green,eleonor.green@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,ERP Manager,management,98%,valid
+Qvantum Energi,Jon Persson,jon.persson@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Head of Market Development,management,97%,valid
+Qvantum Energi,Wolfgang Herold,wolfgang.herold@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,,,97%,
+Qvantum Energi,Fredrik Rosenqvist,fredrik.rosenqvist@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,,,97%,
+Qvantum Energi,Federico Rosales,federico.rosales@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Chief Operating Officer,executive,96%,valid
+Qvantum Energi,Philip Ord,philip.ord@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,CEO,executive,96%,valid
+Uponor Eastern Europe,Tim Botten,tim.botten@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,Manager,management,94%,valid
+Uponor Eastern Europe,Terje Andersen,terje.andersen@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Mary Armbruster,mary.armbruster@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,Public Works,communication,94%,
+Uponor Eastern Europe,James Griffiths,james.griffiths@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Gabor Bernath,gabor.bernath@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Krisztina Pap,krisztina.pap@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Richard Prate,richard.prate@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,David Keller,david.keller@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Gretchen Desutter,gretchen.desutter@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Zoltan Jonas,zoltan.jonas@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+REHAU Eastern Europe,Morne Smuts,morne.smuts@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+REHAU Eastern Europe,Boris Muntyan,boris.muntyan@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Deputy Director of Sales,sales,94%,accept_all
+REHAU Eastern Europe,Fabian Leppert,fabian.leppert@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Infrastructure Director,management,94%,accept_all
+REHAU Eastern Europe,Michael Stocker,michael.stocker@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Head of Product,management,94%,
+REHAU Eastern Europe,Jan Hoppe,jan.hoppe@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Head of Supply Chain Management,management,94%,accept_all
+REHAU Eastern Europe,Pravin Jadhav,pravin.jadhav@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Finance Executive,finance,94%,
+REHAU Eastern Europe,Thomas Graf,thomas.graf@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Executive Director,management,94%,
+REHAU Eastern Europe,Iris Kaiser,iris.kaiser@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Head of E-Commerce,management,94%,accept_all
+REHAU Eastern Europe,Manuel Sureda,manuel.sureda@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Chairman,executive,94%,accept_all
+REHAU Eastern Europe,Joaquim Moreira,joaquim.moreira@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Commercial Director,management,94%,
+NIBE Baltic,Leif Nystrom,leif@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Chief Executive Officer,executive,94%,
+NIBE Baltic,Peter Cerny,peter@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Director of International Sales Operations,sales,94%,
+NIBE Baltic,Johannes Berggren,johannes@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Art Director,design,93%,accept_all
+NIBE Baltic,Birgitta Gustafsson,birgitta@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Art Director,design,93%,
+NIBE Baltic,Nils Larsson,nils@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Director of Industrial Engineering,management,92%,accept_all
+NIBE Baltic,Fredrik Wallin,fredrik@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Director of Strategic Sourcing,management,92%,accept_all
+NIBE Baltic,Gregory II,gregory@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,IT Director,it,91%,accept_all
+NIBE Baltic,Rob Spoelman,rob@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Managing Director,executive,91%,accept_all
+NIBE Baltic,Lisa Shaw,lisa@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Vice President of Human Resources,hr,90%,accept_all
+NIBE Baltic,George Ginger,george@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Managing Partner,management,90%,
+Bosch Thermotechnology,,info@bosch-thermotechnology.com,bosch-thermotechnology.com,区域,HVAC,hunter.io,Tier2,,support,81%,
+Centrometal,,komercijala@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,99%,valid
+Centrometal,Danijel Novak,danijel.novak@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,94%,
+Centrometal,,servis@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,90%,
+Centrometal,,prodaja@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,communication,89%,
+Centrometal,,tehnicki.ured@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,88%,
+Centrometal,,server.web@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,84%,
+Centrometal,,racunovodstvo@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,83%,
+Centrometal,,nabava@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,82%,
+Centrometal,,export@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,79%,
+Centrometal,,sarajevo@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,78%,
+Termovent,Aleksandra Tomic,aleksandra.tomic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Senior HR Business Partner,sales,99%,
+Termovent,Stevan Miric,stevan.miric@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Chief Executive Officer,executive,95%,
+Termovent,Ivan Jankovic,ivan.jankovic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Head Of Kladovo Plant,management,95%,
+Termovent,Dragan Spasojevic,dragan.spasojevic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Director of Research and Development,education,95%,valid
+Termovent,Katarina Mijucić,katarina.mijucic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Business Intelligence Analyst,sales,83%,valid
+Termovent,Marija Popović,marija.popovic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Procurement Specialist,operations,99%,
+Termovent,Dejan Stanić,dejan.stanic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Service Engineer,operations,99%,valid
+Termovent,Jovana Djordjic,jovana.djordjic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Marketing Manager,marketing,99%,
+Termovent,Denis Dacic,denis.dacic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,,,98%,valid
+Termovent,Jelena Rudinac,jelena.rudinac@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Senior Finance Controller,finance,98%,
+Viessmann Bulgaria,,info-bg@viessmann.bg,viessmann.bg,保加利亚,HVAC,hunter.io,Tier3,,support,75%,
+Airco HVACR,Artur Gondek,a.gondek@airco.com.pl,airco.com.pl,波兰,HVAC,hunter.io,Tier2,,,94%,
+Airco HVACR,Krystian Gondek,k.gondek@airco.com.pl,airco.com.pl,波兰,HVAC,hunter.io,Tier2,,,93%,
+Airco HVACR,,p.jasiewicz@airco.com.pl,airco.com.pl,波兰,HVAC,hunter.io,Tier2,,,88%,
+Airco HVACR,,biuro@airco.com.pl,airco.com.pl,波兰,HVAC,hunter.io,Tier2,,,76%,
+Ariston Romania,Dung Van,dung.van@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+Ariston Romania,Sofia Tram,sofia.tram@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Marketing Director,marketing,94%,accept_all
+Ariston Romania,Ahmed Shehata,ahmed.shehata@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Sales Director,sales,93%,accept_all
+Ariston Romania,Hoang Phong,hoang.phong@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Marketing Director,marketing,93%,accept_all
+Ariston Romania,Thomas Ceulaer,thomas.ceulaer@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Sales and Marketing Director,sales,84%,accept_all
+Ariston Romania,Alexander Koshlay,alexander.koshlay@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Commercial Director,management,84%,accept_all
+Ariston Romania,Marcin Pierog,marcin.pierog@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,,,94%,accept_all
+Ariston Romania,Angelo Mancini,angelo.mancini@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,,,94%,accept_all
+Ariston Romania,Victor Yanez,victor.yanez@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Quality Management,management,93%,accept_all
+Ariston Romania,Erica Furin,erica.furin@ariston.com,ariston.com,罗马尼亚,HVAC,hunter.io,Tier2,Account Manager,sales,93%,accept_all
+BDR Thermea Hungary,Oscar Mogro,oscar.mogro@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,,93%,
+BDR Thermea Hungary,,info@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,support,79%,
+BDR Thermea Hungary,,contactus@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,support,75%,
+BDR Thermea Hungary,,dorien.souman@bdrthermea.com,bdrthermea.com,匈牙利,HVAC,hunter.io,Tier2,,,10%,
+Belimo,Marco Marchetti,marco.marchetti@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+Belimo,Sebastian Weibel,sebastian.weibel@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Logistics,management,94%,accept_all
+Belimo,Christoph Hoenig,christoph.hoenig@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Global Head of Product Management,management,94%,accept_all
+Belimo,Luca Pauletti,luca.pauletti@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+Belimo,Cornelia Zahner,cornelia.zahner@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Executive Assistant,operations,94%,accept_all
+Belimo,Vivian Wang,vivian.wang@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Logistics,operations,94%,accept_all
+Belimo,Andreas Marty,andreas.marty@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Product Management,management,94%,
+Belimo,Dominic Frutiger,dominic.frutiger@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Product Engineering,management,94%,
+Belimo,Jing Wang,jing.wang@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Head of Product,management,94%,accept_all
+Belimo,Sven Maushake,sven.maushake@belimo.com,belimo.com,匈牙利,HVAC,hunter.io,Tier2,Chief Information Officer,it,94%,accept_all
+Bosch Thermotechnology,,info@bosch-thermotechnology.com,bosch-thermotechnology.com,区域,HVAC,hunter.io,Tier2,,support,81%,
+Buderus Czech,Petr Jindra,jindra@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,94%,
+Buderus Czech,Jiri Placek,placek@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,94%,
+Buderus Czech,Marek Dvoracek,dvoracek@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,93%,
+Buderus Czech,Pavel Balik,balik@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,93%,
+Buderus Czech,Jan Eisner,eisner@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,92%,
+Buderus Czech,,technika@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,91%,
+Buderus Czech,,info@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,support,90%,
+Buderus Czech,,samek@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,85%,
+Buderus Czech,,marasek@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,84%,
+Buderus Czech,,pala@buderus.cz,buderus.cz,捷克,HVAC,hunter.io,Tier1,,,84%,
+Centrometal,,komercijala@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,99%,valid
+Centrometal,Danijel Novak,danijel.novak@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,94%,
+Centrometal,,servis@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,90%,
+Centrometal,,prodaja@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,communication,89%,
+Centrometal,,tehnicki.ured@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,88%,
+Centrometal,,server.web@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,84%,
+Centrometal,,racunovodstvo@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,83%,
+Centrometal,,nabava@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,82%,
+Centrometal,,export@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,79%,
+Centrometal,,sarajevo@centrometal.hr,centrometal.hr,克罗地亚,HVAC,hunter.io,Tier3,,,78%,
+Daikin Central Europe,,heatpumpadoptioneuhsbu@daikin.eu,daikin.eu,捷克,HVAC,hunter.io,Tier1,,,99%,valid
+Daikin Central Europe,,info@daikin.eu,daikin.eu,捷克,HVAC,hunter.io,Tier1,,support,98%,valid
+Dakon,,dakon@dakon.cz,dakon.cz,捷克,HVAC,hunter.io,Tier2,,,94%,
+Dakon,,servis@dakon.cz,dakon.cz,捷克,HVAC,hunter.io,Tier2,,,79%,
+Danfoss Hungary,,hheatingnews@danfoss.hu,danfoss.hu,匈牙利,HVAC,hunter.io,Tier1,,communication,75%,
+Danfoss Hungary,,heatingnews@danfoss.hu,danfoss.hu,匈牙利,HVAC,hunter.io,Tier1,,communication,75%,
+Dedeman,,suportclienti@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,94%,accept_all
+Dedeman,,contact@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,support,83%,
+Dedeman,,otiliaburcut@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,79%,accept_all
+Dedeman,,newsletter@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,communication,79%,
+Dedeman,,automobileonesti@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,78%,
+Dedeman,,resurse74@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,78%,
+Dedeman,,automobile@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,78%,
+Dedeman,,info@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,support,77%,
+Dedeman,,resurse35@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,77%,
+Dedeman,,vasilesolcanu@dedeman.ro,dedeman.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,76%,accept_all
+Defro,Piotr Cynkier,piotr.cynkier@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,CFO,executive,98%,
+Defro,Marcin Dyjach,marcin.dyjach@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Quality Manager,management,99%,valid
+Defro,Mariusz Zaborowicz,mariusz.zaborowicz@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Engineering Manager,management,99%,valid
+Defro,Jolanta Wieczorek,jolanta.wieczorek@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Online Marketing Specialist,marketing,99%,valid
+Defro,Karol Sroka,karol.sroka@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Product Development Manager,management,99%,valid
+Defro,Sylwester Gruszczyński,sylwester.gruszczynski@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Production Optimization Specialist,operations,98%,
+Defro,Artur Parzych,artur.parzych@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Regional Manager,management,98%,valid
+Defro,Grzegorz Węglarz,grzegorz.weglarz@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Financial Analyst,finance,97%,
+Defro,Kacper Cierpica,kacper.cierpica@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Technical Advisor,operations,97%,
+Defro,Monika Zych,monika.zych@defro.pl,defro.pl,波兰,HVAC,hunter.io,Tier2,Export Manager,management,97%,valid
+Enbra Group,Barbora Maněnová,manenova@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,Marketing Specialist,marketing,94%,
+Enbra Group,Jakub Záruba,zaruba@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,Product Sales Manager,sales,94%,
+Enbra Group,Miroslav Klíma,klima@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,Director of Controlling and IT,it,94%,
+Enbra Group,Patrik Prokes,prokes@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,Sales Director,sales,92%,
+Enbra Group,Matěj Holyszewski,holyszewskim@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,Product Manager,it,91%,
+Enbra Group,Hana Chutná,chutna@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,Marketing Specialist,marketing,84%,valid
+Enbra Group,Ivo Muller,muller@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,,,94%,
+Enbra Group,Jan Blecha,blecha@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,,,94%,
+Enbra Group,Tomas Kolin,kolin@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,,,94%,
+Enbra Group,Marcela Cerna,cerna@enbra.cz,enbra.cz,捷克,HVAC,hunter.io,Tier1,,,94%,
+Ferroli Romania,,office@ferroli.ro,ferroli.ro,罗马尼亚,HVAC,hunter.io,Tier2,,,83%,accept_all
+Galmet,Adam Tromsa,a.tromsa@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Controlling and Process Optimization Manager,management,99%,valid
+Galmet,Julia Sobaszek,j.sobaszek@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Technical Consultant for Heat Pumps,management,99%,valid
+Galmet,Przemysław Racki,p.racki@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Regional Sales Manager,sales,99%,
+Galmet,Martyna Mikulska,m.mikulska@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Technical Advisor for Heat Pumps,operations,98%,valid
+Galmet,Emilia Klosak,e.klosak@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Recovery Systems Specialist,it,98%,
+Galmet,Maciej Rafalski,m.rafalski@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Technical Advisor,operations,98%,valid
+Galmet,Marek Balicz,m.balicz@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Product Manager,it,97%,
+Galmet,Paweł Kurek,p.kurek@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,"Heat Pump Designer, R&D Department",design,97%,
+Galmet,Roman Balicz,r.balicz@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Technical Director,management,97%,valid
+Galmet,Anna Kobylanska,a.kobylanska@galmet.com.pl,galmet.com.pl,波兰,HVAC,hunter.io,Tier1,Accountant,finance,96%,
+HAJDU RT,Tamas Balogh,balogh.tamas@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,Chief Financial Officer,finance,98%,valid
+HAJDU RT,József Simon,simon.jozsef@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,Chief Information Officer,it,96%,
+HAJDU RT,Peter Sztanyi,sztanyi.peter@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,Commercial Director,management,84%,
+HAJDU RT,Robert Frank,frank.robert@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,Export Sales Manager,sales,99%,
+HAJDU RT,Barnabás Lovas,lovas.barnabas@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,IT Specialist,it,99%,valid
+HAJDU RT,István Árva,arva.istvan@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,IT Specialist,it,98%,
+HAJDU RT,András Széplaki,szeplaki.andras@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,Teamcenter Key User,it,97%,
+HAJDU RT,Orbán Szabolcs,orban.szabolcs@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,Project Manager,management,95%,
+HAJDU RT,Mihaly Hajdu,hajdu@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,,,94%,
+HAJDU RT,Tunde Botto,botto.tunde@hajdurt.hu,hajdurt.hu,匈牙利,HVAC,hunter.io,Tier1,,,93%,
+HAKOM,Dane Beda,dane@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,,99%,valid
+HAKOM,,d.langfort@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,,98%,valid
+HAKOM,,szkolenia@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,,98%,valid
+HAKOM,,mm@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,,97%,
+HAKOM,,praca@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,communication,96%,valid
+HAKOM,,serwis@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,support,95%,valid
+HAKOM,,a.ciszewski@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,,80%,
+HAKOM,,sprzedaz@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,,75%,
+HAKOM,,b2b@hakom.pl,hakom.pl,波兰,HVAC,hunter.io,Tier1,,sales,75%,
+HALTON,Jude Caddy,jude.caddy@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Head of Human Resources,hr,94%,
+HALTON,Christopher Gentry,christopher.gentry@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Global Service Director,management,94%,accept_all
+HALTON,Andro Nasution,andro.nasution@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Representative Office Head,support,94%,accept_all
+HALTON,Salla Ahlberg,salla.ahlberg@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Director of Marketing,marketing,94%,accept_all
+HALTON,Penny Tong,penny.tong@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,,,93%,accept_all
+HALTON,Marcelo Vale,marcelo.vale@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Managing Director,executive,93%,
+HALTON,Derek Shen,derek.shen@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Sales Director,sales,93%,
+HALTON,Philipp Missbach,philipp.missbach@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Head of Sales,sales,93%,accept_all
+HALTON,Shuresh Maran,shuresh.maran@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,Executive Vice President,executive,93%,accept_all
+HALTON,Kai Konola,kai.konola@halton.com,halton.com,捷克,HVAC,hunter.io,Tier2,,,93%,accept_all
+Hewalex,Leszek Skiba,leszek.skiba@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,99%,valid
+Hewalex,,justyna.rychta@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,96%,
+Hewalex,,karolina.firuzek@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,95%,
+Hewalex,Adrian Piotrowski,adrian.piotrowski@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,94%,
+Hewalex,Grzegorz Szewczak,grzegorz.szewczak@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,93%,
+Hewalex,Dariusz Klonowski,dariusz.klonowski@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,92%,
+Hewalex,Marcin Zaborowski,marcin.zaborowski@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,91%,
+Hewalex,,serwis@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,support,90%,
+Hewalex,Pawel Waligorski,pawel.waligorski@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,89%,
+Hewalex,Patrycja Adamska,patrycja.adamska@hewalex.pl,hewalex.pl,波兰,HVAC,hunter.io,Tier1,,,88%,
+Klima-Venta,Karolina Trzeciak,k.trzeciak@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,Purchasing Engineer,operations,99%,
+Klima-Venta,Łukasz Chwastyk,l.chwastyk@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,Warranty and Service Department,operations,98%,
+Klima-Venta,Magdalena Kochel,magdalena.kochel@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,Owner,executive,98%,
+Klima-Venta,Dawid Markowiak,d.markowiak@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,Project Manager of Sanitary Installations,management,97%,
+Klima-Venta,Daniel Mazurkiewicz,d.mazurkiewicz@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,Chief Operating Officer,executive,96%,
+Klima-Venta,Krystian Nowak,k.nowak@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,Bid Specialist,sales,95%,
+Klima-Venta,Micha Kochel,m.kochel@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,,,99%,
+Klima-Venta,Joanna Lech,j.lech@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,,,94%,
+Klima-Venta,,marketing@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,,marketing,90%,valid
+Klima-Venta,,praca@klima-venta.pl,klima-venta.pl,波兰,HVAC,hunter.io,Tier2,,communication,79%,
+Klimor,Dariusz Szylman,dszylman@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,CEO,executive,84%,valid
+Klimor,Zbigniew Górski,zgorski@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Export Specialist,sales,99%,valid
+Klimor,Joanna Stachowiak,jstachowiak@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Administrative Specialist,management,99%,valid
+Klimor,Piotr Świerczek,pswierczek@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Operations Manager,management,99%,valid
+Klimor,Piotr Gardias,pgardias@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Constructor,,98%,valid
+Klimor,Mateusz Kujawski,mkujawski@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Frontend Developer,it,98%,valid
+Klimor,Dominik Tański,dtanski@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Quality Control Specialist,operations,98%,valid
+Klimor,Malwina Redlaff,mredlaff@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Technical Sales Consultant,sales,97%,valid
+Klimor,Arkadiusz Bandkowski,abandkowski@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Senior Technical Sales Consultant,sales,97%,
+Klimor,Mateusz Byra,mbyra@klimor.com,klimor.com,波兰,HVAC,hunter.io,Tier2,Technical Sales Consultant,sales,96%,
+Kospel S.A.,,marketing@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,sales,99%,
+Kospel S.A.,,a.walewski@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,98%,valid
+Kospel S.A.,,sprzedaz@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,94%,
+Kospel S.A.,,serwis@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,support,93%,
+Kospel S.A.,,doradcy@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,92%,
+Kospel S.A.,,info@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,support,91%,valid
+Kospel S.A.,,rekrutacja@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,90%,
+Kospel S.A.,,p.krzeminski@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,84%,valid
+Kospel S.A.,,k.lukasik@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,84%,
+Kospel S.A.,,kundendienst@kospel.pl,kospel.pl,波兰,HVAC,hunter.io,Tier1,,,83%,
+KSB Group,Colleen Mace,colleen.mace@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Vice President,executive,94%,accept_all
+KSB Group,Sabine Müller,sabine.mueller@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Vice President of Innovation,executive,94%,accept_all
+KSB Group,Sebastian Lang,sebastian.lang@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Product Owner,executive,94%,accept_all
+KSB Group,Suman Malik,suman.malik@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Senior Service Executive,executive,94%,accept_all
+KSB Group,Ivan Morales,ivan.morales@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Head of Shipping,management,94%,accept_all
+KSB Group,Vanessa Völker,vanessa.voelker@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Director of Corporate Functions,management,94%,accept_all
+KSB Group,Christof Lindner,christof.lindner@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Vice President of Sales,sales,94%,accept_all
+KSB Group,Christian Ehm,christian.ehm@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Treasurer,finance,94%,accept_all
+KSB Group,Helmut Lammers,helmut.lammers@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,Regional Director,executive,94%,accept_all
+KSB Group,Verena Späth,verena.spaeth@ksb.com,ksb.com,区域,HVAC,hunter.io,Tier2,HR Business Partner,sales,94%,accept_all
+NIBE Baltic,Leif Nystrom,leif@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Chief Executive Officer,executive,94%,
+NIBE Baltic,Peter Cerny,peter@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Director of International Sales Operations,sales,94%,
+NIBE Baltic,Johannes Berggren,johannes@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Art Director,design,93%,accept_all
+NIBE Baltic,Birgitta Gustafsson,birgitta@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Art Director,design,93%,
+NIBE Baltic,Nils Larsson,nils@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Director of Industrial Engineering,management,92%,accept_all
+NIBE Baltic,Fredrik Wallin,fredrik@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Director of Strategic Sourcing,management,92%,accept_all
+NIBE Baltic,Gregory II,gregory@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,IT Director,it,91%,accept_all
+NIBE Baltic,Rob Spoelman,rob@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Managing Director,executive,91%,accept_all
+NIBE Baltic,Lisa Shaw,lisa@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Vice President of Human Resources,hr,90%,accept_all
+NIBE Baltic,George Ginger,george@nibe.eu,nibe.eu,区域,HVAC,hunter.io,Tier2,Managing Partner,management,90%,
+Panasonic CZ,,vs_sales@panasonic.com,panasonic.com,捷克,HVAC,hunter.io,Tier2,,sales,75%,
+Plum HVAC,Monika Roszkowska,monika.roszkowska@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Chief Financial Officer,finance,99%,valid
+Plum HVAC,Magda Woźniak,magda.wozniak@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,HR Manager,management,98%,valid
+Plum HVAC,Anna Ogilba,anna.ogilba@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Marketing Specialist,marketing,97%,valid
+Plum HVAC,Magda Turecka,magda.turecka@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Marketing Manager,marketing,97%,valid
+Plum HVAC,Paulina Borys,paulina.borys@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Senior HR Specialist,hr,97%,valid
+Plum HVAC,Marcin Groman,marcin.groman@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Project Manager,management,99%,
+Plum HVAC,Mariusz Sawicki,mariusz.sawicki@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Project Manager,management,99%,
+Plum HVAC,Adriana Bojczuk,adriana.bojczuk@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Content Creator,communication,99%,
+Plum HVAC,Katarzyna Kacprzak,katarzyna.kacprzak@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Manager,management,99%,valid
+Plum HVAC,Martyna Sakowicz,martyna.sakowicz@plum.pl,plum.pl,波兰,HVAC,hunter.io,Tier2,Content Creator,communication,98%,
+Protherm,Frantisek Srp,frantisek.srp@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,94%,
+Protherm,Jiri Vavrina,vavrinaj@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,94%,
+Protherm,Jiri Hoffmann,hoffmannj@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,93%,
+Protherm,Michal Cerny,michal.cerny@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,92%,
+Protherm,Jiri Jirasek,jiri.jirasek@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,91%,
+Protherm,,protherm@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,communication,90%,
+Protherm,Jiri Malinsky,jiri.malinsky@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,89%,
+Protherm,,schneidv@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,85%,
+Protherm,,jan.priplata@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,80%,
+Protherm,,marketa.drabova@protherm.cz,protherm.cz,捷克,HVAC,hunter.io,Tier2,,,79%,
+Qvantum Energi,Anette Leijonberg,anette.leijonberg@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Director of Finance,finance,99%,valid
+Qvantum Energi,Lina Simonsson,lina.simonsson@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Marketing Director,marketing,99%,valid
+Qvantum Energi,Thomas Nowak,thomas.nowak@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Vice President of Government Relations,communication,99%,valid
+Qvantum Energi,Lars Bierlein,lars.bierlein@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Director of New Markets,management,99%,valid
+Qvantum Energi,Eleonor Green,eleonor.green@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,ERP Manager,management,98%,valid
+Qvantum Energi,Jon Persson,jon.persson@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Head of Market Development,management,97%,valid
+Qvantum Energi,Wolfgang Herold,wolfgang.herold@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,,,97%,
+Qvantum Energi,Fredrik Rosenqvist,fredrik.rosenqvist@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,,,97%,
+Qvantum Energi,Federico Rosales,federico.rosales@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,Chief Operating Officer,executive,96%,valid
+Qvantum Energi,Philip Ord,philip.ord@qvantum.com,qvantum.com,区域,HVAC,hunter.io,Tier2,CEO,executive,96%,valid
+REHAU Eastern Europe,Morne Smuts,morne.smuts@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Sales Director,sales,94%,accept_all
+REHAU Eastern Europe,Boris Muntyan,boris.muntyan@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Deputy Director of Sales,sales,94%,accept_all
+REHAU Eastern Europe,Fabian Leppert,fabian.leppert@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Infrastructure Director,management,94%,accept_all
+REHAU Eastern Europe,Michael Stocker,michael.stocker@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Head of Product,management,94%,
+REHAU Eastern Europe,Jan Hoppe,jan.hoppe@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Head of Supply Chain Management,management,94%,accept_all
+REHAU Eastern Europe,Pravin Jadhav,pravin.jadhav@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Finance Executive,finance,94%,
+REHAU Eastern Europe,Thomas Graf,thomas.graf@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Executive Director,management,94%,
+REHAU Eastern Europe,Iris Kaiser,iris.kaiser@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Head of E-Commerce,management,94%,accept_all
+REHAU Eastern Europe,Manuel Sureda,manuel.sureda@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Chairman,executive,94%,accept_all
+REHAU Eastern Europe,Joaquim Moreira,joaquim.moreira@rehau.com,rehau.com,区域,HVAC,hunter.io,Tier2,Commercial Director,management,94%,
+Romstal,,comenzionline@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,94%,valid
+Romstal,,office@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,93%,valid
+Romstal,Andrei Bejan,andrei.bejan@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,89%,valid
+Romstal,Mare Mai,mare@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,88%,invalid
+Romstal,Constanta Din,constanta@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,87%,invalid
+Romstal,,felicia.gheta@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,86%,valid
+Romstal,,dispecerat.national@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,85%,valid
+Romstal,,suport.tehnic@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,84%,valid
+Romstal,,dataprotection@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,83%,valid
+Romstal,,suportpiesedeschimb@romstal.ro,romstal.ro,罗马尼亚,HVAC,hunter.io,Tier1,,,82%,valid
+Stiebel Eltron Slovakia,Ondrej Tabák,ondrej.tabak@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Welding Process Engineer,,99%,valid
+Stiebel Eltron Slovakia,Ivana Radosavljevic,ivana.radosavljevic@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Accounts Payable Clerk,finance,99%,valid
+Stiebel Eltron Slovakia,Michal Berecky,michal.berecky@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Welding Technician,operations,99%,valid
+Stiebel Eltron Slovakia,Ladislav Belán,ladislav.belan@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,CNC Programmer,it,99%,valid
+Stiebel Eltron Slovakia,Libor Novak,libor.novak@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,Laboratory Development Specialist,health,98%,
+Stiebel Eltron Slovakia,Michal Choma,michal.choma@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,99%,valid
+Stiebel Eltron Slovakia,Juraj Roth,juraj.roth@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Stiebel Eltron Slovakia,Daniel Cech,daniel.cech@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Stiebel Eltron Slovakia,Patrik Prihoda,patrik.prihoda@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Stiebel Eltron Slovakia,Pavol Stasak,pavol.stasak@stiebel-eltron.sk,stiebel-eltron.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,98%,valid
+Termet,Kamil Milczarek,kamil.milczarek@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,Regional Sales Manager,sales,99%,
+Termet,Artur Stawiarski,artur.stawiarski@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,Regional Sales Manager,sales,98%,
+Termet,Artur Jakubczak,artur.jakubczak@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,Regional Sales Manager,sales,97%,
+Termet,Krzysztof Lisiecki,krzysztof.lisiecki@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,94%,
+Termet,Marcin Burek,marcin.burek@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,94%,
+Termet,Joanna Wrobel,joanna.wrobel@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,94%,
+Termet,Monika Targosz,monika.targosz@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,94%,
+Termet,Pawel Nowak,pawel.nowak@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,93%,
+Termet,Mateusz Szulc,mateusz.szulc@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,93%,
+Termet,Dusan Pisarcik,dusan.pisarcik@termet.com.pl,termet.com.pl,波兰,HVAC,hunter.io,Tier2,,,93%,
+Termovent,Aleksandra Tomic,aleksandra.tomic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Senior HR Business Partner,sales,99%,
+Termovent,Stevan Miric,stevan.miric@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Chief Executive Officer,executive,95%,
+Termovent,Ivan Jankovic,ivan.jankovic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Head Of Kladovo Plant,management,95%,
+Termovent,Dragan Spasojevic,dragan.spasojevic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Director of Research and Development,education,95%,valid
+Termovent,Katarina Mijucić,katarina.mijucic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Business Intelligence Analyst,sales,83%,valid
+Termovent,Marija Popović,marija.popovic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Procurement Specialist,operations,99%,
+Termovent,Dejan Stanić,dejan.stanic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Service Engineer,operations,99%,valid
+Termovent,Jovana Djordjic,jovana.djordjic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Marketing Manager,marketing,99%,
+Termovent,Denis Dacic,denis.dacic@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,,,98%,valid
+Termovent,Jelena Rudinac,jelena.rudinac@termovent.rs,termovent.rs,塞尔维亚,HVAC,hunter.io,Tier3,Senior Finance Controller,finance,98%,
+Thermona,Martin Novak,novak@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,94%,invalid
+Thermona,Dusan Zaloudek,zaloudek@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,93%,invalid
+Thermona,Dominik Novacek,novacekd@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,92%,invalid
+Thermona,,viktorin@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,91%,invalid
+Thermona,,obchod@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,90%,invalid
+Thermona,,export@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,89%,unknown
+Thermona,,kubicek@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,88%,invalid
+Thermona,,galat@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,84%,invalid
+Thermona,,prochazka@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,83%,unknown
+Thermona,,foralova@thermona.cz,thermona.cz,捷克,HVAC,hunter.io,Tier2,,,82%,unknown
+Uponor Eastern Europe,Tim Botten,tim.botten@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,Manager,management,94%,valid
+Uponor Eastern Europe,Terje Andersen,terje.andersen@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Mary Armbruster,mary.armbruster@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,Public Works,communication,94%,
+Uponor Eastern Europe,James Griffiths,james.griffiths@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Gabor Bernath,gabor.bernath@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Krisztina Pap,krisztina.pap@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Richard Prate,richard.prate@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,David Keller,david.keller@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Gretchen Desutter,gretchen.desutter@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Uponor Eastern Europe,Zoltan Jonas,zoltan.jonas@uponor.com,uponor.com,区域,HVAC,hunter.io,Tier2,,,94%,
+Vaillant Slovakia,,vaillant@vaillant.sk,vaillant.sk,斯洛伐克,HVAC,hunter.io,Tier2,,,99%,valid
+Viessmann Bulgaria,,info-bg@viessmann.bg,viessmann.bg,保加利亚,HVAC,hunter.io,Tier3,,support,75%,
+Viessmann Czech,,viessmann@viessmann.cz,viessmann.cz,捷克,HVAC,hunter.io,Tier1,,,94%,valid
+Viessmann Czech,,info@viessmann.cz,viessmann.cz,捷克,HVAC,hunter.io,Tier1,,support,79%,valid
+Viessmann Czech,,servis@viessmann.cz,viessmann.cz,捷克,HVAC,hunter.io,Tier1,,,79%,valid
+Viessmann Czech,,zakazky@viessmann.cz,viessmann.cz,捷克,HVAC,hunter.io,Tier1,,,78%,valid
+Viessmann Czech,,energocelky@viessmann.cz,viessmann.cz,捷克,HVAC,hunter.io,Tier1,,,78%,valid
+Xylem/Lowara,Ryan Dobbs,ryan.dobbs@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Director of RMA Services,management,94%,
+Xylem/Lowara,John Lind,john.lind@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Director of Product Development,management,94%,accept_all
+Xylem/Lowara,Chris Lucchesi,chris.lucchesi@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Director of Product Management,management,94%,
+Xylem/Lowara,Nasreen Khan,nasreen.khan@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Senior HR Business Partner,sales,94%,accept_all
+Xylem/Lowara,Shobha Sridharan,shobha.sridharan@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Product Owner,executive,94%,accept_all
+Xylem/Lowara,Malin Jansson,malin.jansson@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Product Owner,executive,94%,accept_all
+Xylem/Lowara,Lori Austin,lori.austin@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Sales Enablement Director,sales,94%,accept_all
+Xylem/Lowara,Jonny Newman,jonny.newman@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Chief Engineer,executive,94%,accept_all
+Xylem/Lowara,Peter Townsend,peter.townsend@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,Business Partner,sales,94%,accept_all
+Xylem/Lowara,Trent Roach,trent.roach@xylem.com,xylem.com,捷克,HVAC,hunter.io,Tier2,"Senior Director, Business Process Transformation",sales,94%,

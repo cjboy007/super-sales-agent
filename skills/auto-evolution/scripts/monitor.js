@@ -48,7 +48,7 @@ function main() {
     try {
       const data = JSON.parse(fs.readFileSync(path.join(TASKS_DIR, file), 'utf8'));
       
-      if (['reviewing', 'executing'].includes(data.status)) {
+      if (['reviewing', 'executing', 'reviewed'].includes(data.status)) {
         const updatedAt = new Date(data.updated_at).getTime();
         const age = Date.now() - updatedAt;
         
@@ -67,9 +67,9 @@ function main() {
         }
       }
       
-      // 3. Detect consecutive failures
+      // 3. Detect consecutive failures — check both 'result' (from executor) and 'verdict' (from reviewer/auditor)
       const recentHistory = (data.history || []).slice(-3);
-      const allFailed = recentHistory.length >= 3 && recentHistory.every(h => h.result === 'failure');
+      const allFailed = recentHistory.length >= 3 && recentHistory.every(h => h.result === 'failure' || h.verdict === 'fail');
       if (allFailed) {
         issues.push(`🚨 Task ${data.task_id} failed 3 times in a row — needs manual intervention`);
       }

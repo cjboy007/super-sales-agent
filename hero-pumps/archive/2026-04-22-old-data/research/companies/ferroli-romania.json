@@ -1,0 +1,25 @@
+{
+  "company": "Ferroli Romania",
+  "country": "罗马尼亚",
+  "website": "ferroli.ro",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "office@ferroli.ro",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:04.465728+00:00",
+    "query": "Ferroli Romania 罗马尼亚 HVAC pump distributor manufacturer",
+    "summary": "Heating - Ferroli https://www. ferroli. com/int/in-the-world For assistance on Ferroli products, please contact the Ferroli service network in your Country. Send us an email to: **presales. export@ferroli.",
+    "sources": [
+      "https://www.ferroli.com/int/in-the-world",
+      "https://rocketreach.co/ferroli-romania-profile_b451fa19fc779ca5",
+      "https://www.ferroli.com/int/industrial"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

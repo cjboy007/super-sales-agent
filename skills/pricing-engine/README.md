@@ -4,7 +4,7 @@
 
 ## Overview
 
-`pricing-engine` 是 Farreach Electronic 的核心定价模块，属于 Evolution 系统 Phase 3。它将材料成本（LME 铜价实时联动）、数量阶梯折扣、客户等级（A/B/C/D）、多币种汇率整合为一套自动化定价流程，并直接集成到 `quotation-workflow` 生成 PDF/HTML 报价单。
+`pricing-engine` 是 Your Company 的核心定价模块，属于 Evolution 系统 Phase 3。它将材料成本（LME 铜价实时联动）、数量阶梯折扣、客户等级（A/B/C/D）、多币种汇率整合为一套自动化定价流程，并直接集成到 `quotation-workflow` 生成 PDF/HTML 报价单。
 
 ## Architecture
 
@@ -73,7 +73,7 @@
 
 ### 快速报价
 ```bash
-cd <pricing-engine-root>/scripts
+cd /path/to/your/.openclaw/workspace/skills/pricing-engine/scripts
 
 # 单品报价
 node pricing-engine.js quote HDMI-2.1-8K-2M 1000 B USD
@@ -169,7 +169,7 @@ PRICE_HISTORY_FILE=/path/to/custom.jsonl  # 自定义历史记录路径
 - `scripts/generate_quotation_html.py`：HTML 报价单生成
 
 确保 quotation-workflow 已安装在：
-`<quotation-workflow-root>/`
+`/path/to/your/.openclaw/workspace/skills/quotation-workflow/`
 
 ### copper-price-monitor 集成
 copper-price-adapter 从 copper-price-monitor 的输出数据文件读取铜价。

@@ -1,0 +1,21 @@
+{
+  "company": "Belimo",
+  "country": "匈牙利",
+  "website": "belimo.com",
+  "tier": "Tier2",
+  "industry": "暖通阀门/执行器",
+  "contacts": [
+    {
+      "name": "Marco Marchetti",
+      "email": "marco.marchetti@belimo.com",
+      "position": "未确认（待补充）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Belimo Hungary HVAC valves actuators",
+    "summary": "Belimo 是瑞士暖通阀门/执行器制造商，在匈牙利有业务。Marco Marchetti 职位未确认。",
+    "sources": []
+  },
+  "outreach_notes": "瑞士暖通阀门/执行器制造商。"
+}

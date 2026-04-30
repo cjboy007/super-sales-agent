@@ -1,0 +1,23 @@
+{
+  "company": "Uponor Eastern Europe",
+  "country": "区域（东欧）",
+  "website": "uponor.com",
+  "tier": "Tier1",
+  "industry": "HVAC/管道",
+  "contacts": [
+    {
+      "name": "Tim Botten",
+      "email": "tim.botten@uponor.com",
+      "position": "Heating and Cooling Category Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Uponor Eastern Europe HVAC pipe system pump procurement",
+    "summary": "Uponor 是北欧领先的管道/暖通系统制造商。Tim Botten 同时担任 Heating & Cooling Category Manager 和 Product Portfolio Product Manager，直接负责暖通品类采购决策。",
+    "sources": [
+      "https://linkedin.com/in/timothy-botten-79755a164"
+    ]
+  },
+  "outreach_notes": "北欧管道/暖通系统龙头。Tim 直接负责暖通品类采购，最佳切入点。"
+}

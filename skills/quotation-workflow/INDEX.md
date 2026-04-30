@@ -8,11 +8,11 @@
 
 ```bash
 # 1. 准备数据（复制示例修改）
-cp /Users/wilson/.openclaw/workspace/skills/quotation-workflow/examples/farreach_sample.json \
+cp /path/to/your/.openclaw/workspace/skills/quotation-workflow/examples/your-company_sample.json \
    my_quotation.json
 
 # 2. 一键生成（Excel + Word + PDF）
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate-all.sh \
+/path/to/your/.openclaw/workspace/skills/quotation-workflow/scripts/generate-all.sh \
   my_quotation.json QT-20260314-001
 
 # 3. 查看结果
@@ -48,26 +48,26 @@ ls -lh QT-20260314-001.*
 ## 📁 关键路径
 
 ```
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/
+/path/to/your/.openclaw/workspace/skills/quotation-workflow/
 ├── INDEX.md                    # 本文档（入口）
 ├── QUICK_START.md              # 快速开始
 ├── SKILL.md                    # 技能文档
 ├── README.md                   # 完整文档
 ├── quotation_data_template.json # 数据模板
 ├── examples/                   # 示例文件
-│   ├── farreach_sample.json
-│   ├── QT-20260314-001-Farreach.xlsx
-│   ├── QT-20260314-001-Farreach.docx
-│   └── QT-20260314-001-Farreach.pdf
+│   ├── your-company_sample.json
+│   ├── QT-20260314-001-Your Company.xlsx
+│   ├── QT-20260314-001-Your Company.docx
+│   └── QT-20260314-001-Your Company.pdf
 └── scripts/
     ├── generate-all.sh         # 一键生成 ⭐
     ├── convert-to-pdf.sh       # PDF 批量转换
 ```
 
 **相关技能：**
-- Excel: `/Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/`
-- Word: `/Users/wilson/.openclaw/workspace/skills/word-docx/scripts/`
-- 读取 DOCX: `/Users/wilson/.openclaw/workspace/skills/read-docx/`
+- Excel: `/path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/`
+- Word: `/path/to/your/.openclaw/workspace/skills/word-docx/scripts/`
+- 读取 DOCX: `/path/to/your/.openclaw/workspace/skills/read-docx/`
 
 ---
 
@@ -112,7 +112,7 @@ python3 read-docx.py "QT-*.docx" -v
 
 1. **查看快速指南** → `QUICK_START.md`
 2. **查看数据格式** → `SKILL.md` 的"数据格式"章节
-3. **查看示例** → `examples/farreach_sample.json`
+3. **查看示例** → `examples/your-company_sample.json`
 4. **查看完整文档** → `README.md`
 
 ---

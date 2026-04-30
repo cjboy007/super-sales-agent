@@ -1,0 +1,23 @@
+{
+  "company": "GC-Gruppe",
+  "country": "德国",
+  "website": "gc-gruppe.com",
+  "tier": "Tier1",
+  "industry": "暖通批发分销",
+  "contacts": [
+    {
+      "name": "通用邮箱",
+      "email": "info@gc-gruppe.com",
+      "position": "待确认（需补充）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "GC Gruppe Germany HVAC wholesale distributor",
+    "summary": "GC-Gruppe 是德国大型暖通批发分销商，产品涵盖锅炉、热泵、管道和泵类产品。",
+    "sources": [
+      "https://gc-gruppe.com"
+    ]
+  },
+  "outreach_notes": "大型暖通分销商，采购量大。需找到具体采购负责人。"
+}

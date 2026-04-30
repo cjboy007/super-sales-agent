@@ -1,0 +1,19 @@
+{
+  "company": "Uponor Eastern Europe",
+  "country": "区域",
+  "website": "uponor.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [],
+  "research": {
+    "searched_at": "2026-04-20T15:51:39.762292+00:00",
+    "query": "Uponor Eastern Europe Europe HVAC pump distributor manufacturer",
+    "summary": "Uponor Oyj is a Finnish company specializing in plumbing, radiant heating/cooling, and indoor climate solutions for residential and commercial buildings. Listed on Helsinki Stock Exchange. Products sold in 100+ countries, prominent in Nordic and Eastern European markets. Also operates infrastructure pipe systems (water/wastewater). Recently acquired by Georg Fischer for €2.2bn.",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Uponor",
+      "https://www.uponor.com/en-en/products",
+      "https://www.expoclima.net/en/aziende/5371/uponor-srl"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。Uponor 主营管道系统而非泵体，但其地暖/供水系统可能需要循环泵配套。建议通过其采购或产品团队切入，推荐 Farreach 的 OEM 配套方案。注意 Uponor 已被 Georg Fischer 收购，需关注供应链变化。"
+}

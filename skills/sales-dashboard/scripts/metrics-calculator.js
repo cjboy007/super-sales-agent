@@ -100,7 +100,7 @@ function calcYoY(currentMetrics) {
   try {
     const prev = JSON.parse(fs.readFileSync(path.join(SNAPSHOTS_DIR, files[0]), 'utf-8'));
     const changes = {};
-    const numKpis = ['new_leads', 'new_customers', 'order_count', 'order_amount', 'quotation_count', 'quotation_amount'];
+    const numKpis = ['new_leads', 'new_customers', 'order_count', 'order_amount', 'quotation_count', 'quotation_amount', 'repeat_purchase_rate', 'repeat_purchase_cycle_days'];
     
     for (const kpi of numKpis) {
       const cur = currentMetrics.kpis[kpi];
@@ -142,15 +142,15 @@ function detectAnomalies(metrics) {
     });
   }
   
-  // 报价无订单
-  if (typeof kpis.quotation_count === 'number' && kpis.quotation_count > 5 && kpis.order_count === 0) {
+  // 复购率过低
+  if (typeof kpis.repeat_purchase_rate === 'number' && kpis.repeat_purchase_rate < 20) {
     alerts.push({
-      type: 'quotation_no_order',
-      severity: 'warning',
-      message: `⚠️ ${kpis.quotation_count} 份报价但 0 订单，需检查报价竞争力`
+      type: 'low_repeat_purchase_rate',
+      severity: 'info',
+      message: `📉 复购率仅 ${kpis.repeat_purchase_rate}%，建议关注老客户激活与二次成交`
     });
   }
-  
+
   return alerts;
 }
 
@@ -179,6 +179,15 @@ function main() {
     metrics.yoy = yoy;
     console.log('\n=== 同比 ===');
     console.log(JSON.stringify(yoy.changes, null, 2));
+  }
+
+  // 2.5 复购分析
+  if (metrics.repeat_purchase) {
+    console.log('\n=== 复购分析 ===');
+    console.log(`  复购率: ${metrics.kpis.repeat_purchase_rate}`);
+    console.log(`  复购周期(天): ${metrics.kpis.repeat_purchase_cycle_days}`);
+    console.log(`  月度趋势条数: ${(metrics.repeat_purchase.monthly_trend || []).length}`);
+    console.log(`  TOP10客户数: ${(metrics.repeat_purchase.top10_customers || []).length}`);
   }
   
   // 3. 异常检测

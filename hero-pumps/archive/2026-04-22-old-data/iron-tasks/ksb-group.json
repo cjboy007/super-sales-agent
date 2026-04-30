@@ -1,0 +1,42 @@
+{
+  "company": "KSB Group",
+  "country": "区域",
+  "contacts": [
+    {
+      "name": "Sebastian Lang",
+      "email": "sebastian.lang@ksb.com",
+      "position": "Product Owner"
+    },
+    {
+      "name": "Vanessa Völker",
+      "email": "vanessa.voelker@ksb.com",
+      "position": "Director of Corporate Functions"
+    },
+    {
+      "name": "Helmut Lammers",
+      "email": "helmut.lammers@ksb.com",
+      "position": "Regional Director"
+    },
+    {
+      "name": "Ivan Morales",
+      "email": "ivan.morales@ksb.com",
+      "position": "Head of Shipping"
+    },
+    {
+      "name": "Colleen Mace",
+      "email": "colleen.mace@ksb.com",
+      "position": "Vice President"
+    },
+    {
+      "name": "Sabine Müller",
+      "email": "sabine.mueller@ksb.com",
+      "position": "Vice President of Innovation"
+    },
+    {
+      "name": "Suman Malik",
+      "email": "suman.malik@ksb.com",
+      "position": "Senior Service Executive"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 KSB Group 写开发信。\n\n## 公司背景\n- **公司：** KSB Group（区域）\n- **网站：** ksb.com\n- **行业：** HVAC\n- **调研：** Heating and Cooling Supply - KSB  com/en-ke/applications/building-services/heating-and-cooling-supply KSB is the only supplier on the market to offer a complete range of heating, air-conditioning and \n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Christof Lindner | christof.lindner@ksb.com | Vice President of Sales\n2. Christof Lindner | christof.lindner@ksb.com | Vice President of Sales\n3. Sebastian Lang | sebastian.lang@ksb.com | Product Owner\n4. Sebastian Lang | sebastian.lang@ksb.com | Product Owner\n5. Vanessa Völker | vanessa.voelker@ksb.com | Director of Corporate Functions\n6. Helmut Lammers | helmut.lammers@ksb.com | Regional Director\n7. Vanessa Völker | vanessa.voelker@ksb.com | Director of Corporate Functions\n8. Helmut Lammers | helmut.lammers@ksb.com | Regional Director\n9. Ivan Morales | ivan.morales@ksb.com | Head of Shipping\n10. Ivan Morales | ivan.morales@ksb.com | Head of Shipping\n11. Colleen Mace | colleen.mace@ksb.com | Vice President\n12. Sabine Müller | sabine.mueller@ksb.com | Vice President of Innovation\n13. Suman Malik | suman.malik@ksb.com | Senior Service Executive\n14. Christian Ehm | christian.ehm@ksb.com | Treasurer\n15. Verena Späth | verena.spaeth@ksb.com | HR Business Partner\n16. Colleen Mace | colleen.mace@ksb.com | Vice President\n17. Sabine Müller | sabine.mueller@ksb.com | Vice President of Innovation\n18. Suman Malik | suman.malik@ksb.com | Senior Service Executive\n19. Christian Ehm | christian.ehm@ksb.com | Treasurer\n20. Verena Späth | verena.spaeth@ksb.com | HR Business Partner\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

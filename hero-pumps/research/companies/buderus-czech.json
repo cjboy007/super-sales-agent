@@ -1,0 +1,23 @@
+{
+  "company": "Buderus Czech",
+  "country": "捷克",
+  "website": "buderus.cz",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Petr Jindra",
+      "email": "jindra@buderus.cz",
+      "position": "Regional Sales Representative"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Buderus Czech HVAC Bosch subsidiary",
+    "summary": "Buderus 是 Bosch 旗下暖通品牌，在捷克有销售和分销网络。Petr Jindra 负责捷克中部和东部区域销售。可通过其了解当地经销商网络并引荐采购联系人。",
+    "sources": [
+      "https://buderus.cz"
+    ]
+  },
+  "outreach_notes": "Bosch 旗下暖通品牌。Petr 是销售岗，可请其引荐采购负责人。"
+}

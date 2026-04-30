@@ -1,0 +1,547 @@
+{
+  "metadata": {
+    "generated_at": "2026-04-29T09:40:52Z",
+    "input_count": 5,
+    "search_provider": "searxng",
+    "llm_mode": "never",
+    "llm_model": null
+  },
+  "summary": {
+    "fit_counts": {
+      "high": 5,
+      "medium": 0,
+      "low": 0
+    },
+    "scoring_methods": {
+      "llm_batch": 0,
+      "heuristic": 5
+    },
+    "search_error_companies": 0,
+    "llm_errors": []
+  },
+  "results": [
+    {
+      "company_name": "EVROLAN",
+      "email": "gerenski@eurolan.net",
+      "website": "https://eurolan.net",
+      "domain": "eurolan.net",
+      "fit_rating": "high",
+      "quality_score": 100,
+      "confidence": "medium",
+      "summary": "Heuristic rating high; detected signals: cable, cables, wire, wires, wiring. Top result: Shore Llc - Global Trade Intelligence Platform for Smarter Business Growth",
+      "evidence_urls": [
+        "https://www.marketinsidedata.com/en/company/shore-llc/ec25aaf8e46550a2e0f2498d077af2c2",
+        "https://www.eve-electronics.com/",
+        "https://support.microsoft.com/en-us/contactus"
+      ],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "high",
+        "score": 429,
+        "reasons": [
+          "+30:cable",
+          "+30:cables",
+          "+21:wire",
+          "+14:wires",
+          "+6:wiring",
+          "+48:hdmi",
+          "+28:displayport",
+          "+36:usb",
+          "+24:usb-c",
+          "+36:fiber",
+          "+16:optical",
+          "+24:lan cable",
+          "+5:adapter",
+          "+8:connector",
+          "+27:distributor",
+          "+24:wholesale",
+          "+15:av",
+          "+7:networking",
+          "+18:oem",
+          "+12:odm"
+        ]
+      },
+      "queries": [
+        "\"EVROLAN\" company products distributor cable electronics",
+        "EVROLAN HDMI USB cable distributor"
+      ],
+      "search_results": [
+        {
+          "title": "Shore Llc - Global Trade Intelligence Platform for Smarter Business Growth",
+          "url": "https://www.marketinsidedata.com/en/company/shore-llc/ec25aaf8e46550a2e0f2498d077af2c2",
+          "snippet": "The company's major import commodities include products classified under HS Code 8544492000 (Cables ... Evrolan Llc of 1.92 Mn, Anlan Llc of 1.59 Mn, Ereg Llc of ...",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "electronics distributor | Connectors - Electronic Components - Cable assembly - EVE GmbH",
+          "url": "https://www.eve-electronics.com/",
+          "snippet": "Our assortment of electronic components also contains various types of batteries, power supplies, tools and cables as well as equipment for the connection technology. Depending on the branch, if you are a manufacturer, developer, a trading partner, a prefabricator or working for a public institution, we can offer you an individual concept for a perfect disposition and thus the base to an economic fabrication of your products.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Contact Us - Microsoft Support",
+          "url": "https://support.microsoft.com/en-us/contactus",
+          "snippet": "Contact Microsoft Support. Find solutions to common problems, or get help from a support agent.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Supply Chain Data Of Llc Evrolan Company Profile | Trademo",
+          "url": "https://www.trademo.com/companies/llc-evrolan/44346488",
+          "snippet": "Trademo collects Llc Evrolan's import-export shipments data from a variety of public and private sources including Bill of Lading, Customs Declarations of several countries etc. After collecting Llc Evrolan import-export transactional data, it is a standardized and normalized to build a 360-degree trade profile of the company.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "opticom.bg alternatives | Top 47 similar sites like opticom.bg",
+          "url": "https://www.sitelike.org/similar/opticom.bg/",
+          "snippet": "If you're searching for similar sites, the top 5 opticom.bg alternatives are danimpex.com, evrolan.net, ic-intracom.bg, kabeli.eu, opticom-bg.com. This ...",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Arrow Electronics: Connect with Electronic Components | Arrow.com",
+          "url": "https://www.arrow.com/",
+          "snippet": "Arrow’s supply chain solutions help you gain more control, resilience and visibility across your global electronics supply chain.More about Supply Chain Solutions ... We help source, build and launch products that improve the quality of life for people around the world.",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Microsoft Support",
+          "url": "https://support.microsoft.com/en-us",
+          "snippet": "Microsoft Support is here to help you with Microsoft products. Find how-to articles, videos, and training for Microsoft Copilot, Microsoft 365, Windows 11, Surface, and more.",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "EVROLAN BG EOOD Company Profile - Dun & Bradstreet",
+          "url": "https://www.dnb.com/business-directory/company-profiles.evrolan_bg_eood.87f7d45c0f5427ae987d8f71d1797060.html",
+          "snippet": "Find company research, competitor information, contact details & financial data for EVROLAN BG EOOD of Montana. Get the latest business insights from Dun & Bradstreet.",
+          "source": "searxng",
+          "score": 0.5
+        }
+      ],
+      "errors": [],
+      "extra": {}
+    },
+    {
+      "company_name": "ALTACOM TELECOMUNICAÇÕES",
+      "email": "contato@altacom.com.br",
+      "website": "https://altacom.com.br",
+      "domain": "altacom.com.br",
+      "fit_rating": "high",
+      "quality_score": 100,
+      "confidence": "medium",
+      "summary": "Heuristic rating high; detected signals: cable, cables, wire, wiring, hdmi. Top result: Company profile - Altacom",
+      "evidence_urls": [
+        "https://www.altacomitalia.it/en/company-profile/",
+        "https://news.yahoo.co.jp/",
+        "https://br.linkedin.com/company/altacom-telecomunica%C3%A7%C3%B5es-e-inform%C3%A1tica-ltda"
+      ],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "high",
+        "score": 260,
+        "reasons": [
+          "+30:cable",
+          "+30:cables",
+          "+21:wire",
+          "+6:wiring",
+          "+48:hdmi",
+          "+36:usb",
+          "+12:fiber",
+          "+15:adapter",
+          "+24:connector",
+          "+9:distributor",
+          "+24:wholesale",
+          "+15:av",
+          "-18:bank",
+          "+8:official-domain-hit"
+        ]
+      },
+      "queries": [
+        "\"ALTACOM TELECOMUNICAÇÕES\" company products distributor cable electronics",
+        "ALTACOM TELECOMUNICAÇÕES HDMI USB cable distributor"
+      ],
+      "search_results": [
+        {
+          "title": "Company profile - Altacom",
+          "url": "https://www.altacomitalia.it/en/company-profile/",
+          "snippet": "ALTACOM has a technological and automated factory while maintaining its artisanal soul. The strong equilibrium between the high precision guaranteed by modern ...缺少字詞： TELECOMUNICAÇÕES distributor cable",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Yahoo!ニュース",
+          "url": "https://news.yahoo.co.jp/",
+          "snippet": "2 days ago · Facebook 共同企画、独自制作コンテンツなどを投稿 X（旧Twitter） リアルタイムでニュースを配信 news HACK Yahoo!ニュースのオウンドメディア",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Altacom Telecomunicações E Informática Ltda | LinkedIn",
+          "url": "https://br.linkedin.com/company/altacom-telecomunica%C3%A7%C3%B5es-e-inform%C3%A1tica-ltda",
+          "snippet": "Altacom Telecomunicações E Informática Ltda Telecomunicações São Paulo, SP 14 seguidores Sobre nós Altacom Telecomunicações E Informática Ltda is a company based out of Brazil.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "[PDF] AVR-4308 - Denon",
+          "url": "https://assets.denon.com/documentmaster/uk/bed_avr-4308a.pdf",
+          "snippet": "To completely disconnect this product from the mains, disconnect the plug from the wall socket outlet. The mains plug is used to completely interrupt the power ...",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Google ニュース",
+          "url": "https://news.google.com/home?hl=ja&ceid=JP%3Aja",
+          "snippet": "トランプ氏、イラン提案に「早急に」対応へ－原油続伸で111ドル台（Bloomberg） 6 時間前 Yahoo!ニュース トランプ氏「イラン崩壊状態」、 ホルムズ開放を要請と主張（ロイター） 1 時間前 ニュー …",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Altacom Telecomunicações E Informática Ltda",
+          "url": "https://www.empresafone.com.br/empresa/altacom-telecomunicacoes-e-informatica-ltda-sao-paulo-sp-jardim-vila-formosa-1894554",
+          "snippet": "Rua Rego Barros, 77 - Jardim Vila Formosa. ☎️ (11) 2783-97.... Confira o telefone, endereço, avaliações e outras informações",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "[PDF] Review of Cable & Wireless Guernsey's Price Control",
+          "url": "https://www.gcra.gg/sites/default/files/case-document/t07g-review-of-cable-wireless-guernseys-price-control-draft-decision.pdf",
+          "snippet": "The DG proposes to find C&W Guernsey Limited dominant in the retail mobile telecommunications market and C&W Guernsey, Wave Telecom and Guernsey Airtel dominant ...",
+          "source": "searxng",
+          "score": 0.3333333333333333
+        },
+        {
+          "title": "ライブドアニュース（livedoor ニュース）",
+          "url": "https://news.livedoor.com/",
+          "snippet": "ライブドアニュースは、幅広いジャンルのニュースをいち早くお伝えします。わかりやすさ、読みやすさにこだわり、記事の核心をまとめた要約 ...",
+          "source": "searxng",
+          "score": 0.3333333333333333
+        }
+      ],
+      "errors": [],
+      "extra": {}
+    },
+    {
+      "company_name": "AFRASTELECOM",
+      "email": "afras@afrastelecom.com.br",
+      "website": "https://afrastelecom.com.br",
+      "domain": "afrastelecom.com.br",
+      "fit_rating": "high",
+      "quality_score": 100,
+      "confidence": "medium",
+      "summary": "Heuristic rating high; detected signals: cable, cables, wire, hdmi, displayport. Top result: WhatsApp Web",
+      "evidence_urls": [
+        "https://web.whatsapp.com/",
+        "https://www.linkedin.com/directory/companies/a-98",
+        "https://wa.me/?locale=en_US"
+      ],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "high",
+        "score": 336,
+        "reasons": [
+          "+30:cable",
+          "+30:cables",
+          "+21:wire",
+          "+48:hdmi",
+          "+14:displayport",
+          "+36:usb",
+          "+24:fiber",
+          "+10:aoc",
+          "+24:lan cable",
+          "+15:adapter",
+          "+8:connector",
+          "+27:distributor",
+          "+24:wholesale",
+          "+5:retailer",
+          "+5:av",
+          "+7:networking",
+          "+6:oem",
+          "+6:odm",
+          "-12:university",
+          "+8:official-domain-hit"
+        ]
+      },
+      "queries": [
+        "\"AFRASTELECOM\" company products distributor cable electronics",
+        "AFRASTELECOM HDMI USB cable distributor"
+      ],
+      "search_results": [
+        {
+          "title": "WhatsApp Web",
+          "url": "https://web.whatsapp.com/",
+          "snippet": "Acesse o WhatsApp Web para enviar mensagens e arquivos de um jeito simples, confiável e seguro no seu computador. Totalmente gratuito.",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Companies starting with 'A' - Page 98 - LinkedIn",
+          "url": "https://www.linkedin.com/directory/companies/a-98",
+          "snippet": "Aflak Electronics Industries Company · Aflak Novin Kar · Aflak Solutions ... Afrastelecom · Afrastudio · Afrat.org · Afratec hooshmand co| شرکت نوآوران افراتک ...",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "WhatsApp - wa.me",
+          "url": "https://wa.me/?locale=en_US",
+          "snippet": "Hosted by WhatsApp 2026 © WhatsApp LLC Privacy & Terms",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "WhatsApp Web Login – Quick Setup on PC or Mac - Techlicious",
+          "url": "https://www.techlicious.com/tip/how-to-use-whatsapp-web/",
+          "snippet": "Feb 10, 2026 · WhatsApp Web lets you use your account in a browser on a Windows PC or Mac, syncing your messages so you can type, send files, and manage conversations without picking up …",
+          "source": "searxng",
+          "score": 0.3333333333333333
+        },
+        {
+          "title": "2 Cara Login WhatsApp Web dengan Mudah dan Cepat - Kompas.com",
+          "url": "https://tekno.kompas.com/read/2024/10/12/14350027/2-cara-login-whatsapp-web-dengan-mudah-dan-cepat",
+          "snippet": "Oct 12, 2024 · Cara login WhatsApp Web itu cukup mudah. Setidaknya, terdapat dua cara login WA Web di laptop atau PC yang bisa dilakukan pengguna.",
+          "source": "searxng",
+          "score": 0.25
+        },
+        {
+          "title": "WhatsApp Web: Cara Login, Scan, dan Menggunakannya (2026)",
+          "url": "https://teknogram.id/whatsapp-web/",
+          "snippet": "Feb 10, 2026 · Baru pertama kali pakai WA Web? Yuk, kenali apa itu WhatsApp Web mulai dari cara login, scan, fitur, hingga penggunaannya untuk keperluan sehari-hari.",
+          "source": "searxng",
+          "score": 0.2
+        },
+        {
+          "title": "WhatsApp Web: Panduan Lengkap Cara Login dan Menggunakannya",
+          "url": "https://it.telkomuniversity.ac.id/whatsapp-web-panduan-lengkap-cara-login-dan-menggunakannya/",
+          "snippet": "Jan 7, 2025 · Pelajari cara mudah menggunakan WhatsApp Web dan panduan lengkap WhatsApp Web login tanpa ribet. Temukan solusi praktis untuk akses cepat ke akun WhatsApp Anda melalui …",
+          "source": "searxng",
+          "score": 0.16666666666666666
+        },
+        {
+          "title": "Begini Cara Login Whatsapp Web dari Laptop dan HP dengan",
+          "url": "https://inet.detik.com/tips-dan-trik/d-7003196/begini-cara-login-whatsapp-web-dari-laptop-dan-hp-dengan-mudah-tanpa-ribet",
+          "snippet": "Oct 26, 2023 · Browser web yang bisa digunakan yaitu Google Chrome, Microsoft Edge, dan Mozilla Firefox. WhatsApp web memiliki fungsi dan fitur yang sama dengan aplikasi WhatsApp yang ada di HP.",
+          "source": "searxng",
+          "score": 0.14285714285714285
+        }
+      ],
+      "errors": [],
+      "extra": {}
+    },
+    {
+      "company_name": "GOOD 42 IT-SOLUTIONS",
+      "email": "bestellung@good42.de",
+      "website": "https://good42.de",
+      "domain": "good42.de",
+      "fit_rating": "high",
+      "quality_score": 100,
+      "confidence": "medium",
+      "summary": "Heuristic rating high; detected signals: cable, cables, wire, wiring, hdmi. Top result: good， well， great， nice的区别是什么？_百度知道",
+      "evidence_urls": [
+        "https://zhidao.baidu.com/question/948122270208541012.html",
+        "https://good42.de/en/home/",
+        "https://www.zhihu.com/question/14030126745"
+      ],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "high",
+        "score": 398,
+        "reasons": [
+          "+30:cable",
+          "+30:cables",
+          "+7:wire",
+          "+6:wiring",
+          "+48:hdmi",
+          "+14:displayport",
+          "+36:usb",
+          "+36:usb-c",
+          "+12:fiber",
+          "+8:optical",
+          "+30:ethernet",
+          "+15:adapter",
+          "+8:connector",
+          "+27:distributor",
+          "+24:wholesale",
+          "+15:av",
+          "+14:networking",
+          "+18:oem",
+          "+12:odm",
+          "+8:official-domain-hit"
+        ]
+      },
+      "queries": [
+        "\"GOOD 42 IT-SOLUTIONS\" company products distributor cable electronics",
+        "GOOD 42 IT-SOLUTIONS HDMI USB cable distributor"
+      ],
+      "search_results": [
+        {
+          "title": "good， well， great， nice的区别是什么？_百度知道",
+          "url": "https://zhidao.baidu.com/question/948122270208541012.html",
+          "snippet": "Oct 16, 2023 · 1. \"Good\" 是一个非常通用的形容词，通常指某样东西质量好，或者某个人做得好。 例如，“I had a good meal” （我吃了个好饭），“She's a good person\"（她是个好人）等等。 2. \"Well\" 与 …",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "GOOD 42. - IT-Solutions GmbH",
+          "url": "https://good42.de/en/home/",
+          "snippet": "2023年3月19日 · Our focus is on trading in IT products from leading manufacturers. We support our customers with a wide range of products and services. Based on ...缺少字詞： distributor cable electronics",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "英语中，good和well的区别？ - 知乎",
+          "url": "https://www.zhihu.com/question/14030126745",
+          "snippet": "Mar 4, 2025 · 1. Good（形容词） 核心意义是好的，可以表示质量、品质或状态的优良。，修饰名词：a good book（好书）、good weather（好天气）。也可以描述人的能力或行为：She is good at math（ …",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Find A Distributor - Channel Partners - Hikvision Global",
+          "url": "https://www.hikvision.com/en/Partners/channel-partners/find-a-distributor/",
+          "snippet": "Search for an authorized Hikvision distributor in your country or region and find contact information here. Hikvision, a top-of-the-line AIoT solutions and ...",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "for good 为什么是“永远”的意思？ - 知乎",
+          "url": "https://www.zhihu.com/question/472047980",
+          "snippet": "Jul 13, 2021 · The idiom \"for good\" (meaning \"for a very long time\" or \"for all time\") ultimately came to mean \"forever\" or \"for the rest of your days\". 自十四世纪以来，在善的含义中，当用于可以计数或测量 …",
+          "source": "searxng",
+          "score": 0.3333333333333333
+        },
+        {
+          "title": "[PDF] Vendor ID - USB-IF",
+          "url": "https://www.usb.org/sites/default/files/vendor_ids03102026_0.pdf",
+          "snippet": "2026年3月10日 · Changzhou Wujin BEST Electronic Cables Co., Ltd. 8181. Changzhou Xinchao Technologies, Inc. 8408. Changzhoushi Wujin Miqi East Electronics Co., ...",
+          "source": "searxng",
+          "score": 0.3333333333333333
+        },
+        {
+          "title": "在英语中，good和well有何区别？ - 知乎",
+          "url": "https://www.zhihu.com/question/297114025",
+          "snippet": "很简单呀~ good是形容词， 它修饰的是：名词 例如： He is a good student. （他是一个好学生。） 在上句中，被修饰的词是 名词student，所以用的就是good。 而well是副词， 它修饰的是：动词 例如： …",
+          "source": "searxng",
+          "score": 0.25
+        },
+        {
+          "title": "Top Cable Distributors in Ernakulam near me - Justdial",
+          "url": "https://www.justdial.com/Ernakulam/Cable-Distributors/nct-10066870",
+          "snippet": "評分 4.2(1,039)Cable Distributors in Ernakulam - Find top-rated suppliers for all your cable needs! Buy, sell, or explore the best deals on electrical, data, ...",
+          "source": "searxng",
+          "score": 0.25
+        }
+      ],
+      "errors": [],
+      "extra": {}
+    },
+    {
+      "company_name": "X-GEN NETWORKS",
+      "email": "partners@x-gennetworks.com.au",
+      "website": "https://x-gennetworks.com.au",
+      "domain": "x-gennetworks.com.au",
+      "fit_rating": "high",
+      "quality_score": 100,
+      "confidence": "medium",
+      "summary": "Heuristic rating high; detected signals: cable, cables, wire, hdmi, usb. Top result: [PDF] Xgen Series | Modular Power Solutions | Advanced Energy",
+      "evidence_urls": [
+        "https://www.advancedenergy.com/getmedia/8f696a54-b178-4259-8424-67173b6c5db3/en-lv-xgen-brochure.pdf",
+        "https://www.zhihu.com/question/1981809570432194448",
+        "https://en.autech.com.tw/xgen-series.html"
+      ],
+      "scoring_method": "heuristic",
+      "heuristic": {
+        "rating": "high",
+        "score": 383,
+        "reasons": [
+          "+30:cable",
+          "+30:cables",
+          "+7:wire",
+          "+48:hdmi",
+          "+36:usb",
+          "+36:usb-c",
+          "+24:fiber",
+          "+24:fibre",
+          "+30:ethernet",
+          "+10:cat6",
+          "+15:adapter",
+          "+8:connector",
+          "+27:distributor",
+          "+16:wholesale",
+          "+8:importer",
+          "+15:av",
+          "+7:networking",
+          "+6:oem",
+          "+6:odm"
+        ]
+      },
+      "queries": [
+        "\"X-GEN NETWORKS\" company products distributor cable electronics",
+        "X-GEN NETWORKS HDMI USB cable distributor"
+      ],
+      "search_results": [
+        {
+          "title": "[PDF] Xgen Series | Modular Power Solutions | Advanced Energy",
+          "url": "https://www.advancedenergy.com/getmedia/8f696a54-b178-4259-8424-67173b6c5db3/en-lv-xgen-brochure.pdf",
+          "snippet": "Excelsys Technologies brings over 20 years experience of modular power supply development and applications support in our revolutionary Xgen series of products.",
+          "source": "searxng",
+          "score": 1.6666666666666665
+        },
+        {
+          "title": "如何看待中国国防部在海外社交媒体平台X正式开通官方账号？",
+          "url": "https://www.zhihu.com/question/1981809570432194448",
+          "snippet": "中国国防部于2025年12月8日在海外社交媒体平台X正式开通官方账号，账号名为\"Ministry of National De… 梦回2011年的微博，而且加强了，这辈子见过的最精彩的评论区，两波人魔法对轰，实力旗鼓相 …",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "Xgen Series - Autech Technology",
+          "url": "https://en.autech.com.tw/xgen-series.html",
+          "snippet": "Our Xgen Ultra-Quiet series is designed for high efficiency and low acoustic noise and consists of ten powerPacs.The compact 1U supplies offer up to 800 W of ...",
+          "source": "searxng",
+          "score": 1.0
+        },
+        {
+          "title": "如何评价美国恐怖电影《X》？",
+          "url": "https://www.zhihu.com/tardis/bd/ans/2450929317",
+          "snippet": "最终，X评级与色情电影变得越来越密切，越来越多的影院也开始拒绝放映X级影片。 到1990年，美国电影协会停用了X评级，取而代之的是NC-17。 与X评级不同的是，NC-17有商标，不能自行应用，但 …",
+          "source": "searxng",
+          "score": 0.5
+        },
+        {
+          "title": "Xgen series - 新傑雅股份有限公司|",
+          "url": "https://www.newjr.com.tw/product/xgen-series/",
+          "snippet": "新傑雅專注於節能減碳的龐大市場需求，提供同步整流和低功耗待載IC設計及高效率智能電源，協助研發單位完成不同領域新產品的開發，如通訊、運算、醫療、自動控制和軍事特殊的 ...缺少字詞： NETWORKS company distributor cable electronics",
+          "source": "searxng",
+          "score": 0.4722222222222222
+        },
+        {
+          "title": "Cablenet - Wholesale Cables Distributor - CMS Store",
+          "url": "https://store.cmsdistribution.com/en-gb/vendors/cablenet",
+          "snippet": "Cablenet's full range of cables are now available to shop through the CMS Store. Easy online ordering. Next day delivery.",
+          "source": "searxng",
+          "score": 0.3484848484848485
+        },
+        {
+          "title": "如何评价美国恐怖电影《X》？ - 知乎",
+          "url": "https://www.zhihu.com/question/522624266",
+          "snippet": "A24恐怖片《X》迷影彩蛋全解析： 电影风格也像时尚一样轮回，当创新停滞不前时，复古就成了解决方法。 2022年这部以复古样子出现的恐怖片《X》引发了很多讨论。 从影片故意做旧的海报就能看出 …",
+          "source": "searxng",
+          "score": 0.3333333333333333
+        },
+        {
+          "title": "X上面被认定为未成年怎么解决? - 知乎",
+          "url": "https://www.zhihu.com/question/1932813092426880354",
+          "snippet": "以后我们欧洲IP可能要找一个可以魔法到其他国家的软件了 [惊喜] 其实身份认证本质上是不需要花钱的，奈何保国同志毒就毒在规定一定要有 premium 才能身份认证，所以相当于一定要花11欧才能不被 …",
+          "source": "searxng",
+          "score": 0.25
+        }
+      ],
+      "errors": [],
+      "extra": {}
+    }
+  ]
+}

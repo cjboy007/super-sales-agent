@@ -18,10 +18,9 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 
 // ==================== 配置 ====================
-const OKKI_WORKSPACE = process.env.OKKI_WORKSPACE || path.resolve(__dirname, '../../../xiaoman-okki');
-const ENV_PATH = process.env.ENV_PATH || path.resolve(__dirname, '../../../.env');
-const OKKI_CONFIG_PATH = path.join(OKKI_WORKSPACE, 'api/config.json');
-const TOKEN_CACHE_PATH = path.join(OKKI_WORKSPACE, 'api/token.cache');
+const ENV_PATH = '/path/to/your/.openclaw/workspace/.env';
+const OKKI_CONFIG_PATH = '/path/to/your/.openclaw/workspace/xiaoman-okki/api/config.json';
+const TOKEN_CACHE_PATH = '/path/to/your/.openclaw/workspace/xiaoman-okki/api/token.cache';
 
 const CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/segmentation-rules.json'), 'utf8'));
 const DATA_DIR = path.join(ROOT, 'data');

@@ -1,0 +1,24 @@
+{
+  "company": "Airco HVACR",
+  "country": "波兰",
+  "website": "airco.com.pl",
+  "tier": "Tier1",
+  "industry": "HVAC 分销",
+  "contacts": [
+    {
+      "name": "Artur Gondek",
+      "email": "a.gondek@airco.com.pl",
+      "position": "CEO / Co-founder"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Airco HVACR Poland Samsung heat pump distributor",
+    "summary": "Airco HVACR 是波兰 HVACR 批发商，也是 Samsung 热泵在波兰的经销商。Artur Gondek 是 CEO/创始人，Krystian Gondek (k.gondek@airco.com.pl) 可能是联合创始人。作为经销商，他们采购泵类产品用于项目配套。",
+    "sources": [
+      "https://airco.com.pl",
+      "https://linkedin.com/in/artur-gondek"
+    ]
+  },
+  "outreach_notes": "波兰 HVACR 批发商，Samsung 热泵波兰经销商。经销商老板，有采购决策权。"
+}

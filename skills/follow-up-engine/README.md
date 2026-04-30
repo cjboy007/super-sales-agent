@@ -177,7 +177,7 @@ node scripts/follow-up-scheduler.js --dry-run --debug
 
 ```bash
 # 检查 OKKI CLI 连接
-python3 /Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py --help
+python3 /path/to/your/.openclaw/workspace/xiaoman-okki/api/okki.py --help
 
 # 查看同步日志
 cat logs/okki-integration-$(date +%Y-%m-%d).log

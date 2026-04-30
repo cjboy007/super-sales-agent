@@ -2,7 +2,7 @@
 
 本地订单跟踪系统 — 手动状态管理 + 客户邮件通知 + 命令行看板
 
-> 适用于 Farreach Electronic，task-005 产出物，由 IRON (qwen3.5-plus) 实现，WILSON 审阅通过。
+> 适用于 Your Company，task-005 产出物，由 IRON (qwen3.5-plus) 实现，WILSON 审阅通过。
 
 ---
 
@@ -79,7 +79,7 @@ pending_production → in_production → ready_to_ship → shipped → completed
 ### 安装依赖
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/order-tracker
+cd /path/to/your/.openclaw/workspace/skills/order-tracker
 npm install
 ```
 
@@ -132,7 +132,7 @@ node update-order-status.js --order-id ORD-xxx --status completed \
 ### 2. 发送客户邮件通知
 
 > **依赖：** 需要 `imap-smtp-email` skill 的 `.env` 文件，路径为  
-> `/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/.env`
+> `/path/to/your/.openclaw/workspace/skills/imap-smtp-email/.env`
 
 ```bash
 cd scripts/
@@ -292,7 +292,7 @@ node order-dashboard.js
 通知脚本复用 `imap-smtp-email` skill 的 SMTP 配置，无需单独配置：
 
 ```
-依赖文件：/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/.env
+依赖文件：/path/to/your/.openclaw/workspace/skills/imap-smtp-email/.env
 ```
 
 `.env` 需包含：
@@ -300,7 +300,7 @@ node order-dashboard.js
 SMTP_HOST=smtphz.qiye.163.com
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=your-email
+SMTP_USER=your-email@your-domain.com
 SMTP_PASS=<password>
 ```
 

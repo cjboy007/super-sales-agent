@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema#",
+  "$id": "https://super-sales-agent/workflow-engine/schemas/rule-schema.json",
+  "title": "Workflow Engine Rule Schema",
+  "description": "规则结构定义 - 支持条件表达式和动作编排",
+  "type": "object",
+  "required": ["id", "name", "trigger", "actions"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "规则唯一标识符",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "规则名称（中英文）"
+    },
+    "description": {
+      "type": "string",
+      "description": "规则描述"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 50,
+      "description": "优先级（1-100，数字越大优先级越高）"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否启用"
+    },
+    "trigger": {
+      "type": "object",
+      "description": "触发条件",
+      "required": ["event_type"],
+      "properties": {
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "email_received",
+            "quotation_sent",
+            "customer_created",
+            "order_updated",
+            "trail_created"
+          ]
+        },
+        "conditions": {
+          "type": "object",
+          "description": "触发条件列表（AND/OR 逻辑）",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["all", "any"],
+              "default": "all",
+              "description": "all=AND, any=OR"
+            },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["field", "operator", "value"],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "description": "字段路径（支持嵌套，如 payload.customer.status）"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "enum": ["equals", "not_equals", "greater_than", "less_than", "contains", "regex", "exists"]
+                  },
+                  "value": {
+                    "description": "比较值",
+                    "oneOf": [
+                      {"type": "string"},
+                      {"type": "number"},
+                      {"type": "boolean"},
+                      {"type": "array"}
+                    ]
+                  }
+                }
+              },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "description": "动作列表（按顺序执行）",
+      "items": {
+        "$ref": "action-schema.json#"
+      },
+      "minItems": 1
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "created_by": {"type": "string"},
+        "version": {"type": "string", "default": "1.0"},
+        "tags": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "id": "vip-inquiry-auto-reply",
+      "name": "VIP 客户询盘自动回复",
+      "description": "当 VIP 客户发送询盘邮件时，自动创建报价单草稿并通知销售总监",
+      "priority": 90,
+      "enabled": true,
+      "trigger": {
+        "event_type": "email_received",
+        "conditions": {
+          "type": "all",
+          "checks": [
+            {"field": "payload.intent", "operator": "equals", "value": "inquiry"},
+            {"field": "payload.customer.tier", "operator": "equals", "value": "vip"}
+          ]
+        }
+      },
+      "actions": [
+        {
+          "type": "generate_quotation",
+          "config": {
+            "customer_id": "${payload.customer.id}",
+            "template": "vip-standard",
+            "items": "${payload.inquiry.items}"
+          }
+        },
+        {
+          "type": "send_email",
+          "config": {
+            "to": "${payload.from}",
+            "template": "vip-inquiry-ack",
+            "variables": {"customer_name": "${payload.customer.name}"}
+          }
+        },
+        {
+          "type": "create_okki_trail",
+          "config": {
+            "customer_id": "${payload.customer.id}",
+            "trail_type": 105,
+            "content": "VIP 客户询盘，已自动生成报价单草稿"
+          }
+        }
+      ]
+    },
+    {
+      "id": "quote-followup-sequence",
+      "name": "报价单跟进序列",
+      "description": "报价单发送后 3 天未回复，自动发送跟进邮件",
+      "priority": 70,
+      "enabled": true,
+      "trigger": {
+        "event_type": "quotation_sent",
+        "conditions": {
+          "type": "all",
+          "checks": [
+            {"field": "payload.amount", "operator": "greater_than", "value": 10000}
+          ]
+        }
+      },
+      "actions": [
+        {
+          "type": "wait",
+          "config": {
+            "duration_minutes": 4320
+          }
+        },
+        {
+          "type": "branch",
+          "config": {
+            "condition": "${payload.customer.replied} == false",
+            "true_actions": [
+              {
+                "type": "send_email",
+                "config": {
+                  "to": "${payload.customer.email}",
+                  "template": "quote-followup-1"
+                }
+              }
+            ],
+            "false_actions": []
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -80,7 +80,7 @@ function keywordMatch(subject, body) {
 
 /**
  * 使用 LLM 进行意图分类
- * 调用 OpenRouter API (claude-sonnet-4)
+ * 调用百炼 DashScope API (qwen3.6-plus)
  */
 async function classifyWithLLM(subject, body) {
   const schema = loadSchema();
@@ -89,7 +89,7 @@ async function classifyWithLLM(subject, body) {
     `- ${i.id}: ${i.name_en} (${i.name_zh})`
   ).join('\n');
   
-  const prompt = `You are an email intent classifier for a B2B electronics company (Farreach Electronic - HDMI/DP/USB cables).
+  const prompt = `You are an email intent classifier for a B2B electronics company (Your Company - HDMI/DP/USB cables).
 
 Classify the following email into ONE of these intents:
 ${intentList}
@@ -110,16 +110,14 @@ Body: ${body.slice(0, 2000)}
 Classification:`;
 
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://coding.dashscope.aliyuncs.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://farreach-electronic.com',
-        'X-Title': 'Farreach EmailIntent',
+        'Authorization': `Bearer ${process.env.DASHSCOPE_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4',
+        model: 'qwen3.6-plus',
         messages: [
           {
             role: 'system',

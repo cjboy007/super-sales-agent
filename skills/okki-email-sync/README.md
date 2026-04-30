@@ -7,8 +7,8 @@
 ### 前置要求
 
 - Node.js 18+
-- OKKI CLI：`/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki.py`
-- 向量索引：`/Users/wilson/.openclaw/workspace/vector_store/` (LanceDB)
+- OKKI CLI：`/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki.py`
+- 向量索引：`/path/to/your/.openclaw/workspace/vector_store/` (LanceDB)
 
 ### 测试连接
 
@@ -23,7 +23,7 @@ node okki-sync.js test
 
 测试 1: 域名提取
   john@example.com → example.com (公共域：false)
-  test-email@your-domain.com → gmail.com (公共域：true)
+  test@gmail.com → gmail.com (公共域：true)
 
 测试 2: 去重机制
   创建测试记录：test-1234567890
@@ -63,7 +63,7 @@ const { matchCustomer, createEmailTrail, syncEmailToOkki } = require('./okki-syn
 const result = await syncEmailToOkki({
   uid: 'unique-email-id',
   from: 'customer@example.com',
-  to: 'your-email',
+  to: 'your-email@your-domain.com',
   subject: 'Product inquiry',
   date: new Date().toISOString(),
   body: 'We are interested in...',

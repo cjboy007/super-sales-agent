@@ -1,0 +1,52 @@
+{
+  "company": "Defro",
+  "country": "波兰",
+  "contacts": [
+    {
+      "name": "Monika Zych",
+      "email": "monika.zych@defro.pl",
+      "position": "Export Manager"
+    },
+    {
+      "name": "Karol Sroka",
+      "email": "karol.sroka@defro.pl",
+      "position": "Product Development Manager"
+    },
+    {
+      "name": "Sylwester Gruszczyński",
+      "email": "sylwester.gruszczynski@defro.pl",
+      "position": "Production Optimization Specialist"
+    },
+    {
+      "name": "Marcin Dyjach",
+      "email": "marcin.dyjach@defro.pl",
+      "position": "Quality Manager"
+    },
+    {
+      "name": "Mariusz Zaborowicz",
+      "email": "mariusz.zaborowicz@defro.pl",
+      "position": "Engineering Manager"
+    },
+    {
+      "name": "Artur Parzych",
+      "email": "artur.parzych@defro.pl",
+      "position": "Regional Manager"
+    },
+    {
+      "name": "Jolanta Wieczorek",
+      "email": "jolanta.wieczorek@defro.pl",
+      "position": "Online Marketing Specialist"
+    },
+    {
+      "name": "Grzegorz Węglarz",
+      "email": "grzegorz.weglarz@defro.pl",
+      "position": "Financial Analyst"
+    },
+    {
+      "name": "Kacper Cierpica",
+      "email": "kacper.cierpica@defro.pl",
+      "position": "Technical Advisor"
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Defro 写开发信。\n\n## 公司背景\n- **公司：** Defro（波兰）\n- **网站：** defro.pl\n- **行业：** HVAC\n- **调研：** Heat Pumps - Defro Czyste ciepło  pl/en/heat-pumps-en/ Defro is not just a manufacturer, but above all a partner that delivers reliable and modern solutions. Polish quality. Our heat pumps are manufac\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Monika Zych | monika.zych@defro.pl | Export Manager\n2. Monika Zych | monika.zych@defro.pl | Export Manager\n3. Karol Sroka | karol.sroka@defro.pl | Product Development Manager\n4. Sylwester Gruszczyński | sylwester.gruszczynski@defro.pl | Production Optimization Specialist\n5. Karol Sroka | karol.sroka@defro.pl | Product Development Manager\n6. Sylwester Gruszczyński | sylwester.gruszczynski@defro.pl | Production Optimization Specialist\n7. Marcin Dyjach | marcin.dyjach@defro.pl | Quality Manager\n8. Mariusz Zaborowicz | mariusz.zaborowicz@defro.pl | Engineering Manager\n9. Artur Parzych | artur.parzych@defro.pl | Regional Manager\n10. Marcin Dyjach | marcin.dyjach@defro.pl | Quality Manager\n11. Mariusz Zaborowicz | mariusz.zaborowicz@defro.pl | Engineering Manager\n12. Artur Parzych | artur.parzych@defro.pl | Regional Manager\n13. Piotr Cynkier | piotr.cynkier@defro.pl | CFO\n14. Jolanta Wieczorek | jolanta.wieczorek@defro.pl | Online Marketing Specialist\n15. Grzegorz Węglarz | grzegorz.weglarz@defro.pl | Financial Analyst\n16. Kacper Cierpica | kacper.cierpica@defro.pl | Technical Advisor\n17. Piotr Cynkier | piotr.cynkier@defro.pl | CFO\n18. Jolanta Wieczorek | jolanta.wieczorek@defro.pl | Online Marketing Specialist\n19. Grzegorz Węglarz | grzegorz.weglarz@defro.pl | Financial Analyst\n20. Kacper Cierpica | kacper.cierpica@defro.pl | Technical Advisor\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 20 封。"
+}

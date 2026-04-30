@@ -1,0 +1,12 @@
+{
+  "company": "Dakon",
+  "country": "捷克",
+  "website": "dakon.cz",
+  "tier": "Tier1",
+  "summary": "Dakon is a Czech heating boiler and HVAC brand, now part of Daikin Industries Czech Republic s.r.o. Founded in 1924, Daikin is a global leader in HVAC with significant presence in Central/Eastern Europe. Dakon brand focuses on heating boilers, wall-hung gas boilers, and heating solutions for Czech and Slovak markets. Manufacturing operations in Plzeň, Czech Republic. Revenue ~€740 million, 152 employees in Czech entity.",
+  "contacts": [
+    {"name": "", "email": "dakon@dakon.cz", "role": "general"}
+  ],
+  "research_date": "2026-04-29",
+  "notes": "Part of Daikin group - large scale purchasing. Heating boilers need circulating pumps. Czech market entry point. Use general email for initial contact."
+}

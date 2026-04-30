@@ -37,8 +37,8 @@ examples/QT-20260314-011-HTMLv2.html    (13KB)
 
 ```bash
 # 生成
-python3 /Users/wilson/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation_traditional.py \
-  --data farreach_sample.json \
+python3 /path/to/your/.openclaw/workspace/skills/excel-xlsx/scripts/generate_quotation_traditional.py \
+  --data your-company_sample.json \
   --output QT-20260314-001.xlsx
 
 # 打开
@@ -60,8 +60,8 @@ soffice --headless --convert-to pdf QT-20260314-001.xlsx
 
 ```bash
 # 生成
-python3 /Users/wilson/.openclaw/workspace/skills/quotation-workflow/scripts/generate_quotation_html.py \
-  --data farreach_sample.json \
+python3 /path/to/your/.openclaw/workspace/skills/quotation-workflow/scripts/generate_quotation_html.py \
+  --data your-company_sample.json \
   --output QT-20260314-001.html
 
 # 打开并导出 PDF
@@ -103,7 +103,7 @@ open QT-20260314-001.html
 ## 📝 快速测试
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills
+cd /path/to/your/.openclaw/workspace/skills
 
 # Excel 传统版（快速测试）
 python3 excel-xlsx/scripts/generate_quotation_traditional.py \

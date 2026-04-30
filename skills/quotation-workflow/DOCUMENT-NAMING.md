@@ -97,7 +97,7 @@ PR-20260330-001-Reminder.pdf ❌ 错误
 ## 🗂️ 文件存储结构
 
 ```
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/data/
+/path/to/your/.openclaw/workspace/skills/quotation-workflow/data/
 ├── QT-20260330-001.pdf          # 主文件（HTML 导出）
 ├── QT-20260330-001-Excel.pdf    # 备选文件（Excel 导出）
 ├── QT-20260330-001.xlsx         # Excel 源文件

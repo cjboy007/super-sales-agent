@@ -74,7 +74,7 @@ Our team is now working on your order with priority. We will keep you updated on
 If you have any questions, please don't hesitate to contact us.
 
 Best regards,
-Farreach Electronic Co., Ltd
+Your Company Name, Ltd
 your-email@your-domain.com
       `.trim(),
       zh: (order) => `
@@ -125,10 +125,10 @@ ${order.product_list.map(p => `  - ${p.name} (SKU: ${p.sku}): ${p.quantity} unit
 
 We are arranging the shipment and will provide you with the tracking information shortly.
 
-Thank you for your patience and trust in Farreach Electronic.
+Thank you for your patience and trust in Your Company.
 
 Best regards,
-Farreach Electronic Co., Ltd
+Your Company Name, Ltd
 your-email@your-domain.com
       `.trim(),
       zh: (order) => `
@@ -186,10 +186,10 @@ ${order.shipping_address ? [
 
 You can track your shipment using the tracking number above. Please allow 1-2 business days for the tracking information to be updated.
 
-Thank you for choosing Farreach Electronic!
+Thank you for choosing Your Company!
 
 Best regards,
-Farreach Electronic Co., Ltd
+Your Company Name, Ltd
 your-email@your-domain.com
       `.trim(),
       zh: (order) => `
@@ -248,7 +248,7 @@ If you have any questions or need further assistance, please don't hesitate to c
 We look forward to serving you again!
 
 Best regards,
-Farreach Electronic Co., Ltd
+Your Company Name, Ltd
 your-email@your-domain.com
       `.trim(),
       zh: (order) => `
@@ -295,7 +295,7 @@ If you have any questions about this cancellation or would like to place a new o
 We apologize for any inconvenience caused.
 
 Best regards,
-Farreach Electronic Co., Ltd
+Your Company Name, Ltd
 your-email@your-domain.com
       `.trim(),
       zh: (order) => `

@@ -1,0 +1,45 @@
+{
+  "company": "Stiebel Eltron Slovakia",
+  "country": "斯洛伐克",
+  "website": "stiebel-eltron.sk",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Ondrej Tabák",
+      "email": "ondrej.tabak@stiebel-eltron.sk",
+      "position": "Welding Process Engineer"
+    },
+    {
+      "name": "Ivana Radosavljevic",
+      "email": "ivana.radosavljevic@stiebel-eltron.sk",
+      "position": "Accounts Payable Clerk"
+    },
+    {
+      "name": "Michal Berecky",
+      "email": "michal.berecky@stiebel-eltron.sk",
+      "position": "Welding Technician"
+    },
+    {
+      "name": "Ladislav Belán",
+      "email": "ladislav.belan@stiebel-eltron.sk",
+      "position": "CNC Programmer"
+    },
+    {
+      "name": "Libor Novak",
+      "email": "libor.novak@stiebel-eltron.sk",
+      "position": "Laboratory Development Specialist"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:25.848944+00:00",
+    "query": "Stiebel Eltron Slovakia 斯洛伐克 HVAC pump distributor manufacturer",
+    "summary": "Stiebel Eltron Slovakia, S. - Poprad 058 01 (Okres Poprad), Hlavná https://lb. kompass. com/en/c/stiebel-eltron-slovakia-s-r-o/sk009589/ Importers and exporters · Importers-exporters, heating, ventilation and air conditioning (HVAC) equipment.",
+    "sources": [
+      "https://lb.kompass.com/en/c/stiebel-eltron-slovakia-s-r-o/sk009589/",
+      "https://www.emis.com/php/company-profile/SK/Stiebel_Eltron_Slovakia_sro_en_2114639.html",
+      "https://www.thetradevision.com/global/supplier/stiebel-eltron-slovakia-sro/slovakia/57611896"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

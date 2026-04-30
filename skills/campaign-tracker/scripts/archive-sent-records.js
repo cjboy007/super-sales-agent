@@ -22,7 +22,7 @@ const crypto = require('crypto');
 
 const CONFIG = {
   // task-001 邮件系统目录
-  emailSystemDir: process.env.EMAIL_SKILL_ROOT || path.join(__dirname, '..', '..', 'imap-smtp-email'),
+  emailSystemDir: '/path/to/your/.openclaw/workspace/skills/imap-smtp-email',
   
   // 归档目录
   archiveDir: path.join(__dirname, '..', 'archive'),
@@ -31,7 +31,7 @@ const CONFIG = {
   logsDir: path.join(__dirname, '..', 'logs'),
   
   // 已处理记录文件（去重用）
-  processedFile: process.env.CAMPAIGN_TRACKER_PROCESSED_FILE || '/tmp/campaign-tracker-processed.json',
+  processedFile: '/tmp/campaign-tracker-processed.json',
   
   // 跟踪 schema 路径
   trackingSchema: path.join(__dirname, '..', 'config', 'tracking-schema.json')
@@ -186,7 +186,7 @@ function getMockSentEmails() {
     {
       uid: 'mock-001',
       subject: 'Inquiry about HDMI cables - MOQ and pricing',
-      from: 'wilson@farreach-electronic.com',
+      from: 'wilson@your-domain.com',
       to: 'john@abctrading.com',
       date: new Date().toISOString(),
       template_id: 'template-inquiry-001',
@@ -199,7 +199,7 @@ function getMockSentEmails() {
     {
       uid: 'mock-002',
       subject: 'Follow-up: DP Cable quotation QT-2026-0042',
-      from: 'wilson@farreach-electronic.com',
+      from: 'wilson@your-domain.com',
       to: 'sales@xyzelec.com',
       date: new Date().toISOString(),
       template_id: 'template-followup-002',
@@ -212,7 +212,7 @@ function getMockSentEmails() {
     {
       uid: 'mock-003',
       subject: 'USB-C Cable sample shipped - tracking SF1234567890',
-      from: 'wilson@farreach-electronic.com',
+      from: 'wilson@your-domain.com',
       to: 'purchasing@globaltech.com',
       date: new Date().toISOString(),
       template_id: 'template-sample-001',

@@ -1,0 +1,57 @@
+{
+  "company": "HAJDU RT",
+  "country": "匈牙利",
+  "contacts": [
+    {
+      "name": "Robert Frank",
+      "email": "frank.robert@hajdurt.hu",
+      "position": "Export Sales Manager"
+    },
+    {
+      "name": "Orbán Szabolcs",
+      "email": "orban.szabolcs@hajdurt.hu",
+      "position": "Project Manager"
+    },
+    {
+      "name": "Peter Sztanyi",
+      "email": "sztanyi.peter@hajdurt.hu",
+      "position": "Commercial Director"
+    },
+    {
+      "name": "Tamas Balogh",
+      "email": "balogh.tamas@hajdurt.hu",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "József Simon",
+      "email": "simon.jozsef@hajdurt.hu",
+      "position": "Chief Information Officer"
+    },
+    {
+      "name": "Barnabás Lovas",
+      "email": "lovas.barnabas@hajdurt.hu",
+      "position": "IT Specialist"
+    },
+    {
+      "name": "István Árva",
+      "email": "arva.istvan@hajdurt.hu",
+      "position": "IT Specialist"
+    },
+    {
+      "name": "András Széplaki",
+      "email": "szeplaki.andras@hajdurt.hu",
+      "position": "Teamcenter Key User"
+    },
+    {
+      "name": "Mihaly Hajdu",
+      "email": "hajdu@hajdurt.hu",
+      "position": ""
+    },
+    {
+      "name": "Tunde Botto",
+      "email": "botto.tunde@hajdurt.hu",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 HAJDU RT 写开发信。\n\n## 公司背景\n- **公司：** HAJDU RT（匈牙利）\n- **网站：** hajdurt.hu\n- **行业：** HVAC\n- **调研：** A supplier of reliable and environmentally-friendly household goods  net/automotive/1899-a-supplier-of-reliable-and-environmentally-friendly-household-goods-hajdu Established in 1952, Hajdu is the lea\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Robert Frank | frank.robert@hajdurt.hu | Export Sales Manager\n2. Orbán Szabolcs | orban.szabolcs@hajdurt.hu | Project Manager\n3. Peter Sztanyi | sztanyi.peter@hajdurt.hu | Commercial Director\n4. Tamas Balogh | balogh.tamas@hajdurt.hu | Chief Financial Officer\n5. József Simon | simon.jozsef@hajdurt.hu | Chief Information Officer\n6. Barnabás Lovas | lovas.barnabas@hajdurt.hu | IT Specialist\n7. István Árva | arva.istvan@hajdurt.hu | IT Specialist\n8. András Széplaki | szeplaki.andras@hajdurt.hu | Teamcenter Key User\n9. Mihaly Hajdu | hajdu@hajdurt.hu | N/A\n10. Tunde Botto | botto.tunde@hajdurt.hu | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

@@ -1,0 +1,52 @@
+{
+  "company": "HAKOM",
+  "country": "波兰",
+  "contacts": [
+    {
+      "name": "Dane Beda",
+      "email": "dane@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "d.langfort@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "szkolenia@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "mm@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "praca@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "serwis@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "a.ciszewski@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "sprzedaz@hakom.pl",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "b2b@hakom.pl",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 HAKOM 写开发信。\n\n## 公司背景\n- **公司：** HAKOM（波兰）\n- **网站：** hakom.pl\n- **行业：** HVAC\n- **调研：** About us - Info - HAKOM  pl/en/aboutus/about-us HAKOM is a manufacturing, trading and service firm in the ventilation and air conditioning industry. Our main activity is the manufacture and sale of eq\n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（9 个，按优先级排序）\n1. Dane Beda | dane@hakom.pl | N/A\n2. d.langfort@hakom.pl | d.langfort@hakom.pl | N/A\n3. szkolenia@hakom.pl | szkolenia@hakom.pl | N/A\n4. mm@hakom.pl | mm@hakom.pl | N/A\n5. praca@hakom.pl | praca@hakom.pl | N/A\n6. serwis@hakom.pl | serwis@hakom.pl | N/A\n7. a.ciszewski@hakom.pl | a.ciszewski@hakom.pl | N/A\n8. sprzedaz@hakom.pl | sprzedaz@hakom.pl | N/A\n9. b2b@hakom.pl | b2b@hakom.pl | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 9 封。"
+}

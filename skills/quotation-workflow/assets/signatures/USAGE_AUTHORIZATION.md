@@ -25,7 +25,7 @@
 ## 签名文件位置
 
 ```
-/Users/wilson/.openclaw/workspace/skills/quotation-workflow/assets/signatures/
+/path/to/your/.openclaw/workspace/skills/quotation-workflow/assets/signatures/
 └── jaden_signature.png
 ```
 

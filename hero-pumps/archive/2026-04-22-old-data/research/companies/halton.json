@@ -1,0 +1,45 @@
+{
+  "company": "HALTON",
+  "country": "捷克",
+  "website": "halton.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Jude Caddy",
+      "email": "jude.caddy@halton.com",
+      "position": "Head of Human Resources"
+    },
+    {
+      "name": "Christopher Gentry",
+      "email": "christopher.gentry@halton.com",
+      "position": "Global Service Director"
+    },
+    {
+      "name": "Andro Nasution",
+      "email": "andro.nasution@halton.com",
+      "position": "Representative Office Head"
+    },
+    {
+      "name": "Salla Ahlberg",
+      "email": "salla.ahlberg@halton.com",
+      "position": "Director of Marketing"
+    },
+    {
+      "name": "Penny Tong",
+      "email": "penny.tong@halton.com",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:23.804126+00:00",
+    "query": "HALTON 捷克 HVAC pump distributor manufacturer",
+    "summary": "Halton Distributor | Supplying Halton Parts & Equipment https://knapeassociates. com/manufacturers/halton-group/ As the official distributor of Halton, Knape Associates can offer customers a wide range of high-quality industrial ventilation equipment and solutions.",
+    "sources": [
+      "https://knapeassociates.com/manufacturers/halton-group/",
+      "https://www.halton.com/locations/ventistal-halton-distributor/",
+      "https://www.fermag.com/manufacturer/halton-group-americas-inc/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

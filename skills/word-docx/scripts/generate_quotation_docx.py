@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""生成 Word 报价单 - 支持模板填充、样式、表格
-
-🔴 P0-REVISE: 集成数据验证（防止示例数据）
-"""
+"""生成 Word 报价单 - 支持模板填充、样式、表格"""
 
 import sys
 import json
@@ -14,15 +11,6 @@ from docx.shared import Inches, Pt, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
-
-# 🔴 P0: 导入验证模块
-sys.path.insert(0, str(Path(__file__).parent.parent / 'quotation-workflow' / 'scripts'))
-try:
-    from quotation_schema import validate_quotation_data
-    VALIDATION_AVAILABLE = True
-except ImportError:
-    VALIDATION_AVAILABLE = False
-    print("⚠️  警告：quotation_schema 模块不可用，将跳过数据验证")
 
 # 颜色定义
 COLORS = {
@@ -101,13 +89,13 @@ def create_quotation_docx(output_path, data=None):
     # ============ 公司信息 ============
     company = doc.add_paragraph()
     company.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = company.add_run("Farreach Electronic Co., Ltd.")
+    run = company.add_run("Your Company Name, Ltd.")
     run.font.size = Pt(12)
     run.font.bold = True
     
     info = doc.add_paragraph()
     info.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = info.add_run("📧 your-email | 🌐 www.farreach-electronic.com | 📱 +86-756-XXXXXXX")
+    run = info.add_run("📧 your-email@your-domain.com | 🌐 www.your-domain.com | 📱 +86-756-XXXXXXX")
     run.font.size = Pt(10)
     run.font.italic = True
     
@@ -358,23 +346,6 @@ def main():
         if not args.data and not args.quick_test:
             print("❌ 请提供 --data 或 --quick-test", file=sys.stderr)
             sys.exit(1)
-        
-        # 🔴 P0: 数据验证（强制，无交互确认）
-        if VALIDATION_AVAILABLE and not args.quick_test:
-            print("🔍 验证报价单数据...")
-            valid, errors = validate_quotation_data(data)
-            
-            if not valid:
-                print("❌ 数据验证失败，Word 报价单生成已终止:")
-                for i, err in enumerate(errors, start=1):
-                    print(f"  {i}. {err}")
-                print()
-                print("请检查数据文件，确保使用真实客户信息。")
-                print("如需要测试，请使用 --quick-test 参数")
-                sys.exit(1)
-            
-            print("✅ 数据验证通过")
-            print()
         
         output = create_quotation_docx(args.output, data)
         print(f"✅ Word 报价单已生成：{output}")

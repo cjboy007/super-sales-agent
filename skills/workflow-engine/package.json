@@ -1,0 +1,48 @@
+{
+  "name": "@super-sales-agent/workflow-engine",
+  "version": "1.0.0",
+  "description": "通用工作流规则引擎，用于编排跨系统自动化流程",
+  "main": "lib/rule-engine.js",
+  "scripts": {
+    "test": "node --test test/**/*.test.js",
+    "test:e2e": "bash test/e2e.sh",
+    "test:coverage": "node --test --experimental-test-coverage test/**/*.test.js",
+    "validate": "node cli/workflow-cli.js validate --rules config/rules/",
+    "lint": "eslint lib/ test/"
+  },
+  "keywords": [
+    "workflow",
+    "rule-engine",
+    "automation",
+    "crm",
+    "okki"
+  ],
+  "author": "Super Sales Agent Team",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "lib/",
+    "schemas/",
+    "config/",
+    "docs/",
+    "cli/",
+    "SKILL.md",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/super-sales-agent/workflow-engine"
+  },
+  "bugs": {
+    "url": "https://github.com/super-sales-agent/workflow-engine/issues"
+  },
+  "homepage": "https://github.com/super-sales-agent/workflow-engine#readme"
+}

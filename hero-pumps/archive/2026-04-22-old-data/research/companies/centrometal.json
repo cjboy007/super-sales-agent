@@ -1,0 +1,45 @@
+{
+  "company": "Centrometal",
+  "country": "克罗地亚",
+  "website": "centrometal.hr",
+  "tier": "Tier3",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "",
+      "email": "komercijala@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "Danijel Novak",
+      "email": "danijel.novak@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "servis@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "prodaja@centrometal.hr",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "tehnicki.ured@centrometal.hr",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:39.867125+00:00",
+    "query": "Centrometal 克罗地亚 HVAC pump distributor manufacturer",
+    "summary": "Heat pumps - Centrometal - termometal. hr https://termometal. hr/en/products/manufacturers/centrometal/renewable-energy-sources/heat-pumps/ No. 1 for HVAC systems. Receive for free by email. promotional offers; special offers for installers and dealers; news in our assortment; news and info about our 2.",
+    "sources": [
+      "https://termometal.hr/en/products/manufacturers/centrometal/renewable-energy-sources/heat-pumps/",
+      "https://energetska-efikasnost.me/wp-content/uploads/Projekti/MONTESOL-qualified-companies.pdf",
+      "https://www.centrometal.hr/en/product/heat-pumps/881/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier3目标。先建立初步联系，了解其采购需求和现有供应商情况。"
+}

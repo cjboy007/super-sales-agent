@@ -120,9 +120,9 @@ function buildEmailContent(logisticsData, notificationType) {
         </table>
         <p>我们将持续更新物流状态，敬请关注。</p>
         <p>如有任何疑问，请随时联系我们。</p>
-        <p>祝商祺！<br/>Farreach Electronic Team</p>
+        <p>祝商祺！<br/>Your Company Team</p>
       `;
-      textContent = `订舱确认通知\n\n尊敬的 ${customerName}，\n\n您的订单 ${orderId} 已成功订舱。\n物流单号：${logisticsId}\nETD: ${logisticsData.etd || '待确认'}\nETA: ${logisticsData.eta || '待确认'}\n\n祝商祺！\nFarreach Electronic Team`;
+      textContent = `订舱确认通知\n\n尊敬的 ${customerName}，\n\n您的订单 ${orderId} 已成功订舱。\n物流单号：${logisticsId}\nETD: ${logisticsData.etd || '待确认'}\nETA: ${logisticsData.eta || '待确认'}\n\n祝商祺！\nYour Company Team`;
       break;
       
     case 'shipment':
@@ -140,9 +140,9 @@ function buildEmailContent(logisticsData, notificationType) {
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>剩余天数</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${calculateDaysToETA(logisticsData.eta)} 天</td></tr>
         </table>
         <p>我们将持续追踪货物状态，到港后会及时通知您。</p>
-        <p>祝商祺！<br/>Farreach Electronic Team</p>
+        <p>祝商祺！<br/>Your Company Team</p>
       `;
-      textContent = `发货通知\n\n尊敬的 ${customerName}，\n\n您的订单 ${orderId} 已发货。\n物流单号：${logisticsId}\n提单号：${logisticsData.billOfLading?.blNo || '待提供'}\nATD: ${logisticsData.atd || logisticsData.etd || '待确认'}\nETA: ${logisticsData.eta || '待确认'}\n\n祝商祺！\nFarreach Electronic Team`;
+      textContent = `发货通知\n\n尊敬的 ${customerName}，\n\n您的订单 ${orderId} 已发货。\n物流单号：${logisticsId}\n提单号：${logisticsData.billOfLading?.blNo || '待提供'}\nATD: ${logisticsData.atd || logisticsData.etd || '待确认'}\nETA: ${logisticsData.eta || '待确认'}\n\n祝商祺！\nYour Company Team`;
       break;
       
     case 'arrival':
@@ -157,9 +157,9 @@ function buildEmailContent(logisticsData, notificationType) {
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>ATA (实际到港)</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${logisticsData.ata || new Date().toISOString().split('T')[0]}</td></tr>
         </table>
         <p>请尽快安排清关和提货手续。</p>
-        <p>祝商祺！<br/>Farreach Electronic Team</p>
+        <p>祝商祺！<br/>Your Company Team</p>
       `;
-      textContent = `到港通知\n\n尊敬的 ${customerName}，\n\n您的货物已到达目的港 ${logisticsData.portOfDischarge}。\n物流单号：${logisticsId}\n\n请尽快安排清关和提货手续。\n\n祝商祺！\nFarreach Electronic Team`;
+      textContent = `到港通知\n\n尊敬的 ${customerName}，\n\n您的货物已到达目的港 ${logisticsData.portOfDischarge}。\n物流单号：${logisticsId}\n\n请尽快安排清关和提货手续。\n\n祝商祺！\nYour Company Team`;
       break;
       
     case 'delivery':
@@ -174,9 +174,9 @@ function buildEmailContent(logisticsData, notificationType) {
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>送达时间</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${new Date().toISOString().split('T')[0]}</td></tr>
         </table>
         <p>感谢您的信任与支持！期待再次合作。</p>
-        <p>祝商祺！<br/>Farreach Electronic Team</p>
+        <p>祝商祺！<br/>Your Company Team</p>
       `;
-      textContent = `送达通知\n\n尊敬的 ${customerName}，\n\n您的货物已成功送达。\n物流单号：${logisticsId}\n订单号：${orderId}\n\n感谢您的信任与支持！\n\n祝商祺！\nFarreach Electronic Team`;
+      textContent = `送达通知\n\n尊敬的 ${customerName}，\n\n您的货物已成功送达。\n物流单号：${logisticsId}\n订单号：${orderId}\n\n感谢您的信任与支持！\n\n祝商祺！\nYour Company Team`;
       break;
       
     default:
@@ -212,7 +212,7 @@ function calculateDaysToETA(etaDate) {
  */
 async function sendEmail(emailData) {
   // TODO: 集成 SMTP 邮件发送模块
-  // 参考：/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js
+  // 参考：/path/to/your/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js
   console.log('发送邮件:', emailData.to, emailData.subject);
   return {
     success: true,

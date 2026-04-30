@@ -1,0 +1,45 @@
+{
+  "company": "HAJDU RT",
+  "country": "匈牙利",
+  "website": "hajdurt.hu",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Tamas Balogh",
+      "email": "balogh.tamas@hajdurt.hu",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "József Simon",
+      "email": "simon.jozsef@hajdurt.hu",
+      "position": "Chief Information Officer"
+    },
+    {
+      "name": "Peter Sztanyi",
+      "email": "sztanyi.peter@hajdurt.hu",
+      "position": "Commercial Director"
+    },
+    {
+      "name": "Robert Frank",
+      "email": "frank.robert@hajdurt.hu",
+      "position": "Export Sales Manager"
+    },
+    {
+      "name": "Barnabás Lovas",
+      "email": "lovas.barnabas@hajdurt.hu",
+      "position": "IT Specialist"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:16.995867+00:00",
+    "query": "HAJDU RT 匈牙利 HVAC pump distributor manufacturer",
+    "summary": "A supplier of reliable and environmentally-friendly household goods https://manufacturing-journal. net/automotive/1899-a-supplier-of-reliable-and-environmentally-friendly-household-goods-hajdu Established in 1952, Hajdu is the leading company of Hajdu Group headquartered in Teglas, Hungary.",
+    "sources": [
+      "https://manufacturing-journal.net/automotive/1899-a-supplier-of-reliable-and-environmentally-friendly-household-goods-hajdu",
+      "https://hajdurt.hu/files/downloads/hajdu-pt-hc-prospektus-enpdf-20240214141056.pdf",
+      "https://issuu.com/industryeurope/docs/v25-6/s/14501767"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

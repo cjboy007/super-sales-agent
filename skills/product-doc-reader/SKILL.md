@@ -1,6 +1,6 @@
 ---
 name: product-doc-reader
-description: '产品工程图纸结构化提取器 v5.0。pdftotext 优先 + Vision 兜底，支持软连字符清理/跨行关联/数据校验。专为 Farreach 线材产品图纸设计。'
+description: '产品工程图纸结构化提取器 v5.0。pdftotext 优先 + Vision 兜底，支持软连字符清理/跨行关联/数据校验。专为 Your Company 线材产品图纸设计。'
 metadata:
   {
     "openclaw": {
@@ -103,7 +103,7 @@ PDF 图纸
 
 ### 基本提取（混合模式，推荐）
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/product-doc-reader
+cd /path/to/your/.openclaw/workspace/skills/product-doc-reader
 python3 scripts/extract_hybrid.py <图纸.pdf>
 # 输出到 ./output/<图纸名>.json 和 .md
 ```

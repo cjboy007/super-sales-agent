@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "period": "monthly",
+    "date_range": {
+      "start": "2026-02-28",
+      "end": "2026-03-30"
+    },
+    "collected_at": "2026-04-01T01:01:31.336Z",
+    "sources_available": [
+      "okki",
+      "campaign-tracker"
+    ]
+  },
+  "kpis": {
+    "new_leads": 0,
+    "new_customers": 0,
+    "quotation_count": 0,
+    "quotation_amount": 0,
+    "order_count": 0,
+    "order_amount": 0,
+    "opportunity_count": 0,
+    "conversion_rate": "N/A",
+    "email_sent": 3,
+    "email_reply_rate": 66.7,
+    "replied_count": 2
+  },
+  "comparison": {
+    "available": false,
+    "note": "首次采集，无历史数据"
+  },
+  "alerts": []
+}

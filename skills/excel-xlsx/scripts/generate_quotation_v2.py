@@ -57,7 +57,7 @@ def create_quotation_excel(output_path, data=None):
     row = 1
     
     # 公司名称（A1）
-    ws['A1'] = company.get('company_name', 'Farreach Electronic Co., Ltd.')
+    ws['A1'] = company.get('company_name', 'Your Company Name, Ltd.')
     ws['A1'].font = Font(bold=True, size=18, color='0F172A')
     
     # 公司标语（A2）
@@ -65,10 +65,10 @@ def create_quotation_excel(output_path, data=None):
     ws['A2'].font = Font(size=10, color='64748B', italic=True)
     
     # 联系信息（A4:A6）
-    ws['A4'] = f"📧 {company.get('company_email', 'your-email')}"
+    ws['A4'] = f"📧 {company.get('company_email', 'sale@your-domain.com')}"
     ws['A4'].font = Font(size=9, color='64748B')
     
-    ws['A5'] = f"🌐 {company.get('company_website', 'www.farreach-electronic.com')}"
+    ws['A5'] = f"🌐 {company.get('company_website', 'www.your-domain.com')}"
     ws['A5'].font = Font(size=9, color='64748B')
     
     ws['A6'] = f"📍 {company.get('company_address', 'Zhuhai, Guangdong, China')}"
@@ -301,7 +301,7 @@ def create_quotation_excel(output_path, data=None):
     bank_row += 1
     bank_info = company.get('bank_info', {})
     bank_data = [
-        ('Beneficiary:', bank_info.get('beneficiary', 'Farreach Electronic Co., Ltd.')),
+        ('Beneficiary:', bank_info.get('beneficiary', 'Your Company Name, Ltd.')),
         ('Bank Name:', bank_info.get('bank_name', 'Standard Chartered Bank')),
         ('Account No:', bank_info.get('account_no', '1234 5678 9012')),
         ('SWIFT Code:', bank_info.get('swift_code', 'SCBLHKHH'))
@@ -366,10 +366,10 @@ def main():
                 data = json.load(f)
         elif args.quick_test:
             data = {
-                'company_name': 'Farreach Electronic Co., Ltd.',
+                'company_name': 'Your Company Name, Ltd.',
                 'company_tagline': 'Premium Connectivity Solutions',
-                'company_email': 'your-email',
-                'company_website': 'www.farreach-electronic.com',
+                'company_email': 'sale@your-domain.com',
+                'company_website': 'www.your-domain.com',
                 'company_address': 'Zhuhai, Guangdong, China',
                 'customer': {
                     'company_name': 'Best Buy Electronics Inc.',
@@ -410,7 +410,7 @@ def main():
                 'payment_terms': 'T/T 30% deposit, 70% before shipment',
                 'freight': 350.00,
                 'bank_info': {
-                    'beneficiary': 'Farreach Electronic Co., Ltd.',
+                    'beneficiary': 'Your Company Name, Ltd.',
                     'bank_name': 'Standard Chartered Bank',
                     'account_no': '1234 5678 9012',
                     'swift_code': 'SCBLHKHH'

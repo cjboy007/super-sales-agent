@@ -1,0 +1,21 @@
+{
+  "company": "Onninen",
+  "country": "芬兰",
+  "website": "onninen.com",
+  "tier": "Tier1",
+  "industry": "暖通/电气批发",
+  "contacts": [
+    {
+      "name": "通用邮箱",
+      "email": "info@onninen.com",
+      "position": "待确认"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "Onninen Finland HVAC electrical wholesaler",
+    "summary": "Onninen 是北欧最大的暖通/电气批发商之一，产品涵盖管道、泵、阀门和暖通设备。",
+    "sources": ["https://onninen.com"]
+  },
+  "outreach_notes": "大型批发商，采购量大。需要找到具体采购负责人。"
+}

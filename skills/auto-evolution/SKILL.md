@@ -1,12 +1,12 @@
 ---
 name: auto-evolution
-description: "Multi-agent auto-evolution system — orchestrate review-execute-audit loops with 4 roles (Coordinator, Reviewer, Executor, Auditor). A single coordinator agent drives the loop by spawning sub-agents for review, execution, and audit. Break goals into subtasks, auto-iterate with dual quality gates, and auto-package results. Use when: user wants autonomous task execution with built-in quality assurance."
+description: "Multi-agent auto-evolution system with hybrid mode — orchestrate review-execute-audit loops with 4 roles (Coordinator, Reviewer, Executor, Auditor). Supports manual subtasks (simple tasks) and automatic subtask generation via Reviewer (complex tasks). A single coordinator agent drives the loop by spawning sub-agents. Break goals into subtasks, auto-iterate with dual quality gates, and auto-package results. Use when: user wants autonomous task execution with built-in quality assurance."
 ---
 
 # auto-evolution
 
 **Category:** Agent Orchestration / Meta-Skill
-**Version:** 0.7.0
+**Version:** 2.0.0
 
 ---
 
@@ -21,9 +21,9 @@ This is a **meta-skill**: it doesn't handle business logic. It orchestrates the 
 | Role | Responsibility | When Spawned | Recommended Model |
 |------|---------------|--------------|-------------------|
 | **Coordinator** | Drives the loop, updates task state, spawns sub-agents | Always (heartbeat/cron) | Any (cost-efficient) |
-| **Reviewer** | Pre-execution review, generates detailed instructions | Before each subtask | Strong (Sonnet/GPT-4o) |
-| **Executor** | Implements one subtask, runs verification | After review approves | Cost-effective (Qwen/Haiku) |
-| **Auditor** | Post-execution audit, decides pass/retry | After execution completes | Strong (Sonnet/GPT-4o) |
+| **Reviewer** | Pre-execution review, generates detailed subtasks | Complex tasks only | Strong (Sonnet/GPT-5.4) |
+| **Executor** | Implements one subtask, runs verification | After review approves | Cost-effective (Qwen3.5-Plus) |
+| **Auditor** | Post-execution audit, decides pass/retry | After execution completes | Strong (Sonnet/GPT-5.4) |
 
 **Why 4 roles?**
 - Reviewer and Auditor are **both quality gates** but serve different purposes
@@ -35,14 +35,52 @@ This is a **meta-skill**: it doesn't handle business logic. It orchestrates the 
 
 ---
 
+## 🔄 Hybrid Mode (v2.0)
+
+**Task Complexity Assessment (5 dimensions, 1-5 points each):**
+
+| Dimension | 1 point | 3 points | 5 points |
+|-----------|---------|----------|----------|
+| **Code Lines** | <100 | 200-500 | >1000 |
+| **Files** | 1-2 | 5-10 | >20 |
+| **Risk** | Docs/Test | Feature improvement | Architecture change |
+| **Dependencies** | None | 3-5 | Cross-system |
+| **Innovation** | Routine fix | Feature enhancement | New feature |
+
+**Task Classification:**
+
+| Total Score | Task Type | Subtask Mode | Flow |
+|-------------|-----------|--------------|------|
+| **5-10** | Simple | Manual | Executor only |
+| **11-17** | Medium | Manual (recommended) or Auto | Optional Reviewer |
+| **18-25** | Complex | Auto (required) | Reviewer → Executor → Auditor |
+
+**Usage:**
+
+```bash
+# Create task (interactive)
+node scripts/create-task.js
+
+# Start Reviewer (complex tasks only)
+node scripts/start-reviewer.js <task-id>
+```
+
+---
+
 ## Core Modules
 
 | File | Purpose |
 |------|---------|
-| `scripts/heartbeat-coordinator.js` | Coordinator: scan tasks → spawn Reviewer/Executor/Auditor |
-| `scripts/monitor.js` | Monitor: detect stuck tasks, clean orphaned locks |
-| `scripts/pack-skill.js` | Package completed tasks → skill directories |
-| `config/task-schema.json` | Task file JSON Schema |
+| `scripts/heartbeat-coordinator.js` | Coordinator: classify tasks, match capsules, spawn Reviewer/Executor/Auditor |
+| `scripts/generate-capsule.js` | Generate Capsule from completed task, update index |
+| `scripts/capsule-matcher.js` | Match new tasks against historical Capsules |
+| `scripts/category-stats.js` | Category statistics + weekly evolution report |
+| `scripts/monitor.js` | Monitor: detect stuck tasks (including 'reviewed'), clean locks, failure alerts |
+| `scripts/pack-skill.js` | Package completed tasks → skill directories (with archive verification) |
+| `scripts/create-task.js` | Interactive task creator (v2 schema compatible) |
+| `scripts/start-reviewer.js` | Outputs structured Reviewer payload for coordinator to spawn |
+| `scripts/utils/classify.js` | Shared task classification utilities (used by coordinator, matcher, generator) |
+| `config/task-schema.json` | Task file JSON Schema v2 |
 
 ---
 
@@ -140,6 +178,7 @@ Coordinator heartbeat
 pending → reviewed → executing → pending (next subtask)
                          → completed (all done)
                          → packaged ✅
+                         → capsule generated ✅
 ```
 
 ### Key Rules
@@ -179,6 +218,11 @@ Required fields:
 # Scan and output next phase prompt
 node scripts/heartbeat-coordinator.js
 
+# Filter by phase (only process tasks in that phase)
+node scripts/heartbeat-coordinator.js --phase review
+node scripts/heartbeat-coordinator.js --phase execute
+node scripts/heartbeat-coordinator.js --phase audit
+
 # Apply review result
 node scripts/heartbeat-coordinator.js apply-review task-001.json review.txt
 
@@ -195,6 +239,22 @@ node scripts/monitor.js
 node scripts/pack-skill.js
 ```
 
+### v2 CLI (new)
+
+```bash
+# Generate Capsules from archived tasks
+node scripts/generate-capsule.js --backfill
+
+# Match capsules for pending tasks
+node scripts/capsule-matcher.js --all
+
+# Category statistics
+node scripts/category-stats.js
+
+# Generate weekly evolution report
+node scripts/category-stats.js --weekly
+```
+
 ---
 
 ## Design Philosophy
@@ -205,3 +265,5 @@ node scripts/pack-skill.js
 - **One subtask per tick** — predictable, reviewable, won't timeout
 - **Self-healing** — monitor detects and fixes stuck states
 - **Cost-efficient** — strong models only where judgment matters (Reviewer, Auditor)
+- **Experience accumulation** — every completed task becomes a reusable Capsule
+- **Category-driven** — 6 task categories (build/refactor/optimize/repair/test/integrate)

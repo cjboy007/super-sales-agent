@@ -1,0 +1,45 @@
+{
+  "company": "Buderus Czech",
+  "country": "捷克",
+  "website": "buderus.cz",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Petr Jindra",
+      "email": "jindra@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Placek",
+      "email": "placek@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Marek Dvoracek",
+      "email": "dvoracek@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Pavel Balik",
+      "email": "balik@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Jan Eisner",
+      "email": "eisner@buderus.cz",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:32.903287+00:00",
+    "query": "Buderus Czech 捷克 HVAC pump distributor manufacturer",
+    "summary": "Buderus HVAC Hardware for Sale - Blackhawk Supply https://blackhawksupply. com/collections/buderus?srsltid=AfmBOooaQMhHaDROOxUy1QeQxLn8zIyP8J5Tq-9GAirgDrOySY3uZcVz Blackhawk Supply carries Buderus boilers, radiators, pumps, valves, and accessories for residential and commercial heating systems.",
+    "sources": [
+      "https://blackhawksupply.com/collections/buderus?srsltid=AfmBOooaQMhHaDROOxUy1QeQxLn8zIyP8J5Tq-9GAirgDrOySY3uZcVz",
+      "https://www.buderus.com/en/",
+      "https://www.weinmann-schanz.de/us/en/marken/b/buderus.html"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

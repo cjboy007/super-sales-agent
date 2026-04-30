@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "period": "weekly",
+    "date_range": {
+      "start": "2026-03-23",
+      "end": "2026-03-29"
+    },
+    "collected_at": "2026-03-30T01:00:44.391Z",
+    "sources_available": [
+      "okki",
+      "campaign-tracker"
+    ]
+  },
+  "kpis": {
+    "new_leads": 0,
+    "new_customers": 0,
+    "quotation_count": 0,
+    "quotation_amount": 0,
+    "order_count": 0,
+    "order_amount": 0,
+    "opportunity_count": 0,
+    "conversion_rate": "N/A",
+    "email_sent": 3,
+    "email_reply_rate": 66.7,
+    "replied_count": 2
+  },
+  "comparison": {
+    "available": true,
+    "previous_snapshot": "weekly-2026-03-22.json",
+    "changes": {
+      "new_leads": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "new_customers": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "quotation_count": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "quotation_amount": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "order_count": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "order_amount": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "opportunity_count": {
+        "current": 0,
+        "previous": "N/A",
+        "change_percent": "N/A"
+      },
+      "email_sent": {
+        "current": 3,
+        "previous": 3,
+        "change_percent": 0
+      }
+    }
+  },
+  "alerts": [
+    {
+      "type": "zero_orders",
+      "severity": "warning",
+      "message": "⚠️ 本周零订单"
+    }
+  ]
+}

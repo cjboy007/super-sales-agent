@@ -1,0 +1,229 @@
+{
+  "scored_at": "2026-03-24T18:30:43.138Z",
+  "sample_mode": true,
+  "duration_ms": 0,
+  "summary": {
+    "total_customers": 6,
+    "segments": {
+      "VIP": 1,
+      "active": 1,
+      "normal": 0,
+      "dormant": 3,
+      "lost": 1
+    }
+  },
+  "changes": [
+    {
+      "company_id": "C001",
+      "company_name": "TechVision GmbH",
+      "type": "new",
+      "from": null,
+      "to": "VIP",
+      "score_from": null,
+      "score_to": 85.75
+    },
+    {
+      "company_id": "C002",
+      "company_name": "Pacific Trading Co.",
+      "type": "new",
+      "from": null,
+      "to": "active",
+      "score_from": null,
+      "score_to": 72
+    },
+    {
+      "company_id": "C003",
+      "company_name": "SilkRoad Electronics",
+      "type": "new",
+      "from": null,
+      "to": "dormant",
+      "score_from": null,
+      "score_to": 31
+    },
+    {
+      "company_id": "C005",
+      "company_name": "Dormant Corp",
+      "type": "new",
+      "from": null,
+      "to": "dormant",
+      "score_from": null,
+      "score_to": 30
+    },
+    {
+      "company_id": "C004",
+      "company_name": "NorthStar Import",
+      "type": "new",
+      "from": null,
+      "to": "dormant",
+      "score_from": null,
+      "score_to": 17
+    },
+    {
+      "company_id": "C006",
+      "company_name": "Ghost Ltd",
+      "type": "new",
+      "from": null,
+      "to": "lost",
+      "score_from": null,
+      "score_to": 9
+    }
+  ],
+  "results": [
+    {
+      "company_id": "C001",
+      "company_name": "TechVision GmbH",
+      "scores": {
+        "order_amount": {
+          "raw": 100000,
+          "normalized": 100
+        },
+        "order_frequency": {
+          "raw": 4,
+          "normalized": 55
+        },
+        "recency": {
+          "raw": 0,
+          "normalized": 100
+        },
+        "interaction": {
+          "raw": 20,
+          "normalized": 80
+        }
+      },
+      "total_score": 85.75,
+      "segment": "VIP",
+      "segment_label": "VIP 客户",
+      "strategy": "优先跟进 + 专属折扣 + 季度回访"
+    },
+    {
+      "company_id": "C002",
+      "company_name": "Pacific Trading Co.",
+      "scores": {
+        "order_amount": {
+          "raw": 22500,
+          "normalized": 75
+        },
+        "order_frequency": {
+          "raw": 3,
+          "normalized": 55
+        },
+        "recency": {
+          "raw": 0,
+          "normalized": 100
+        },
+        "interaction": {
+          "raw": 8,
+          "normalized": 55
+        }
+      },
+      "total_score": 72,
+      "segment": "active",
+      "segment_label": "活跃客户",
+      "strategy": "定期跟进 + 新品推荐 + 交叉销售"
+    },
+    {
+      "company_id": "C003",
+      "company_name": "SilkRoad Electronics",
+      "scores": {
+        "order_amount": {
+          "raw": 4300,
+          "normalized": 25
+        },
+        "order_frequency": {
+          "raw": 2,
+          "normalized": 30
+        },
+        "recency": {
+          "raw": 30,
+          "normalized": 45
+        },
+        "interaction": {
+          "raw": 2,
+          "normalized": 30
+        }
+      },
+      "total_score": 31,
+      "segment": "dormant",
+      "segment_label": "休眠客户",
+      "strategy": "唤醒邮件 + 特别优惠 + 原因调查"
+    },
+    {
+      "company_id": "C005",
+      "company_name": "Dormant Corp",
+      "scores": {
+        "order_amount": {
+          "raw": 12000,
+          "normalized": 50
+        },
+        "order_frequency": {
+          "raw": 1,
+          "normalized": 30
+        },
+        "recency": {
+          "raw": 200,
+          "normalized": 5
+        },
+        "interaction": {
+          "raw": 1,
+          "normalized": 10
+        }
+      },
+      "total_score": 30,
+      "segment": "dormant",
+      "segment_label": "休眠客户",
+      "strategy": "唤醒邮件 + 特别优惠 + 原因调查"
+    },
+    {
+      "company_id": "C004",
+      "company_name": "NorthStar Import",
+      "scores": {
+        "order_amount": {
+          "raw": 800,
+          "normalized": 10
+        },
+        "order_frequency": {
+          "raw": 1,
+          "normalized": 30
+        },
+        "recency": {
+          "raw": 100,
+          "normalized": 20
+        },
+        "interaction": {
+          "raw": 1,
+          "normalized": 10
+        }
+      },
+      "total_score": 17,
+      "segment": "dormant",
+      "segment_label": "休眠客户",
+      "strategy": "唤醒邮件 + 特别优惠 + 原因调查"
+    },
+    {
+      "company_id": "C006",
+      "company_name": "Ghost Ltd",
+      "scores": {
+        "order_amount": {
+          "raw": 0,
+          "normalized": 10
+        },
+        "order_frequency": {
+          "raw": 0,
+          "normalized": 10
+        },
+        "recency": {
+          "raw": 999,
+          "normalized": 5
+        },
+        "interaction": {
+          "raw": 0,
+          "normalized": 10
+        }
+      },
+      "total_score": 9,
+      "segment": "lost",
+      "segment_label": "流失客户",
+      "strategy": "最后挽回 + 流失原因归档"
+    }
+  ]
+}

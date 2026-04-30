@@ -1,0 +1,45 @@
+{
+  "company": "Bravida",
+  "country": "瑞典",
+  "website": "bravida.se",
+  "tier": "Tier1-Nordic",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Anette Lundin",
+      "email": "anette.lundin@bravida.se",
+      "position": "HR Partner"
+    },
+    {
+      "name": "Trond-Lauritz Larsen",
+      "email": "trond.larsen@bravida.se",
+      "position": "Regional Director"
+    },
+    {
+      "name": "Jan Pedersen",
+      "email": "jan.pedersen@bravida.se",
+      "position": "HR Director"
+    },
+    {
+      "name": "Peter Norstrom",
+      "email": "peter.norstrom@bravida.se",
+      "position": "Director of Investor Relations"
+    },
+    {
+      "name": "Andreas Alsén",
+      "email": "andreas.alsen@bravida.se",
+      "position": "Chief Operating Officer"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:22.252805+00:00",
+    "query": "Bravida 瑞典 HVAC pump distributor manufacturer",
+    "summary": "Sweden HVAC Distributors https://www. hvacinformed. com/companies/distributor-sweden/directory. html This international company manufactures and supplies condensate water removal pumps and accessories for the air conditioning industry in over 100 countries 2.",
+    "sources": [
+      "https://www.hvacinformed.com/companies/distributor-sweden/directory.html",
+      "https://www.crunchbase.com/organization/bravida-holding",
+      "https://www.globaldata.com/company-profile/bravida-sverige-ab/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-Nordic重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

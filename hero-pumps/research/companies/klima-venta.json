@@ -1,0 +1,45 @@
+{
+  "company": "Klima-Venta",
+  "country": "波兰",
+  "website": "klima-venta.pl",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Karolina Trzeciak",
+      "email": "k.trzeciak@klima-venta.pl",
+      "position": "Purchasing Engineer"
+    },
+    {
+      "name": "Łukasz Chwastyk",
+      "email": "l.chwastyk@klima-venta.pl",
+      "position": "Warranty and Service Department"
+    },
+    {
+      "name": "Magdalena Kochel",
+      "email": "magdalena.kochel@klima-venta.pl",
+      "position": "Owner"
+    },
+    {
+      "name": "Dawid Markowiak",
+      "email": "d.markowiak@klima-venta.pl",
+      "position": "Project Manager of Sanitary Installations"
+    },
+    {
+      "name": "Daniel Mazurkiewicz",
+      "email": "d.mazurkiewicz@klima-venta.pl",
+      "position": "Chief Operating Officer"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:33.750814+00:00",
+    "query": "Klima-Venta 波兰 HVAC pump distributor manufacturer",
+    "summary": "HVAC Companies in Poland https://www. hvacinformed. com/companies/poland-hvac-companies/directory. html LG Electronics, a $60-billion-plus global smart life solutions company, offers a wide range of heating, ventilating, and air conditioning (HVAC) solutions, along with heat pump water heaters and controls, for residential and commercial buildings.",
+    "sources": [
+      "https://www.hvacinformed.com/companies/poland-hvac-companies/directory.html",
+      "https://ensun.io/search/hvac/poland",
+      "https://www.klima-therm.com/pl/about-company,92,en"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

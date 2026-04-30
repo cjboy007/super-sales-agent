@@ -1,0 +1,45 @@
+{
+  "company": "Plum HVAC",
+  "country": "波兰",
+  "website": "plum.pl",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Monika Roszkowska",
+      "email": "monika.roszkowska@plum.pl",
+      "position": "Chief Financial Officer"
+    },
+    {
+      "name": "Magda Woźniak",
+      "email": "magda.wozniak@plum.pl",
+      "position": "HR Manager"
+    },
+    {
+      "name": "Anna Ogilba",
+      "email": "anna.ogilba@plum.pl",
+      "position": "Marketing Specialist"
+    },
+    {
+      "name": "Magda Turecka",
+      "email": "magda.turecka@plum.pl",
+      "position": "Marketing Manager"
+    },
+    {
+      "name": "Paulina Borys",
+      "email": "paulina.borys@plum.pl",
+      "position": "Senior HR Specialist"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:58.400844+00:00",
+    "query": "Plum HVAC 波兰 HVAC pump distributor manufacturer",
+    "summary": "get to know us - Plum https://plum. pl/en/about-us/ We are a manufacturer of industrial electronics, including controllers for heat pumps, boiler controllers, ventilation and underfloor heating controllers, sensors, gas volume converters, gas flow recorders, and other measurement devices.",
+    "sources": [
+      "https://plum.pl/en/about-us/",
+      "https://hvac.plum.pl/en/hvac-home/",
+      "https://plum.pl/en/home-plum/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

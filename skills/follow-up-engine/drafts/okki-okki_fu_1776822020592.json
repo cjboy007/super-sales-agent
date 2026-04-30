@@ -1,0 +1,12 @@
+{
+  "okki_record_id": "okki_fu_1776822020592",
+  "customer_id": "okki_003",
+  "type": "email_draft",
+  "status": "draft",
+  "content": {
+    "subject": "",
+    "template_id": "template-sample-001"
+  },
+  "scheduled_date": "2026-04-22T01:40:20.592Z",
+  "owner": "wilson"
+}

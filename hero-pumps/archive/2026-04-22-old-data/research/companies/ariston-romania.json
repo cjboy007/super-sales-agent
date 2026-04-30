@@ -1,0 +1,45 @@
+{
+  "company": "Ariston Romania",
+  "country": "罗马尼亚",
+  "website": "ariston.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Dung Van",
+      "email": "dung.van@ariston.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Sofia Tram",
+      "email": "sofia.tram@ariston.com",
+      "position": "Marketing Director"
+    },
+    {
+      "name": "Ahmed Shehata",
+      "email": "ahmed.shehata@ariston.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Hoang Phong",
+      "email": "hoang.phong@ariston.com",
+      "position": "Marketing Director"
+    },
+    {
+      "name": "Thomas Ceulaer",
+      "email": "thomas.ceulaer@ariston.com",
+      "position": "Sales and Marketing Director"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:01.246996+00:00",
+    "query": "Ariston Romania 罗马尼亚 HVAC pump distributor manufacturer",
+    "summary": "Ariston Romania commits to innovative, high-efficiency solutions for. https://renewablesnow. com/news/ariston-romania-commits-to-innovative-high-efficiency-solutions-for-sustainable-homes-853016/ Ariston Romania is part of Italy's Ariston Group that produces heating systems and related products.",
+    "sources": [
+      "https://renewablesnow.com/news/ariston-romania-commits-to-innovative-high-efficiency-solutions-for-sustainable-homes-853016/",
+      "https://www.ariston.com/en-us/about-us/",
+      "https://www.aristongroup.com/en/brands-and-solutions/our-solutions"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

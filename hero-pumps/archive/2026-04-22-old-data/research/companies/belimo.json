@@ -1,0 +1,45 @@
+{
+  "company": "Belimo",
+  "country": "匈牙利",
+  "website": "belimo.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Marco Marchetti",
+      "email": "marco.marchetti@belimo.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Sebastian Weibel",
+      "email": "sebastian.weibel@belimo.com",
+      "position": "Head of Logistics"
+    },
+    {
+      "name": "Christoph Hoenig",
+      "email": "christoph.hoenig@belimo.com",
+      "position": "Global Head of Product Management"
+    },
+    {
+      "name": "Luca Pauletti",
+      "email": "luca.pauletti@belimo.com",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Cornelia Zahner",
+      "email": "cornelia.zahner@belimo.com",
+      "position": "Executive Assistant"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:49:10.745763+00:00",
+    "query": "Belimo 匈牙利 HVAC pump distributor manufacturer",
+    "summary": "https://www. havtech. com/manufacturer/belimo/ Belimo is the global market leader in the development, production and marketing of actuator solutions for controlling heating, ventilation and air 2. Belimo HVAC Solutions https://indeco-tx.",
+    "sources": [
+      "https://www.havtech.com/manufacturer/belimo/",
+      "https://indeco-tx.com/belimo-hvac-solutions/",
+      "https://bostonaircontrols.com/product-category/belimo/?srsltid=AfmBOoo276FKpATrYZJQu2jZjBzICDQ2mzCOWXPoP6sH2JheFAIl8k7_"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

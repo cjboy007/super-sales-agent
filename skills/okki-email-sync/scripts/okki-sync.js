@@ -12,18 +12,17 @@
 const { execFile } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 
 // ==================== 配置 ====================
 const CONFIG = {
-  // OKKI CLI 路径（可通过环境变量覆盖）
-  okkiCliPath: process.env.OKKI_CLI_PATH || path.join(__dirname, '../../xiaoman-okki/api/okki.py'),
+  // OKKI CLI 路径
+  okkiCliPath: '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki.py',
   
-  // 客户向量搜索脚本路径（可通过环境变量覆盖）
-  customerSearchScript: process.env.VECTOR_SEARCH_PATH || path.join(__dirname, '../../vector_store/search-customers.py'),
+  // 客户向量搜索脚本路径
+  customerSearchScript: '/path/to/your/.openclaw/workspace/vector_store/search-customers.py',
   
-  // Python 虚拟环境路径（可通过环境变量覆盖）
-  pythonVenv: process.env.PYTHON_VENV_PATH || 'python3',
+  // Python 虚拟环境路径（优先使用）
+  pythonVenv: '/path/to/your/.openclaw/workspace/vector_store/venv/bin/python3',
   
   // 公共域名黑名单
   publicDomains: [
@@ -32,11 +31,11 @@ const CONFIG = {
     'icloud.com', 'me.com', 'mac.com', 'live.com', 'msn.com'
   ],
   
-  // 去重记录文件（可通过环境变量覆盖）
-  processedFile: process.env.OKKI_SYNC_RECORD_FILE || path.join(os.tmpdir(), 'okki-sync-processed.json'),
+  // 去重记录文件
+  processedFile: '/tmp/okki-sync-processed.json',
   
   // 未匹配日志文件
-  unmatchedLog: path.join(os.tmpdir(), 'okki-unmatched-emails.log'),
+  unmatchedLog: '/tmp/okki-unmatched-emails.log',
   
   // Trail 类型枚举
   TRAIL_TYPE: {
@@ -55,8 +54,10 @@ const CONFIG = {
  */
 function execPython(scriptPath, args = [], options = {}) {
   return new Promise((resolve, reject) => {
-    // 使用配置的 Python 路径（可能是 venv 或系统 Python）
-    const pythonPath = CONFIG.pythonVenv;
+    // 优先使用 venv Python，否则使用系统 Python
+    const pythonPath = fs.existsSync(CONFIG.pythonVenv) 
+      ? CONFIG.pythonVenv 
+      : 'python3';
     
     const fullArgs = [scriptPath, ...args];
     
@@ -500,9 +501,9 @@ async function runTest() {
   console.log('测试 1: 域名提取');
   const testEmails = [
     'john@example.com',
-    'sales@farreach-electronic.com',
+    'sales@your-domain.com',
     'invalid-email',
-    'test-email@your-domain.com'
+    'test@gmail.com'
   ];
   testEmails.forEach(email => {
     const domain = extractDomain(email);
@@ -630,7 +631,7 @@ if (require.main === module) {
           return sum + lineTotal;
         }, 0);
         
-        // 支持两种数据格式：顶层字段（cable-germany.json）或嵌套 quotation 对象（farreach_5products.json）
+        // 支持两种数据格式：顶层字段（cable-germany.json）或嵌套 quotation 对象（your-company_5products.json）
         const quotationData = {
           uid: `quotation-${Date.now()}-${quotationNo || 'unknown'}`,
           quotationNo: quotationNo || data.quotationNo || data.quotation?.quotation_no || 'unknown',

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "description": "Farreach 销售仪表盘配置",
+  "description": "Your Company 销售仪表盘配置",
   "kpis": {
     "email_sent": {
       "label": "邮件发送量",
@@ -78,8 +78,8 @@
     "okki": {
       "type": "api",
       "required": true,
-      "client_path": "/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_client.py",
-      "config_path": "/Users/wilson/.openclaw/workspace/xiaoman-okki/api/config.json",
+      "client_path": "/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki_client.py",
+      "config_path": "/path/to/your/.openclaw/workspace/xiaoman-okki/api/config.json",
       "endpoints": {
         "customers": "/v1/company/list",
         "orders": "/v1/invoices/order/list",
@@ -101,8 +101,8 @@
     "campaign-tracker": {
       "type": "file",
       "required": false,
-      "analytics_script": "/Users/wilson/.openclaw/workspace/skills/campaign-tracker/scripts/analytics-report.js",
-      "reports_dir": "/Users/wilson/.openclaw/workspace/skills/campaign-tracker/reports",
+      "analytics_script": "/path/to/your/.openclaw/workspace/skills/campaign-tracker/scripts/analytics-report.js",
+      "reports_dir": "/path/to/your/.openclaw/workspace/skills/campaign-tracker/reports",
       "data_fields": {
         "email_sent": "total_sent",
         "email_reply_rate": "reply_rate",
@@ -112,22 +112,22 @@
     "follow-up-engine": {
       "type": "file",
       "required": false,
-      "metrics_path": "/Users/wilson/.openclaw/workspace/skills/follow-up-engine/data/metrics-export.json"
+      "metrics_path": "/path/to/your/.openclaw/workspace/skills/follow-up-engine/data/metrics-export.json"
     },
     "order-tracker": {
       "type": "file",
       "required": false,
-      "metrics_path": "/Users/wilson/.openclaw/workspace/skills/order-tracker/data/metrics-export.json"
+      "metrics_path": "/path/to/your/.openclaw/workspace/skills/order-tracker/data/metrics-export.json"
     },
     "customer-segmentation": {
       "type": "file",
       "required": false,
-      "metrics_path": "/Users/wilson/.openclaw/workspace/skills/customer-segmentation/data/metrics-export.json"
+      "metrics_path": "/path/to/your/.openclaw/workspace/skills/customer-segmentation/data/metrics-export.json"
     },
     "pricing-engine": {
       "type": "file",
       "required": false,
-      "metrics_path": "/Users/wilson/.openclaw/workspace/skills/pricing-engine/data/metrics-export.json"
+      "metrics_path": "/path/to/your/.openclaw/workspace/skills/pricing-engine/data/metrics-export.json"
     }
   },
   "alerts": {

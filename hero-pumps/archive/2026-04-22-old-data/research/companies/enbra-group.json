@@ -1,0 +1,45 @@
+{
+  "company": "Enbra Group",
+  "country": "捷克",
+  "website": "enbra.cz",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Barbora Maněnová",
+      "email": "manenova@enbra.cz",
+      "position": "Marketing Specialist"
+    },
+    {
+      "name": "Jakub Záruba",
+      "email": "zaruba@enbra.cz",
+      "position": "Product Sales Manager"
+    },
+    {
+      "name": "Miroslav Klíma",
+      "email": "klima@enbra.cz",
+      "position": "Director of Controlling and IT"
+    },
+    {
+      "name": "Patrik Prokes",
+      "email": "prokes@enbra.cz",
+      "position": "Sales Director"
+    },
+    {
+      "name": "Matěj Holyszewski",
+      "email": "holyszewskim@enbra.cz",
+      "position": "Product Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:00.359541+00:00",
+    "query": "Enbra Group 捷克 HVAC pump distributor manufacturer",
+    "summary": "Enbra, A. Company Profile - Czech Republic - EMIS https://www. com/php/company-profile/CZ/Enbra_AS_en_1420156. html Enbra, A. is a company in Czech Republic, with a head office in Brno. The enterprise operates in the Wholesale Trade industry.",
+    "sources": [
+      "https://www.emis.com/php/company-profile/CZ/Enbra_AS_en_1420156.html",
+      "https://cz.linkedin.com/in/ondrej-popelka",
+      "https://lb.kompass.com/z/ww/a/headers-central-heating-plant/3335009/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

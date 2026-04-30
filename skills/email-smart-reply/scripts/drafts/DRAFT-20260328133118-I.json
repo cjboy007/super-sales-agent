@@ -1,0 +1,17 @@
+{
+  "draft_id": "DRAFT-20260328133118-I",
+  "subject": "Re: Inquiry about HDMI cables",
+  "body": "Dear Valued Customer,\n\nThank you for your interest in Your Company products.\n\nPlease find attached our product catalog and price list for your reference.\n\nCould you please share more details about your requirements?\n- Product type and specifications\n- Estimated quantity\n- Target market\n\nThis will help us provide an accurate quotation.\n\nBest regards,\nJaden\nYour Company Name, Ltd.",
+  "language": "en",
+  "template_used": "template-inquiry-001",
+  "intent": "inquiry",
+  "confidence": 0.92,
+  "requires_human_approval": false,
+  "escalate": false,
+  "created_at": "2026-03-28T13:31:19.803Z",
+  "original_email": {
+    "subject": "Inquiry about HDMI cables",
+    "from": "customer@example.com",
+    "receivedAt": "2026-03-28T13:31:18.988Z"
+  }
+}

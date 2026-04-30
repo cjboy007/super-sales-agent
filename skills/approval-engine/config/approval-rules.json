@@ -419,7 +419,7 @@
     "email": {
       "enabled": true,
       "smtp_config_env": "SMTP_CONFIG",
-      "from_address": "approval@farreach.com"
+      "from_address": "approval@your-company.com"
     },
     "okki": {
       "enabled": true,
@@ -438,13 +438,13 @@
     },
     "logging": {
       "level": "info",
-      "file": "/Users/wilson/.openclaw/workspace/skills/approval-engine/logs/approval.log",
+      "file": "/path/to/your/.openclaw/workspace/skills/approval-engine/logs/approval.log",
       "max_size_mb": 10,
       "retention_days": 30
     },
     "metrics": {
       "enabled": true,
-      "output_file": "/Users/wilson/.openclaw/workspace/skills/approval-engine/metrics/approval-stats.json"
+      "output_file": "/path/to/your/.openclaw/workspace/skills/approval-engine/metrics/approval-stats.json"
     }
   }
 }

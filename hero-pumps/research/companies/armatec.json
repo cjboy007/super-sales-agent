@@ -1,0 +1,21 @@
+{
+  "company": "Armatec",
+  "country": "瑞典",
+  "website": "armatec.se",
+  "tier": "Tier2",
+  "industry": "水暖/泵阀分销",
+  "contacts": [
+    {
+      "name": "通用邮箱",
+      "email": "info@armatec.se",
+      "position": "待确认"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "Armatec Sweden pump valve distributor",
+    "summary": "Armatec 是瑞典水暖/泵阀分销商，代理多个品牌的水处理和暖通产品。",
+    "sources": ["https://armatec.se"]
+  },
+  "outreach_notes": "泵阀分销商，可能直接采购循环泵。"
+}

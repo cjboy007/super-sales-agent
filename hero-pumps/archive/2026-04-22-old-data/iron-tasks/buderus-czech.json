@@ -1,0 +1,57 @@
+{
+  "company": "Buderus Czech",
+  "country": "捷克",
+  "contacts": [
+    {
+      "name": "Petr Jindra",
+      "email": "jindra@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Jiri Placek",
+      "email": "placek@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Marek Dvoracek",
+      "email": "dvoracek@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Pavel Balik",
+      "email": "balik@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "Jan Eisner",
+      "email": "eisner@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "technika@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "info@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "samek@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "marasek@buderus.cz",
+      "position": ""
+    },
+    {
+      "name": "",
+      "email": "pala@buderus.cz",
+      "position": ""
+    }
+  ],
+  "prompt": "你是 IRON，Hero Pump 的贸易操作员。请为 Buderus Czech 写开发信。\n\n## 公司背景\n- **公司：** Buderus Czech（捷克）\n- **网站：** buderus.cz\n- **行业：** HVAC\n- **调研：** Buderus HVAC Hardware for Sale - Blackhawk Supply  com/collections/buderus?srsltid=AfmBOooaQMhHaDROOxUy1QeQxLn8zIyP8J5Tq-9GAirgDrOySY3uZcVz Blackhawk Supply carries Buderus boilers, radiators, pumps, \n\n## 产品\n变频循环泵（variable frequency circulating pumps）\n- ErP EEI ≤ 0.23, TÜV SÜD, CE, RoHS\n- 比 Grundfos/Wilo 低 30-40%\n- 浙江桐乡工厂直供，支持 OEM\n\n## 联系人（10 个，按优先级排序）\n1. Petr Jindra | jindra@buderus.cz | N/A\n2. Jiri Placek | placek@buderus.cz | N/A\n3. Marek Dvoracek | dvoracek@buderus.cz | N/A\n4. Pavel Balik | balik@buderus.cz | N/A\n5. Jan Eisner | eisner@buderus.cz | N/A\n6. technika@buderus.cz | technika@buderus.cz | N/A\n7. info@buderus.cz | info@buderus.cz | N/A\n8. samek@buderus.cz | samek@buderus.cz | N/A\n9. marasek@buderus.cz | marasek@buderus.cz | N/A\n10. pala@buderus.cz | pala@buderus.cz | N/A\n\n## 要求\n1. 每封 80-120 词（不含签名）\n2. 根据职位定制：Sales→价格/利润，Product→技术参数，CEO→战略价值\n3. 严禁 \"hope this finds you well\"、破折号、空洞恭维\n4. 结尾只推进一个动作\n5. 每人 3 个主题行\n\n## 签名\nJaden Yeung\nSales Manager | Hero Pump — Zhejiang Huiruo Pump Industry\nsales@heropumps.com.cn\nWhatsApp: +86 136 8034 2402\nwww.heropumps.com.cn\n\n## 输出\n对每个联系人输出：\n\n### [姓名/邮箱]\n- **职位：** [职位]\n- **主题（推荐）：** [...]\n- **备选：** [...] | [...]\n\n**正文：**\n[邮件内容]\n\n---\n\n请一次输出全部 10 封。"
+}

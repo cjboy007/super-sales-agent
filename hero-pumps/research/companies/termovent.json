@@ -1,0 +1,12 @@
+{
+  "company": "Termovent",
+  "country": "塞尔维亚",
+  "website": "termovent.rs",
+  "tier": "Tier2",
+  "summary": "Termovent is a Serbian HVAC manufacturer headquartered in Belgrade, founded in 1993. Family company with ~200 employees. Main products include Air Handling Units (AHU), clean rooms, HVAC equipment, and process systems. Operates manufacturing facilities in Belgrade and Kladovo. Growing presence in Southeast European HVAC market.",
+  "contacts": [
+    {"name": "Stevan Miric", "email": "stevan.miric@termovent.rs", "role": "unknown"}
+  ],
+  "research_date": "2026-04-29",
+  "notes": "Southeast European market entry point. HVAC manufacturer may need circulating pumps for their systems. Family company - relationship-driven sales approach."
+}

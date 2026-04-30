@@ -1,0 +1,45 @@
+{
+  "company": "GC-Gruppe",
+  "country": "德国",
+  "website": "gc-gruppe.de",
+  "tier": "Tier1-EU",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Thorsten Ludewig",
+      "email": "thorsten.ludewig@gc-gruppe.de",
+      "position": "Head of Master Data Management"
+    },
+    {
+      "name": "Mario Deibel",
+      "email": "mario.deibel@gc-gruppe.de",
+      "position": "Product Manager"
+    },
+    {
+      "name": "Nico Schulze",
+      "email": "nico.schulze@gc-gruppe.de",
+      "position": "Branch Manager"
+    },
+    {
+      "name": "Petra Schmidt",
+      "email": "petra.schmidt@gc-gruppe.de",
+      "position": "Marketing Manager"
+    },
+    {
+      "name": "Marina Maurer",
+      "email": "marina.maurer@gc-gruppe.de",
+      "position": "Executive Assistant"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:14.045414+00:00",
+    "query": "GC-Gruppe 德国 HVAC pump distributor manufacturer",
+    "summary": "GC-GRUPPE - Der Großhandel für SHK https://www. gc-gruppe. de/ Die GC-GRUPPE**, das sind über 100 Fachgroßhändler für Haustechnik mit mehr als 920 Standorten in ganz Deutschland. Mit unserem Vollsortiment im Bereich der Haustechnik, einer ausgereiften Logistik, innovativen E-Business-Tools und den persönlichen Ansprechpartnern bieten wir Ihnen als SHK-Fachgroßhandel einen Rundum-Service für Ihr Geschäft.",
+    "sources": [
+      "https://www.gc-gruppe.de/",
+      "https://www.gc-gruppe.de/en/about-us/history",
+      "https://www.premieralts.com/investors/gc-gruppe"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1-EU重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

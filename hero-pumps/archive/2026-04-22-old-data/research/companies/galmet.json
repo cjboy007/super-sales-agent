@@ -1,0 +1,45 @@
+{
+  "company": "Galmet",
+  "country": "波兰",
+  "website": "galmet.com.pl",
+  "tier": "Tier1",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Adam Tromsa",
+      "email": "a.tromsa@galmet.com.pl",
+      "position": "Controlling and Process Optimization Manager"
+    },
+    {
+      "name": "Julia Sobaszek",
+      "email": "j.sobaszek@galmet.com.pl",
+      "position": "Technical Consultant for Heat Pumps"
+    },
+    {
+      "name": "Przemysław Racki",
+      "email": "p.racki@galmet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Martyna Mikulska",
+      "email": "m.mikulska@galmet.com.pl",
+      "position": "Technical Advisor for Heat Pumps"
+    },
+    {
+      "name": "Emilia Klosak",
+      "email": "e.klosak@galmet.com.pl",
+      "position": "Recovery Systems Specialist"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:10.563593+00:00",
+    "query": "Galmet 波兰 HVAC pump distributor manufacturer",
+    "summary": "Contact Galmet - Leading Heating Solutions Manufacturer | Galmet https://galmet. eu/contact Heat pumps. Competitive prices and the best heat pumps. ### Water heaters. Efficient storage of hot water available anytime.",
+    "sources": [
+      "https://galmet.eu/contact",
+      "https://bbs.fobshanghai.com/company/mibw163l3448602.html",
+      "https://stroyka.md/en/brands/galmet"
+    ]
+  },
+  "outreach_notes": "该公司为Tier1重要目标。建议联系出口/采购负责人，强调 Farreach 的 OEM 产能优势（越南工厂月产 80 万件）和价格竞争力。"
+}

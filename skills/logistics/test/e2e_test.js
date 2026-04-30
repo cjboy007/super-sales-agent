@@ -4,7 +4,7 @@
  * 测试流程：订单发货→报关单据→提单→客户通知→OKKI 同步
  * 
  * 执行方式：
- *   cd /Users/wilson/.openclaw/workspace/skills/logistics
+ *   cd /path/to/your/.openclaw/workspace/skills/logistics
  *   node test/e2e_test.js
  */
 
@@ -96,7 +96,7 @@ function execPython(scriptPath, args = [], options = {}) {
  * 执行 OKKI CLI 命令
  */
 function execOkkiCli(args = [], options = {}) {
-  const okkiCliPath = '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_cli.py';
+  const okkiCliPath = '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki_cli.py';
   return execPython(okkiCliPath, args, options);
 }
 

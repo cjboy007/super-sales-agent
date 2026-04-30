@@ -2,7 +2,7 @@
 """
 Product Drawing Extractor v2.0
 ===============================
-专为 Farreach 产品工程图纸设计的结构化信息提取器。
+专为 Your Company 产品工程图纸设计的结构化信息提取器。
 
 策略：
   1. Docling 提取带坐标的文本块
@@ -544,7 +544,7 @@ def parse_company_info(blocks: list[TextBlock]) -> dict:
     company_parts = []
     for b in candidate_blocks:
         text = b.text.strip()
-        if any(kw in text for kw in ("SKW", "FARREACH", "福睿", "farreach")):
+        if any(kw in text for kw in ("SKW", "FARREACH", "福睿", "your-company")):
             company_parts.append(text)
         date_match = re.search(r"\d{4}[./\-]\d{2}[./\-]\d{2}", text)
         if date_match:

@@ -71,7 +71,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 | 新开分支机构/仓库 | 供应链管理需求增加 | 批量采购 + 物流 |
 | 参加展会（CES 等） | 需要新品支持 | 新品线材适配 |
 | 官网有 HDMI/DP 产品但无品牌 | 可能 OEM/分销 | 提供 OEM 线材 |
-| 公司网站提到 "quality"/"premium" | 对品质要求高 | Farreach 品质背书 |
+| 公司网站提到 "quality"/"premium" | 对品质要求高 | Your Company 品质背书 |
 | LinkedIn 提到 "supplier change"/"sourcing" | 在换供应商 | 切换成本低，快速响应 |
 
 **输出格式示例：**
@@ -114,7 +114,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 **要求：**
 - 基于真实情报，不编造
 - 提到客户最近的具体动态（融资、展会、招聘等）
-- 一句话说明 Farreach 能帮到他什么
+- 一句话说明 Your Company 能帮到他什么
 - 不出现 "cutting-edge"（USER.md 禁令）
 
 **模板变量：**
@@ -130,7 +130,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 
 Hi [Name],
 
-Congratulations on the $3M Series A! I noticed you're expanding into the Australian market — as you scale, reliable HDMI and USB cable supply is critical. Farreach has been manufacturing certified cables for [similar company in space] since 2010. Would love to share how we helped them reduce supplier lead time by 40%.
+Congratulations on the $3M Series A! I noticed you're expanding into the Australian market — as you scale, reliable HDMI and USB cable supply is critical. Your Company has been manufacturing certified cables for [similar company in space] since 2010. Would love to share how we helped them reduce supplier lead time by 40%.
 
 ---
 
@@ -235,7 +235,7 @@ Phase 1-4 的输出之后，追加 Phase 5 的完整内容：
 ### P2 — 批量模式 + 话术库
 - **批量输入：** 支持 `companies.json` 数组 → 逐个处理 → 输出 `summary.md`
 - **汇总报告：** 按 Hot/Warm/Cold/Dead 分组，含表格和评分
-- **Farreach 话术库：** 根据 Hot/Warm/Cold 类型选择不同开场角度
+- **Your Company 话术库：** 根据 Hot/Warm/Cold 类型选择不同开场角度
 
 ### 文件变更
 - ✅ `SKILL.md` → 升级为 v2.0（完整重写）

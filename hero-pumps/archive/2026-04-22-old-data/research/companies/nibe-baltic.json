@@ -1,0 +1,45 @@
+{
+  "company": "NIBE Baltic",
+  "country": "区域",
+  "website": "nibe.eu",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Leif Nystrom",
+      "email": "leif@nibe.eu",
+      "position": "Chief Executive Officer"
+    },
+    {
+      "name": "Peter Cerny",
+      "email": "peter@nibe.eu",
+      "position": "Director of International Sales Operations"
+    },
+    {
+      "name": "Johannes Berggren",
+      "email": "johannes@nibe.eu",
+      "position": "Art Director"
+    },
+    {
+      "name": "Birgitta Gustafsson",
+      "email": "birgitta@nibe.eu",
+      "position": "Art Director"
+    },
+    {
+      "name": "Nils Larsson",
+      "email": "nils@nibe.eu",
+      "position": "Director of Industrial Engineering"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:48.649337+00:00",
+    "query": "NIBE Baltic Europe HVAC pump distributor manufacturer",
+    "summary": "NIBE: Heating and air-conditioning systems - Archiproducts https://www. archiproducts. com/en/nibe?srsltid=AfmBOoqyhhWU8FYaMtWGqjpXS5mkFdnOdUuDJ00R1olfdlkdOIrH7ni1 Discover the complete catalogue of NIBE products.",
+    "sources": [
+      "https://www.archiproducts.com/en/nibe?srsltid=AfmBOoqyhhWU8FYaMtWGqjpXS5mkFdnOdUuDJ00R1olfdlkdOIrH7ni1",
+      "https://www.nibe.eu/en-eu/contact/nibe-partners",
+      "https://www.buildingcentre.co.uk/product_finder/company/nibe-energy-systems-limited"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

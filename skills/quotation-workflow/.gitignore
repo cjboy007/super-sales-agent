@@ -1,7 +1,0 @@
-node_modules/
-data/*.pdf
-data/QT-*.xlsx
-data/QT-*.docx
-data/QT-*.html
-output/
-.env

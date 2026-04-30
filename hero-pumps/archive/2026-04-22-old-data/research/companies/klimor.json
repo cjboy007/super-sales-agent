@@ -1,0 +1,45 @@
+{
+  "company": "Klimor",
+  "country": "波兰",
+  "website": "klimor.com",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Dariusz Szylman",
+      "email": "dszylman@klimor.com",
+      "position": "CEO"
+    },
+    {
+      "name": "Zbigniew Górski",
+      "email": "zgorski@klimor.com",
+      "position": "Export Specialist"
+    },
+    {
+      "name": "Joanna Stachowiak",
+      "email": "jstachowiak@klimor.com",
+      "position": "Administrative Specialist"
+    },
+    {
+      "name": "Piotr Świerczek",
+      "email": "pswierczek@klimor.com",
+      "position": "Operations Manager"
+    },
+    {
+      "name": "Piotr Gardias",
+      "email": "pgardias@klimor.com",
+      "position": "Constructor"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:50:37.859164+00:00",
+    "query": "Klimor 波兰 HVAC pump distributor manufacturer",
+    "summary": "About Us - KLIMA-THERM Group https://ktg. pl/about-us The Group's leading affiliated enterprises operating in the Polish market are: Klima-Therm – distributor of air conditioning systems – and Klimor – manufacturer 2.",
+    "sources": [
+      "https://ktg.pl/about-us",
+      "https://gunnpegelow.com/partners/klimor-2/",
+      "https://www.klimor.com/"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

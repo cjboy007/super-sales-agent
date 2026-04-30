@@ -1,3 +1,12 @@
+---
+name: customer-segmentation
+description: '客户分层系统，自动标签 + 生命周期管理 + 价值分析'
+metadata:
+  {
+    "openclaw": { "emoji": "🏷️", "requires": { "anyBins": ["node"] } },
+  }
+---
+
 # Customer Segmentation — 客户分层
 
 自动客户标签 + 生命周期管理 + 价值分析。基于 OKKI CRM 数据，5 级客户分层（VIP/活跃/普通/休眠/流失），自动评分+标签同步。
@@ -18,7 +27,7 @@
 ## 使用
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/customer-segmentation
+cd /path/to/your/.openclaw/workspace/skills/customer-segmentation
 
 # 1. 采集客户数据
 node scripts/customer-data-collector.js

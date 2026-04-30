@@ -1,0 +1,23 @@
+{
+  "company": "Centrometal",
+  "country": "克罗地亚",
+  "website": "centrometal.hr",
+  "tier": "Tier1",
+  "industry": "HVAC/锅炉",
+  "contacts": [
+    {
+      "name": "Sven Raonic",
+      "email": "sven.raonic@centrometal.hr",
+      "position": "Purchasing Manager"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:50:00.000Z",
+    "query": "Centrometal Croatia boiler manufacturer heating systems",
+    "summary": "Centrometal 是克罗地亚锅炉/暖通设备制造商。Sven Raonic 是采购经理，自 2013 年起在该公司负责采购。",
+    "sources": [
+      "https://hr.linkedin.com/in/sven-raonic-531146152"
+    ]
+  },
+  "outreach_notes": "克罗地亚锅炉制造商。Sven 是采购经理，直接决策人。"
+}

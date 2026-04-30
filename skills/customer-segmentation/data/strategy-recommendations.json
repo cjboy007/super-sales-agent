@@ -1,0 +1,208 @@
+{
+  "generated_at": "2026-03-24T20:24:14.638Z",
+  "scored_at": "2026-03-24T18:30:43.138Z",
+  "total_customers": 6,
+  "segments": {
+    "VIP": {
+      "label": "VIP 客户",
+      "count": 1,
+      "avg_score": 85.75,
+      "strategy": {
+        "priority": "highest",
+        "actions": [
+          "优先跟进: 48h 内必须响应询盘",
+          "专属折扣: pricing-engine 自动应用 VIP 折扣",
+          "季度回访: 每季度主动联系确认需求",
+          "新品优先: 新产品发布第一时间通知",
+          "专属客服: 指定专人跟进"
+        ],
+        "email_cadence": "每周至少 1 次主动触达",
+        "discount_tier": "VIP"
+      },
+      "customers": [
+        {
+          "company_id": "C001",
+          "company_name": "TechVision GmbH",
+          "score": 85.75,
+          "manual_override": false
+        }
+      ]
+    },
+    "active": {
+      "label": "活跃客户",
+      "count": 1,
+      "avg_score": 72,
+      "strategy": {
+        "priority": "high",
+        "actions": [
+          "定期跟进: 每两周确认订单进度和需求",
+          "新品推荐: 根据历史订单推荐相关产品",
+          "交叉销售: 分析采购品类缺口，推荐互补产品",
+          "促销通知: 季节性促销优先通知"
+        ],
+        "email_cadence": "每两周 1 次主动触达",
+        "discount_tier": "A"
+      },
+      "customers": [
+        {
+          "company_id": "C002",
+          "company_name": "Pacific Trading Co.",
+          "score": 72,
+          "manual_override": false
+        }
+      ]
+    },
+    "normal": {
+      "label": "普通客户",
+      "count": 0,
+      "avg_score": 0,
+      "strategy": {
+        "priority": "medium",
+        "actions": [
+          "常规维护: 每月确认合作状态",
+          "促销通知: 大型促销活动通知",
+          "需求挖掘: 了解新项目计划"
+        ],
+        "email_cadence": "每月 1 次主动触达",
+        "discount_tier": "B"
+      },
+      "customers": []
+    },
+    "dormant": {
+      "label": "休眠客户",
+      "count": 3,
+      "avg_score": 26,
+      "strategy": {
+        "priority": "high",
+        "actions": [
+          "唤醒邮件: 发送定制唤醒邮件（含专属优惠）",
+          "特别优惠: 提供限时折扣刺激复购",
+          "原因调查: 了解停止采购的原因",
+          "竞品分析: 检查是否转向竞品"
+        ],
+        "email_cadence": "每两周 1 次唤醒触达",
+        "discount_tier": "C",
+        "urgency": "休眠超 90 天需立即启动唤醒流程"
+      },
+      "customers": [
+        {
+          "company_id": "C003",
+          "company_name": "SilkRoad Electronics",
+          "score": 31,
+          "manual_override": false
+        },
+        {
+          "company_id": "C005",
+          "company_name": "Dormant Corp",
+          "score": 30,
+          "manual_override": false
+        },
+        {
+          "company_id": "C004",
+          "company_name": "NorthStar Import",
+          "score": 17,
+          "manual_override": false
+        }
+      ]
+    },
+    "lost": {
+      "label": "流失客户",
+      "count": 1,
+      "avg_score": 9,
+      "strategy": {
+        "priority": "low",
+        "actions": [
+          "最后挽回: 发送最终挽回邮件（1 次机会）",
+          "流失归档: 记录流失原因",
+          "竞品情报: 了解客户转向哪家供应商",
+          "长期跟踪: 加入年度回访名单"
+        ],
+        "email_cadence": "季度 1 次低频触达",
+        "discount_tier": "D",
+        "urgency": "超 180 天无互动，标记为长期流失"
+      },
+      "customers": [
+        {
+          "company_id": "C006",
+          "company_name": "Ghost Ltd",
+          "score": 9,
+          "manual_override": false
+        }
+      ]
+    }
+  },
+  "upgrade_opportunities": [
+    {
+      "company_id": "C006",
+      "company_name": "Ghost Ltd",
+      "current_segment": "lost",
+      "current_score": 9,
+      "target_segment": "dormant",
+      "target_score": 15,
+      "gap": 6,
+      "bottleneck": {
+        "dimension": "order_amount",
+        "label": "订单金额",
+        "current_score": 10,
+        "raw_value": 0,
+        "potential_gain": 36
+      },
+      "nudge": "增加订单金额是关键。当前 12 个月累计 $0。建议推荐高价值产品或大批量优惠方案。"
+    },
+    {
+      "company_id": "C003",
+      "company_name": "SilkRoad Electronics",
+      "current_segment": "dormant",
+      "current_score": 31,
+      "target_segment": "normal",
+      "target_score": 40,
+      "gap": 9,
+      "bottleneck": {
+        "dimension": "order_amount",
+        "label": "订单金额",
+        "current_score": 25,
+        "raw_value": 4300,
+        "potential_gain": 30
+      },
+      "nudge": "增加订单金额是关键。当前 12 个月累计 $4,300。建议推荐高价值产品或大批量优惠方案。"
+    },
+    {
+      "company_id": "C005",
+      "company_name": "Dormant Corp",
+      "current_segment": "dormant",
+      "current_score": 30,
+      "target_segment": "normal",
+      "target_score": 40,
+      "gap": 10,
+      "bottleneck": {
+        "dimension": "order_amount",
+        "label": "订单金额",
+        "current_score": 50,
+        "raw_value": 12000,
+        "potential_gain": 20
+      },
+      "nudge": "增加订单金额是关键。当前 12 个月累计 $12,000。建议推荐高价值产品或大批量优惠方案。"
+    },
+    {
+      "company_id": "C002",
+      "company_name": "Pacific Trading Co.",
+      "current_segment": "active",
+      "current_score": 72,
+      "target_segment": "VIP",
+      "target_score": 85,
+      "gap": 13,
+      "bottleneck": {
+        "dimension": "order_frequency",
+        "label": "交易频次",
+        "current_score": 55,
+        "raw_value": 3,
+        "potential_gain": 11.25
+      },
+      "nudge": "提升下单频次。当前 12 个月仅 3 单。建议定期发送新品通知和补货提醒。"
+    }
+  ],
+  "metadata": {
+    "config_version": "segmentation-rules.json",
+    "generation_ms": 10
+  }
+}

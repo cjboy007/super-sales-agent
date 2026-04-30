@@ -1,0 +1,23 @@
+{
+  "company": "Bravida Nordic",
+  "country": "瑞典",
+  "website": "bravida.se",
+  "tier": "Tier2",
+  "industry": "建筑服务/暖通安装",
+  "contacts": [
+    {
+      "name": "通用邮箱",
+      "email": "info@bravida.se",
+      "position": "待确认（需补充）"
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-23T01:55:00.000Z",
+    "query": "Bravida Nordic building services HVAC installation electrical plumbing",
+    "summary": "Bravida 是北欧最大的建筑技术服务公司之一，业务涵盖电气、管道和暖通安装。",
+    "sources": [
+      "https://bravida.se"
+    ]
+  },
+  "outreach_notes": "大型安装公司，项目配套需要大量循环泵。需找到具体采购负责人。"
+}

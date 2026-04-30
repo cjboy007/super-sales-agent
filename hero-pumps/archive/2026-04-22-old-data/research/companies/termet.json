@@ -1,0 +1,45 @@
+{
+  "company": "Termet",
+  "country": "波兰",
+  "website": "termet.com.pl",
+  "tier": "Tier2",
+  "industry": "HVAC",
+  "contacts": [
+    {
+      "name": "Kamil Milczarek",
+      "email": "kamil.milczarek@termet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Artur Stawiarski",
+      "email": "artur.stawiarski@termet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Artur Jakubczak",
+      "email": "artur.jakubczak@termet.com.pl",
+      "position": "Regional Sales Manager"
+    },
+    {
+      "name": "Krzysztof Lisiecki",
+      "email": "krzysztof.lisiecki@termet.com.pl",
+      "position": ""
+    },
+    {
+      "name": "Marcin Burek",
+      "email": "marcin.burek@termet.com.pl",
+      "position": ""
+    }
+  ],
+  "research": {
+    "searched_at": "2026-04-20T15:51:28.895482+00:00",
+    "query": "Termet 波兰 HVAC pump distributor manufacturer",
+    "summary": "https://www. termet. pl/en/company/6 TERMET S. is a leading manufacturer of heating equipment in Poland - gas boilers of various types, water heaters and solutions based on renewable energy 2. Termet S.",
+    "sources": [
+      "https://www.termet.com.pl/en/company/6",
+      "https://besteon.pl/en/manufacturer/termet-en/?srsltid=AfmBOoreBW7XLo0CBhrk3Skgfwh3MtYUbOjgVw9zm8yqFrKXMvFvDMaS",
+      "https://www.solfinity.pl/en/manufacturers/termet"
+    ]
+  },
+  "outreach_notes": "该公司为Tier2潜力客户。可通过其销售或产品团队切入，推荐循环泵/阀门配套方案。"
+}

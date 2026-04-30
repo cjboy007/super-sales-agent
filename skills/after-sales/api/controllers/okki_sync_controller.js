@@ -9,14 +9,11 @@ const path = require('path');
 
 // ==================== 配置 ====================
 const CONFIG = {
-  // OKKI CLI 路径（支持环境变量覆盖）
-  okkiCliPath: process.env.OKKI_CLI_PATH || path.resolve(__dirname, '../../../../xiaoman-okki/api/okki_cli.py'),
+  // OKKI CLI 路径
+  okkiCliPath: '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki_cli.py',
   
-  // OKKI Python 客户端路径（支持环境变量覆盖）
-  okkiClientPath: process.env.OKKI_CLIENT_PATH || path.resolve(__dirname, '../../../../xiaoman-okki/api/okki_client.py'),
-  
-  // OKKI 工作区根目录（用于 Python path）
-  okkiWorkspacePath: process.env.OKKI_WORKSPACE_PATH || path.resolve(__dirname, '../../../../xiaoman-okki/api'),
+  // OKKI Python 客户端路径
+  okkiClientPath: '/path/to/your/.openclaw/workspace/xiaoman-okki/api/okki_client.py',
   
   // Trail 类型
   TRAIL_TYPE: {
@@ -227,7 +224,7 @@ async function createAfterSalesTrailViaPython(companyId, data, type) {
     // 创建临时 Python 脚本调用 OKKI 客户端
     const tempScript = `
 import sys
-sys.path.insert(0, '${CONFIG.okkiWorkspacePath.replace(/\\/g, '\\\\')}')
+sys.path.insert(0, '/path/to/your/.openclaw/workspace/xiaoman-okki/api')
 from okki_client import OKKIClient
 import json
 

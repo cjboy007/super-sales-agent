@@ -1,6 +1,10 @@
 ---
 name: logistics-tracker
-description: 物流跟踪技能，对接 17Track 批量 API，自动跟踪运单状态，向客户发送邮件通知，并在异常时告警。
+description: '物流跟踪系统，API 对接 + 客户推送 + 异常告警'
+metadata:
+  {
+    "openclaw": { "emoji": "🚢", "requires": { "anyBins": ["node"] } },
+  }
 ---
 
 # logistics-tracker
@@ -82,7 +86,7 @@ logistics-tracker/
 运单通知通过 `imap-smtp-email` skill 的 SMTP 发送：
 
 ```
-/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js
+/path/to/your/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js
 ```
 
 确保 `imap-smtp-email` skill 的 `.env` 已配置正确的 SMTP 凭证。
@@ -92,7 +96,7 @@ logistics-tracker/
 异常检测器从 `order-tracker` 读取已发货订单自动创建跟踪记录：
 
 ```
-/Users/wilson/.openclaw/workspace/skills/order-tracker/data/orders.json
+/path/to/your/.openclaw/workspace/skills/order-tracker/data/orders.json
 ```
 
 ---
@@ -102,7 +106,7 @@ logistics-tracker/
 ### 主调度器（推荐入口）
 
 ```bash
-cd /Users/wilson/.openclaw/workspace/skills/logistics-tracker
+cd /path/to/your/.openclaw/workspace/skills/logistics-tracker
 
 # 执行一次完整调度周期（查询 + 状态更新 + 通知 + 异常检测）
 node scripts/scheduler.js
@@ -181,10 +185,10 @@ notify.sendShippedNotification({
 
 ```bash
 # 每 6 小时执行一次完整调度周期
-0 */6 * * * cd /Users/wilson/.openclaw/workspace/skills/logistics-tracker && node scripts/scheduler.js >> /tmp/logistics-tracker.log 2>&1
+0 */6 * * * cd /path/to/your/.openclaw/workspace/skills/logistics-tracker && node scripts/scheduler.js >> /tmp/logistics-tracker.log 2>&1
 
 # 每天早上 9 点执行异常检测（可独立运行，也会在 scheduler 中执行）
-0 9 * * * cd /Users/wilson/.openclaw/workspace/skills/logistics-tracker && node scripts/anomaly-detector.js >> /tmp/logistics-anomaly.log 2>&1
+0 9 * * * cd /path/to/your/.openclaw/workspace/skills/logistics-tracker && node scripts/anomaly-detector.js >> /tmp/logistics-anomaly.log 2>&1
 ```
 
 > **注意：** 17Track 免费版每天 100 次配额。每 6h 跑一次（4次/天），每次最多 25 运单可安全使用。活跃运单超过 25 时，调度器会自动按优先级分配配额。

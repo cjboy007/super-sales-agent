@@ -25,10 +25,9 @@ const http = require('http');
 // ============ 路径 ============
 const BASE_DIR = path.join(__dirname, '..');
 const CONFIG_PATH = path.join(BASE_DIR, 'config', 'dashboard-config.json');
-const OKKI_WORKSPACE = process.env.OKKI_WORKSPACE || path.resolve(__dirname, '../../../xiaoman-okki');
-const OKKI_CONFIG_PATH = path.join(OKKI_WORKSPACE, 'api/config.json');
-const OKKI_TOKEN_CACHE = path.join(OKKI_WORKSPACE, 'api/token.cache');
-const ENV_PATH = process.env.ENV_PATH || path.resolve(__dirname, '../../../.env');
+const OKKI_CONFIG_PATH = '/path/to/your/.openclaw/workspace/xiaoman-okki/api/config.json';
+const OKKI_TOKEN_CACHE = '/path/to/your/.openclaw/workspace/xiaoman-okki/api/token.cache';
+const ENV_PATH = '/path/to/your/.openclaw/workspace/.env';
 const SNAPSHOTS_DIR = path.join(BASE_DIR, 'data', 'snapshots');
 const LATEST_PATH = path.join(BASE_DIR, 'data', 'latest.json');
 const LOGS_DIR = path.join(BASE_DIR, 'logs');
@@ -280,9 +279,29 @@ async function collectOkkiData(dateRange) {
     }, 0);
     results.orders_raw = orders;
     log('info', `订单: ${orders.length}, 金额: ${results.order_amount}`);
+
+    // 复购分析（基于近 12 个月订单历史）
+    const repeatAnalysisStart = new Date(`${dateRange.end}T00:00:00+08:00`);
+    repeatAnalysisStart.setMonth(repeatAnalysisStart.getMonth() - 11);
+    repeatAnalysisStart.setDate(1);
+    const repeatTimeParams = {
+      start_time: repeatAnalysisStart.toISOString().split('T')[0],
+      end_time: dateRange.end,
+      time_type: '2'
+    };
+    const repeatOrders = await okkiListAll(config, token, '/v1/invoices/order/list', repeatTimeParams);
+    results.repeat_purchase = analyzeRepeatPurchase(repeatOrders, repeatTimeParams);
+    log('info', '复购分析完成', results.repeat_purchase.summary);
   } catch (e) {
     results.order_count = 'N/A';
     results.order_amount = 'N/A';
+    results.repeat_purchase = {
+      repeat_purchase_rate: 'N/A',
+      repeat_purchase_cycle_days: 'N/A',
+      repeat_purchase_monthly_trend: [],
+      repeat_purchase_top10: [],
+      summary: { total_customers: 'N/A', repeat_customers: 'N/A', total_orders: 'N/A' }
+    };
     log('error', '订单数据采集失败', { error: e.message });
   }
   
@@ -328,6 +347,131 @@ async function collectOkkiData(dateRange) {
   }
   
   return results;
+}
+
+function analyzeRepeatPurchase(orders, dateRange) {
+  if (!Array.isArray(orders) || orders.length === 0) {
+    return {
+      repeat_purchase_rate: 0,
+      repeat_purchase_cycle_days: 'N/A',
+      repeat_purchase_monthly_trend: [],
+      repeat_purchase_top10: [],
+      summary: { total_customers: 0, repeat_customers: 0, total_orders: 0, date_range: dateRange }
+    };
+  }
+
+  const customerMap = new Map();
+  const normalizedOrders = [];
+
+  for (const order of orders) {
+    const customerId = String(
+      order.company_id || order.customer_id || order.client_id || order.serial_id || order.customer_serial_id || ''
+    ).trim();
+    const customerName = order.company_name || order.customer_name || order.client_name || order.name || '未知客户';
+    const orderDateRaw = order.order_time || order.created_at || order.create_time || order.created_time || order.date || order.order_date;
+    const orderDate = orderDateRaw ? new Date(orderDateRaw) : null;
+
+    if (!customerId || !orderDate || Number.isNaN(orderDate.getTime())) continue;
+
+    const amount = parseFloat(order.amount || order.total_amount || order.order_amount || 0);
+    const normalized = {
+      customer_id: customerId,
+      customer_name: customerName,
+      order_date: orderDate,
+      order_date_str: orderDate.toISOString().split('T')[0],
+      amount: Number.isNaN(amount) ? 0 : amount
+    };
+
+    normalizedOrders.push(normalized);
+
+    if (!customerMap.has(customerId)) {
+      customerMap.set(customerId, {
+        customer_id: customerId,
+        customer_name: customerName,
+        order_count: 0,
+        total_amount: 0,
+        orders: []
+      });
+    }
+
+    const customer = customerMap.get(customerId);
+    customer.order_count += 1;
+    customer.total_amount += normalized.amount;
+    customer.orders.push(normalized);
+  }
+
+  const customers = Array.from(customerMap.values());
+  const totalCustomers = customers.length;
+  const repeatCustomers = customers.filter(c => c.order_count >= 2);
+  const repeatPurchaseRate = totalCustomers > 0
+    ? parseFloat((repeatCustomers.length / totalCustomers * 100).toFixed(2))
+    : 0;
+
+  const intervals = [];
+  for (const customer of customers) {
+    customer.orders.sort((a, b) => a.order_date - b.order_date);
+    for (let i = 1; i < customer.orders.length; i++) {
+      const diffMs = customer.orders[i].order_date - customer.orders[i - 1].order_date;
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+      if (diffDays >= 0) intervals.push(diffDays);
+    }
+  }
+
+  const repeatPurchaseCycleDays = intervals.length > 0
+    ? parseFloat((intervals.reduce((sum, days) => sum + days, 0) / intervals.length).toFixed(1))
+    : 'N/A';
+
+  const monthlyTrendMap = new Map();
+  for (const order of normalizedOrders) {
+    const month = order.order_date_str.substring(0, 7);
+    if (!monthlyTrendMap.has(month)) monthlyTrendMap.set(month, new Map());
+    const monthCustomers = monthlyTrendMap.get(month);
+    if (!monthCustomers.has(order.customer_id)) {
+      monthCustomers.set(order.customer_id, { customer_name: order.customer_name, order_count: 0 });
+    }
+    monthCustomers.get(order.customer_id).order_count += 1;
+  }
+
+  const repeatPurchaseMonthlyTrend = Array.from(monthlyTrendMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([month, monthCustomers]) => {
+      const entries = Array.from(monthCustomers.values());
+      const total = entries.length;
+      const repeat = entries.filter(item => item.order_count >= 2).length;
+      return {
+        month,
+        total_customers: total,
+        repeat_customers: repeat,
+        repeat_purchase_rate: total > 0 ? parseFloat((repeat / total * 100).toFixed(2)) : 0
+      };
+    });
+
+  const repeatPurchaseTop10 = customers
+    .sort((a, b) => {
+      if (b.order_count !== a.order_count) return b.order_count - a.order_count;
+      return b.total_amount - a.total_amount;
+    })
+    .slice(0, 10)
+    .map(customer => ({
+      customer_id: customer.customer_id,
+      customer_name: customer.customer_name,
+      order_count: customer.order_count,
+      total_amount: parseFloat(customer.total_amount.toFixed(2)),
+      last_order_date: customer.orders[customer.orders.length - 1]?.order_date_str || 'N/A'
+    }));
+
+  return {
+    repeat_purchase_rate: repeatPurchaseRate,
+    repeat_purchase_cycle_days: repeatPurchaseCycleDays,
+    repeat_purchase_monthly_trend: repeatPurchaseMonthlyTrend,
+    repeat_purchase_top10: repeatPurchaseTop10,
+    summary: {
+      total_customers: totalCustomers,
+      repeat_customers: repeatCustomers.length,
+      total_orders: normalizedOrders.length,
+      date_range: dateRange
+    }
+  };
 }
 
 // ============ Campaign Tracker 数据采集 ============
@@ -404,6 +548,8 @@ function collectOptionalSource(name) {
 
 // ============ 指标汇总 ============
 function assembleMetrics(okkiData, campaignData, optionalSources, dateRange, period) {
+  const repeatPurchase = okkiData.repeat_purchase || {};
+
   const metrics = {
     metadata: {
       period,
@@ -420,8 +566,19 @@ function assembleMetrics(okkiData, campaignData, optionalSources, dateRange, per
       order_count: okkiData.order_count,
       order_amount: okkiData.order_amount,
       opportunity_count: okkiData.opportunity_count,
+      repeat_purchase_rate: repeatPurchase.repeat_purchase_rate ?? 'N/A',
+      repeat_purchase_cycle_days: repeatPurchase.repeat_purchase_cycle_days ?? 'N/A',
       // 计算转化率
       conversion_rate: 'N/A'
+    },
+    repeat_purchase: {
+      monthly_trend: repeatPurchase.repeat_purchase_monthly_trend || [],
+      top10_customers: repeatPurchase.repeat_purchase_top10 || [],
+      summary: repeatPurchase.summary || {
+        total_customers: 'N/A',
+        repeat_customers: 'N/A',
+        total_orders: 'N/A'
+      }
     }
   };
   
@@ -472,7 +629,7 @@ function calcComparison(currentMetrics) {
     const prev = JSON.parse(fs.readFileSync(prevPath, 'utf-8'));
     
     const comp = { available: true, previous_snapshot: snapshotFiles[0], changes: {} };
-    const numericKpis = ['new_leads', 'new_customers', 'quotation_count', 'quotation_amount', 'order_count', 'order_amount', 'opportunity_count', 'email_sent'];
+    const numericKpis = ['new_leads', 'new_customers', 'quotation_count', 'quotation_amount', 'order_count', 'order_amount', 'opportunity_count', 'email_sent', 'repeat_purchase_rate', 'repeat_purchase_cycle_days'];
     
     for (const kpi of numericKpis) {
       const cur = currentMetrics.kpis[kpi];
@@ -590,7 +747,14 @@ async function main() {
     okkiData = {
       new_customers: 'N/A', order_count: 'N/A', order_amount: 'N/A',
       quotation_count: 'N/A', quotation_amount: 'N/A',
-      new_leads: 'N/A', opportunity_count: 'N/A'
+      new_leads: 'N/A', opportunity_count: 'N/A',
+      repeat_purchase: {
+        repeat_purchase_rate: 'N/A',
+        repeat_purchase_cycle_days: 'N/A',
+        repeat_purchase_monthly_trend: [],
+        repeat_purchase_top10: [],
+        summary: { total_customers: 'N/A', repeat_customers: 'N/A', total_orders: 'N/A' }
+      }
     };
   }
   
