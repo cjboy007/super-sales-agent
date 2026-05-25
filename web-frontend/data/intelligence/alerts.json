@@ -1,0 +1,23 @@
+{
+  "updatedAt": "2026-05-18T18:00:51.149500+08:00",
+  "alerts": [
+    {
+      "id": "1",
+      "keyword": "铜价",
+      "type": "danger",
+      "message": "LME 铜价: $13669/吨（SearXNG (tradingeconomics.com)）",
+      "time": "刚刚",
+      "change": "-$749",
+      "source": "SearXNG (tradingeconomics.com)"
+    },
+    {
+      "id": "2",
+      "keyword": "汇率",
+      "type": "warning",
+      "message": "USD/CNY 实时汇率: 6.8102（SearXNG）",
+      "time": "刚刚",
+      "change": "6.8102",
+      "source": "SearXNG"
+    }
+  ]
+}

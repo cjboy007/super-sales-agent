@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+.battle-station {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.battle-station .mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.scan-line {
+  background: linear-gradient(180deg, transparent 0%, rgba(16,185,129,0.03) 50%, transparent 100%);
+  animation: scan 4s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.pulse-dot {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.glow-green { box-shadow: 0 0 12px rgba(16,185,129,0.3); }
+.glow-amber { box-shadow: 0 0 12px rgba(245,158,11,0.3); }
+.glow-red { box-shadow: 0 0 12px rgba(239,68,68,0.3); }
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.battle-station ::-webkit-scrollbar { width: 4px; }
+.battle-station ::-webkit-scrollbar-track { background: #0f172a; }
+.battle-station ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }

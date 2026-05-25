@@ -1,0 +1,19 @@
+{
+  "name": "super-sales-agent",
+  "version": "1.0.0",
+  "description": "SSA monorepo root — test, lint, and security scripts",
+  "private": true,
+  "scripts": {
+    "test": "npm run test --prefix web-frontend && node farreach/test-api-server-security.js && node farreach/test-expression-evaluator.js && node tests/p05-hitl-email-blocking.test.js && node tests/command-injection-security.test.js",
+    "test:unit": "npm run test --prefix web-frontend",
+    "test:farreach": "node farreach/test-api-server-security.js && node farreach/test-expression-evaluator.js",
+    "test:hitl": "node tests/p05-hitl-email-blocking.test.js",
+    "test:command-injection": "node tests/command-injection-security.test.js",
+    "lint": "cd web-frontend && npx tsc --noEmit",
+    "lint:eslint": "npm run lint --prefix web-frontend",
+    "security:test": "node farreach/test-api-server-security.js && node farreach/test-expression-evaluator.js && node tests/p05-hitl-email-blocking.test.js && node tests/command-injection-security.test.js && npm run test --prefix web-frontend -- --reporter=verbose"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
+  }
+}

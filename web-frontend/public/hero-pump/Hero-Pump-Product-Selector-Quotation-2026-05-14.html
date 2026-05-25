@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Pump — Product Selector & Quotation Generator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-card: #111827;
+    --bg-card-hover: #1a2332;
+    --border: #1e293b;
+    --accent: #3b82f6;
+    --accent-glow: #60a5fa;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
+  .tab-bar { display: flex; gap: 2px; background: var(--bg-card); border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+  .tab-btn { padding: 12px 20px; white-space: nowrap; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: var(--text-secondary); background: var(--bg-card-hover); }
+  .tab-btn.active { color: var(--accent-glow); border-bottom-color: var(--accent); background: var(--bg-card-hover); }
+  .tab-content { display: none; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .card:hover { border-color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+  tr:hover td { background: var(--bg-card-hover); color: var(--text-primary); }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge-success { background: rgba(16,185,129,0.15); color: var(--success); }
+  .badge-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .badge-danger { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .badge-info { background: rgba(59,130,246,0.15); color: var(--accent-glow); }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+  h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; color: var(--accent-glow); }
+  .hero-header { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(96,165,250,0.05)); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  .hero-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+  .hero-header p { color: var(--text-secondary); font-size: 1.05rem; }
+  .tip-box { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .tip-box::before { content: '💡 '; }
+  .warning-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .warning-box::before { content: '⚠️ '; }
+  .input-group { margin-bottom: 16px; }
+  .input-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .input-group input, .input-group select { width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 15px; transition: border-color 0.2s; }
+  .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  .input-group .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .btn { padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-glow); transform: translateY(-1px); }
+  .btn-secondary { background: var(--bg-card-hover); color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--text-primary); }
+  .btn-success { background: var(--success); color: white; }
+  .btn-success:hover { opacity: 0.9; }
+  .result-card { background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.05)); border: 2px solid var(--success); border-radius: 12px; padding: 20px; }
+  .result-card .match { font-size: 1.8rem; font-weight: 800; color: var(--success); }
+  .competitor-card { border-left: 4px solid var(--warning); }
+  .formula-box { background: rgba(59,130,246,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; font-size: 14px; margin: 12px 0; }
+  .pump-curve { width: 100%; max-height: 300px; }
+  .kpi { text-align: center; padding: 20px; }
+  .kpi .value { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .kpi .label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .quote-box { background: white; color: #1a1a1a; border-radius: 12px; padding: 32px; font-family: 'Segoe UI', sans-serif; }
+  .quote-box h2 { color: #1a1a1a; }
+  .quote-box table th { color: #64748b; border-bottom: 2px solid #e2e8f0; }
+  .quote-box table td { color: #334155; border-bottom: 1px solid #e2e8f0; }
+  .quote-box .total { font-size: 1.3rem; font-weight: 700; color: #3b82f6; }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr !important; } .grid-3 { grid-template-columns: 1fr !important; } .grid-4 { grid-template-columns: repeat(2, 1fr) !important; } }
+  .application-card { cursor: pointer; transition: all 0.2s; }
+  .application-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .application-card.selected { border-color: var(--accent); background: rgba(59,130,246,0.1); box-shadow: 0 0 0 2px var(--accent); }
+  .calc-result { display: inline-block; padding: 4px 12px; background: rgba(16,185,129,0.15); color: var(--success); border-radius: 6px; font-weight: 700; font-size: 16px; margin-left: 8px; }
+  .highlight-row { background: rgba(59,130,246,0.08); }
+  .savings { color: var(--success); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="selector">🔍 Product Selector</button>
+  <button class="tab-btn" data-tab="calculator">🧮 TDH & Flow Calculator</button>
+  <button class="tab-btn" data-tab="compare">⚔️ Competitor Comparison</button>
+  <button class="tab-btn" data-tab="quote">📋 Quotation Generator</button>
+  <button class="tab-btn" data-tab="energy">⚡ Energy Savings Analyzer</button>
+</div>
+
+<!-- TAB 1: PRODUCT SELECTOR -->
+<div class="tab-content active" id="tab-selector">
+  <div class="hero-header">
+    <h1>🔍 Hero Pump Product Selector</h1>
+    <p>Answer 4 quick questions → Get matched to the right Hero Pump model. Designed for EU HVAC distributors and installers.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <h3>Step 1: Select Application</h3>
+        <div class="grid-2" id="appGrid" style="margin-top:12px">
+          <div class="card application-card" data-app="heating" onclick="selectApp(this)">
+            <div class="text-center">
+              <div class="text-3xl mb-2">🔥</div>
+              <div class="font-semibold">Heating</div>
+              <div class="text-sm text-gray-400 mt-1">Residential / Commercial hydronic heating</div>
+            </div>
+          </div>
+          <div class="card application-card" data-app="cooling" onclick="selectApp(this)">
+            <div class="text-center">
+              <div class="text-3xl mb-2">❄️</div>
+              <div class="font-semibold">Cooling</div>
+              <div class="text-sm text-gray-400 mt-1">Chilled water circulation / AC loops</div>
+            </div>
+          </div>
+          <div class="card application-card" data-app="dhw" onclick="selectApp(this)">
+            <div class="text-center">
+              <div class="text-3xl mb-2">🚿</div>
+              <div class="font-semibold">Hot Water Recirculation</div>
+              <div class="text-sm text-gray-400 mt-1">DHW return loop / instant hot water</div>
+            </div>
+          </div>
+          <div class="card application-card" data-app="solar" onclick="selectApp(this)">
+            <div class="text-center">
+              <div class="text-3xl mb-2">☀️</div>
+              <div class="font-semibold">Solar Thermal</div>
+              <div class="text-sm text-gray-400 mt-1">Solar collector loop circulation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Step 2: System Parameters</h3>
+        <div class="input-group">
+          <label>Heat/Cooling Load (kW)</label>
+          <input type="number" id="loadKw" placeholder="e.g. 25" min="1" max="500" oninput="autoCalculate()">
+          <div class="hint">Building heating/cooling demand. Typical home: 5-30 kW.</div>
+        </div>
+        <div class="input-group">
+          <label>System Type</label>
+          <select id="systemType" onchange="autoCalculate()">
+            <option value="closed">Closed-Loop (HVAC standard)</option>
+            <option value="open">Open-Loop (rare in HVAC)</option>
+          </select>
+          <div class="hint">95%+ of HVAC applications are closed-loop.</div>
+        </div>
+        <div class="input-group">
+          <label>Building Age / Pipe Condition</label>
+          <select id="buildingAge" onchange="autoCalculate()">
+            <option value="new">New Build (post-2010) — 150 Pa/m friction</option>
+            <option value="modern">Modern (2000-2010) — 100 Pa/m friction</option>
+            <option value="old" selected>Older (pre-2000) — 50 Pa/m friction</option>
+          </select>
+          <div class="hint">Older buildings have larger pipes → lower friction loss per meter.</div>
+        </div>
+        <div class="input-group">
+          <label>Estimated Pipe Run Length (m)</label>
+          <input type="number" id="pipeLength" placeholder="e.g. 80" min="5" max="2000" oninput="autoCalculate()">
+          <div class="hint">Feed + return total length. Simplified: (L+W+H)×2 of building.</div>
+        </div>
+        <div class="input-group">
+          <label>Temperature Spread ΔT (K)</label>
+          <select id="deltaT" onchange="autoCalculate()">
+            <option value="20" selected>20 K — Standard (90/70°C)</option>
+            <option value="15">15 K — Underfloor Heating (40/30°C)</option>
+            <option value="10">10 K — Low-Temp System (55/45°C)</option>
+            <option value="5">5 K — Cooling System (7/12°C)</option>
+          </select>
+          <div class="hint">Flow temperature minus return temperature. ΔT=20K for standard radiator systems.</div>
+        </div>
+        <div class="input-group">
+          <label>Fittings & Valves Present</label>
+          <select id="fittings" onchange="autoCalculate()">
+            <option value="1.0">Basic (valves only) — factor 1.0</option>
+            <option value="1.3" selected>Standard (+ TRVs) — factor 1.3</option>
+            <option value="1.6">Complex (+ TRVs + mixing valves) — factor 1.6</option>
+            <option value="2.0">Full (+ TRVs + mixing + gravity brake) — factor 2.0</option>
+          </select>
+          <div class="hint">Additional resistance from system components. TRVs = Thermostatic Radiator Valves.</div>
+        </div>
+
+        <button class="btn btn-primary w-full mt-4" onclick="runSelection()">🔍 Find My Pump</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" id="calcResults" style="display:none">
+        <h3>📊 Calculated Duty Point</h3>
+        <div class="grid-2" style="margin-top:12px">
+          <div class="kpi">
+            <div class="value" id="resFlow">-</div>
+            <div class="label">Flow Rate (m³/h)</div>
+          </div>
+          <div class="kpi">
+            <div class="value" id="resHead">-</div>
+            <div class="label">Total Head (m)</div>
+          </div>
+        </div>
+        <div class="formula-box" id="formulaDetail"></div>
+      </div>
+
+      <div class="card" id="matchResults" style="display:none">
+        <h3>🏆 Recommended Hero Pump</h3>
+        <div class="result-card" id="matchCard"></div>
+        <div style="margin-top:16px">
+          <h4>Alternative Options</h4>
+          <div id="altPumps"></div>
+        </div>
+        <div style="margin-top:16px">
+          <h4>vs Competitor Equivalents</h4>
+          <div id="competitorEquiv"></div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap">
+          <button class="btn btn-success" onclick="switchTab('quote')">📋 Generate Quotation</button>
+          <button class="btn btn-secondary" onclick="switchTab('compare')">⚔️ Compare in Detail</button>
+          <button class="btn btn-secondary" onclick="switchTab('energy')">⚡ Energy Savings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: TDH & FLOW CALCULATOR -->
+<div class="tab-content" id="tab-calculator">
+  <div class="hero-header">
+    <h1>🧮 TDH & Flow Rate Calculator</h1>
+    <p>Engineering-grade circulator pump sizing based on VDMA 24199 and Wilo methodology. For closed-loop HVAC systems.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Total Dynamic Head (TDH) Calculation</h3>
+      <div class="tip-box">In closed-loop HVAC systems, the pump only needs to overcome friction losses — not elevation. Static head cancels out in a circulation loop.</div>
+      <div class="formula-box">
+        <strong>H = R × L × ZF / 10,000</strong><br><br>
+        Where:<br>
+        • R = Pipe friction loss (Pa/m) — 50 to 150<br>
+        • L = Pipe length (m) — feed + return<br>
+        • ZF = Fitting addition factor (1.0 to 2.0)<br>
+        • 10,000 = Conversion factor (Pa → m H₂O)<br><br>
+        <em>Source: VDMA 24199 / Wilo Pump Basics Guide</em>
+      </div>
+
+      <h3 style="margin-top:20px">Flow Rate Calculation</h3>
+      <div class="formula-box">
+        <strong>Q = Φ̇ / (ρ × cₚ × ΔT)</strong><br><br>
+        Where:<br>
+        • Φ̇ = Heat flow rate (W / kW)<br>
+        • ρ = Water density ≈ 1000 kg/m³<br>
+        • cₚ = Specific heat ≈ 4182 J/(kg·K)<br>
+        • ΔT = Temperature spread (K)<br><br>
+        <em>Simplified: Q (m³/h) = Φ̇ (kW) × 0.86 / ΔT (K)</em>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Interactive Calculator</h3>
+      <div class="input-group">
+        <label>Pipe Friction R (Pa/m)</label>
+        <input type="number" id="calcR" value="50" min="10" max="300" oninput="runCalc()">
+        <div class="hint">Old buildings: 50, Modern: 100, New: 150 Pa/m</div>
+      </div>
+      <div class="input-group">
+        <label>Pipe Length L (m)</label>
+        <input type="number" id="calcL" value="80" min="5" max="5000" oninput="runCalc()">
+      </div>
+      <div class="input-group">
+        <label>Fitting Factor ZF</label>
+        <input type="number" id="calcZF" value="1.3" step="0.1" min="1" max="3" oninput="runCalc()">
+      </div>
+      <div class="input-group">
+        <label>Heat Load Φ̇ (kW)</label>
+        <input type="number" id="calcHeat" value="25" min="0.5" max="1000" step="0.5" oninput="runCalc()">
+      </div>
+      <div class="input-group">
+        <label>ΔT (K)</label>
+        <input type="number" id="calcDT" value="20" min="1" max="80" oninput="runCalc()">
+      </div>
+
+      <div class="grid-2" style="margin-top:20px">
+        <div class="result-card text-center">
+          <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase">Total Head</div>
+          <div class="match" id="calcH" style="font-size:2.5rem">5.2 m</div>
+        </div>
+        <div class="result-card text-center">
+          <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase">Flow Rate</div>
+          <div class="match" id="calcQ" style="font-size:2.5rem">1.08 m³/h</div>
+        </div>
+      </div>
+
+      <div class="tip-box" style="margin-top:16px">
+        <strong>Working Point:</strong> <span id="calcPoint">Q = 1.08 m³/h @ H = 5.2 m</span>
+        <br><small>Use this duty point to select a pump from the performance curve.</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: COMPETITOR COMPARISON -->
+<div class="tab-content" id="tab-compare">
+  <div class="hero-header">
+    <h1>⚔️ Competitor Comparison Matrix</h1>
+    <p>Hero Pump vs Grundfos vs Wilo vs DAB — side-by-side specification comparison for EU circulator pumps.</p>
+  </div>
+
+  <div class="card">
+    <h3>Residential Circulator Comparison (EEI ≤ 0.20, A-Rated)</h3>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>🏆 Hero HP-S15/6</th>
+          <th>🏆 Hero HP-S25/8</th>
+          <th>Grundfos UPS3 15-60</th>
+          <th>Grundfos ALPHA2 25-60</th>
+          <th>Wilo Yonos PICO 25/1-6</th>
+          <th>DAB Evosta 2 40-70</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row"><td><strong>Max Head</strong></td><td>6.0 m</td><td>8.0 m</td><td>6.0 m</td><td>6.0 m</td><td>6.0 m</td><td>7.0 m</td></tr>
+        <tr><td><strong>Max Flow</strong></td><td>3.2 m³/h</td><td>5.5 m³/h</td><td>3.1 m³/h</td><td>4.4 m³/h</td><td>4.8 m³/h</td><td>4.8 m³/h</td></tr>
+        <tr class="highlight-row"><td><strong>EEI</strong></td><td>≤0.18</td><td>≤0.19</td><td>≤0.15</td><td>≤0.20</td><td>≤0.20</td><td>≤0.20</td></tr>
+        <tr><td><strong>Energy Rating</strong></td><td><span class="badge badge-success">A</span></td><td><span class="badge badge-success">A</span></td><td><span class="badge badge-success">A</span></td><td><span class="badge badge-success">A</span></td><td><span class="badge badge-success">A</span></td><td><span class="badge badge-success">A</span></td></tr>
+        <tr class="highlight-row"><td><strong>Power Range</strong></td><td>3-45 W</td><td>5-75 W</td><td>3-45 W</td><td>4-46 W</td><td>3-45 W</td><td>4-55 W</td></tr>
+        <tr><td><strong>Max Temp</strong></td><td>110°C</td><td>110°C</td><td>110°C</td><td>110°C</td><td>110°C</td><td>110°C</td></tr>
+        <tr class="highlight-row"><td><strong>Connection</strong></td><td>G 1" / G 1½"</td><td>G 1½" / G 2"</td><td>G 1" / Rp 1"</td><td>G 1½" / Rp 1½"</td><td>Rp 1" / Rp 1¼"</td><td>Rp 1½"</td></tr>
+        <tr><td><strong>Control Modes</strong></td><td>PP / CP / 3-Speed</td><td>PP / CP / 3-Speed</td><td>PP / CP / 3-Speed</td><td>PP / CP / 3-Speed</td><td>PP / CP / ΔT-C / ΔT-V</td><td>PP / CP / 3-Speed</td></tr>
+        <tr class="highlight-row"><td><strong>Modbus/BMS</strong></td><td><span class="badge badge-success">✅ Built-in</span></td><td><span class="badge badge-success">✅ Built-in</span></td><td><span class="badge badge-warning">Optional (GeniBus)</span></td><td><span class="badge badge-danger">❌</span></td><td><span class="badge badge-success">✅ (PLR)</span></td><td><span class="badge badge-danger">❌</span></td></tr>
+        <tr><td><strong>ErP 2026 Ready</strong></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-success">✅</span></td></tr>
+        <tr class="highlight-row"><td><strong>BACS Compliant</strong></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-warning">Partial</span></td><td><span class="badge badge-danger">❌</span></td><td><span class="badge badge-success">✅</span></td><td><span class="badge badge-danger">❌</span></td></tr>
+        <tr><td><strong>Warranty</strong></td><td>3 years</td><td>3 years</td><td>5 years</td><td>5 years</td><td>5 years</td><td>2 years</td></tr>
+        <tr class="highlight-row"><td><strong>Est. EU Retail Price</strong></td><td class="savings">€89-119</td><td class="savings">€129-169</td><td>€149-189</td><td>€169-219</td><td>€139-179</td><td>€109-149</td></tr>
+        <tr><td><strong>Price Advantage</strong></td><td class="savings">-40%</td><td class="savings">-30%</td><td>Baseline</td><td>Baseline</td><td>Baseline</td><td>Baseline</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Commercial / High-Head Comparison</h3>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>🏆 Hero HP-M32/12</th>
+          <th>🏆 Hero HP-D40/16</th>
+          <th>Grundfos MAGNA3 32-120</th>
+          <th>Wilo Stratos MAXO-Z 32/1-12</th>
+          <th>DAB FCP 32/160</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row"><td><strong>Max Head</strong></td><td>12.0 m</td><td>16.0 m</td><td>12.0 m</td><td>12.0 m</td><td>16.0 m</td></tr>
+        <tr><td><strong>Max Flow</strong></td><td>10.0 m³/h</td><td>18.0 m³/h</td><td>10.0 m³/h</td><td>10.5 m³/h</td><td>16.0 m³/h</td></tr>
+        <tr class="highlight-row"><td><strong>Power Range</strong></td><td>20-200 W</td><td>50-400 W</td><td>20-200 W</td><td>20-250 W</td><td>100-500 W</td></tr>
+        <tr><td><strong>Communication</strong></td><td>Modbus RTU + BACnet</td><td>Modbus RTU + BACnet</td><td>GeniBus + CIM (opt.)</td><td>PLR + Modbus (opt.)</td><td>Modbus RTU</td></tr>
+        <tr class="highlight-row"><td><strong>Est. EU Retail Price</strong></td><td class="savings">€249-349</td><td class="savings">€399-549</td><td>€499-699</td><td>€449-599</td><td>€379-499</td></tr>
+        <tr><td><strong>Price Advantage</strong></td><td class="savings">-50%</td><td class="savings">-35%</td><td>Baseline</td><td>Baseline</td><td>Baseline</td></tr>
+        <tr class="highlight-row"><td><strong>Application</strong></td><td>Light Commercial</td><td>Commercial / District</td><td>Commercial / Industrial</td><td>Commercial / HVAC</td><td>Commercial / Industrial</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Key Selling Point:</strong> Hero Pump offers comparable or superior specifications (built-in Modbus/BMS, BACS compliance) at 30-50% lower price points vs Grundfos/Wilo. EEI ratings meet or exceed ErP 2026 requirements. For distributors, margin is 15-25% higher on Hero Pump vs premium brands.
+  </div>
+</div>
+
+<!-- TAB 4: QUOTATION GENERATOR -->
+<div class="tab-content" id="tab-quote">
+  <div class="hero-header">
+    <h1>📋 Quotation Generator</h1>
+    <p>Generate a professional quotation for Hero Pump products. Fill in customer details, select products, and export as PDF-ready format.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <h3>Customer Details</h3>
+        <div class="input-group">
+          <label>Company / Customer Name</label>
+          <input type="text" id="custName" placeholder="e.g. Reiche GmbH">
+        </div>
+        <div class="input-group">
+          <label>Contact Person</label>
+          <input type="text" id="custContact" placeholder="e.g. Hans Mueller">
+        </div>
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" id="custEmail" placeholder="e.g. h.mueller@reiche.de">
+        </div>
+        <div class="input-group">
+          <label>Country</label>
+          <select id="custCountry">
+            <option value="DE">Germany 🇩🇪</option>
+            <option value="PL">Poland 🇵🇱</option>
+            <option value="RO">Romania 🇷🇴</option>
+            <option value="NL">Netherlands 🇳🇱</option>
+            <option value="IT">Italy 🇮🇹</option>
+            <option value="FR">France 🇫🇷</option>
+            <option value="ES">Spain 🇪🇸</option>
+            <option value="SE">Sweden 🇸🇪</option>
+            <option value="AT">Austria 🇦🇹</option>
+            <option value="CZ">Czech Republic 🇨🇿</option>
+            <option value="HU">Hungary 🇭🇺</option>
+            <option value="BE">Belgium 🇧🇪</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Line Items</h3>
+        <div id="lineItems">
+          <div class="grid-3 line-item" style="margin-bottom:12px">
+            <div class="input-group">
+              <label>Product</label>
+              <select class="item-product">
+                <option value="">Select...</option>
+                <option value="HP-S15/6">HP-S15/6 — Residential (€89-119)</option>
+                <option value="HP-S25/8">HP-S25/8 — Residential Large (€129-169)</option>
+                <option value="HP-M32/12">HP-M32/12 — Light Commercial (€249-349)</option>
+                <option value="HP-D40/16">HP-D40/16 — Commercial (€399-549)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Qty</label>
+              <input type="number" class="item-qty" value="10" min="1" oninput="updateQuote()">
+            </div>
+            <div class="input-group">
+              <label>Unit Price (€)</label>
+              <input type="number" class="item-price" value="99" step="0.01" oninput="updateQuote()">
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="addLineItem()" style="margin-top:8px">+ Add Line Item</button>
+      </div>
+
+      <div class="card">
+        <h3>Terms</h3>
+        <div class="input-group">
+          <label>Payment Terms</label>
+          <select id="payTerms">
+            <option value="30">Net 30</option>
+            <option value="60" selected>Net 60</option>
+            <option value="90">Net 90</option>
+            <option value="prepay">100% Prepayment</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Delivery Time</label>
+          <input type="text" id="deliveryTime" value="4-6 weeks EXW" placeholder="e.g. 4-6 weeks EXW">
+        </div>
+        <div class="input-group">
+          <label>Valid Until</label>
+          <input type="date" id="validUntil">
+        </div>
+        <button class="btn btn-primary w-full mt-4" onclick="generateQuote()">📋 Generate Quotation</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" id="quotePreview" style="display:none">
+        <h3>Preview</h3>
+        <div id="quoteContent"></div>
+        <div style="margin-top:16px; display:flex; gap:12px">
+          <button class="btn btn-success" onclick="printQuote()">🖨️ Print / Save PDF</button>
+          <button class="btn btn-secondary" onclick="copyQuote()">📋 Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: ENERGY SAVINGS ANALYZER -->
+<div class="tab-content" id="tab-energy">
+  <div class="hero-header">
+    <h1>⚡ Energy Savings Analyzer</h1>
+    <p>Calculate annual energy savings and ROI when replacing old circulator pumps with Hero Pump A-rated models. The strongest sales tool for distributor conversations.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>System Inputs</h3>
+      <div class="input-group">
+        <label>Current Pump Type</label>
+        <select id="oldPumpType" onchange="calcSavings()">
+          <option value="D">D-Rated (pre-2013, fixed speed) — ~80W avg</option>
+          <option value="C">C-Rated (2013-2015) — ~50W avg</option>
+          <option value="B">B-Rated (2015-2018) — ~35W avg</option>
+          <option value="A_old">A-Rated (2018+, older variable speed) — ~25W avg</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Replacement: Hero Pump Model</label>
+        <select id="newPumpModel" onchange="calcSavings()">
+          <option value="S15">HP-S15/6 — ~8W avg</option>
+          <option value="S25">HP-S25/8 — ~15W avg</option>
+          <option value="M32">HP-M32/12 — ~30W avg</option>
+          <option value="D40">HP-D40/16 — ~55W avg</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Operating Hours / Year</label>
+        <input type="number" id="opHours" value="4380" min="500" max="8760" oninput="calcSavings()">
+        <div class="hint">Heating: ~2000h (Apr-Oct off). Year-round DHW: 8760h. Average: 4380h.</div>
+      </div>
+      <div class="input-group">
+        <label>Electricity Rate (€/kWh)</label>
+        <input type="number" id="elecRate" value="0.35" step="0.01" min="0.05" max="1.00" oninput="calcSavings()">
+        <div class="hint">EU average 2025: €0.35/kWh. Germany: €0.40, France: €0.22.</div>
+      </div>
+      <div class="input-group">
+        <label>Pump Unit Cost (€)</label>
+        <input type="number" id="pumpCost" value="99" min="10" max="1000" oninput="calcSavings()">
+        <div class="hint">Hero Pump S15/6: €89-119. Installation extra.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="grid-2" id="savingsKPIs">
+        <div class="kpi card">
+          <div class="value" id="savOld">80W</div>
+          <div class="label">Old Pump Consumption</div>
+        </div>
+        <div class="kpi card">
+          <div class="value" id="savNew">8W</div>
+          <div class="label">Hero Pump Consumption</div>
+        </div>
+        <div class="kpi card">
+          <div class="value" id="savAnnual">€126</div>
+          <div class="label">Annual Savings</div>
+        </div>
+        <div class="kpi card">
+          <div class="value" id="savROI">0.8 yr</div>
+          <div class="label">Payback Period</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>10-Year Savings Projection</h3>
+        <canvas id="savingsChart" height="250"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>CO₂ Impact</h3>
+        <div class="grid-3">
+          <div class="kpi">
+            <div class="value" id="co2Annual">-</div>
+            <div class="label">kg CO₂ Saved/Year</div>
+          </div>
+          <div class="kpi">
+            <div class="value" id="co2Lifetime">-</div>
+            <div class="label">kg CO₂ Saved (10yr)</div>
+          </div>
+          <div class="kpi">
+            <div class="value" id="treesEquiv">-</div>
+            <div class="label">Tree Equivalent</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>Sales Pitch:</strong> "A D-rated pump costs €150-200/year to run. Our A-rated Hero Pump costs €20-40/year. That's €100-160 back in your pocket every year — the pump pays for itself in under 1 year. Over 10 years, that's €1,000-1,600 saved."
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+const heroPumps = [
+  { id: 'HP-S15/6', name: 'HP-S15/6', category: 'residential', maxHead: 6.0, maxFlow: 3.2, powerMin: 3, powerMax: 45, eei: '≤0.18', connection: 'G 1"', modes: 'PP/CP/3-Speed', modbus: true, priceMin: 89, priceMax: 119, warranty: 3, temp: 110, apps: ['heating', 'cooling', 'dhw'] },
+  { id: 'HP-S25/8', name: 'HP-S25/8', category: 'residential', maxHead: 8.0, maxFlow: 5.5, powerMin: 5, powerMax: 75, eei: '≤0.19', connection: 'G 1½"', modes: 'PP/CP/3-Speed', modbus: true, priceMin: 129, priceMax: 169, warranty: 3, temp: 110, apps: ['heating', 'cooling', 'dhw', 'solar'] },
+  { id: 'HP-M32/12', name: 'HP-M32/12', category: 'commercial', maxHead: 12.0, maxFlow: 10.0, powerMin: 20, powerMax: 200, eei: '≤0.20', connection: 'G 2"', modes: 'PP/CP/Modbus', modbus: true, priceMin: 249, priceMax: 349, warranty: 3, temp: 120, apps: ['heating', 'cooling', 'solar'] },
+  { id: 'HP-D40/16', name: 'HP-D40/16', category: 'commercial', maxHead: 16.0, maxFlow: 18.0, powerMin: 50, powerMax: 400, eei: '≤0.20', connection: 'DN40', modes: 'PP/CP/Modbus/BACnet', modbus: true, priceMin: 399, priceMax: 549, warranty: 3, temp: 120, apps: ['heating', 'cooling', 'solar'] },
+];
+
+const competitors = {
+  'HP-S15/6': { grundfos: 'UPS3 15-60', wilo: 'Yonos PICO 15/1-6', dab: 'Evosta 2 25-60' },
+  'HP-S25/8': { grundfos: 'ALPHA2 25-80', wilo: 'Yonos PICO 25/1-8', dab: 'Evosta 2 40-70' },
+  'HP-M32/12': { grundfos: 'MAGNA3 32-120', wilo: 'Stratos MAXO-Z 32/1-12', dab: 'FCP 32/160' },
+  'HP-D40/16': { grundfos: 'MAGNA3 40-160', wilo: 'Stratos MAXO 40/1-16', dab: 'FCP 40/200' },
+};
+
+const appNames = { heating: '🔥 Heating', cooling: '❄️ Cooling', dhw: '🚿 Hot Water Recirc.', solar: '☀️ Solar Thermal' };
+
+// ==================== TABS ====================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+  if (tabId === 'energy') calcSavings();
+  if (tabId === 'calculator') runCalc();
+}
+
+// ==================== APPLICATION SELECTOR ====================
+let selectedApp = null;
+
+function selectApp(el) {
+  document.querySelectorAll('.application-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedApp = el.dataset.app;
+}
+
+// ==================== AUTO CALCULATE ====================
+function autoCalculate() { /* live update if needed */ }
+
+function runSelection() {
+  if (!selectedApp) { alert('Please select an application type.'); return; }
+
+  const loadKw = parseFloat(document.getElementById('loadKw').value);
+  const pipeLength = parseFloat(document.getElementById('pipeLength').value);
+  const buildingAge = document.getElementById('buildingAge').value;
+  const deltaT = parseFloat(document.getElementById('deltaT').value);
+  const fittings = parseFloat(document.getElementById('fittings').value);
+
+  if (!loadKw || !pipeLength) { alert('Please enter heat load and pipe length.'); return; }
+
+  // Calculate flow rate: Q (m³/h) = kW × 0.86 / ΔT
+  const flowRate = (loadKw * 0.86) / deltaT;
+
+  // Calculate head: H = R × L × ZF / 10000
+  const frictionMap = { new: 150, modern: 100, old: 50 };
+  const R = frictionMap[buildingAge];
+  const head = (R * pipeLength * fittings) / 10000;
+
+  // Show results
+  document.getElementById('calcResults').style.display = 'block';
+  document.getElementById('resFlow').textContent = flowRate.toFixed(2) + ' m³/h';
+  document.getElementById('resHead').textContent = head.toFixed(1) + ' m';
+  document.getElementById('formulaDetail').innerHTML =
+    `<strong>Flow Rate:</strong> Q = ${loadKw} kW × 0.86 / ${deltaT} K = <strong>${flowRate.toFixed(2)} m³/h</strong><br>` +
+    `<strong>Total Head:</strong> H = ${R} Pa/m × ${pipeLength} m × ${fittings} / 10,000 = <strong>${head.toFixed(1)} m</strong><br><br>` +
+    `<em>Friction loss R: ${buildingAge} build → ${R} Pa/m (Wilo reference range 50-150 Pa/m)</em>`;
+
+  // Match pump
+  const match = findBestPump(flowRate, head, selectedApp);
+  document.getElementById('matchResults').style.display = 'block';
+
+  document.getElementById('matchCard').innerHTML = `
+    <div class="flex justify-between items-start">
+      <div>
+        <div style="font-size:14px;color:var(--text-muted)">Best Match for ${appNames[selectedApp]}</div>
+        <div class="match" style="font-size:2rem">${match.id}</div>
+        <div style="font-size:14px;color:var(--text-secondary);margin-top:4px">${match.category === 'commercial' ? 'Commercial Grade' : 'Residential'} — ${match.connection} — EEI ${match.eei}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:24px;font-weight:800;color:var(--accent-glow)">€${match.priceMin}-${match.priceMax}</div>
+        <div style="font-size:12px;color:var(--text-muted)">Est. EU Retail</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:16px">
+      <div><span style="color:var(--text-muted);font-size:12px">Max Head</span><br><strong>${match.maxHead} m</strong></div>
+      <div><span style="color:var(--text-muted);font-size:12px">Max Flow</span><br><strong>${match.maxFlow} m³/h</strong></div>
+      <div><span style="color:var(--text-muted);font-size:12px">Power</span><br><strong>${match.powerMin}-${match.powerMax} W</strong></div>
+      <div><span style="color:var(--text-muted);font-size:12px">Modbus</span><br>${match.modbus ? '<span class="badge badge-success">Built-in</span>' : '<span class="badge badge-warning">Optional</span>'}</div>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--text-muted)">Your Duty Point: <strong>${flowRate.toFixed(2)} m³/h @ ${head.toFixed(1)} m</strong> → Operating at <strong>${Math.min(95, Math.round((flowRate / match.maxFlow) * 100))}% of max flow, ${Math.min(95, Math.round((head / match.maxHead) * 100))}% of max head</strong> — well within BEP ✅</div>
+    </div>
+  `;
+
+  // Alternatives
+  const alts = heroPumps.filter(p => p.id !== match.id && p.apps.includes(selectedApp));
+  document.getElementById('altPumps').innerHTML = alts.map(p => `
+    <div class="card competitor-card" style="margin-bottom:8px;padding:12px">
+      <div class="flex justify-between items-center">
+        <div>
+          <strong>${p.id}</strong> — ${p.maxHead}m / ${p.maxFlow}m³/h
+          <span class="badge badge-info">${p.category}</span>
+          ${p.modbus ? '<span class="badge badge-success" style="margin-left:4px">Modbus</span>' : ''}
+        </div>
+        <div style="font-weight:700">€${p.priceMin}-${p.priceMax}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Competitor equivalents
+  const comp = competitors[match.id];
+  if (comp) {
+    document.getElementById('competitorEquiv').innerHTML = `
+      <div class="grid-3">
+        <div class="card" style="padding:12px">
+          <div style="font-size:12px;color:var(--text-muted)">Grundfos Equivalent</div>
+          <div style="font-weight:700;margin-top:4px">${comp.grundfos}</div>
+          <div style="font-size:12px;color:var(--text-muted)">~€${Math.round((match.priceMin + match.priceMax) * 1.6)}</div>
+        </div>
+        <div class="card" style="padding:12px">
+          <div style="font-size:12px;color:var(--text-muted)">Wilo Equivalent</div>
+          <div style="font-weight:700;margin-top:4px">${comp.wilo}</div>
+          <div style="font-size:12px;color:var(--text-muted)">~€${Math.round((match.priceMin + match.priceMax) * 1.5)}</div>
+        </div>
+        <div class="card" style="padding:12px">
+          <div style="font-size:12px;color:var(--text-muted)">DAB Equivalent</div>
+          <div style="font-weight:700;margin-top:4px">${comp.dab}</div>
+          <div style="font-size:12px;color:var(--text-muted)">~€${Math.round((match.priceMin + match.priceMax) * 1.2)}</div>
+        </div>
+      </div>
+      <div class="tip-box" style="margin-top:8px">
+        <strong>Your Savings:</strong> Hero Pump ${match.id} is ~${Math.round((1 - (match.priceMin + match.priceMax) / ((match.priceMin + match.priceMax) * 1.6)) * 100)}% less than Grundfos equivalent, with built-in Modbus/BMS that most competitors charge extra for.
+      </div>
+    `;
+  }
+}
+
+function findBestPump(flow, head, app) {
+  const candidates = heroPumps.filter(p =>
+    p.apps.includes(app) &&
+    p.maxFlow >= flow * 0.5 && // Allow some margin
+    p.maxHead >= head * 0.5
+  );
+
+  if (candidates.length === 0) return heroPumps[heroPumps.length - 1];
+
+  // Score: closest match to duty point without excessive oversizing
+  let best = candidates[0];
+  let bestScore = Infinity;
+  for (const p of candidates) {
+    const flowRatio = flow / p.maxFlow;
+    const headRatio = head / p.maxHead;
+    // Ideal: operate at 50-80% of capacity (near BEP)
+    const score = Math.abs(flowRatio - 0.65) + Math.abs(headRatio - 0.65);
+    if (score < bestScore) { bestScore = score; best = p; }
+  }
+  return best;
+}
+
+// ==================== TDH CALCULATOR ====================
+function runCalc() {
+  const R = parseFloat(document.getElementById('calcR').value) || 50;
+  const L = parseFloat(document.getElementById('calcL').value) || 80;
+  const ZF = parseFloat(document.getElementById('calcZF').value) || 1.3;
+  const heat = parseFloat(document.getElementById('calcHeat').value) || 25;
+  const dT = parseFloat(document.getElementById('calcDT').value) || 20;
+
+  const H = (R * L * ZF) / 10000;
+  const Q = (heat * 0.86) / dT;
+
+  document.getElementById('calcH').textContent = H.toFixed(1) + ' m';
+  document.getElementById('calcQ').textContent = Q.toFixed(2) + ' m³/h';
+  document.getElementById('calcPoint').textContent = `Q = ${Q.toFixed(2)} m³/h @ H = ${H.toFixed(1)} m`;
+}
+
+// ==================== QUOTATION GENERATOR ====================
+let lineItemCount = 1;
+
+function addLineItem() {
+  lineItemCount++;
+  const div = document.createElement('div');
+  div.className = 'line-item';
+  div.style.marginBottom = '12px';
+  div.innerHTML = `
+    <div class="grid-3">
+      <div class="input-group">
+        <label>Product</label>
+        <select class="item-product">
+          <option value="">Select...</option>
+          <option value="HP-S15/6">HP-S15/6 — Residential (€89-119)</option>
+          <option value="HP-S25/8">HP-S25/8 — Residential Large (€129-169)</option>
+          <option value="HP-M32/12">HP-M32/12 — Light Commercial (€249-349)</option>
+          <option value="HP-D40/16">HP-D40/16 — Commercial (€399-549)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Qty</label>
+        <input type="number" class="item-qty" value="1" min="1" oninput="updateQuote()">
+      </div>
+      <div class="input-group">
+        <label>Unit Price (€)</label>
+        <input type="number" class="item-price" value="99" step="0.01" oninput="updateQuote()">
+      </div>
+    </div>
+  `;
+  document.getElementById('lineItems').appendChild(div);
+}
+
+function updateQuote() { /* auto update */ }
+
+function generateQuote() {
+  const name = document.getElementById('custName').value || 'Valued Customer';
+  const contact = document.getElementById('custContact').value || '';
+  const email = document.getElementById('custEmail').value || '';
+  const country = document.getElementById('custCountry').value;
+  const payTerms = document.getElementById('payTerms').value;
+  const delivery = document.getElementById('deliveryTime').value || '4-6 weeks EXW';
+  const validUntil = document.getElementById('validUntil').value || '30 days from issue';
+
+  const items = [];
+  let total = 0;
+  document.querySelectorAll('.line-item').forEach(row => {
+    const product = row.querySelector('.item-product').value;
+    const qty = parseInt(row.querySelector('.item-qty').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+    if (product && qty > 0) {
+      const pump = heroPumps.find(p => p.id === product);
+      items.push({ product, qty, price, subtotal: qty * price, pump });
+      total += qty * price;
+    }
+  });
+
+  if (items.length === 0) { alert('Please add at least one line item.'); return; }
+
+  const quoteNum = 'HP-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+  const today = new Date().toISOString().split('T')[0];
+
+  const quoteHTML = `
+    <div class="quote-box">
+      <div class="flex justify-between" style="margin-bottom:24px">
+        <div>
+          <h2 style="font-size:1.8rem;color:#3b82f6">HERO PUMP</h2>
+          <p style="color:#64748b;font-size:14px">European Circulation Pump Solutions</p>
+          <p style="color:#64748b;font-size:13px">Made in China · ErP 2026 Compliant · BACS Ready</p>
+        </div>
+        <div style="text-align:right">
+          <h3 style="color:#3b82f6;margin:0">QUOTATION</h3>
+          <p style="margin:4px 0"><strong>Quote #:</strong> ${quoteNum}</p>
+          <p style="margin:4px 0"><strong>Date:</strong> ${today}</p>
+          <p style="margin:4px 0"><strong>Valid Until:</strong> ${validUntil}</p>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;margin-bottom:24px">
+        <h4 style="margin:0 0 8px;color:#475569">Bill To:</h4>
+        <p style="margin:2px 0"><strong>${name}</strong></p>
+        ${contact ? `<p style="margin:2px 0">${contact}</p>` : ''}
+        ${email ? `<p style="margin:2px 0">${email}</p>` : ''}
+        <p style="margin:2px 0">Country: ${country}</p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(item => `
+            <tr>
+              <td><strong>${item.product}</strong></td>
+              <td>${item.pump ? `${item.pump.category} | ${item.pump.maxHead}m head | ${item.pump.maxFlow}m³/h | EEI ${item.pump.eei}${item.pump.modbus ? ' | Modbus' : ''} | ${item.pump.warranty}yr warranty` : ''}</td>
+              <td>${item.qty}</td>
+              <td>€${item.price.toFixed(2)}</td>
+              <td>€${item.subtotal.toFixed(2)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <div style="text-align:right;margin-top:16px;padding-top:16px;border-top:2px solid #e2e8f0">
+        <div class="total">Total: €${total.toFixed(2)}</div>
+        <p style="color:#64748b;font-size:13px;margin-top:4px">Excl. VAT · Shipping calculated separately</p>
+      </div>
+
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0">
+        <h4 style="color:#475569;margin:0 0 8px">Terms & Conditions</h4>
+        <div class="grid-2" style="font-size:13px;color:#64748b">
+          <div><strong>Payment:</strong> ${payTerms === 'prepay' ? '100% Prepayment' : 'Net ' + payTerms + ' days'}</div>
+          <div><strong>Delivery:</strong> ${delivery}</div>
+          <div><strong>Warranty:</strong> 3 years from date of delivery</div>
+          <div><strong>Compliance:</strong> ErP 2026 / EN 16297-1 / BACS Directive</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;padding:16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px">
+        <p style="margin:0;font-size:13px;color:#166534"><strong>💡 Energy Savings Note:</strong> Replacing D-rated pumps with Hero Pump A-rated models saves €100-160/year per pump in electricity costs. Payback period: typically < 1 year.</p>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('quotePreview').style.display = 'block';
+  document.getElementById('quoteContent').innerHTML = quoteHTML;
+}
+
+function printQuote() {
+  const content = document.getElementById('quoteContent').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Hero Pump Quotation</title><style>body{font-family:Segoe UI,sans-serif;padding:40px;max-width:800px;margin:0 auto}table{width:100%;border-collapse:collapse}th{text-align:left;padding:8px 12px;font-size:12px;color:#64748b;border-bottom:2px solid #e2e8f0}td{padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px}.flex{display:flex}.justify-between{justify-content:space-between}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}h2{font-size:1.5rem}h3{font-size:1.1rem}h4{font-size:0.95rem}p{margin:4px 0}.total{font-size:1.3rem;font-weight:700;color:#3b82f6}@media print{body{padding:20px}}</style></head><body>${content}</body></html>`);
+  win.document.close();
+  win.print();
+}
+
+function copyQuote() {
+  const text = document.getElementById('quoteContent').innerText;
+  navigator.clipboard.writeText(text).then(() => alert('Quotation copied to clipboard!'));
+}
+
+// ==================== ENERGY SAVINGS ====================
+let savingsChart = null;
+
+function calcSavings() {
+  const oldPower = { D: 80, C: 50, B: 35, A_old: 25 }[document.getElementById('oldPumpType').value] || 80;
+  const newPower = { S15: 8, S25: 15, M32: 30, D40: 55 }[document.getElementById('newPumpModel').value] || 8;
+  const hours = parseFloat(document.getElementById('opHours').value) || 4380;
+  const rate = parseFloat(document.getElementById('elecRate').value) || 0.35;
+  const cost = parseFloat(document.getElementById('pumpCost').value) || 99;
+
+  const oldAnnual = (oldPower / 1000) * hours * rate;
+  const newAnnual = (newPower / 1000) * hours * rate;
+  const savings = oldAnnual - newAnnual;
+  const roi = cost / savings;
+
+  // EU electricity carbon factor ~0.276 kg CO2/kWh
+  const co2Saved = ((oldPower - newPower) / 1000) * hours * 0.276;
+  const trees = Math.round(co2Saved * 10 / 22); // 1 tree absorbs ~22 kg CO2/year
+
+  document.getElementById('savOld').textContent = oldPower + 'W';
+  document.getElementById('savNew').textContent = newPower + 'W';
+  document.getElementById('savAnnual').textContent = '€' + savings.toFixed(0);
+  document.getElementById('savROI').textContent = roi.toFixed(1) + ' yr';
+  document.getElementById('co2Annual').textContent = Math.round(co2Saved);
+  document.getElementById('co2Lifetime').textContent = Math.round(co2Saved * 10);
+  document.getElementById('treesEquiv').textContent = '~' + trees;
+
+  // 10-year chart
+  const years = Array.from({ length: 11 }, (_, i) => i);
+  const cumulativeSavings = years.map(y => (savings * y) - cost);
+
+  const ctx = document.getElementById('savingsChart').getContext('2d');
+  if (savingsChart) savingsChart.destroy();
+  savingsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: years.map(y => 'Year ' + y),
+      datasets: [{
+        label: 'Cumulative Net Savings (€)',
+        data: cumulativeSavings,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16,185,129,0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 4,
+        pointBackgroundColor: '#10b981',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => '€' + ctx.parsed.y.toFixed(0)
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: { callback: v => '€' + v },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        x: {
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ==================== INIT ====================
+document.getElementById('validUntil').value = (() => {
+  const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().split('T')[0];
+})();
+runCalc();
+calcSavings();
+</script>
+</body>
+</html>

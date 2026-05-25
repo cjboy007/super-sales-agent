@@ -47,3 +47,15 @@ skills/*/cache/*.json
 *.env
 .env
 .env.*
+
+# Next.js build output
+generated-website/.next/
+web-frontend/.next/
+
+# Runtime databases and generated SQLite sidecars
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# TypeScript incremental build cache
+*.tsbuildinfo

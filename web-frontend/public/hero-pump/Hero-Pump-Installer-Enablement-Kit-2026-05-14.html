@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Pump — Installer Enablement Kit</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-card: #111827;
+    --bg-card-hover: #1a2332;
+    --border: #1e293b;
+    --accent: #3b82f6;
+    --accent-glow: #60a5fa;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
+  .tab-bar { display: flex; gap: 2px; background: var(--bg-card); border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+  .tab-btn { padding: 12px 20px; white-space: nowrap; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: var(--text-secondary); background: var(--bg-card-hover); }
+  .tab-btn.active { color: var(--accent-glow); border-bottom-color: var(--accent); background: var(--bg-card-hover); }
+  .tab-content { display: none; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .card:hover { border-color: var(--accent); }
+  .kpi { text-align: center; padding: 20px; }
+  .kpi .value { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .kpi .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge-success { background: rgba(16,185,129,0.15); color: var(--success); }
+  .badge-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .badge-danger { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .badge-info { background: rgba(59,130,246,0.15); color: var(--accent-glow); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+  tr:hover td { background: var(--bg-card-hover); color: var(--text-primary); }
+  .step { position: relative; padding-left: 40px; padding-bottom: 24px; }
+  .step::before { content: ''; position: absolute; left: 15px; top: 32px; bottom: 0; width: 2px; background: var(--border); }
+  .step:last-child::before { display: none; }
+  .step-num { position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; }
+  .checklist-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+  .checklist-item label { cursor: pointer; font-size: 14px; color: var(--text-secondary); }
+  .checklist-item input:checked + label { text-decoration: line-through; color: var(--text-muted); }
+  .error-card { border-left: 4px solid var(--danger); }
+  .warn-card { border-left: 4px solid var(--warning); }
+  .info-card { border-left: 4px solid var(--accent); }
+  .quick-ref { background: #fefce8; color: #1a1a1a; border: 2px solid #fbbf24; border-radius: 8px; padding: 20px; font-family: monospace; }
+  .print-only { display: none; }
+  @media print { .tab-bar, .no-print { display: none !important; } .print-only { display: block !important; } .tab-content { display: block !important; padding: 0; } body { background: white; color: black; } .card { border: 1px solid #ddd; background: white; } }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr !important; } .grid-3 { grid-template-columns: 1fr !important; } .grid-4 { grid-template-columns: repeat(2, 1fr) !important; } .kpi .value { font-size: 1.8rem; } }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+  h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; color: var(--accent-glow); }
+  h4 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+  .hero-header { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(96,165,250,0.05)); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  .hero-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+  .hero-header p { color: var(--text-secondary); font-size: 1.05rem; }
+  .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-glow)); border-radius: 4px; transition: width 0.3s; }
+  .copy-btn { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .copy-btn:hover { background: var(--accent-glow); }
+  .tip-box { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .tip-box::before { content: '💡 '; }
+  .warning-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .warning-box::before { content: '⚠️ '; }
+</style>
+</head>
+<body>
+
+<div class="tab-bar no-print" id="tabBar">
+  <button class="tab-btn active" data-tab="overview">📋 Overview</button>
+  <button class="tab-btn" data-tab="selection">🔍 Quick Selection</button>
+  <button class="tab-btn" data-tab="commissioning">🔧 Commissioning</button>
+  <button class="tab-btn" data-tab="troubleshooting">🚨 Troubleshooting</button>
+  <button class="tab-btn" data-tab="modbus">📡 Modbus/BMS</button>
+  <button class="tab-btn" data-tab="erp-check">✅ ErP Checklist</button>
+  <button class="tab-btn" data-tab="rewards">🏆 Rewards</button>
+  <button class="tab-btn" data-tab="quickref">🃏 Quick Ref Card</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div class="tab-content active" id="tab-overview">
+  <div class="hero-header">
+    <h1>🔧 Hero Pump Installer Enablement Kit</h1>
+    <p>Complete field toolkit for HVAC installers — model selection, commissioning, troubleshooting, Modbus setup, ErP compliance & rewards. Designed for EU residential & light commercial circulator pump installations.</p>
+  </div>
+
+  <div class="grid-4">
+    <div class="card kpi"><div class="value">12</div><div class="label">Hero Pump Models</div></div>
+    <div class="card kpi"><div class="value">≤0.16</div><div class="label">Target EEI (Class A)</div></div>
+    <div class="card kpi"><div class="value">5-52W</div><div class="label">Power Range</div></div>
+    <div class="card kpi"><div class="value">5</div><div class="label">Install Steps</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card">
+      <h3>📦 Product Lineup</h3>
+      <table>
+        <thead><tr><th>Series</th><th>Application</th><th>Power</th><th>Key Feature</th></tr></thead>
+        <tbody>
+          <tr><td><strong>HR</strong></td><td>Residential heating</td><td>5-25W</td><td><span class="badge badge-success">PMSM + VFD</span></td></tr>
+          <tr><td><strong>HRA</strong></td><td>Residential + AutoAdapt</td><td>5-35W</td><td><span class="badge badge-info">AUTO mode</span></td></tr>
+          <tr><td><strong>HRB</strong></td><td>Commercial light</td><td>10-47W</td><td><span class="badge badge-warning">Modbus RTU</span></td></tr>
+          <tr><td><strong>JNB</strong></td><td>DHW recirculation</td><td>5-20W</td><td><span class="badge badge-success">Low noise</span></td></tr>
+          <tr><td><strong>HRZL</strong></td><td>Commercial heavy</td><td>20-52W</td><td><span class="badge badge-warning">Modbus + BACnet</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>🆚 vs Competitors — Installer Perspective</h3>
+      <table>
+        <thead><tr><th>Feature</th><th>Hero Pump</th><th>Grundfos ALPHA2 GO</th><th>Wilo Stratos PICO+</th></tr></thead>
+        <tbody>
+          <tr><td>EEI</td><td><strong>≤0.16</strong></td><td>0.15</td><td>0.16</td></tr>
+          <tr><td>Max Power</td><td><strong>52W</strong></td><td>45W</td><td>25W</td></tr>
+          <tr><td>Modbus RTU</td><td><strong>✅ Phase 1</strong></td><td>❌ (ALPHA GO)</td><td>✅ (CIF module)</td></tr>
+          <tr><td>BACnet</td><td><strong>✅ Phase 2</strong></td><td>✅ (CIM 200)</td><td>✅</td></tr>
+          <tr><td>Guided Setup App</td><td>🔄 Planned</td><td>✅ (GO app)</td><td>❌</td></tr>
+          <tr><td>Retail Price</td><td><strong>€80-150</strong></td><td>€200-280</td><td>€155-219</td></tr>
+          <tr><td>Commissioning Time</td><td><strong>~10 min</strong></td><td>~12 min (app)</td><td>~15 min (manual)</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-box">Hero Pump key differentiator: Modbus RTU included Phase 1 (ALPHA GO has zero BMS connectivity). Price 45-65% below competitors.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Kit Contents</h3>
+    <div class="grid-3">
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>🔍 Quick Selection Guide</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Match system requirements to Hero Pump model in 3 questions. Head, flow, application → model recommendation.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>🔧 5-Step Commissioning</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Step-by-step installation workflow from unboxing to first run. Includes pre-checks, mounting, wiring, flushing, and verification.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>🚨 Troubleshooting Matrix</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Error codes, symptoms, causes & fixes. Covers noise, leaks, no flow, electrical issues, and control problems.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>📡 Modbus RTU Setup</h4>
+        <p style="font-size:13px;color:var(--text-muted);">BMS integration guide: wiring, register map, control modes, BACS/SRI compliance checklist.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>✅ ErP Compliance Checklist</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Field verification: EEI label check, variable speed confirmation, CE marking, technical documentation.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>🃏 Quick Reference Card</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Printable pocket card with essential specs, torque values, wiring diagram summary, and emergency contacts.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: QUICK SELECTION -->
+<div class="tab-content" id="tab-selection">
+  <h2>🔍 Quick Selection Guide</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">Answer 3 questions to find the right Hero Pump model. Based on system head, flow rate, and application type.</p>
+
+  <div class="card">
+    <h3>Step 1: What's the System Type?</h3>
+    <div class="grid-2">
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;cursor:pointer;border:2px solid transparent;" onclick="selectSystem(this,'residential')">
+        <h4>🏠 Residential Heating</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Single-family home, radiators or underfloor heating, 1-2 zones, max head &lt;6m</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;cursor:pointer;border:2px solid transparent;" onclick="selectSystem(this,'commercial')">
+        <h4>🏢 Light Commercial</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Small office/clinic, multi-zone, BMS integration needed, head up to 8m</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;cursor:pointer;border:2px solid transparent;" onclick="selectSystem(this,'dhw')">
+        <h4>🚿 DHW Recirculation</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Hot water recirc loop, low noise priority, continuous or timer operation</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;cursor:pointer;border:2px solid transparent;" onclick="selectSystem(this,'heatpump')">
+        <h4>🌡️ Heat Pump Circuit</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Heat pump primary/secondary loop, wide temp range (-10°C to 110°C), R290 compatible</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 2: System Head & Flow Requirements</h3>
+    <table>
+      <thead><tr><th>Hero Pump Model</th><th>Max Head (m)</th><th>Max Flow (m³/h)</th><th>Power (W)</th><th>Connection</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>HR-25/4</strong></td><td>4.0</td><td>2.5</td><td>5-18</td><td>1" (DN25)</td><td>Small apartments, 1-2 radiators</td></tr>
+        <tr><td><strong>HR-25/6</strong></td><td>6.0</td><td>3.0</td><td>5-25</td><td>1" (DN25)</td><td>Standard homes, 3-6 radiators</td></tr>
+        <tr><td><strong>HR-32/6</strong></td><td>6.0</td><td>3.5</td><td>8-30</td><td>1¼" (DN32)</td><td>Larger homes, underfloor heating</td></tr>
+        <tr><td><strong>HRA-25/6</strong></td><td>6.0</td><td>3.0</td><td>5-28</td><td>1" (DN25)</td><td>Auto-adaptive residential</td></tr>
+        <tr><td><strong>HRA-32/7</strong></td><td>7.0</td><td>3.5</td><td>8-35</td><td>1¼" (DN32)</td><td>Auto-adaptive + larger systems</td></tr>
+        <tr><td><strong>HRB-25/6-M</strong></td><td>6.0</td><td>3.0</td><td>10-40</td><td>1" (DN25)</td><td>BMS-controlled light commercial</td></tr>
+        <tr><td><strong>HRB-32/8-M</strong></td><td>8.0</td><td>4.0</td><td>15-47</td><td>1¼" (DN32)</td><td>Multi-zone commercial with Modbus</td></tr>
+        <tr><td><strong>JNB-20/4</strong></td><td>4.0</td><td>1.8</td><td>5-15</td><td>¾" (DN20)</td><td>DHW recirculation, low noise</td></tr>
+        <tr><td><strong>JNB-25/5</strong></td><td>5.0</td><td>2.2</td><td>5-20</td><td>1" (DN25)</td><td>DHW recirculation + small heating</td></tr>
+        <tr><td><strong>HRZL-32/8</strong></td><td>8.0</td><td>4.5</td><td>20-52</td><td>1¼" (DN32)</td><td>Commercial heavy duty</td></tr>
+        <tr><td><strong>HRZL-40/10</strong></td><td>10.0</td><td>5.0</td><td>25-52</td><td>1½" (DN40)</td><td>Large commercial / light industrial</td></tr>
+        <tr><td><strong>HRZL-50/12</strong></td><td>12.0</td><td>6.0</td><td>30-52</td><td>2" (DN50)</td><td>Industrial / district heating substation</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Step 3: Smart Features Needed?</h3>
+    <div class="grid-3">
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>Basic (HR Series)</h4>
+        <ul style="font-size:13px;color:var(--text-secondary);padding-left:16px;">
+          <li>Manual 3-speed or VFD</li>
+          <li>PMSM motor, Class A EEI</li>
+          <li>No communication</li>
+          <li>Price: €80-120</li>
+        </ul>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;border:2px solid var(--accent);">
+        <h4>Auto-Adapt (HRA Series) ⭐</h4>
+        <ul style="font-size:13px;color:var(--text-secondary);padding-left:16px;">
+          <li>Pressure sensor + AUTO mode</li>
+          <li>Auto-adjusts to demand</li>
+          <li>Night mode (quiet operation)</li>
+          <li>Price: €100-150</li>
+        </ul>
+      </div>
+      <div style="padding:16px;background:var(--bg-card-hover);border-radius:8px;">
+        <h4>BMS Ready (HRB/HRZL)</h4>
+        <ul style="font-size:13px;color:var(--text-secondary);padding-left:16px;">
+          <li>Modbus RTU (RS-485)</li>
+          <li>BACS/SRI compliant</li>
+          <li>Remote monitoring & control</li>
+          <li>Price: €120-150</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tip-box">
+      <strong>Selection Rule:</strong> For residential replacements, match existing pump's connection size and head. For new installs, calculate head: ΔP = (pipe length × 0.03) + (fittings × 0.3) + static head. Flow: Q = heat load (kW) / (1.16 × ΔT). Standard ΔT = 10°C (heating) or 5°C (UFH).
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: COMMISSIONING -->
+<div class="tab-content" id="tab-commissioning">
+  <h2>🔧 5-Step Commissioning Workflow</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">From unboxing to verified operation. Based on EN 16297 commissioning standards and Grundfos Guided Setup best practices.</p>
+
+  <div class="card">
+    <h3>⏱️ Commissioning Checklist</h3>
+    <div id="commissioning-checklist">
+      <h4 style="color:var(--accent-glow);margin-top:16px;">Step 1: Pre-Installation Checks (5 min)</h4>
+      <div class="checklist-item"><input type="checkbox" id="c1" onchange="saveChecklist()"><label for="c1">Verify pump model matches order (nameplate: model, EEI, voltage, IP rating)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c2" onchange="saveChecklist()"><label for="c2">Check ErP label on packaging — EEI ≤ 0.23 (Class A: ≤0.16)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c3" onchange="saveChecklist()"><label for="c3">Inspect for shipping damage (housing, connector, cable)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c4" onchange="saveChecklist()"><label for="c4">Confirm pipe connection size matches system (DN20/25/32/40/50)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c5" onchange="saveChecklist()"><label for="c5">Verify electrical supply matches nameplate (220-240V, 50Hz)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c6" onchange="saveChecklist()"><label for="c6">Ensure isolation valves installed on both sides of pump</label></div>
+
+      <h4 style="color:var(--accent-glow);margin-top:16px;">Step 2: Mechanical Installation (10 min)</h4>
+      <div class="checklist-item"><input type="checkbox" id="c7" onchange="saveChecklist()"><label for="c7">Isolate system, drain section, remove old pump</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c8" onchange="saveChecklist()"><label for="c8">Clean pipe ends, inspect seals/gaskets (replace if damaged)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c9" onchange="saveChecklist()"><label for="c9">Install pump with flow arrow matching system flow direction →</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c10" onchange="saveChecklist()"><label for="c10"><strong>CRITICAL:</strong> Motor shaft MUST be horizontal (not vertical up/down). Shaft position: ←→ ✅ | ↑ ↓ ❌</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c11" onchange="saveChecklist()"><label for="c11">Tighten union nuts: hand-tight + ¼ turn with wrench (DO NOT overtighten — max torque 25 Nm)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c12" onchange="saveChecklist()"><label for="c12">Install insulation shell (if not pre-fitted) — ensure venting slot accessible</label></div>
+
+      <h4 style="color:var(--accent-glow);margin-top:16px;">Step 3: Electrical Connection (5 min)</h4>
+      <div class="checklist-item"><input type="checkbox" id="c13" onchange="saveChecklist()"><label for="c13">Disconnect power at circuit breaker — lockout/tagout</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c14" onchange="saveChecklist()"><label for="c14">Remove connector cover, feed cable through gland</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c15" onchange="saveChecklist()"><label for="c15">Wire: L (brown) → L, N (blue) → N, PE (green/yellow) → ⏚</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c16" onchange="saveChecklist()"><label for="c16">Tighten terminal screws (torque 0.5-0.6 Nm). Verify no loose strands</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c17" onchange="saveChecklist()"><label for="c17">Secure cable gland — pull test cable (must not move)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c18" onchange="saveChecklist()"><label for="c18">For Modbus models (HRB/HRZL): connect RS-485 A/B/GND to BMS bus</label></div>
+
+      <h4 style="color:var(--accent-glow);margin-top:16px;">Step 4: Flushing & Venting (5 min)</h4>
+      <div class="checklist-item"><input type="checkbox" id="c19" onchange="saveChecklist()"><label for="c19">Open isolation valves, fill system slowly</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c20" onchange="saveChecklist()"><label for="c20">Vent pump: loosen vent screw 1-2 turns until water flows without bubbles, retighten</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c21" onchange="saveChecklist()"><label for="c21">Vent all radiators / underfloor circuits</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c22" onchange="saveChecklist()"><label for="c22">Check system pressure (min 0.5 bar, recommended 1.0-1.5 bar)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c23" onchange="saveChecklist()"><label for="c23">Check for leaks at all connections</label></div>
+
+      <h4 style="color:var(--accent-glow);margin-top:16px;">Step 5: Startup & Verification (5 min)</h4>
+      <div class="checklist-item"><input type="checkbox" id="c24" onchange="saveChecklist()"><label for="c24">Restore power, verify pump starts smoothly (no unusual noise/vibration)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c25" onchange="saveChecklist()"><label for="c26">Set operating mode: Manual speed (I/II/III) or AUTO (HRA models)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c27" onchange="saveChecklist()"><label for="c27">Verify flow: touch flow pipe (should warm within 2-3 min), check ΔT across pump</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c28" onchange="saveChecklist()"><label for="c28">For Modbus models: verify BMS communication (read register 0x01 = status, 0x02 = speed)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c29" onchange="saveChecklist()"><label for="c29">Record installation: date, model, serial number, installer ID, system type</label></div>
+      <div class="checklist-item"><input type="checkbox" id="c30" onchange="saveChecklist()"><label for="c30">Leave Quick Reference Card with end user</label></div>
+    </div>
+
+    <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <span style="color:var(--text-secondary);font-size:14px;">Progress: </span>
+        <span id="progress-text" style="color:var(--accent-glow);font-weight:700;">0 / 30</span>
+      </div>
+      <div style="flex:1;max-width:300px;margin-left:16px;">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+      <button class="copy-btn" onclick="resetChecklist()" style="background:var(--danger);">Reset</button>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <strong>Most Common Installation Error:</strong> Motor shaft installed vertically (pointing up or down) instead of horizontally. This causes bearing wear, noise, and premature failure. Grundfos reports this as the #1 callback reason for incorrectly commissioned circulators.
+  </div>
+</div>
+
+<!-- TAB 4: TROUBLESHOOTING -->
+<div class="tab-content" id="tab-troubleshooting">
+  <h2>🚨 Troubleshooting Matrix</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">Symptom-based diagnosis + error code reference. Covers 95% of field issues.</p>
+
+  <div class="card">
+    <h3>🔍 Symptom-Based Diagnosis</h3>
+    <table>
+      <thead><tr><th>Symptom</th><th>Probable Cause</th><th>Fix</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td><strong>No flow / pump not running</strong></td><td>No power / tripped breaker / wrong wiring</td><td>Check breaker, verify L/N wiring, test voltage at terminals</td><td><span class="badge badge-danger">P0</span></td></tr>
+        <tr><td><strong>No flow / pump running</strong></td><td>Air lock / closed valves / blocked impeller</td><td>Vent pump (loosen vent screw), check valves open, inspect impeller</td><td><span class="badge badge-danger">P0</span></td></tr>
+        <tr><td><strong>Excessive noise / vibration</strong></td><td>Air in system / shaft not horizontal / bearing wear</td><td>Re-vent system, verify shaft horizontal, check bearing play</td><td><span class="badge badge-warning">P1</span></td></tr>
+        <tr><td><strong>Pump humming but not starting</strong></td><td>Seized impeller (after long idle) / capacitor fault</td><td>Remove rotor, manually turn impeller (should spin freely), clean debris</td><td><span class="badge badge-warning">P1</span></td></tr>
+        <tr><td><strong>Leak at union connection</strong></td><td>Missing/deformed gasket / overtightened / misaligned</td><td>Replace gasket, hand-tight + ¼ turn, realign pipes</td><td><span class="badge badge-warning">P1</span></td></tr>
+        <tr><td><strong>Pump runs constantly</strong></td><td>System leak / wrong speed setting / AUTO not engaged</td><td>Check system pressure drop, lower speed, enable AUTO mode</td><td><span class="badge badge-info">P2</span></td></tr>
+        <tr><td><strong>Pump cycling on/off</strong></td><td>Air in system / pressure switch fault / electrical issue</td><td>Full system vent, check pressure switch, verify stable voltage</td><td><span class="badge badge-info">P2</span></td></tr>
+        <tr><td><strong>Low heat output at radiators</strong></td><td>Pump speed too low / system not balanced / air pockets</td><td>Increase speed, balance radiators (lockshield valves), vent</td><td><span class="badge badge-info">P2</span></td></tr>
+        <tr><td><strong>Modbus communication failure</strong></td><td>Wrong wiring (A/B swapped) / baud rate mismatch / address conflict</td><td>Verify A→A, B→B wiring, check 9600 baud/8N1, verify unique slave address</td><td><span class="badge badge-warning">P1</span></td></tr>
+        <tr><td><strong>Pump overheating</strong></td><td>Running dry / blocked impeller / ambient temp too high</td><td>Check water level, clean impeller, verify ambient &lt;40°C</td><td><span class="badge badge-danger">P0</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🔴 Error Code Reference (Hero Pump HRB/HRZL with Modbus)</h3>
+    <table>
+      <thead><tr><th>Code</th><th>Fault</th><th>Cause</th><th>Remedy</th></tr></thead>
+      <tbody>
+        <tr class="error-card"><td><strong>E01</strong></td><td>Overcurrent</td><td>Blocked impeller / short circuit / motor fault</td><td>Clear impeller, check wiring, replace if motor fault</td></tr>
+        <tr class="error-card"><td><strong>E02</strong></td><td>Dry running</td><td>No water in pump / air lock / low system pressure</td><td>Fill system, vent pump, check pressure (min 0.5 bar)</td></tr>
+        <tr class="warn-card"><td><strong>E03</strong></td><td>Overtemperature</td><td>Ambient &gt;40°C / blocked ventilation / bearing failure</td><td>Improve ventilation, check bearing, reduce ambient temp</td></tr>
+        <tr class="warn-card"><td><strong>E04</strong></td><td>Undervoltage</td><td>Supply &lt;198V / long cable run / loose connection</td><td>Check supply voltage, tighten terminals, verify cable length</td></tr>
+        <tr class="warn-card"><td><strong>E05</strong></td><td>Overvoltage</td><td>Supply &gt;264V / voltage spike</td><td>Install surge protector, check supply, replace damaged electronics</td></tr>
+        <tr class="info-card"><td><strong>E06</strong></td><td>Modbus timeout</td><td>Bus disconnected / wrong address / BMS not polling</td><td>Check RS-485 wiring, verify slave address, check BMS poll rate</td></tr>
+        <tr class="info-card"><td><strong>E07</strong></td><td>Sensor fault</td><td>Pressure sensor disconnected / out of range</td><td>Check sensor cable (HRA models only), replace sensor</td></tr>
+        <tr class="error-card"><td><strong>E08</strong></td><td>EEPROM error</td><td>Corrupted configuration / firmware issue</td><td>Factory reset (hold mode button 10s), contact support if persists</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box">
+      <strong>Wilo Comparison:</strong> Wilo uses E006 (rotating field error), E014 (leakage detection), E080 (pump fault), E090 (plausibility error), E140 (max starts exceeded). Hero Pump error codes are simplified for faster field diagnosis.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🛠️ Quick Fix Decision Tree</h3>
+    <div style="font-family:monospace;font-size:13px;color:var(--text-secondary);white-space:pre-line;line-height:1.8;">
+Pump not running?
+├── No power? → Check breaker → Check wiring → Test voltage
+└── Has power but not running?
+    ├── Humming? → Seized impeller → Remove rotor, clean, reinstall
+    └── Silent? → Electronics fault → Check E-codes → Contact support
+
+Pump running but no flow?
+├── Valves closed? → Open isolation valves
+├── Air lock? → Vent pump (vent screw 1-2 turns)
+└── Blocked? → Check impeller → Inspect strainer/filter
+
+Excessive noise?
+├── Air in system? → Full venting procedure
+├── Shaft not horizontal? → Reinstall pump
+└── Bearing wear? → Check rotor play → Replace if &gt;0.5mm
+
+Modbus not communicating?
+├── A/B swapped? → Verify A→A, B→B
+├── Wrong baud rate? → Set 9600/8N1
+└── Address conflict? → Set unique slave address (1-247)
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: MODBUS/BMS -->
+<div class="tab-content" id="tab-modbus">
+  <h2>📡 Modbus RTU BMS Integration Guide</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">For Hero Pump HRB and HRZL series with Modbus RTU (RS-485). Enables BACS/SRI compliance and remote monitoring.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🔌 Wiring</h3>
+      <table>
+        <thead><tr><th>Terminal</th><th>Signal</th><th>Wire Color</th></tr></thead>
+        <tbody>
+          <tr><td>A (D+)</td><td>Modbus Data +</td><td>White / Green</td></tr>
+          <tr><td>B (D-)</td><td>Modbus Data -</td><td>Black / Red</td></tr>
+          <tr><td>GND</td><td>Signal Ground</td><td>Shield / Bare</td></tr>
+        </tbody>
+      </table>
+      <div class="warning-box">Do NOT connect A to B or GND to A/B. Daisy-chain topology (NOT star). Max 32 devices per bus. Termination resistor 120Ω at last device.</div>
+    </div>
+    <div class="card">
+      <h3>⚙️ Communication Parameters</h3>
+      <table>
+        <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Protocol</td><td>Modbus RTU</td></tr>
+          <tr><td>Baud Rate</td><td>9600 bps (default)</td></tr>
+          <tr><td>Data Bits</td><td>8</td></tr>
+          <tr><td>Parity</td><td>None (N)</td></tr>
+          <tr><td>Stop Bits</td><td>1</td></tr>
+          <tr><td>Slave Address</td><td>1-247 (default: 1)</td></tr>
+          <tr><td>Response Timeout</td><td>100ms</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Register Map (Holding Registers)</h3>
+    <table>
+      <thead><tr><th>Address</th><th>Register</th><th>R/W</th><th>Description</th><th>Values</th></tr></thead>
+      <tbody>
+        <tr><td>0x01</td><td>Status</td><td>R</td><td>Pump operating status</td><td>0=Off, 1=Running, 2=Fault, 3=Standby</td></tr>
+        <tr><td>0x02</td><td>Speed</td><td>R/W</td><td>Current speed setpoint</td><td>0-100% (0 = AUTO mode)</td></tr>
+        <tr><td>0x03</td><td>Power</td><td>R</td><td>Current power consumption</td><td>0-52W (×10 = 0-520)</td></tr>
+        <tr><td>0x04</td><td>Head</td><td>R</td><td>Estimated head pressure</td><td>0-1200 cmH₂O</td></tr>
+        <tr><td>0x05</td><td>Flow Rate</td><td>R</td><td>Estimated flow</td><td>0-600 L/h</td></tr>
+        <tr><td>0x06</td><td>Temperature</td><td>R</td><td>Fluid temperature</td><td>-100 to 1100 (×10 = °C)</td></tr>
+        <tr><td>0x07</td><td>Operating Hours</td><td>R</td><td>Total runtime</td><td>0-65535 hours</td></tr>
+        <tr><td>0x08</td><td>Error Code</td><td>R</td><td>Current error code</td><td>0=No error, 1-8=See error table</td></tr>
+        <tr><td>0x09</td><td>Control Mode</td><td>R/W</td><td>Operating mode</td><td>0=Constant speed, 1=Proportional pressure, 2=Constant pressure, 3=AUTO</td></tr>
+        <tr><td>0x0A</td><td>Setpoint</td><td>R/W</td><td>Pressure setpoint</td><td>0-1200 cmH₂O</td></tr>
+        <tr><td>0x0B</td><td>Slave Address</td><td>R/W</td><td>Modbus address</td><td>1-247</td></tr>
+        <tr><td>0x0C</td><td>Factory Reset</td><td>W</td><td>Reset to factory defaults</td><td>Write 0xAA55 to reset</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🏗️ BACS/SRI Compliance via Modbus</h3>
+    <table>
+      <thead><tr><th>Requirement</th><th>BACS Class C (BA)</th><th>BACS Class B (CS)</th><th>Hero Pump Support</th></tr></thead>
+      <tbody>
+        <tr><td>Continuous monitoring</td><td>✅</td><td>✅</td><td>Read 0x01-0x08 every 60s</td></tr>
+        <tr><td>Remote control</td><td>❌</td><td>✅</td><td>Write 0x02, 0x09, 0x0A</td></tr>
+        <tr><td>Energy reporting</td><td>✅</td><td>✅</td><td>Calculate from 0x03 × hours</td></tr>
+        <tr><td>Fault detection</td><td>✅</td><td>✅</td><td>Read 0x08 (error code)</td></tr>
+        <tr><td>SRI contribution</td><td>D → C (+17%)</td><td>C → B (+13%)</td><td>Both levels supported</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box">Modbus RTU alone upgrades SRI score from D (28%) → C (45%). Adding continuous supervision (Class B) reaches B (58%). This is a key selling point vs Grundfos ALPHA GO (no Modbus/BACnet).</div>
+  </div>
+</div>
+
+<!-- TAB 6: ERP CHECKLIST -->
+<div class="tab-content" id="tab-erp-check">
+  <h2>✅ ErP Compliance Field Checklist</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">Verify ErP 641/2009 compliance at installation. EEI ≤ 0.23 mandatory for all circulator pumps sold in EU since 2013 (stand-alone) / 2015 (integrated).</p>
+
+  <div class="card">
+    <h3>📋 ErP Field Verification</h3>
+    <div id="erp-checklist">
+      <div class="checklist-item"><input type="checkbox" id="e1" onchange="saveErpChecklist()"><label for="e1"><strong>EEI Label:</strong> Check pump nameplate or packaging for EEI value — must be ≤ 0.23. Hero Pump target: ≤ 0.16 (Class A)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e2" onchange="saveErpChecklist()"><label for="e2"><strong>CE Marking:</strong> Verify CE mark on pump body and/or packaging — mandatory for EU market</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e3" onchange="saveErpChecklist()"><label for="e3"><strong>Variable Speed:</strong> Confirm pump has variable speed control (VFD) — ErP requires this for circulator pumps</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e4" onchange="saveErpChecklist()"><label for="e4"><strong>Documentation:</strong> Installation manual must include EEI value and ErP compliance statement</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e5" onchange="saveErpChecklist()"><label for="e5"><strong>Nameplate Data:</strong> Model number, power rating (W), voltage (V), frequency (Hz), IP rating, EEI value, flow/head curve reference</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e6" onchange="saveErpChecklist()"><label for="e6"><strong>Manufacturer Info:</strong> EU economic operator name and address on packaging (Regulation EU 2019/1020)</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e7" onchange="saveErpChecklist()"><label for="e7"><strong>Declaration of Conformity:</strong> Available on request — DoC must reference ErP 641/2009, EN 16297 test standard</label></div>
+      <div class="checklist-item"><input type="checkbox" id="e8" onchange="saveErpChecklist()"><label for="e8"><strong>Energy Class:</strong> Product classified as Class A (EEI ≤ 0.23) on label — Hero Pump achieves Class A (EEI ≤ 0.16)</label></div>
+    </div>
+    <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <span style="color:var(--text-secondary);font-size:14px;">ErP Compliance: </span>
+        <span id="erp-progress-text" style="color:var(--accent-glow);font-weight:700;">0 / 8</span>
+      </div>
+      <div style="flex:1;max-width:300px;margin-left:16px;">
+        <div class="progress-bar"><div class="progress-fill" id="erp-progress-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>⚖️ ErP Regulation Summary</h3>
+    <table>
+      <thead><tr><th>Requirement</th><th>Value</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>EEI threshold</td><td>≤ 0.23</td><td>Hero Pump target ≤ 0.16 (well below threshold)</td></tr>
+        <tr><td>Test standard</td><td>EN 16297-1/2/3:2012</td><td>Multi-point weighted calculation (not single point)</td></tr>
+        <tr><td>EEI range</td><td>0.10 - 1.00</td><td>Lower = more efficient. Grundfos ALPHA2: 0.15, Wilo PICO+: 0.16</td></tr>
+        <tr><td>Variable speed</td><td>Mandatory</td><td>All circulator pumps must have variable speed control</td></tr>
+        <tr><td>Market surveillance</td><td>Random抽检</td><td>Member states conduct market checks — non-compliant products fined/recalled</td></tr>
+        <tr><td>EPREL registration</td><td>Not required</td><td>Circulator pumps NOT in EPREL scope (unlike lighting/appliances)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 7: REWARDS -->
+<div class="tab-content" id="tab-rewards">
+  <h2>🏆 Hero Rewards — Installer Loyalty Program</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">Earn points for every Hero Pump installed. Redeem for tools, training, or cash equivalents. Based on Grundfos Ecademy + WiloXperts best practices.</p>
+
+  <div class="grid-4">
+    <div class="card kpi"><div class="value">€5</div><div class="label">Per Pump Installed</div></div>
+    <div class="card kpi"><div class="value">3 Tiers</div><div class="label">Bronze / Silver / Gold</div></div>
+    <div class="card kpi"><div class="value">Free</div><div class="label">Training & Certification</div></div>
+    <div class="card kpi"><div class="value">Priority</div><div class="label">Support & Warranty</div></div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Tier Benefits</h3>
+    <table>
+      <thead><tr><th>Benefit</th><th>🥉 Bronze (1-10 pumps)</th><th>🥈 Silver (11-50 pumps)</th><th>🥇 Gold (50+ pumps)</th></tr></thead>
+      <tbody>
+        <tr><td>Points per pump</td><td>€5 equivalent</td><td>€7 equivalent</td><td>€10 equivalent</td></tr>
+        <tr><td>Welcome kit</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Free training</td><td>Online only</td><td>Online + in-person</td><td>All formats + VIP</td></tr>
+        <tr><td>Priority support</td><td>❌</td><td>✅ (48h SLA)</td><td>✅ (24h SLA)</td></tr>
+        <tr><td>Extended warranty</td><td>2 years</td><td>3 years</td><td>5 years</td></tr>
+        <tr><td>Co-op marketing</td><td>❌</td><td>€500/year</td><td>€2,000/year</td></tr>
+        <tr><td>Exclusive events</td><td>❌</td><td>❌</td><td>✅</td></tr>
+        <tr><td>Referral bonus</td><td>❌</td><td>€25 per referral</td><td>€50 per referral</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🏅 How to Enroll</h3>
+    <div class="step"><div class="step-num">1</div><h4>Register Online</h4><p style="font-size:14px;color:var(--text-secondary);">Visit hero-pump.eu/installers or scan QR code on pump packaging. Create account with installer license number.</p></div>
+    <div class="step"><div class="step-num">2</div><h4>Verify Installation</h4><p style="font-size:14px;color:var(--text-secondary);">Upload pump serial number + installation photo (nameplate visible). Or scan QR code on pump body with mobile app.</p></div>
+    <div class="step"><div class="step-num">3</div><h4>Earn Points</h4><p style="font-size:14px;color:var(--text-secondary);">Points credited within 48 hours of verification. Redeem via online catalog (tools, training, gift cards, equipment).</p></div>
+    <div class="step"><div class="step-num">4</div><h4>Level Up</h4><p style="font-size:14px;color:var(--text-secondary);">Tier evaluated quarterly. Maintain active status with ≥1 installation per quarter.</p></div>
+  </div>
+
+  <div class="card">
+    <h3>📈 Competitive Landscape — Installer Programs</h3>
+    <table>
+      <thead><tr><th>Brand</th><th>Program</th><th>Points/Pump</th><th>Training</th><th>Key Feature</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Grundfos</strong></td><td>Grundfos for Installers</td><td>None (Ecademy certs)</td><td>7 online modules</td><td>150K members, GO app, Ecademy certs</td></tr>
+        <tr><td><strong>Wilo</strong></td><td>WiloXperts</td><td>None (loyalty only UK)</td><td>Wilo Academy</td><td>UK only (2023.06), installer community</td></tr>
+        <tr><td><strong>Viessmann</strong></td><td>VIPartner</td><td>Heat pump specific</td><td>Heat pump training</td><td>Annual exclusive benefits</td></tr>
+        <tr><td><strong>LG</strong></td><td>All Stars</td><td>Annual benefits</td><td>HVAC training</td><td>Annual tier evaluation</td></tr>
+        <tr style="border-left:3px solid var(--accent);"><td><strong>Hero Pump</strong></td><td>Hero Rewards</td><td>€5-10/pump</td><td>Free online + in-person</td><td><strong>Points-based + BACS/SRI training (unique)</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box">No Chinese brand has an installer loyalty program in EU. Hero Rewards is a structural differentiation — combined with Modbus RTU + BACS/SRI training, creates a "smart installer" identity vs Grundfos/Wilo's generic training.</div>
+  </div>
+</div>
+
+<!-- TAB 8: QUICK REFERENCE CARD -->
+<div class="tab-content" id="tab-quickref">
+  <h2>🃏 Quick Reference Card</h2>
+  <p style="color:var(--text-secondary);margin-bottom:20px;">Printable pocket card — cut along lines, fold, carry in toolkit.</p>
+
+  <div class="quick-ref" id="quickRefCard" style="max-width:500px;">
+    <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:12px;">
+      <div style="font-size:20px;font-weight:800;">⚡ HERO PUMP ⚡</div>
+      <div style="font-size:12px;color:#666;">Installer Quick Reference Card</div>
+    </div>
+
+    <div style="font-weight:700;margin-bottom:6px;">📦 MODEL SELECTION</div>
+    <div style="font-size:11px;line-height:1.6;">
+      HR-25/4: 4m/2.5m³/h — Small apt<br>
+      HR-25/6: 6m/3.0m³/h — Standard home<br>
+      HR-32/6: 6m/3.5m³/h — Large/UFH<br>
+      HRA-25/6: AUTO adaptive<br>
+      HRB-25/6-M: Modbus RTU + BMS<br>
+      JNB-20/4: DHW recirculation<br>
+      HRZL-32/8: Commercial heavy<br>
+    </div>
+
+    <div style="font-weight:700;margin:10px 0 6px;">🔧 KEY SPECS</div>
+    <div style="font-size:11px;line-height:1.6;">
+      EEI: ≤0.16 (Class A) | ErP: ≤0.23 ✅<br>
+      Voltage: 220-240V / 50Hz<br>
+      IP Rating: IP42 (standard) / IP44 (HRB)<br>
+      Max temp: 110°C<br>
+      Max pressure: 10 bar<br>
+      Fluid: Clean water, no solids<br>
+      Shaft: MUST be horizontal ←→<br>
+    </div>
+
+    <div style="font-weight:700;margin:10px 0 6px;">🔌 WIRING</div>
+    <div style="font-size:11px;line-height:1.6;">
+      L = Brown | N = Blue | PE = Green/Yellow<br>
+      Torque: 0.5-0.6 Nm<br>
+      Union nuts: hand-tight + ¼ turn (max 25Nm)<br>
+      RS-485: A=White/Green, B=Black/Red<br>
+      Modbus: 9600/8N1, Address 1-247<br>
+    </div>
+
+    <div style="font-weight:700;margin:10px 0 6px;">🚨 TROUBLESHOOTING</div>
+    <div style="font-size:11px;line-height:1.6;">
+      E01 Overcurrent → Clear impeller<br>
+      E02 Dry run → Fill + vent system<br>
+      E03 Overtemp → Cool + check bearing<br>
+      E06 Modbus timeout → Check A/B wiring<br>
+      No flow → Vent pump (vent screw)<br>
+      Noise → Check shaft horizontal<br>
+    </div>
+
+    <div style="font-weight:700;margin:10px 0 6px;">📞 SUPPORT</div>
+    <div style="font-size:11px;line-height:1.6;">
+      EU Distributor: Contact your Tier 1 partner<br>
+      Technical Support: support@hero-pump.eu<br>
+      Warranty: 2-5 years (see tier)<br>
+      Register: hero-pump.eu/installers<br>
+    </div>
+
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:#999;border-top:1px solid #ccc;padding-top:8px;">
+      Scan QR for full manual → hero-pump.eu/manuals<br>
+      EEI ≤0.16 | Class A | ErP 641/2009 ✅
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <button class="copy-btn" onclick="window.print()" style="font-size:14px;padding:10px 24px;">🖨️ Print Quick Reference Card</button>
+  </div>
+</div>
+
+<script>
+// Tab navigation
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Checklist persistence
+function saveChecklist() {
+  const boxes = document.querySelectorAll('#commissioning-checklist input[type="checkbox"]');
+  const state = Array.from(boxes).map(b => b.checked);
+  localStorage.setItem('hero-pump-commissioning', JSON.stringify(state));
+  updateProgress('commissioning');
+}
+
+function saveErpChecklist() {
+  const boxes = document.querySelectorAll('#erp-checklist input[type="checkbox"]');
+  const state = Array.from(boxes).map(b => b.checked);
+  localStorage.setItem('hero-pump-erp', JSON.stringify(state));
+  updateProgress('erp');
+}
+
+function updateProgress(type) {
+  const prefix = type === 'commissioning' ? 'commissioning-checklist' : 'erp-checklist';
+  const textId = type === 'commissioning' ? 'progress-text' : 'erp-progress-text';
+  const fillId = type === 'commissioning' ? 'progress-fill' : 'erp-progress-fill';
+  const total = document.querySelectorAll(`#${prefix} input[type="checkbox"]`).length;
+  const checked = document.querySelectorAll(`#${prefix} input[type="checkbox"]:checked`).length;
+  document.getElementById(textId).textContent = `${checked} / ${total}`;
+  document.getElementById(fillId).style.width = `${(checked/total)*100}%`;
+}
+
+function resetChecklist() {
+  document.querySelectorAll('#commissioning-checklist input[type="checkbox"]').forEach(b => b.checked = false);
+  localStorage.removeItem('hero-pump-commissioning');
+  updateProgress('commissioning');
+}
+
+function loadChecklist() {
+  const saved = localStorage.getItem('hero-pump-commissioning');
+  if (saved) {
+    const state = JSON.parse(saved);
+    document.querySelectorAll('#commissioning-checklist input[type="checkbox"]').forEach((b, i) => {
+      b.checked = state[i] || false;
+    });
+  }
+  const erpSaved = localStorage.getItem('hero-pump-erp');
+  if (erpSaved) {
+    const erpState = JSON.parse(erpSaved);
+    document.querySelectorAll('#erp-checklist input[type="checkbox"]').forEach((b, i) => {
+      b.checked = erpState[i] || false;
+    });
+  }
+  updateProgress('commissioning');
+  updateProgress('erp');
+}
+
+function selectSystem(el, type) {
+  el.parentElement.querySelectorAll('div').forEach(d => d.style.borderColor = 'transparent');
+  el.style.borderColor = '#3b82f6';
+}
+
+// Init
+loadChecklist();
+</script>
+</body>
+</html>

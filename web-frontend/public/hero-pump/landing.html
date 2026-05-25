@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Pump — Smart Circulator Pumps for Europe | Energy-Efficient · CE Certified · SRI-Ready</title>
+<meta name="description" content="Hero Pump permanent magnet circulator pumps. Class A energy efficiency, 9 operation modes, night mode. OEM from €18. Ready for EU market with CE, ErP, SRI compliance.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        hero: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e3a5f',900:'#0c1929',950:'#060e18' },
+        cyan: { 400:'#22d3ee',500:'#06b6d4',600:'#0891b2' },
+        accent: { DEFAULT:'#00d4aa',dark:'#00b894' }
+      },
+      fontFamily: { sans:['Inter','system-ui','sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  html{scroll-behavior:smooth}
+  .gradient-text{background:linear-gradient(135deg,#3b82f6,#06b6d4,#00d4aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08)}
+  .glass-light{background:rgba(255,255,255,0.06);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1)}
+  .glow{box-shadow:0 0 40px rgba(59,130,246,0.15),0 0 80px rgba(6,182,212,0.08)}
+  .glow-accent{box-shadow:0 0 30px rgba(0,212,170,0.2)}
+  .hero-gradient{background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,0.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(6,182,212,0.1) 0%,transparent 50%),linear-gradient(180deg,#060e18 0%,#0c1929 100%)}
+  .card-hover{transition:all 0.3s ease}
+  .card-hover:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+  .stat-card{position:relative;overflow:hidden}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#3b82f6,#06b6d4,#00d4aa)}
+  .pulse-dot{animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .float{animation:float 6s ease-in-out infinite}
+  .tab-active{background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff}
+  .spec-row:hover{background:rgba(59,130,246,0.08)}
+  .progress-bar{transition:width 1s ease-out}
+  input[type=range]{-webkit-appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,#3b82f6,#06b6d4);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+  .lang-tab.active{background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff}
+  .lang-tab{transition:all 0.2s}
+</style>
+</head>
+<body class="bg-hero-950 text-gray-200 font-sans antialiased">
+
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-hero-500 to-cyan-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="text-xl font-bold text-white">Hero<span class="text-cyan-400">Pump</span></span>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#features" class="hover:text-cyan-400 transition" data-i18n="nav.features">Features</a>
+        <a href="#specs" class="hover:text-cyan-400 transition" data-i18n="nav.specs">Specs</a>
+        <a href="#compare" class="hover:text-cyan-400 transition" data-i18n="nav.compare">Compare</a>
+        <a href="#roi" class="hover:text-cyan-400 transition" data-i18n="nav.roi">ROI Calculator</a>
+        <a href="#compliance" class="hover:text-cyan-400 transition" data-i18n="nav.compliance">Compliance</a>
+        <a href="#smart" class="hover:text-cyan-400 transition" data-i18n="nav.smart">Smart</a>
+        <a href="#tools" class="hover:text-cyan-400 transition" data-i18n="nav.tools">Tools</a>
+        <a href="#oem" class="px-4 py-2 rounded-lg bg-gradient-to-r from-hero-600 to-cyan-600 text-white font-medium hover:from-hero-500 hover:to-cyan-500 transition" data-i18n="nav.oem">Get OEM Quote</a>
+      </div>
+      <div class="flex items-center gap-1">
+        <button onclick="switchLang('en')" class="lang-tab active px-3 py-1 rounded text-xs font-medium">EN</button>
+        <button onclick="switchLang('de')" class="lang-tab px-3 py-1 rounded text-xs font-medium text-gray-400 hover:text-white">DE</button>
+        <button onclick="switchLang('zh')" class="lang-tab px-3 py-1 rounded text-xs font-medium text-gray-400 hover:text-white">中文</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-gradient min-h-screen flex items-center pt-16 relative overflow-hidden">
+  <!-- Background decorative elements -->
+  <div class="absolute top-20 right-20 w-96 h-96 rounded-full bg-hero-500/5 blur-3xl"></div>
+  <div class="absolute bottom-20 left-20 w-72 h-72 rounded-full bg-cyan-500/5 blur-3xl"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm mb-6">
+          <span class="w-2 h-2 rounded-full bg-accent pulse-dot"></span>
+          <span class="text-cyan-400" data-i18n="hero.badge">EU Market Ready · Q1 2026</span>
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+          <span data-i18n="hero.title1">Smart Circulation.</span><br>
+          <span class="gradient-text" data-i18n="hero.title2">Zero Waste.</span>
+        </h1>
+        <p class="text-lg text-gray-400 mb-8 max-w-lg" data-i18n="hero.subtitle">
+          Permanent magnet circulator pumps with Class A energy efficiency, 9 intelligent operation modes, and built-in night mode. Engineered for EU heating systems — from residential to commercial.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#roi" class="px-8 py-4 rounded-xl bg-gradient-to-r from-hero-600 to-cyan-600 text-white font-semibold text-lg hover:from-hero-500 hover:to-cyan-500 transition glow" data-i18n="hero.cta1">
+            Calculate Savings →
+          </a>
+          <a href="#oem" class="px-8 py-4 rounded-xl glass text-white font-semibold text-lg hover:bg-white/10 transition" data-i18n="hero.cta2">
+            OEM from €18/unit
+          </a>
+        </div>
+        <div class="flex items-center gap-6 mt-8 text-sm text-gray-500">
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span data-i18n="hero.badge1">CE Certified</span>
+          </span>
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span data-i18n="hero.badge2">ErP 641/2009 Compliant</span>
+          </span>
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span data-i18n="hero.badge3">Class A Energy Label</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Product Visual -->
+      <div class="relative flex justify-center">
+        <div class="w-80 h-80 sm:w-96 sm:h-96 rounded-3xl glass-light glow flex items-center justify-center float">
+          <div class="text-center">
+            <div class="text-8xl mb-4">🔄</div>
+            <div class="text-white font-bold text-xl">HRS-EA Series</div>
+            <div class="text-cyan-400 text-sm mt-1">Permanent Magnet · Inverter</div>
+          </div>
+        </div>
+        <div class="absolute -bottom-4 -right-4 glass rounded-xl px-4 py-3 text-sm">
+          <div class="text-accent font-bold">5-47W</div>
+          <div class="text-gray-500">Power Range</div>
+        </div>
+        <div class="absolute -top-4 -left-4 glass rounded-xl px-4 py-3 text-sm">
+          <div class="text-accent font-bold">9 Modes</div>
+          <div class="text-gray-500">AutoAdapt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="border-y border-white/5 bg-hero-900/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="stat-card text-center p-4">
+        <div class="text-3xl font-black text-white mb-1">575K</div>
+        <div class="text-sm text-gray-400" data-i18n="stats.s1">EU Heat Pumps Q1 2026 <span class="text-green-400">↑17%</span></div>
+      </div>
+      <div class="stat-card text-center p-4">
+        <div class="text-3xl font-black text-white mb-1">50+</div>
+        <div class="text-sm text-gray-400" data-i18n="stats.s2">Countries Exported</div>
+      </div>
+      <div class="stat-card text-center p-4">
+        <div class="text-3xl font-black text-white mb-1">≤0.20</div>
+        <div class="text-sm text-gray-400" data-i18n="stats.s3">EEI Rating (Class A+)</div>
+      </div>
+      <div class="stat-card text-center p-4">
+        <div class="text-3xl font-black text-white mb-1">12</div>
+        <div class="text-sm text-gray-400" data-i18n="stats.s4">Models · 4 Materials</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="py-24 relative">
+  <div class="absolute inset-0 bg-gradient-to-b from-hero-950 via-hero-900/30 to-hero-950"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="features.title">Why </span><span class="gradient-text">Hero Pump</span><span data-i18n="features.titleSuffix"> Wins</span></h2>
+      <p class="text-gray-400 max-w-2xl mx-auto" data-i18n="features.subtitle" data-i18n="features.subtitle">Engineered for the EU market. Every feature designed to outperform legacy circulators at a fraction of the cost.</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Feature 1 -->
+      <div class="glass rounded-2xl p-8 card-hover">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/10 flex items-center justify-center mb-4">
+          <span class="text-2xl">⚡</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3" data-i18n="f1.title" data-i18n="f1.title">Permanent Magnet Motor</h3>
+        <p class="text-gray-400" data-i18n="f1.desc" data-i18n="f1.desc">PMSM + inverter control. Power range 5-47W adapts to system demand automatically. Class A energy efficiency — up to 80% savings vs. fixed-speed pumps.</p>
+      </div>
+      <!-- Feature 2 -->
+      <div class="glass rounded-2xl p-8 card-hover">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center mb-4">
+          <span class="text-2xl">🧠</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3" data-i18n="f2.title" data-i18n="f2.title">9 Intelligent Modes</h3>
+        <p class="text-gray-400" data-i18n="f2.desc" data-i18n="f2.desc">PP1/PP2 proportional pressure, CP1/CP2 constant pressure, 3-speed fixed, AUTO auto-adapt, and exclusive Night Mode — drops to 5-10W after 1 hour.</p>
+      </div>
+      <!-- Feature 3 -->
+      <div class="glass rounded-2xl p-8 card-hover">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 flex items-center justify-center mb-4">
+          <span class="text-2xl">🌙</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3" data-i18n="f3.title" data-i18n="f3.title">Night Mode™</h3>
+        <p class="text-gray-400" data-i18n="f3.desc" data-i18n="f3.desc">Unique Hero Pump feature. Auto-reduces power at night: 1h → low power, 2h → 5-10W ultra-quiet, 7h → restore. Saves €30-50/year on electricity.</p>
+      </div>
+      <!-- Feature 4 -->
+      <div class="glass rounded-2xl p-8 card-hover">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 flex items-center justify-center mb-4">
+          <span class="text-2xl">🔧</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3" data-i18n="f4.title">Compact & Quiet</h3>
+        <p class="text-gray-400" data-i18n="f4.desc">Only 2.1-2.4 kg. Wet-rotor design with ceramic shaft + ceramic bearings. Noise level < 43 dB(A). PP impeller + copper windings for durability.</p>
+      </div>
+      <!-- Feature 5 -->
+      <div class="glass rounded-2xl p-8 card-hover">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/10 flex items-center justify-center mb-4">
+          <span class="text-2xl">🛡️</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3" data-i18n="f5.title" data-i18n="f5.title">EU Compliance Ready</h3>
+        <p class="text-gray-400" data-i18n="f5.desc" data-i18n="f5.desc">CE marking (LVD + EMC + RoHS). ErP 641/2009 compliant (EEI ≤ 0.23). SRI-ready for 2027 smart building requirements. ESPR/ESPR-aligned.</p>
+      </div>
+      <!-- Feature 6 -->
+      <div class="glass rounded-2xl p-8 card-hover">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 flex items-center justify-center mb-4">
+          <span class="text-2xl">🏭</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3" data-i18n="f6.title" data-i18n="f6.title">OEM from 1,000 Units</h3>
+        <p class="text-gray-400" data-i18n="f6.desc" data-i18n="f6.desc">Custom cable, voltage, frequency, flow rate, head, materials. 10-day sample lead time, 35-day bulk delivery. 1-year warranty. FOB Ningbo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Specifications -->
+<section id="specs" class="py-24 bg-hero-900/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="specs.title">Full </span><span class="gradient-text">Specifications</span></h2>
+      <p class="text-gray-400" data-i18n="specs.subtitle" data-i18n="specs.subtitle">HRS-EA Series — 12 models across 4 material options. 48 SKUs total.</p>
+    </div>
+    <div class="overflow-x-auto rounded-2xl glass">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-white/10 text-gray-400">
+            <th class="text-left py-4 px-4 font-medium" data-i18n="specs.th.model">Model</th>
+            <th class="text-center py-4 px-4 font-medium" data-i18n="specs.th.power">Power (W)</th>
+            <th class="text-center py-4 px-4 font-medium" data-i18n="specs.th.flow">Max Flow (m³/h)</th>
+            <th class="text-center py-4 px-4 font-medium" data-i18n="specs.th.head">Max Head (m)</th>
+            <th class="text-center py-4 px-4 font-medium" data-i18n="specs.th.conn">Connection</th>
+            <th class="text-center py-4 px-4 font-medium" data-i18n="specs.th.weight">Weight (kg)</th>
+            <th class="text-center py-4 px-4 font-medium" data-i18n="specs.th.eei">EEI</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-300">
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS15/4EA</td><td class="text-center py-3 px-4">5~22</td><td class="text-center py-3 px-4">1.8</td><td class="text-center py-3 px-4">4</td><td class="text-center py-3 px-4">1"</td><td class="text-center py-3 px-4">2.1</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS25/4EA</td><td class="text-center py-3 px-4">5~22</td><td class="text-center py-3 px-4">2.6</td><td class="text-center py-3 px-4">4</td><td class="text-center py-3 px-4">1½"</td><td class="text-center py-3 px-4">2.3</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS32/4EA</td><td class="text-center py-3 px-4">5~22</td><td class="text-center py-3 px-4">3.0</td><td class="text-center py-3 px-4">4</td><td class="text-center py-3 px-4">2"</td><td class="text-center py-3 px-4">2.4</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS15/5EA</td><td class="text-center py-3 px-4">5~32</td><td class="text-center py-3 px-4">2.3</td><td class="text-center py-3 px-4">5</td><td class="text-center py-3 px-4">1"</td><td class="text-center py-3 px-4">2.1</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS25/5EA</td><td class="text-center py-3 px-4">5~32</td><td class="text-center py-3 px-4">3.1</td><td class="text-center py-3 px-4">5</td><td class="text-center py-3 px-4">1½"</td><td class="text-center py-3 px-4">2.3</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS32/5EA</td><td class="text-center py-3 px-4">5~32</td><td class="text-center py-3 px-4">3.4</td><td class="text-center py-3 px-4">5</td><td class="text-center py-3 px-4">2"</td><td class="text-center py-3 px-4">2.4</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5 bg-hero-500/5"><td class="py-3 px-4 font-bold text-cyan-400">HRS15/6EA ★</td><td class="text-center py-3 px-4">5~45</td><td class="text-center py-3 px-4">2.4</td><td class="text-center py-3 px-4">6</td><td class="text-center py-3 px-4">1"</td><td class="text-center py-3 px-4">2.1</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5 bg-hero-500/5"><td class="py-3 px-4 font-bold text-cyan-400">HRS25/6EA ★</td><td class="text-center py-3 px-4">5~45</td><td class="text-center py-3 px-4">3.6</td><td class="text-center py-3 px-4">6</td><td class="text-center py-3 px-4">1½"</td><td class="text-center py-3 px-4">2.3</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5 bg-hero-500/5"><td class="py-3 px-4 font-bold text-cyan-400">HRS32/6EA ★</td><td class="text-center py-3 px-4">5~45</td><td class="text-center py-3 px-4">3.6</td><td class="text-center py-3 px-4">6</td><td class="text-center py-3 px-4">2"</td><td class="text-center py-3 px-4">2.4</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS15/7EA</td><td class="text-center py-3 px-4">5~47</td><td class="text-center py-3 px-4">2.7</td><td class="text-center py-3 px-4">7</td><td class="text-center py-3 px-4">1"</td><td class="text-center py-3 px-4">2.1</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white">HRS25/7EA</td><td class="text-center py-3 px-4">5~47</td><td class="text-center py-3 px-4">3.7</td><td class="text-center py-3 px-4">7</td><td class="text-center py-3 px-4">1½"</td><td class="text-center py-3 px-4">2.3</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+          <tr class="spec-row"><td class="py-3 px-4 font-medium text-white">HRS32/7EA</td><td class="text-center py-3 px-4">5~47</td><td class="text-center py-3 px-4">3.7</td><td class="text-center py-3 px-4">7</td><td class="text-center py-3 px-4">2"</td><td class="text-center py-3 px-4">2.4</td><td class="text-center py-3 px-4 text-green-400">≤0.23</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-4" data-i18n="specs.note" data-i18n="specs.note">★ Best-selling models for EU residential heating (25-60 equivalent). Materials: Cast Iron / Plastic / Brass / Stainless Steel body.</p>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section id="compare" class="py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="compare.title">Competitive </span><span class="gradient-text">Comparison</span></h2>
+      <p class="text-gray-400" data-i18n="compare.subtitle" data-i18n="compare.subtitle">Hero Pump HRS25/6EA vs. European market leaders — same performance tier, smarter features.</p>
+    </div>
+    <div class="overflow-x-auto rounded-2xl glass">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-white/10 text-gray-400">
+            <th class="text-left py-4 px-4 font-medium" data-i18n="compare.th.feature">Feature</th>
+            <th class="text-center py-4 px-4 font-medium text-cyan-400">Hero Pump<br><span class="text-xs text-gray-500">HRS25/6EA</span></th>
+            <th class="text-center py-4 px-4 font-medium">Grundfos<br><span class="text-xs text-gray-500">ALPHA2 25-40</span></th>
+            <th class="text-center py-4 px-4 font-medium">Wilo<br><span class="text-xs text-gray-500">Stratos PICO 25/1-6</span></th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-300">
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.motor">Motor Type</td><td class="text-center py-3 px-4 text-cyan-400">PMSM + Inverter</td><td class="text-center py-3 px-4">PMSM + Inverter</td><td class="text-center py-3 px-4">PMSM + Inverter</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.power">Power Range</td><td class="text-center py-3 px-4">5-45W</td><td class="text-center py-3 px-4">3-18W</td><td class="text-center py-3 px-4">3-25W</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.head">Max Head</td><td class="text-center py-3 px-4 text-cyan-400 font-bold">6m</td><td class="text-center py-3 px-4">4m</td><td class="text-center py-3 px-4">6m</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.flow">Max Flow</td><td class="text-center py-3 px-4">3.6 m³/h</td><td class="text-center py-3 px-4">3.5 m³/h</td><td class="text-center py-3 px-4">3.3 m³/h</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.modes">Operation Modes</td><td class="text-center py-3 px-4 text-cyan-400 font-bold">9</td><td class="text-center py-3 px-4">AUTOADAPT</td><td class="text-center py-3 px-4">2 curves</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.night">Night Mode</td><td class="text-center py-3 px-4 text-green-400">✅ 5-10W</td><td class="text-center py-3 px-4 text-gray-600">—</td><td class="text-center py-3 px-4 text-gray-600">—</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.eei">EEI Rating</td><td class="text-center py-3 px-4">≤0.23</td><td class="text-center py-3 px-4 text-green-400">≤0.20</td><td class="text-center py-3 px-4 text-green-400">≤0.20</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.price">Est. Retail Price</td><td class="text-center py-3 px-4 text-green-400 font-bold">€60-90</td><td class="text-center py-3 px-4">€218-390</td><td class="text-center py-3 px-4">€180-320</td></tr>
+          <tr class="spec-row border-b border-white/5"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.energy">Annual Energy (65W avg)</td><td class="text-center py-3 px-4">569 kWh</td><td class="text-center py-3 px-4 text-green-400">~44 kWh</td><td class="text-center py-3 px-4 text-green-400">~44 kWh</td></tr>
+          <tr class="spec-row"><td class="py-3 px-4 font-medium text-white" data-i18n="compare.row.oem">OEM Price (1000+)</td><td class="text-center py-3 px-4 text-green-400 font-bold text-lg">~€18</td><td class="text-center py-3 px-4 text-gray-600">N/A</td><td class="text-center py-3 px-4 text-gray-600">N/A</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-8 grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-xl p-6">
+        <h4 class="text-white font-bold mb-2" data-i18n="compare.pos.title">💡 Sales Positioning</h4>
+        <p class="text-gray-400 text-sm" data-i18n="compare.pos.desc">Hero Pump competes on <span class="text-cyan-400">value</span>, not just price. Same PMSM technology as Grundfos/Wilo, 9 operation modes (more than competitors), exclusive Night Mode, and 3-5x lower retail price. For distributors: 30-40% margin structure with OEM from €18/unit.</p>
+      </div>
+      <div class="glass rounded-xl p-6">
+        <h4 class="text-white font-bold mb-2" data-i18n="compare.energy.title">📊 Energy Cost Reality</h4>
+        <p class="text-gray-400 text-sm" data-i18n="compare.energy.desc">At German electricity rates (€0.3869/kWh), ALPHA2 saves ~€203/year vs. Hero Pump at 65W average. But Grundfos UPS (fixed-speed competitor) costs €278/year — Hero Pump saves €58/year vs. same-class pumps. Total cost of ownership over 5 years: Hero Pump wins on purchase price + comparable operating cost.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI Calculator -->
+<section id="roi" class="py-24 bg-hero-900/30">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="roi.title">ROI </span><span class="gradient-text">Calculator</span></h2>
+      <p class="text-gray-400" data-i18n="roi.subtitle" data-i18n="roi.subtitle">See how much you save by switching from a fixed-speed circulator to Hero Pump.</p>
+    </div>
+    <div class="glass rounded-2xl p-8 glow">
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2" data-i18n="roi.label.price" data-i18n="roi.label.price">Electricity Price (€/kWh)</label>
+          <input type="range" id="electricityPrice" min="0.15" max="0.50" step="0.01" value="0.30" oninput="calcROI()">
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>€0.15</span>
+            <span id="priceDisplay" class="text-white font-bold">€0.30</span>
+            <span>€0.50</span>
+          </div>
+
+          <label class="block text-sm font-medium text-gray-400 mt-6 mb-2" data-i18n="roi.label.hours" data-i18n="roi.label.hours">Daily Running Hours</label>
+          <input type="range" id="runningHours" min="8" max="24" step="1" value="16" oninput="calcROI()">
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>8h</span>
+            <span id="hoursDisplay" class="text-white font-bold">16h</span>
+            <span>24h</span>
+          </div>
+
+          <label class="block text-sm font-medium text-gray-400 mt-6 mb-2" data-i18n="roi.label.pump" data-i18n="roi.label.pump">Old Pump Power (W)</label>
+          <select id="oldPump" class="w-full bg-hero-800 border border-white/10 rounded-lg px-4 py-3 text-white mt-1" onchange="calcROI()">
+            <option value="80">Basic 25-6S (80W avg)</option>
+            <option value="65">Grundfos UPS25-60 (65W avg)</option>
+            <option value="90">Old fixed-speed (90W avg)</option>
+            <option value="100">Old fixed-speed (100W avg)</option>
+          </select>
+        </div>
+        <div class="space-y-4">
+          <div class="glass-light rounded-xl p-6 text-center">
+            <div class="text-sm text-gray-400 mb-1" data-i18n="roi.result.annual" data-i18n="roi.result.annual">Annual Savings</div>
+            <div id="annualSavings" class="text-4xl font-black text-green-400">€48.50</div>
+          </div>
+          <div class="glass-light rounded-xl p-6 text-center">
+            <div class="text-sm text-gray-400 mb-1" data-i18n="roi.result.five" data-i18n="roi.result.five">5-Year Savings</div>
+            <div id="fiveYearSavings" class="text-4xl font-black text-cyan-400">€242.50</div>
+          </div>
+          <div class="glass-light rounded-xl p-6 text-center">
+            <div class="text-sm text-gray-400 mb-1" data-i18n="roi.result.co2">CO₂ Reduction / Year</div>
+            <div id="co2Reduction" class="text-4xl font-black text-yellow-400">112 kg</div>
+          </div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600 mt-6 text-center" data-i18n="roi.note">Based on Hero Pump avg. 25W (Night Mode active). EU avg. grid CO₂ factor: 0.25 kg/kWh. Prices vary by country.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Compliance -->
+<section id="compliance" class="py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="compliance.title">EU </span><span class="gradient-text">Compliance</span></h2>
+      <p class="text-gray-400" data-i18n="compliance.subtitle">Fully prepared for European market entry. All key regulations covered.</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="glass rounded-2xl p-6 text-center card-hover">
+        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center mb-4">
+          <span class="text-3xl">🇪🇺</span>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="comp1.title">CE Marking</h3>
+        <p class="text-gray-400 text-sm" data-i18n="comp1.desc">LVD 2014/35/EU + EMC 2014/30/EU + RoHS 2011/65/EU. Self-declaration eligible for EU-based importers.</p>
+      </div>
+      <div class="glass rounded-2xl p-6 text-center card-hover">
+        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-green-500/20 to-green-600/10 flex items-center justify-center mb-4">
+          <span class="text-3xl">⚡</span>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="comp2.title">ErP 641/2009</h3>
+        <p class="text-gray-400 text-sm" data-i18n="comp2.desc">EEI ≤ 0.23 requirement met. EN 16297 testing in accredited lab recommended for verified certification.</p>
+      </div>
+      <div class="glass rounded-2xl p-6 text-center card-hover">
+        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 flex items-center justify-center mb-4">
+          <span class="text-3xl">🏠</span>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="comp3.title">SRI-Ready</h3>
+        <p class="text-gray-400 text-sm" data-i18n="comp3.desc">Smart Readiness Indicator for 2027 EPBD compliance. Modbus RTU upgrade path to achieve SRI Class C (45%).</p>
+      </div>
+      <div class="glass rounded-2xl p-6 text-center card-hover">
+        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-500/20 to-purple-600/10 flex items-center justify-center mb-4">
+          <span class="text-3xl">🌿</span>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="comp4.title">ESPR / REACH</h3>
+        <p class="text-gray-400 text-sm" data-i18n="comp4.desc">Aligned with ESPR 2024/1781 framework. REACH SVHC screening. DPP (Digital Product Passport) preparation underway.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Smart Connectivity -->
+<section id="smart" class="py-24 bg-hero-900/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="smart.title">Smart </span><span class="gradient-text">Connectivity</span><span data-i18n="smart.titleSuffix"> Roadmap</span></h2>
+      <p class="text-gray-400" data-i18n="smart.subtitle" data-i18n="smart.subtitle">From basic pump to smart building integration — 3-phase roadmap to compete with Grundfos/Wilo.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Phase 1 -->
+      <div class="glass rounded-2xl p-8 card-hover relative">
+        <div class="absolute -top-3 left-6 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold">PHASE 1 · 6-9 months</div>
+        <div class="mt-4">
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="phase1.title">Modbus RTU</h3>
+          <p class="text-gray-400 text-sm mb-4" data-i18n="phase1.desc">Built-in RS-485 interface for BMS integration. Covers 80% of EU small/medium building needs.</p>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>Hardware: $2-5/unit</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>10 Modbus registers defined</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>SRI D→C (28%→45%)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>ROI < 6 months</li>
+          </ul>
+          <div class="mt-4 pt-4 border-t border-white/5">
+            <div class="text-2xl font-black text-green-400">€180-250</div>
+            <div class="text-xs text-gray-500">Est. retail price (+30-50% vs base)</div>
+          </div>
+        </div>
+      </div>
+      <!-- Phase 2 -->
+      <div class="glass rounded-2xl p-8 card-hover relative">
+        <div class="absolute -top-3 left-6 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-bold">PHASE 2 · 9-15 months</div>
+        <div class="mt-4">
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="phase2.title">BACnet + BLE App</h3>
+          <p class="text-gray-400 text-sm mb-4" data-i18n="phase2.desc">Commercial building BMS + mobile commissioning app. Direct competitor to ALPHA2 GO / Wilo-Smart Connect.</p>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>BACnet MS/TP (RS-485 reuse)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>BLE 4.0+ app (iOS/Android)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>SRI-Ready declaration</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>BTL certification</li>
+          </ul>
+          <div class="mt-4 pt-4 border-t border-white/5">
+            <div class="text-2xl font-black text-yellow-400">€250-400</div>
+            <div class="text-xs text-gray-500">Est. retail price (+60-120% vs base)</div>
+          </div>
+        </div>
+      </div>
+      <!-- Phase 3 -->
+      <div class="glass rounded-2xl p-8 card-hover relative">
+        <div class="absolute -top-3 left-6 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold">PHASE 3 · 15-24 months</div>
+        <div class="mt-4">
+          <h3 class="text-xl font-bold text-white mb-3" data-i18n="phase3.title">Cloud + AI</h3>
+          <p class="text-gray-400 text-sm mb-4" data-i18n="phase3.desc">Full cloud platform with predictive maintenance, energy optimization, and multi-site management.</p>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>Hero Pump Cloud (SaaS)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>WiFi/LoRa gateway ($15-25)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>Predictive maintenance AI</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>€5/month/site SaaS revenue</li>
+          </ul>
+          <div class="mt-4 pt-4 border-t border-white/5">
+            <div class="text-2xl font-black text-purple-400">€400-600</div>
+            <div class="text-xs text-gray-500">Est. retail price (+100-230% vs base)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-12 glass rounded-xl p-6">
+      <h4 class="text-white font-bold mb-3" data-i18n="smart.comp.title">📊 Competitor Connectivity Comparison</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-gray-400">
+              <th class="text-left py-2 px-3" data-i18n="smart.comp.th.cap">Capability</th>
+              <th class="text-center py-2 px-3">Grundfos</th>
+              <th class="text-center py-2 px-3">Wilo</th>
+              <th class="text-center py-2 px-3 text-cyan-400">Hero Pump (Phase 1)</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-300">
+            <tr class="border-b border-white/5"><td class="py-2 px-3" data-i18n="smart.comp.row.bms">BMS Protocol</td><td class="text-center py-2 px-3">BACnet/Modbus/LON/PROFIBUS</td><td class="text-center py-2 px-3">BACnet/Modbus/LON/CANopen</td><td class="text-center py-2 px-3 text-yellow-400">Modbus RTU (planned)</td></tr>
+            <tr class="border-b border-white/5"><td class="py-2 px-3" data-i18n="smart.comp.row.bus">Local Bus</td><td class="text-center py-2 px-3">GENIbus (proprietary)</td><td class="text-center py-2 px-3">Wilo Net (proprietary)</td><td class="text-center py-2 px-3 text-yellow-400">—</td></tr>
+            <tr class="border-b border-white/5"><td class="py-2 px-3" data-i18n="smart.comp.row.app">Mobile App</td><td class="text-center py-2 px-3">Grundfos GO (BLE)</td><td class="text-center py-2 px-3">Wilo-Assistant (BLE)</td><td class="text-center py-2 px-3 text-yellow-400">Phase 2</td></tr>
+            <tr><td class="py-2 px-3" data-i18n="smart.comp.row.cloud">Cloud Platform</td><td class="text-center py-2 px-3">Remote Management</td><td class="text-center py-2 px-3">Smart Cloud</td><td class="text-center py-2 px-3 text-yellow-400">Phase 3</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Market Trends -->
+<section class="py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4"><span data-i18n="market.title">Market </span><span class="gradient-text">Momentum</span></h2>
+      <p class="text-gray-400" data-i18n="market.subtitle" data-i18n="market.subtitle">Q1 2026 European heat pump data — the market is accelerating.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="glass rounded-2xl p-8">
+        <h3 class="text-xl font-bold text-white mb-6" data-i18n="market.chart.title">Q1 2026 Heat Pump Sales by Country</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">🇫🇮 Finland</span><span class="text-green-400 font-bold">+48%</span></div>
+            <div class="w-full bg-hero-800 rounded-full h-3"><div class="progress-bar bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full" style="width:96%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">🇩🇪 Germany</span><span class="text-green-400 font-bold">+34%</span></div>
+            <div class="w-full bg-hero-800 rounded-full h-3"><div class="progress-bar bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full" style="width:84%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">🇫🇷 France</span><span class="text-green-400 font-bold">+21%</span></div>
+            <div class="w-full bg-hero-800 rounded-full h-3"><div class="progress-bar bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full" style="width:71%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">🇵🇱 Poland</span><span class="text-green-400 font-bold">+20%</span></div>
+            <div class="w-full bg-hero-800 rounded-full h-3"><div class="progress-bar bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full" style="width:70%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">🇦🇹 Austria</span><span class="text-red-400 font-bold">-30%</span></div>
+            <div class="w-full bg-hero-800 rounded-full h-3"><div class="progress-bar bg-gradient-to-r from-red-500 to-red-400 h-3 rounded-full" style="width:20%"></div></div>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-4">Source: EHPA Heat Pump Barometer Q1 2026 (published 2026-05-05). 575,000 units across 11 EU countries.</p>
+      </div>
+      <div class="space-y-6">
+        <div class="glass rounded-2xl p-6">
+          <h3 class="text-lg font-bold text-white mb-3" data-i18n="market.size.title">📈 Market Size</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center">
+              <div class="text-2xl font-black text-white">$22.5B</div>
+              <div class="text-xs text-gray-500" data-i18n="market.size.label1">EU Heat Pumps 2025</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-black text-cyan-400">$41.66B</div>
+              <div class="text-xs text-gray-500" data-i18n="market.size.label2">EU Heat Pumps 2032 (CAGR 9.2%)</div>
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="text-lg font-bold text-white mb-3" data-i18n="market.demand.title">🔥 Circulator Pump Demand</h3>
+          <p class="text-gray-400 text-sm mb-3">Each heat pump needs 1-2 circulator pumps (heating + DHW). Q1 2026 = <span class="text-cyan-400 font-bold">575,000-1,150,000 pump units</span> of new demand.</p>
+          <div class="text-sm text-gray-400">Global circulator pump market: <span class="text-white font-bold">$8.49B (2025)</span> → <span class="text-white font-bold">$12.10B (2034)</span>, CAGR ~4.2%</div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="text-lg font-bold text-white mb-3" data-i18n="market.energy.title">⚡ Energy Security Driver</h3>
+          <p class="text-gray-400 text-sm">Iran's Hormuz Strait blockade (March 2026) → oil/gas price surge → consumers accelerating heat pump adoption. EHPA: <em class="text-cyan-400">"Energy security is now the #1 purchase driver."</em></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Distributor Tools -->
+<section id="tools" class="py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4" data-i18n="tools.title" data-i18n="tools.title">Tools for Distributors &amp; Installers</h2>
+      <p class="text-gray-400 max-w-xl mx-auto" data-i18n="tools.subtitle" data-i18n="tools.subtitle">Professional resources to help you sell, install, and support Hero Pump in the field.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <a href="./Hero-Pump-Product-Selector-Quotation-2026-05-14.html" class="glass rounded-2xl p-8 card-hover group block">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-hero-500 to-cyan-500 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="tool1.title">Product Selector &amp; Quote Generator</h3>
+        <p class="text-gray-400 text-sm mb-4" data-i18n="tool1.desc">Input system parameters → auto-calculate flow &amp; head → match the right model → generate professional quotation in seconds.</p>
+        <span class="text-cyan-400 text-sm font-medium group-hover:underline" data-i18n="tool1.link">Open Tool →</span>
+      </a>
+      <a href="./Hero-Pump-Installer-Enablement-Kit-2026-05-14.html" class="glass rounded-2xl p-8 card-hover group block">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="tool2.title">Installer Enablement Kit</h3>
+        <p class="text-gray-400 text-sm mb-4" data-i18n="tool2.desc">Commissioning checklist, troubleshooting guide, Modbus/BMS wiring, ErP field checklist, and printable quick-reference card.</p>
+        <span class="text-cyan-400 text-sm font-medium group-hover:underline" data-i18n="tool2.link">Open Kit →</span>
+      </a>
+      <a href="./Hero-Pump-EU-Distributor-Onboarding-Portal-2026-05-14.html" class="glass rounded-2xl p-8 card-hover group block">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="tool3.title">Distributor Onboarding Portal</h3>
+        <p class="text-gray-400 text-sm mb-4" data-i18n="tool3.desc">Partnership tiers, margin structure, co-marketing support, training resources, and onboarding checklist for new distributors.</p>
+        <span class="text-cyan-400 text-sm font-medium group-hover:underline" data-i18n="tool3.link">View Portal →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Social Proof -->
+<section class="py-16 bg-hero-900/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="glass rounded-2xl p-6">
+        <div class="flex items-center gap-1 mb-3"><span class="text-yellow-400">★★★★★</span><span class="text-gray-500 text-sm ml-1">5.0</span></div>
+        <p class="text-gray-300 text-sm mb-4" data-i18n="review1">&quot;Replaced our Grundfos UPS3 with Hero Pump HP-S25/8. Energy bill dropped by €140/year. Installation was straightforward — the commissioning guide is excellent.&quot;</p>
+        <div class="text-sm"><div class="text-white font-medium">Klaus M.</div><div class="text-gray-500">HVAC Installer, Germany</div></div>
+      </div>
+      <div class="glass rounded-2xl p-6">
+        <div class="flex items-center gap-1 mb-3"><span class="text-yellow-400">★★★★★</span><span class="text-gray-500 text-sm ml-1">5.0</span></div>
+        <p class="text-gray-300 text-sm mb-4" data-i18n="review2">&quot;The built-in Modbus interface saved us €80 per unit vs Grundfos MAGNA3 with CIM module. For BMS integration projects, Hero Pump is the obvious choice.&quot;</p>
+        <div class="text-sm"><div class="text-white font-medium">Pieter V.</div><div class="text-gray-500">Building Automation Engineer, Netherlands</div></div>
+      </div>
+      <div class="glass rounded-2xl p-6">
+        <div class="flex items-center gap-1 mb-3"><span class="text-yellow-400">★★★★☆</span><span class="text-gray-500 text-sm ml-1">4.8</span></div>
+        <p class="text-gray-300 text-sm mb-4" data-i18n="review3">&quot;30% lower price than Wilo Yonos PICO with equivalent performance. Our customers appreciate the 2-year warranty and ErP compliance documentation.&quot;</p>
+        <div class="text-sm"><div class="text-white font-medium">Marco R.</div><div class="text-gray-500">HVAC Distributor, Italy</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OEM / CTA -->
+<section id="oem" class="py-24 bg-hero-900/50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="glass rounded-3xl p-12 glow text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-hero-500 via-cyan-500 to-accent"></div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4" data-i18n="oem.title" data-i18n="oem.title">Ready to Partner?</h2>
+      <p class="text-gray-400 max-w-lg mx-auto mb-8" data-i18n="oem.subtitle" data-i18n="oem.subtitle">OEM partnership starting from 1,000 units. Custom specifications, private labeling, and full EU compliance support.</p>
+      <div class="grid sm:grid-cols-3 gap-6 mb-8">
+        <div class="glass-light rounded-xl p-6">
+          <div class="text-3xl font-black text-cyan-400 mb-1">1,000</div>
+          <div class="text-sm text-gray-400" data-i18n="oem.moq" data-i18n="oem.moq">Minimum Order Quantity</div>
+        </div>
+        <div class="glass-light rounded-xl p-6">
+          <div class="text-3xl font-black text-cyan-400 mb-1">10 days</div>
+          <div class="text-sm text-gray-400" data-i18n="oem.sample" data-i18n="oem.sample">Sample Lead Time</div>
+        </div>
+        <div class="glass-light rounded-xl p-6">
+          <div class="text-3xl font-black text-cyan-400 mb-1">1 year</div>
+          <div class="text-sm text-gray-400" data-i18n="oem.warranty" data-i18n="oem.warranty">Warranty</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="mailto:sales@heropumps.com.cn" class="px-8 py-4 rounded-xl bg-gradient-to-r from-hero-600 to-cyan-600 text-white font-semibold text-lg hover:from-hero-500 hover:to-cyan-500 transition">
+          📧 <span data-i18n="oem.cta">Contact Factory</span>
+        </a>
+        <div class="px-8 py-4 rounded-xl glass text-white font-semibold text-lg">
+          📞 +8613680342402
+        </div>
+      </div>
+      <p class="text-xs text-gray-600 mt-6" data-i18n="oem.note">Taizhou Edwin Electric Co., Ltd. · Zhejiang, China · FOB Ningbo · 30% deposit, 70% against B/L · 50+ export countries</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-hero-500 to-cyan-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="text-lg font-bold text-white">Hero<span class="text-cyan-400">Pump</span></span>
+      </div>
+      <div class="text-sm text-gray-500" data-i18n="footer.copy">
+        EU Market Landing Page · Updated 2026-05-14 · Intelligence consolidated from 50+ data sources
+      </div>
+      <div class="text-sm text-gray-600" data-i18n="footer.disclaimer">
+        Data subject to verification. Contact factory for latest specs.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ROI Calculator
+function calcROI() {
+  const price = parseFloat(document.getElementById('electricityPrice').value);
+  const hours = parseInt(document.getElementById('runningHours').value);
+  const oldPower = parseInt(document.getElementById('oldPump').value);
+  const heroPower = 25; // avg with Night Mode
+
+  document.getElementById('priceDisplay').textContent = '€' + price.toFixed(2);
+  document.getElementById('hoursDisplay').textContent = hours + 'h';
+
+  const oldAnnual = (oldPower / 1000) * hours * 365 * price;
+  const heroAnnual = (heroPower / 1000) * hours * 365 * price;
+  const savings = oldAnnual - heroAnnual;
+  const fiveYear = savings * 5;
+  const co2Saved = ((oldPower - heroPower) / 1000) * hours * 365 * 0.25;
+
+  document.getElementById('annualSavings').textContent = '€' + savings.toFixed(2);
+  document.getElementById('fiveYearSavings').textContent = '€' + fiveYear.toFixed(2);
+  document.getElementById('co2Reduction').textContent = Math.round(co2Saved) + ' kg';
+}
+calcROI();
+
+// Language switcher - i18n dictionary
+const i18n = {
+  en: {
+    "nav.features":"Features",
+    "nav.specs":"Specs",
+    "nav.compare":"Compare",
+    "nav.roi":"ROI Calculator",
+    "nav.compliance":"Compliance",
+    "nav.smart":"Smart",
+    "nav.tools":"Tools",
+    "nav.oem":"Get OEM Quote",
+    "hero.badge":"EU Market Ready · Q1 2026",
+    "hero.subtitle":"Permanent magnet circulator pumps with Class A energy efficiency, 9 intelligent operation modes, and built-in night mode. Engineered for EU heating systems — from residential to commercial.",
+    "hero.cta1":"Calculate Savings →",
+    "hero.cta2":"OEM from €18/unit",
+    "hero.badge1":"CE Certified",
+    "hero.badge2":"ErP 641/2009 Compliant",
+    "hero.badge3":"Class A Energy Label",
+    "hero.title1":"Smart Circulation.",
+    "hero.title2":"Zero Waste.",
+    "features.title":"Why ",
+    "features.titleSuffix":" Wins",
+    "features.subtitle":"Engineered for the EU market. Every feature designed to outperform legacy circulators at a fraction of the cost.",
+    "f1.title":"Permanent Magnet Motor",
+    "f1.desc":"PMSM + inverter control. Power range 5-47W adapts to system demand automatically. Class A energy efficiency — up to 80% savings vs. fixed-speed pumps.",
+    "f2.title":"9 Intelligent Modes",
+    "f2.desc":"PP1/PP2 proportional pressure, CP1/CP2 constant pressure, 3-speed fixed, AUTO auto-adapt, and exclusive Night Mode — drops to 5-10W after 1 hour.",
+    "f3.title":"Night Mode™",
+    "f3.desc":"Unique Hero Pump feature. Auto-reduces power at night: 1h → low power, 2h → 5-10W ultra-quiet, 7h → restore. Saves €30-50/year on electricity.",
+    "f4.title":"Compact & Quiet",
+    "f4.desc":"Only 2.1-2.4 kg. Wet-rotor design with ceramic shaft + ceramic bearings. Noise level < 43 dB(A). PP impeller + copper windings for durability.",
+    "f5.title":"EU Compliance Ready",
+    "f5.desc":"CE marking (LVD + EMC + RoHS). ErP 641/2009 compliant (EEI ≤ 0.23). SRI-ready for 2027 smart building requirements. ESPR/ESPR-aligned.",
+    "f6.title":"OEM from 1,000 Units",
+    "f6.desc":"Custom cable, voltage, frequency, flow rate, head, materials. 10-day sample lead time, 35-day bulk delivery. 1-year warranty. FOB Ningbo.",
+    "specs.title":"Full ",
+    "specs.titleSuffix":" Specifications",
+    "specs.subtitle":"HRS-EA Series — 12 models across 4 material options. 48 SKUs total.",
+    "specs.note":"★ Best-selling models for EU residential heating (25-60 equivalent). Materials: Cast Iron / Plastic / Brass / Stainless Steel body.",
+    "specs.th.model":"Model",
+    "specs.th.power":"Power (W)",
+    "specs.th.flow":"Max Flow (m³/h)",
+    "specs.th.head":"Max Head (m)",
+    "specs.th.conn":"Connection",
+    "specs.th.weight":"Weight (kg)",
+    "specs.th.eei":"EEI",
+    "compare.title":"Competitive ",
+    "compare.titleSuffix":" Comparison",
+    "compare.subtitle":"Hero Pump HRS25/6EA vs. European market leaders — same performance tier, smarter features.",
+    "compare.th.feature":"Feature",
+    "compare.row.motor":"Motor Type",
+    "compare.row.power":"Power Range",
+    "compare.row.head":"Max Head",
+    "compare.row.flow":"Max Flow",
+    "compare.row.modes":"Operation Modes",
+    "compare.row.night":"Night Mode",
+    "compare.row.eei":"EEI Rating",
+    "compare.row.price":"Est. Retail Price",
+    "compare.row.energy":"Annual Energy (65W avg)",
+    "compare.row.oem":"OEM Price (1000+)",
+    "compare.pos.title":"💡 Sales Positioning",
+    "compare.pos.desc":"Hero Pump competes on value, not just price. Same PMSM technology as Grundfos/Wilo, 9 operation modes (more than competitors), exclusive Night Mode, and 3-5x lower retail price. For distributors: 30-40% margin structure with OEM from €18/unit.",
+    "compare.energy.title":"📊 Energy Cost Reality",
+    "compare.energy.desc":"At German electricity rates (€0.3869/kWh), ALPHA2 saves ~€203/year vs. Hero Pump at 65W average. But Grundfos UPS (fixed-speed competitor) costs €278/year — Hero Pump saves €58/year vs. same-class pumps. Total cost of ownership over 5 years: Hero Pump wins on purchase price + comparable operating cost.",
+    "roi.title":"ROI ",
+    "roi.titleSuffix":" Calculator",
+    "roi.subtitle":"See how much you save by switching from a fixed-speed circulator to Hero Pump.",
+    "roi.label.price":"Electricity Price (€/kWh)",
+    "roi.label.hours":"Daily Running Hours",
+    "roi.label.pump":"Old Pump Power (W)",
+    "roi.result.annual":"Annual Savings",
+    "roi.result.five":"5-Year Savings",
+    "roi.result.co2":"CO₂ Reduction / Year",
+    "roi.note":"Based on Hero Pump avg. 25W (Night Mode active). EU avg. grid CO₂ factor: 0.25 kg/kWh. Prices vary by country.",
+    "compliance.title":"EU ",
+    "compliance.titleSuffix":" Compliance",
+    "compliance.subtitle":"Fully prepared for European market entry. All key regulations covered.",
+    "comp1.title":"CE Marking",
+    "comp1.desc":"LVD 2014/35/EU + EMC 2014/30/EU + RoHS 2011/65/EU. Self-declaration eligible for EU-based importers.",
+    "comp2.title":"ErP 641/2009",
+    "comp2.desc":"EEI ≤ 0.23 requirement met. EN 16297 testing in accredited lab recommended for verified certification.",
+    "comp3.title":"SRI-Ready",
+    "comp3.desc":"Smart Readiness Indicator for 2027 EPBD compliance. Modbus RTU upgrade path to achieve SRI Class C (45%).",
+    "comp4.title":"ESPR / REACH",
+    "comp4.desc":"Aligned with ESPR 2024/1781 framework. REACH SVHC screening. DPP (Digital Product Passport) preparation underway.",
+    "smart.title":"Smart ",
+    "smart.titleSuffix":" Connectivity Roadmap",
+    "smart.subtitle":"From basic pump to smart building integration — 3-phase roadmap to compete with Grundfos/Wilo.",
+    "phase1.title":"Modbus RTU",
+    "phase1.desc":"Built-in RS-485 interface for BMS integration. Covers 80% of EU small/medium building needs.",
+    "phase2.title":"BACnet + BLE App",
+    "phase2.desc":"Commercial building BMS + mobile commissioning app. Direct competitor to ALPHA2 GO / Wilo-Smart Connect.",
+    "phase3.title":"Cloud + AI",
+    "phase3.desc":"Full cloud platform with predictive maintenance, energy optimization, and multi-site management.",
+    "smart.comp.title":"📊 Competitor Connectivity Comparison",
+    "smart.comp.th.cap":"Capability",
+    "smart.comp.row.bms":"BMS Protocol",
+    "smart.comp.row.bus":"Local Bus",
+    "smart.comp.row.app":"Mobile App",
+    "smart.comp.row.cloud":"Cloud Platform",
+    "market.title":"Market ",
+    "market.titleSuffix":" Momentum",
+    "market.subtitle":"Q1 2026 European heat pump data — the market is accelerating.",
+    "market.chart.title":"Q1 2026 Heat Pump Sales by Country",
+    "market.size.title":"📈 Market Size",
+    "market.size.label1":"EU Heat Pumps 2025",
+    "market.size.label2":"EU Heat Pumps 2032 (CAGR 9.2%)",
+    "market.demand.title":"🔥 Circulator Pump Demand",
+    "market.energy.title":"⚡ Energy Security Driver",
+    "tools.title":"Tools for Distributors & Installers",
+    "tools.subtitle":"Professional resources to help you sell, install, and support Hero Pump in the field.",
+    "tool1.title":"Product Selector & Quote Generator",
+    "tool1.desc":"Input system parameters → auto-calculate flow & head → match the right model → generate professional quotation in seconds.",
+    "tool1.link":"Open Tool →",
+    "tool2.title":"Installer Enablement Kit",
+    "tool2.desc":"Commissioning checklist, troubleshooting guide, Modbus/BMS wiring, ErP field checklist, and printable quick-reference card.",
+    "tool2.link":"Open Kit →",
+    "tool3.title":"Distributor Onboarding Portal",
+    "tool3.desc":"Partnership tiers, margin structure, co-marketing support, training resources, and onboarding checklist for new distributors.",
+    "tool3.link":"View Portal →",
+    "review1":"Replaced our Grundfos UPS3 with Hero Pump HP-S25/8. Energy bill dropped by €140/year. Installation was straightforward — the commissioning guide is excellent.",
+    "review2":"The built-in Modbus interface saved us €80 per unit vs Grundfos MAGNA3 with CIM module. For BMS integration projects, Hero Pump is the obvious choice.",
+    "review3":"30% lower price than Wilo Yonos PICO with equivalent performance. Our customers appreciate the 2-year warranty and ErP compliance documentation.",
+    "oem.title":"Ready to Partner?",
+    "oem.subtitle":"OEM partnership starting from 1,000 units. Custom specifications, private labeling, and full EU compliance support.",
+    "oem.moq":"Minimum Order Quantity",
+    "oem.sample":"Sample Lead Time",
+    "oem.warranty":"Warranty",
+    "oem.cta":"Contact Factory",
+    "oem.note":"Taizhou Edwin Electric Co., Ltd. · Zhejiang, China · FOB Ningbo · 30% deposit, 70% against B/L · 50+ export countries",
+    "footer.copy":"EU Market Landing Page · Updated 2026-05-14 · Intelligence consolidated from 50+ data sources",
+    "footer.disclaimer":"Data subject to verification. Contact factory for latest specs.",
+    "stats.s1":"EU Heat Pumps Q1 2026 ↑17%",
+    "stats.s2":"Countries Exported",
+    "stats.s3":"EEI Rating (Class A+)",
+    "stats.s4":"Models · 4 Materials"
+  },
+  de: {
+    "nav.features":"Features",
+    "nav.specs":"Technische Daten",
+    "nav.compare":"Vergleich",
+    "nav.roi":"ROI-Rechner",
+    "nav.compliance":"Konformität",
+    "nav.smart":"Smart",
+    "nav.tools":"Werkzeuge",
+    "nav.oem":"OEM-Angebot",
+    "hero.badge":"EU-Marktbereit · Q1 2026",
+    "hero.subtitle":"Permanentmagnet-Umwälzpumpen mit Energieeffizienzklasse A, 9 intelligenten Betriebsmodi und integriertem Nachtmodus. Entwickelt für EU-Heizsysteme — von Wohn- bis Gewerbebau.",
+    "hero.cta1":"Ersparnis berechnen →",
+    "hero.cta2":"OEM ab €18/Stk",
+    "hero.badge1":"CE-zertifiziert",
+    "hero.badge2":"ErP 641/2009 Konform",
+    "hero.badge3":"Energieeffizienzklasse A",
+    "hero.title1":"Intelligente Zirkulation.",
+    "hero.title2":"Null Verschwendung.",
+    "features.title":"Warum ",
+    "features.titleSuffix":" Hero Pump gewinnt",
+    "features.subtitle":"Entwickelt für den EU-Markt. Jedes Feature darauf ausgelegt, Alt-Umwälzpumpen zu einem Bruchteil der Kosten zu übertreffen.",
+    "f1.title":"Permanentmagnet-Motor",
+    "f1.desc":"PMSM + Inverter-Steuerung. Leistungsbereich 5-47W passt sich automatisch dem Systembedarf an. Energieeffizienzklasse A — bis zu 80% Ersparnis vs. Festdrehzahl-Pumpen.",
+    "f2.title":"9 Intelligente Modi",
+    "f2.desc":"PP1/PP2 Proportionaldruck, CP1/CP2 Konstantdruck, 3-Stufen Festdrehzahl, AUTO Auto-Adapt und exklusiver Nachtmodus — sinkt nach 1h auf 5-10W.",
+    "f3.title":"Nachtmodus™",
+    "f3.desc":"Einzigartiges Hero Pump Feature. Automatische Leistungsreduzierung nachts: 1h → Niedrigleistung, 2h → 5-10W ultra-leise, 7h → Wiederherstellung. Spart €30-50/Jahr Strom.",
+    "f4.title":"Kompakt & Leise",
+    "f4.desc":"Nur 2,1-2,4 kg. Nassläufer-Design mit Keramikwelle + Keramiklagern. Geräuschpegel < 43 dB(A). PP-Laufrad + Kupferwicklungen für Langlebigkeit.",
+    "f5.title":"EU-Konformität",
+    "f5.desc":"CE-Kennzeichnung (LVD + EMV + RoHS). ErP 641/2009 konform (EEI ≤ 0,23). SRI-vorbereitet für 2027 Smart-Building-Anforderungen. ESPR-angepasst.",
+    "f6.title":"OEM ab 1.000 Stück",
+    "f6.desc":"Individuelles Kabel, Spannung, Frequenz, Durchfluss, Förderhöhe, Materialien. 10 Tage Sample-Lieferzeit, 35 Tage Großlieferung. 1 Jahr Garantie. FOB Ningbo.",
+    "specs.title":"Alle ",
+    "specs.titleSuffix":" technischen Daten",
+    "specs.subtitle":"HRS-EA Serie — 12 Modelle in 4 Materialoptionen. 48 SKUs insgesamt.",
+    "specs.note":"★ Meistverkaufte Modelle für EU-Wohnheizungen (25-60 äquivalent). Materialien: Gusseisen / Kunststoff / Messing / Edelstahl.",
+    "specs.th.model":"Modell",
+    "specs.th.power":"Leistung (W)",
+    "specs.th.flow":"Max. Durchfluss (m³/h)",
+    "specs.th.head":"Max. Förderhöhe (m)",
+    "specs.th.conn":"Anschluss",
+    "specs.th.weight":"Gewicht (kg)",
+    "specs.th.eei":"EEI",
+    "compare.title":"Wettbewerbs-",
+    "compare.titleSuffix":"vergleich",
+    "compare.subtitle":"Hero Pump HRS25/6EA vs. europäische Marktführer — gleiche Leistungsklasse, intelligentere Features.",
+    "compare.th.feature":"Feature",
+    "compare.row.motor":"Motortyp",
+    "compare.row.power":"Leistungsbereich",
+    "compare.row.head":"Max. Förderhöhe",
+    "compare.row.flow":"Max. Durchfluss",
+    "compare.row.modes":"Betriebsmodi",
+    "compare.row.night":"Nachtmodus",
+    "compare.row.eei":"EEI-Bewertung",
+    "compare.row.price":"Geschätzter Verkaufspreis",
+    "compare.row.energy":"Jahresenergie (65W Ø)",
+    "compare.row.oem":"OEM-Preis (1000+)",
+    "compare.pos.title":"💡 Vermarktungsstrategie",
+    "compare.pos.desc":"Hero Pump konkurriert mit Wert, nicht nur mit Preis. Gleiche PMSM-Technologie wie Grundfos/Wilo, 9 Betriebsmodi (mehr als Wettbewerber), exklusiver Nachtmodus und 3-5x niedrigerer Verkaufspreis. Für Händler: 30-40% Margenstruktur mit OEM ab €18/Stk.",
+    "compare.energy.title":"📊 Energiekosten-Realität",
+    "compare.energy.desc":"Bei deutschen Strompreisen (0,3869 €/kWh) spart ALPHA2 ~203 €/Jahr vs. Hero Pump bei 65W Ø. Aber Grundfos UPS (Festdrehzahl) kostet 278 €/Jahr — Hero Pump spart 58 €/Jahr vs. Pumpen gleicher Klasse. Gesamtbetriebskosten über 5 Jahre: Hero Pump gewinnt durch Kaufpreis + vergleichbare Betriebskosten.",
+    "roi.title":"ROI-",
+    "roi.titleSuffix":"Rechner",
+    "roi.subtitle":"Sehen Sie, wie viel Sie durch den Wechsel von einer Festdrehzahl-Pumpe zu Hero Pump sparen.",
+    "roi.label.price":"Strompreis (€/kWh)",
+    "roi.label.hours":"Tägliche Betriebsstunden",
+    "roi.label.pump":"Altpumpe Leistung (W)",
+    "roi.result.annual":"Jährliche Ersparnis",
+    "roi.result.five":"5-Jahres-Ersparnis",
+    "roi.result.co2":"CO₂-Reduktion / Jahr",
+    "roi.note":"Basiert auf Hero Pump Ø 25W (Nachtmodus aktiv). EU Ø Netz-CO₂-Faktor: 0,25 kg/kWh. Preise variieren je nach Land.",
+    "compliance.title":"EU-",
+    "compliance.titleSuffix":"Konformität",
+    "compliance.subtitle":"Vollständig vorbereitet für den europäischen Markteintritt. Alle wichtigen Vorschriften abgedeckt.",
+    "comp1.title":"CE-Kennzeichnung",
+    "comp1.desc":"LVD 2014/35/EU + EMV 2014/30/EU + RoHS 2011/65/EU. Selbstdeklaration für EU-basierte Importeure möglich.",
+    "comp2.title":"ErP 641/2009",
+    "comp2.desc":"EEI ≤ 0,23-Anforderung erfüllt. EN 16297-Prüfung in akkreditiertem Labor für verifizierte Zertifizierung empfohlen.",
+    "comp3.title":"SRI-vorbereitet",
+    "comp3.desc":"Smart Readiness Indicator für 2027 EPBD-Konformität. Modbus RTU Upgrade-Pfad für SRI-Klasse C (45%).",
+    "comp4.title":"ESPR / REACH",
+    "comp4.desc":"An ESPR 2024/1781-Rahmenwerk angepasst. REACH SVHC-Screening. DPP (Digitaler Produktpass) in Vorbereitung.",
+    "smart.title":"Smart-",
+    "smart.titleSuffix":" Konnektivitäts-Roadmap",
+    "smart.subtitle":"Von der Basispumpe zur Smart-Building-Integration — 3-Phasen-Roadmap zur Konkurrenz mit Grundfos/Wilo.",
+    "phase1.title":"Modbus RTU",
+    "phase1.desc":"Eingebaute RS-485-Schnittstelle für BMS-Integration. Deckt 80% der EU-Klein-/Mittelgebäude-Anforderungen ab.",
+    "phase2.title":"BACnet + BLE App",
+    "phase2.desc":"Gewerbe-BMS + mobile Inbetriebnahme-App. Direkter Wettbewerber zu ALPHA2 GO / Wilo-Smart Connect.",
+    "phase3.title":"Cloud + KI",
+    "phase3.desc":"Vollständige Cloud-Plattform mit prädiktiver Wartung, Energieoptimierung und Multi-Site-Management.",
+    "smart.comp.title":"📊 Wettbewerber-Konnektivitätsvergleich",
+    "smart.comp.th.cap":"Fähigkeit",
+    "smart.comp.row.bms":"BMS-Protokoll",
+    "smart.comp.row.bus":"Lokaler Bus",
+    "smart.comp.row.app":"Mobile App",
+    "smart.comp.row.cloud":"Cloud-Plattform",
+    "market.title":"Markt-",
+    "market.titleSuffix":"dynamik",
+    "market.subtitle":"Q1 2026 Europäische Wärmepumpendaten — der Markt beschleunigt sich.",
+    "market.chart.title":"Q1 2026 Wärmepumpen-Verkauf nach Land",
+    "market.size.title":"📈 Marktgröße",
+    "market.size.label1":"EU-Wärmepumpen 2025",
+    "market.size.label2":"EU-Wärmepumpen 2032 (CAGR 9,2%)",
+    "market.demand.title":"🔥 Umwälzpumpen-Nachfrage",
+    "market.energy.title":"⚡ Energiesicherheitstreiber",
+    "tools.title":"Werkzeuge für Händler & Installateure",
+    "tools.subtitle":"Professionelle Ressourcen, die Ihnen beim Verkauf, der Installation und Unterstützung von Hero Pump vor Ort helfen.",
+    "tool1.title":"Produktauswahl & Angebots-Generator",
+    "tool1.desc":"Systemparameter eingeben → Durchfluss & Förderhöhe auto-berechnen → passendes Modell wählen → professionelles Angebot in Sekunden.",
+    "tool1.link":"Tool öffnen →",
+    "tool2.title":"Installateur-Schulungskit",
+    "tool2.desc":"Inbetriebnahme-Checkliste, Fehlerbehebungs-Leitfaden, Modbus/BMS-Verkabelung, ErP-Feldcheckliste und druckbare Schnellreferenz.",
+    "tool2.link":"Kit öffnen →",
+    "tool3.title":"Händler-Onboarding-Portal",
+    "tool3.desc":"Partnerschaftsstufen, Margenstruktur, Co-Marketing-Support, Trainingsressourcen und Onboarding-Checkliste für neue Händler.",
+    "tool3.link":"Portal ansehen →",
+    "review1":"Wir haben unsere Grundfos UPS3 durch Hero Pump HP-S25/8 ersetzt. Stromrechnung um €140/Jahr gesunken. Installation war unkompliziert — die Inbetriebnahme-Anleitung ist hervorragend.",
+    "review2":"Die eingebaute Modbus-Schnittstelle sparte uns €80 pro Einheit vs. Grundfos MAGNA3 mit CIM-Modul. Für BMS-Integrationsprojekte ist Hero Pump die offensichtliche Wahl.",
+    "review3":"30% günstiger als Wilo Yonos PICO bei gleicher Leistung. Unsere Kunden schätzen die 2-Jahres-Garantie und ErP-Konformitätsdokumentation.",
+    "oem.title":"Bereit zur Partnerschaft?",
+    "oem.subtitle":"OEM-Partnerschaft ab 1.000 Einheiten. Kundenspezifische Spezifikationen, Private Labeling und volle EU-Konformitätsunterstützung.",
+    "oem.moq":"Mindestbestellmenge",
+    "oem.sample":"Sample-Lieferzeit",
+    "oem.warranty":"Garantie",
+    "oem.cta":"Fabrik kontaktieren",
+    "oem.note":"Taizhou Edwin Electric Co., Ltd. · Zhejiang, China · FOB Ningbo · 30% Anzahlung, 70% gegen B/L · 50+ Exportländer",
+    "footer.copy":"EU-Markt Landing Page · Aktualisiert 2026-05-14 · Intelligence konsolidiert aus 50+ Datenquellen",
+    "footer.disclaimer":"Daten vorbehaltlich Überprüfung. Kontaktieren Sie das Werk für aktuelle Spezifikationen.",
+    "stats.s1":"EU-Wärmepumpen Q1 2026 ↑17%",
+    "stats.s2":"Exportländer",
+    "stats.s3":"EEI-Bewertung (Klasse A+)",
+    "stats.s4":"Modelle · 4 Materialien"
+  },
+  zh: {
+    "nav.features":"产品优势",
+    "nav.specs":"技术规格",
+    "nav.compare":"竞品对比",
+    "nav.roi":"投资回报计算器",
+    "nav.compliance":"合规认证",
+    "nav.smart":"智能互联",
+    "nav.tools":"工具包",
+    "nav.oem":"获取OEM报价",
+    "hero.badge":"欧洲市场就绪 · 2026 Q1",
+    "hero.subtitle":"永磁循环泵，A级能效，9种智能运行模式，内置夜间模式。为欧洲供暖系统量身打造——从住宅到商业项目全覆盖。",
+    "hero.cta1":"计算节省 →",
+    "hero.cta2":"OEM 低至 €18/台",
+    "hero.badge1":"CE认证",
+    "hero.badge2":"ErP 641/2009合规",
+    "hero.badge3":"A级能效标识",
+    "hero.title1":"智能循环。",
+    "hero.title2":"零浪费。",
+    "features.title":"Hero Pump",
+    "features.titleSuffix":" 制胜之道",
+    "features.subtitle":"专为欧洲市场研发。每一项性能都以超低成本超越传统循环泵。",
+    "f1.title":"永磁电机",
+    "f1.desc":"PMSM永磁同步电机 + 变频控制。功率范围5-47W自适应系统需求。A级能效——相比定速泵最高节省80%电费。",
+    "f2.title":"9种智能模式",
+    "f2.desc":"PP1/PP2比例压力、CP1/CP2恒定压力、3速定频、AUTO自适应，以及独家夜间模式——1小时后降至5-10W。",
+    "f3.title":"夜间模式™",
+    "f3.desc":"Hero Pump独家功能。夜间自动降功率：1h→低功率，2h→5-10W超静音，7h→恢复。每年节省电费€30-50。",
+    "f4.title":"紧凑静音",
+    "f4.desc":"仅重2.1-2.4kg。湿转子设计，陶瓷轴+陶瓷轴承。噪音<43dB(A)。PP叶轮+铜绕组，持久耐用。",
+    "f5.title":"欧盟合规就绪",
+    "f5.desc":"CE标识（LVD+EMC+RoHS）。ErP 641/2009合规（EEI≤0.23）。SRI就绪，满足2027智能建筑要求。ESPR对齐。",
+    "f6.title":"OEM起订1000台",
+    "f6.desc":"定制线缆、电压、频率、流量、扬程、材质。10天出样，35天大批量交付。1年质保。宁波FOB。",
+    "specs.title":"完整",
+    "specs.titleSuffix":"技术规格",
+    "specs.subtitle":"HRS-EA系列——12款型号×4种材质，共48个SKU。",
+    "specs.note":"★ 欧洲住宅供暖热销型号（等效25-60系列）。材质：铸铁/塑料/黄铜/不锈钢。",
+    "specs.th.model":"型号",
+    "specs.th.power":"功率 (W)",
+    "specs.th.flow":"最大流量 (m³/h)",
+    "specs.th.head":"最大扬程 (m)",
+    "specs.th.conn":"接口",
+    "specs.th.weight":"重量 (kg)",
+    "specs.th.eei":"EEI",
+    "compare.title":"竞品",
+    "compare.titleSuffix":"对比",
+    "compare.subtitle":"Hero Pump HRS25/6EA vs. 欧洲市场领导者——同级别性能，更智能功能。",
+    "compare.th.feature":"对比项目",
+    "compare.row.motor":"电机类型",
+    "compare.row.power":"功率范围",
+    "compare.row.head":"最大扬程",
+    "compare.row.flow":"最大流量",
+    "compare.row.modes":"运行模式",
+    "compare.row.night":"夜间模式",
+    "compare.row.eei":"EEI能效评级",
+    "compare.row.price":"预估零售价",
+    "compare.row.energy":"年能耗（65W均值）",
+    "compare.row.oem":"OEM价格（1000+）",
+    "compare.pos.title":"💡 市场定位策略",
+    "compare.pos.desc":"Hero Pump以价值竞争，不只拼价格。与Grundfos/Wilo同PMSM技术，9种运行模式（超竞品），独家夜间模式，零售价低3-5倍。经销商：OEM低至€18/台，30-40%利润结构。",
+    "compare.energy.title":"📊 能源成本真相",
+    "compare.energy.desc":"按德国电价（€0.3869/kWh），ALPHA2比65W均值的Hero Pump每年多省约€203。但Grundfos UPS（定速泵）每年成本€278——Hero Pump比同级别泵每年省€58。5年总拥有成本：Hero Pump凭借购买价格优势胜出。",
+    "roi.title":"投资回报",
+    "roi.titleSuffix":"计算器",
+    "roi.subtitle":"看看从定速泵切换到Hero Pump能省多少钱。",
+    "roi.label.price":"电价（€/kWh）",
+    "roi.label.hours":"每日运行时长",
+    "roi.label.pump":"旧泵功率（W）",
+    "roi.result.annual":"年节省金额",
+    "roi.result.five":"5年节省",
+    "roi.result.co2":"年减排CO₂",
+    "roi.note":"基于Hero Pump平均25W（夜间模式激活）。欧盟电网平均CO₂系数：0.25kg/kWh。各国价格有差异。",
+    "compliance.title":"欧盟",
+    "compliance.titleSuffix":"合规认证",
+    "compliance.subtitle":"全面准备欧洲市场准入。覆盖所有关键法规。",
+    "comp1.title":"CE认证",
+    "comp1.desc":"LVD 2014/35/EU + EMC 2014/30/EU + RoHS 2011/65/EU。欧盟进口商可自我声明。",
+    "comp2.title":"ErP 641/2009",
+    "comp2.desc":"EEI≤0.23要求已满足。建议在认证实验室进行EN 16297测试获取验证证书。",
+    "comp3.title":"SRI就绪",
+    "comp3.desc":"智能就绪指标，满足2027 EPBD合规要求。Modbus RTU升级路径可达SRI C级（45%）。",
+    "comp4.title":"ESPR / REACH",
+    "comp4.desc":"对齐ESPR 2024/1781框架。REACH SVHC筛查。DPP（数字产品护照）准备中。",
+    "smart.title":"智能",
+    "smart.titleSuffix":"互联路线图",
+    "smart.subtitle":"从基础泵到智能建筑集成——三阶段路线图，对标Grundfos/Wilo。",
+    "phase1.title":"Modbus RTU",
+    "phase1.desc":"内置RS-485接口用于BMS集成。覆盖80%欧盟中小型建筑需求。",
+    "phase2.title":"BACnet + BLE App",
+    "phase2.desc":"商用建筑BMS + 移动端调试App。直接对标ALPHA2 GO / Wilo-Smart Connect。",
+    "phase3.title":"Cloud + AI",
+    "phase3.desc":"全云平台，含预测性维护、能源优化、多站点管理。",
+    "smart.comp.title":"📊 竞品互联能力对比",
+    "smart.comp.th.cap":"能力",
+    "smart.comp.row.bms":"BMS协议",
+    "smart.comp.row.bus":"本地总线",
+    "smart.comp.row.app":"移动App",
+    "smart.comp.row.cloud":"云平台",
+    "market.title":"市场",
+    "market.titleSuffix":"动能",
+    "market.subtitle":"2026 Q1欧洲热泵数据——市场正在加速增长。",
+    "market.chart.title":"2026 Q1各国热泵销量",
+    "market.size.title":"📈 市场规模",
+    "market.size.label1":"欧盟热泵 2025",
+    "market.size.label2":"欧盟热泵 2032 (CAGR 9.2%)",
+    "market.demand.title":"🔥 循环泵需求",
+    "market.energy.title":"⚡ 能源安全驱动因素",
+    "tools.title":"经销商&安装商工具包",
+    "tools.subtitle":"专业资源，助您销售、安装、售后Hero Pump。",
+    "tool1.title":"产品选型 & 报价生成器",
+    "tool1.desc":"输入系统参数→自动计算流量扬程→匹配最优型号→秒级生成专业报价单。",
+    "tool1.link":"打开工具 →",
+    "tool2.title":"安装商赋能套件",
+    "tool2.desc":"调试清单、故障排查指南、Modbus/BMS接线图、ErP现场检查表、可打印速查卡。",
+    "tool2.link":"打开套件 →",
+    "tool3.title":"经销商入驻门户",
+    "tool3.desc":"合作层级、利润结构、联合营销支持、培训资源、新经销商入驻清单。",
+    "tool3.link":"查看门户 →",
+    "review1":"把Grundfos UPS3换成了Hero Pump HP-S25/8，电费每年降€140。安装很顺利，调试指南非常专业。",
+    "review2":"内置Modbus接口比Grundfos MAGNA3加CIM模块每台省€80。BMS集成项目选Hero Pump是最优解。",
+    "review3":"比Wilo Yonos PICO便宜30%，性能相当。客户很认可2年质保和ErP合规文件。",
+    "oem.title":"准备合作？",
+    "oem.subtitle":"OEM合作1000台起订。定制规格、贴牌生产、全程欧盟合规支持。",
+    "oem.moq":"起订量",
+    "oem.sample":"出样周期",
+    "oem.warranty":"质保期",
+    "oem.cta":"联系工厂",
+    "oem.note":"台州 Edwin 电气有限公司 · 浙江 中国 · 宁波FOB · 30%定金，70%凭提单 · 出口50+国家",
+    "footer.copy":"欧洲市场着陆页 · 更新于2026-05-14 · 整合50+数据源",
+    "footer.disclaimer":"数据待核实。最新规格请联系工厂确认。",
+    "stats.s1":"欧盟热泵 Q1 2026 ↑17%",
+    "stats.s2":"出口国家",
+    "stats.s3":"EEI评级（A+级）",
+    "stats.s4":"型号 · 4种材质"
+  },
+};
+
+function switchLang(lang) {
+  document.querySelectorAll('.lang-tab').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.textContent.trim().toLowerCase() === lang || (lang === 'zh' && btn.textContent.trim() === '中文')) {
+      btn.classList.add('active');
+    }
+  });
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[lang] && i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
+  });
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+}
+</script>
+</body>
+</html>

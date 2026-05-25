@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #e2e8f0;
+  background: #020617;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.font-mono,
+code,
+kbd,
+samp,
+pre {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.battle-grid {
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.035) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.battle-scan {
+  background: linear-gradient(180deg, transparent 0%, rgba(16, 185, 129, 0.03) 50%, transparent 100%);
+  animation: battle-scan 4s ease-in-out infinite;
+}
+
+@keyframes battle-scan {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 999px;
+}
+
+.battle-page {
+  min-height: 100vh;
+  background-color: #020617;
+  color: #e2e8f0;
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.026) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.battle-topbar {
+  min-height: 44px;
+  border-bottom: 1px solid #1e293b;
+  background: rgba(15, 23, 42, 0.86);
+  backdrop-filter: blur(14px);
+}
+
+.battle-panel {
+  border: 1px solid #1e293b;
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 6px;
+}
+
+.battle-input {
+  border: 1px solid #334155;
+  background: rgba(2, 6, 23, 0.72);
+  color: #e2e8f0;
+  border-radius: 6px;
+}
+
+.battle-input:focus {
+  outline: none;
+  border-color: #10b981;
+}

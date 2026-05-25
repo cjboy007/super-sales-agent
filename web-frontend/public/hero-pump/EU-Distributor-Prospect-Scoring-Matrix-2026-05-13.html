@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Pump — EU Distributor Prospect Scoring Matrix</title>
+  <!-- ⚠️ MOCK DATA: 评分数据为 AI 估算，公司名真实但评分未经验证，需补齐实际数据后使用 -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg: #0f1117; --surface: #1a1d27; --surface2: #242836; --border: #2d3148; --primary: #6366f1; --primary-dim: #4f46e5; --accent: #22d3ee; --accent2: #a78bfa; --green: #34d399; --yellow: #fbbf24; --red: #f87171; --text: #e2e8f0; --text-dim: #94a3b8; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; }
+  .tab-btn { padding: 10px 20px; border: none; background: transparent; color: var(--text-dim); cursor: pointer; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: var(--text); background: var(--surface); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card-glow { box-shadow: 0 0 20px rgba(99,102,241,0.1); }
+  .kpi-value { font-size: 32px; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-tier1 { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+  .badge-tier2 { background: rgba(99,102,241,0.15); color: var(--primary); border: 1px solid rgba(99,102,241,0.3); }
+  .badge-tier3 { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+  .badge-tier4 { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+  .score-bar { height: 8px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--surface2); border-radius: 3px; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 2px solid var(--accent); }
+  .prospect-row { transition: background 0.15s; }
+  .prospect-row:hover { background: var(--surface2); }
+  .tooltip { position: relative; }
+  .tooltip:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--surface2); color: var(--text); padding: 6px 12px; border-radius: 6px; font-size: 12px; white-space: nowrap; z-index: 10; border: 1px solid var(--border); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-in { animation: fadeIn 0.3s ease forwards; }
+  .country-flag { font-size: 18px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-[var(--border)] bg-[var(--surface)] sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🌊</span>
+      <div>
+        <h1 class="text-lg font-bold">Hero Pump — EU Distributor Prospect Scoring Matrix</h1>
+        <p class="text-xs text-[var(--text-dim)]">Data-driven partner evaluation framework • Spur Reply methodology + Hero Pump market intel</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 text-sm text-[var(--text-dim)]">
+      <span id="clock" class="font-mono"></span>
+      <span class="badge badge-tier1">EPBD 5/29</span>
+    </div>
+  </div>
+  <nav class="max-w-7xl mx-auto px-4 flex gap-0 overflow-x-auto" id="tabs"></nav>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+<!-- TAB 1: Overview & KPIs -->
+<section id="tab-overview" class="tab-panel active">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="card card-glow animate-in">
+      <div class="text-xs text-[var(--text-dim)] mb-1">Prospects Evaluated</div>
+      <div class="kpi-value" id="kpi-prospects">15</div>
+      <div class="text-xs text-[var(--text-dim)] mt-1">across 7 EU markets</div>
+    </div>
+    <div class="card animate-in">
+      <div class="text-xs text-[var(--text-dim)] mb-1">Tier 1 (Priority)</div>
+      <div class="kpi-value" id="kpi-tier1">4</div>
+      <div class="text-xs text-[var(--text-dim)] mt-1">immediate outreach</div>
+    </div>
+    <div class="card animate-in">
+      <div class="text-xs text-[var(--text-dim)] mb-1">Avg Score</div>
+      <div class="kpi-value" id="kpi-avg">--</div>
+      <div class="text-xs text-[var(--text-dim)] mt-1">weighted composite</div>
+    </div>
+    <div class="card animate-in">
+      <div class="text-xs text-[var(--text-dim)] mb-1">Scoring Dimensions</div>
+      <div class="kpi-value">5</div>
+      <div class="text-xs text-[var(--text-dim)] mt-1">multi-criteria model</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="card">
+      <h3 class="text-sm font-semibold mb-3">Scoring Framework</h3>
+      <p class="text-xs text-[var(--text-dim)] mb-4">Based on Spur Reply partner scoring methodology + B2B channel management best practices. Each dimension scored 0-10, weighted by Hero Pump strategic priority.</p>
+      <div id="weights-list"></div>
+    </div>
+    <div class="card">
+      <h3 class="text-sm font-semibold mb-3">Tier Distribution</h3>
+      <canvas id="tier-chart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-sm font-semibold mb-3">Why Distributor Scoring Matters for Hero Pump</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <div>
+        <div class="text-[var(--accent)] font-semibold mb-1">🎯 Resource Optimization</div>
+        <p class="text-[var(--text-dim)] text-xs">EU HVAC wholesale has 211+ distributors (Europages). Scoring focuses limited OEM outreach budget on highest-potential partners. Per Spur Reply: "Manage your portfolio, select whom to manage, choose where to scale."</p>
+      </div>
+      <div>
+        <div class="text-[var(--accent)] font-semibold mb-1">📊 Multi-Dimensional Fit</div>
+        <p class="text-[var(--text-dim)] text-xs">Sales volume alone is insufficient. Our model evaluates market reach, technical capability, compliance readiness, competitive fit, and engagement willingness — 5 dimensions vs. single-metric approaches.</p>
+      </div>
+      <div>
+        <div class="text-[var(--accent)] font-semibold mb-1">⚡ EPBD Window</div>
+        <p class="text-[var(--text-dim)] text-xs">EPBD member state transposition by 2026-05-29 (16 days). BACS compliance drives demand for smart circulator pumps. Scoring identifies distributors already positioned for BACS/SRI — fastest route to market.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 2: Prospect Database -->
+<section id="tab-prospects" class="tab-panel">
+  <div class="card mb-4">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold">EU HVAC Distributor Prospect Database</h3>
+      <div class="flex gap-2">
+        <input type="text" id="search-prospect" placeholder="Search distributor..." class="bg-[var(--surface2)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text)] w-56" oninput="filterProspects()">
+        <select id="filter-tier" class="bg-[var(--surface2)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text)]" onchange="filterProspects()">
+          <option value="all">All Tiers</option>
+          <option value="Tier 1">Tier 1</option>
+          <option value="Tier 2">Tier 2</option>
+          <option value="Tier 3">Tier 3</option>
+          <option value="Tier 4">Tier 4</option>
+        </select>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" id="prospect-table">
+        <thead>
+          <tr class="border-b border-[var(--border)] text-[var(--text-dim)]">
+            <th class="text-left py-2 px-3">#</th>
+            <th class="text-left py-2 px-3">Distributor</th>
+            <th class="text-left py-2 px-3">Country</th>
+            <th class="text-left py-2 px-3">Type</th>
+            <th class="text-center py-2 px-3">Score</th>
+            <th class="text-center py-2 px-3">Tier</th>
+            <th class="text-center py-2 px-3">Reach</th>
+            <th class="text-center py-2 px-3">Tech</th>
+            <th class="text-center py-2 px-3">Compliance</th>
+            <th class="text-center py-2 px-3">Comp. Fit</th>
+            <th class="text-center py-2 px-3">Engage</th>
+            <th class="text-left py-2 px-3">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="prospect-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 3: Scoring Calculator -->
+<section id="tab-calculator" class="tab-panel">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-sm font-semibold mb-4">Interactive Score Calculator</h3>
+      <p class="text-xs text-[var(--text-dim)] mb-4">Adjust scores (0-10) for each dimension. Weights auto-apply. Total = Σ(score × weight).</p>
+      <div id="calculator-inputs"></div>
+      <button onclick="addCustomProspect()" class="mt-4 w-full bg-[var(--primary)] hover:bg-[var(--primary-dim)] text-white font-semibold py-2 rounded-lg text-sm transition">+ Add to Prospect List</button>
+    </div>
+    <div class="card">
+      <h3 class="text-sm font-semibold mb-4">Score Breakdown</h3>
+      <canvas id="calc-radar" height="280"></canvas>
+      <div class="mt-4 text-center">
+        <div class="text-4xl font-bold" id="calc-total">--</div>
+        <div class="text-sm text-[var(--text-dim)]" id="calc-tier-label">Adjust sliders to calculate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 4: Comparison Matrix -->
+<section id="tab-comparison" class="tab-panel">
+  <div class="card mb-4">
+    <h3 class="text-sm font-semibold mb-3">Top Prospects Radar Comparison</h3>
+    <p class="text-xs text-[var(--text-dim)] mb-4">Radar overlay of Tier 1 + Tier 2 prospects. Larger area = better overall fit for Hero Pump.</p>
+    <canvas id="comparison-radar" height="350"></canvas>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-sm font-semibold mb-3">Score Distribution by Dimension</h3>
+      <canvas id="dim-bar" height="250"></canvas>
+    </div>
+    <div class="card">
+      <h3 class="text-sm font-semibold mb-3">Market Coverage Heatmap</h3>
+      <div id="heatmap" class="grid grid-cols-7 gap-1 text-xs"></div>
+      <div class="flex justify-between mt-2 text-[var(--text-dim)] text-[10px]">
+        <span>DE</span><span>NL</span><span>AT</span><span>FR</span><span>BE</span><span>IT</span><span>PL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 5: Outreach Plan -->
+<section id="tab-outreach" class="tab-panel">
+  <div class="card mb-4">
+    <h3 class="text-sm font-semibold mb-3">🎯 Tier 1 — Immediate Outreach (Next 16 Days before EPBD 5/29)</h3>
+    <div id="tier1-plan" class="space-y-3"></div>
+  </div>
+  <div class="card mb-4">
+    <h3 class="text-sm font-semibold mb-3">📋 Tier 2 — Warm Pipeline (30-60 Days)</h3>
+    <div id="tier2-plan" class="space-y-3"></div>
+  </div>
+  <div class="card">
+    <h3 class="text-sm font-semibold mb-3">📊 Outreach ROI Projection</h3>
+    <canvas id="outreach-chart" height="200"></canvas>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ========== DATA ==========
+const DIMENSIONS = [
+  { key: 'reach', label: 'Market Reach', weight: 0.25, desc: 'Geographic coverage, installer network size, brand recognition in target markets' },
+  { key: 'tech', label: 'Technical Capability', weight: 0.20, desc: 'HVAC expertise, smart pump knowledge, BACS/SRI understanding, training capacity' },
+  { key: 'compliance', label: 'Compliance Readiness', weight: 0.20, desc: 'EPBD/BACS/SRI awareness, certification support, regulatory expertise' },
+  { key: 'compFit', label: 'Competitive Fit', weight: 0.20, desc: 'Gap in current portfolio (no Grundfos/Wilo exclusivity), price tier alignment, OEM openness' },
+  { key: 'engage', label: 'Engagement Willingness', weight: 0.15, desc: 'OEM/ODM experience, Chinese manufacturer openness, response likelihood, partnership history' }
+];
+
+const PROSPECTS = [
+  {
+    name: 'Linum Europe', country: 'NL', type: 'Wholesaler',
+    reach: 8, tech: 7, compliance: 7, compFit: 8, engage: 8,
+    notes: 'Specialized HVAC/refrigeration/HP wholesaler. Components focus. Local NL stock. Ideal entry point for Benelux.'
+  },
+  {
+    name: 'CAIROX Netherlands', country: 'NL', type: 'Distributor',
+    reach: 7, tech: 8, compliance: 7, compFit: 7, engage: 7,
+    notes: 'Leading NL HVAC supplier. Ventilation + heating + heat pumps. Professional installer network. Local stock.'
+  },
+  {
+    name: 'VTP Group', country: 'NL', type: 'Wholesaler',
+    reach: 8, tech: 7, compliance: 6, compFit: 7, engage: 6,
+    notes: 'Major NL HVAC wholesaler. Multi-brand. Strong installer relationships. May carry Grundfos/Wilo already.'
+  },
+  {
+    name: 'Sanicare', country: 'BE', type: 'Distributor',
+    reach: 7, tech: 7, compliance: 7, compFit: 8, engage: 7,
+    notes: 'BE/NL HVAC distributor. Growing heat pump segment. BACS-relevant market. Moderate exclusivity constraints.'
+  },
+  {
+    name: 'Solarc / Solar Focus DE', country: 'DE', type: 'Distributor',
+    reach: 6, tech: 7, compliance: 8, compFit: 7, engage: 6,
+    notes: 'DE renewable energy distributor. Strong BACS compliance awareness. GEG §71a expertise. DE market is critical.'
+  },
+  {
+    name: 'Reichel + Marchi', country: 'DE', type: 'Wholesaler',
+    reach: 7, tech: 8, compliance: 8, compFit: 6, engage: 5,
+    notes: 'DE HVAC wholesaler. Technical depth strong. Likely carries Grundfos. High compliance knowledge. Harder to convert.'
+  },
+  {
+    name: 'Rausch + Co', country: 'DE', type: 'Distributor',
+    reach: 6, tech: 7, compliance: 7, compFit: 7, engage: 7,
+    notes: 'DE mid-size HVAC distributor. Open to new brands. Good technical team. Reasonable entry barrier.'
+  },
+  {
+    name: 'Heating & Plumbing Wholesale (UK→EU)', country: 'DE', type: 'Wholesaler',
+    reach: 5, tech: 6, compliance: 6, compFit: 8, engage: 8,
+    notes: 'Growing EU presence. Low exclusivity conflicts. Open to OEM partnerships. Lower brand recognition = more flexible.'
+  },
+  {
+    name: 'Aurelius Group (AT)', country: 'AT', type: 'Distributor',
+    reach: 5, tech: 6, compliance: 7, compFit: 7, engage: 7,
+    notes: 'AT HVAC distributor. Market shrank -30% in Q1 2026 (subsidy gap) → recovery play. BACS knowledge growing.'
+  },
+  {
+    name: 'Technochem (AT)', country: 'AT', type: 'Wholesaler',
+    reach: 5, tech: 7, compliance: 6, compFit: 7, engage: 6,
+    notes: 'AT technical wholesaler. Water treatment + HVAC. Moderate reach. Good for niche positioning.'
+  },
+  {
+    name: 'Cedeplus (FR)', country: 'FR', type: 'Distributor',
+    reach: 7, tech: 6, compliance: 6, compFit: 7, engage: 7,
+    notes: 'FR HVAC distributor. France +34% HP growth Q1 2026. Good market momentum. Moderate technical depth.'
+  },
+  {
+    name: 'Atlantic Group (FR)', country: 'FR', type: 'Manufacturer+Distributor',
+    reach: 9, tech: 9, compliance: 8, compFit: 3, engage: 3,
+    notes: 'Major FR heat pump manufacturer. Direct competitor risk. Very high reach/tech but lowest fit. Watch only.'
+  },
+  {
+    name: 'Polskie Pompy (PL)', country: 'PL', type: 'Distributor',
+    reach: 5, tech: 5, compliance: 5, compFit: 8, engage: 8,
+    notes: 'PL pump distributor. Poland +20% HP growth. Low compliance awareness = education opportunity. High openness.'
+  },
+  {
+    name: 'Termo-Technik (PL)', country: 'PL', type: 'Wholesaler',
+    reach: 6, tech: 6, compliance: 5, compFit: 8, engage: 7,
+    notes: 'PL HVAC wholesaler. Growing market. Cost-sensitive = good price fit for Hero Pump. Moderate tech capability.'
+  },
+  {
+    name: 'IDM Energy (IT)', country: 'IT', type: 'Distributor',
+    reach: 5, tech: 6, compliance: 6, compFit: 7, engage: 7,
+    notes: 'IT renewable energy distributor. Italy stable HP market. Moderate reach. Good compliance trajectory.'
+  }
+];
+
+// ========== SCORING ==========
+function calcScore(p) {
+  return DIMENSIONS.reduce((sum, d) => sum + p[d.key] * d.weight * 10, 0);
+}
+
+function getTier(score) {
+  if (score >= 72) return 'Tier 1';
+  if (score >= 60) return 'Tier 2';
+  if (score >= 48) return 'Tier 3';
+  return 'Tier 4';
+}
+
+function tierBadge(tier) {
+  const cls = tier === 'Tier 1' ? 'badge-tier1' : tier === 'Tier 2' ? 'badge-tier2' : tier === 'Tier 3' ? 'badge-tier3' : 'badge-tier4';
+  return `<span class="badge ${cls}">${tier}</span>`;
+}
+
+function scoreColor(score) {
+  if (score >= 72) return 'var(--green)';
+  if (score >= 60) return 'var(--primary)';
+  if (score >= 48) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function scoreBar(score) {
+  const pct = score;
+  const color = scoreColor(score);
+  return `<div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+}
+
+const COUNTRY_MAP = { DE: '🇩🇪', NL: '🇳🇱', AT: '🇦🇹', FR: '🇫🇷', BE: '🇧🇪', IT: '🇮🇹', PL: '🇵🇱' };
+
+// ========== INIT ==========
+PROSPECTS.forEach(p => { p.score = calcScore(p); p.tier = getTier(p.score); });
+PROSPECTS.sort((a, b) => b.score - a.score);
+
+const tierCounts = { 'Tier 1': 0, 'Tier 2': 0, 'Tier 3': 0, 'Tier 4': 0 };
+PROSPECTS.forEach(p => tierCounts[p.tier]++);
+const avgScore = (PROSPECTS.reduce((s, p) => s + p.score, 0) / PROSPECTS.length).toFixed(1);
+
+document.getElementById('kpi-prospects').textContent = PROSPECTS.length;
+document.getElementById('kpi-tier1').textContent = tierCounts['Tier 1'];
+document.getElementById('kpi-avg').textContent = avgScore;
+
+// ========== TABS ==========
+const TABS = [
+  { id: 'overview', label: '📊 Overview' },
+  { id: 'prospect', label: '📋 Prospects' },
+  { id: 'calculator', label: '🧮 Calculator' },
+  { id: 'comparison', label: '📈 Comparison' },
+  { id: 'outreach', label: '🎯 Outreach Plan' }
+];
+
+const tabsNav = document.getElementById('tabs');
+TABS.forEach((t, i) => {
+  const btn = document.createElement('button');
+  btn.className = `tab-btn${i === 0 ? ' active' : ''}`;
+  btn.textContent = t.label;
+  btn.onclick = () => switchTab(t.id);
+  tabsNav.appendChild(btn);
+});
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', TABS[i].id === id));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${id}`));
+  if (id === 'comparison') renderComparison();
+  if (id === 'outreach') renderOutreach();
+}
+
+// ========== WEIGHTS LIST ==========
+const weightsList = document.getElementById('weights-list');
+DIMENSIONS.forEach(d => {
+  weightsList.innerHTML += `<div class="flex items-center gap-3 mb-2">
+    <div class="w-32 text-xs font-medium">${d.label}</div>
+    <div class="flex-1">${scoreBar(d.weight * 100)}</div>
+    <div class="w-10 text-xs text-right font-mono">${(d.weight * 100).toFixed(0)}%</div>
+    <div class="tooltip text-[var(--text-dim)] cursor-help" data-tip="${d.desc}">ℹ️</div>
+  </div>`;
+});
+
+// ========== PROSPECT TABLE ==========
+function renderProspects(list) {
+  const tbody = document.getElementById('prospect-tbody');
+  tbody.innerHTML = list.map((p, i) => `<tr class="prospect-row border-b border-[var(--border)]">
+    <td class="py-2 px-3 text-[var(--text-dim)]">${i + 1}</td>
+    <td class="py-2 px-3 font-medium">${p.name}</td>
+    <td class="py-2 px-3"><span class="country-flag">${COUNTRY_MAP[p.country] || ''}</span> ${p.country}</td>
+    <td class="py-2 px-3 text-xs text-[var(--text-dim)]">${p.type}</td>
+    <td class="py-2 px-3 text-center font-bold" style="color:${scoreColor(p.score)}">${p.score.toFixed(1)}</td>
+    <td class="py-2 px-3 text-center">${tierBadge(p.tier)}</td>
+    <td class="py-2 px-3 text-center">${scoreBar(p.reach * 10)}</td>
+    <td class="py-2 px-3 text-center">${scoreBar(p.tech * 10)}</td>
+    <td class="py-2 px-3 text-center">${scoreBar(p.compliance * 10)}</td>
+    <td class="py-2 px-3 text-center">${scoreBar(p.compFit * 10)}</td>
+    <td class="py-2 px-3 text-center">${scoreBar(p.engage * 10)}</td>
+    <td class="py-2 px-3 text-xs text-[var(--text-dim)] max-w-[200px] truncate tooltip" data-tip="${p.notes}">${p.notes.substring(0, 40)}...</td>
+  </tr>`).join('');
+}
+
+function filterProspects() {
+  const search = document.getElementById('search-prospect').value.toLowerCase();
+  const tier = document.getElementById('filter-tier').value;
+  let filtered = PROSPECTS.filter(p => {
+    if (tier !== 'all' && p.tier !== tier) return false;
+    if (search && !p.name.toLowerCase().includes(search) && !p.country.toLowerCase().includes(search) && !p.notes.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  renderProspects(filtered);
+}
+
+renderProspects(PROSPECTS);
+
+// ========== TIER CHART ==========
+new Chart(document.getElementById('tier-chart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Tier 1 (Priority)', 'Tier 2 (Warm)', 'Tier 3 (Monitor)', 'Tier 4 (Watch)'],
+    datasets: [{ data: [tierCounts['Tier 1'], tierCounts['Tier 2'], tierCounts['Tier 3'], tierCounts['Tier 4']],
+      backgroundColor: ['#34d399', '#6366f1', '#fbbf24', '#f87171'], borderColor: '#1a1d27', borderWidth: 2 }]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } } } }
+});
+
+// ========== CALCULATOR ==========
+const calcInputs = document.getElementById('calculator-inputs');
+DIMENSIONS.forEach(d => {
+  calcInputs.innerHTML += `<div class="mb-4">
+    <div class="flex justify-between text-xs mb-1">
+      <span class="font-medium">${d.label} <span class="text-[var(--text-dim)]">(${(d.weight * 100).toFixed(0)}%)</span></span>
+      <span id="calc-val-${d.key}" class="font-mono">5</span>
+    </div>
+    <input type="range" min="0" max="10" value="5" step="1" data-key="${d.key}" oninput="updateCalc()">
+  </div>`;
+});
+
+let calcRadarChart = null;
+
+function updateCalc() {
+  const vals = {};
+  document.querySelectorAll('#calculator-inputs input[type="range"]').forEach(slider => {
+    const key = slider.dataset.key;
+    vals[key] = parseInt(slider.value);
+    document.getElementById(`calc-val-${key}`).textContent = vals[key];
+  });
+  const total = DIMENSIONS.reduce((sum, d) => sum + vals[d.key] * d.weight * 10, 0);
+  const tier = getTier(total);
+  document.getElementById('calc-total').textContent = total.toFixed(1);
+  document.getElementById('calc-total').style.color = scoreColor(total);
+  document.getElementById('calc-tier-label').innerHTML = tierBadge(tier);
+
+  if (calcRadarChart) calcRadarChart.destroy();
+  calcRadarChart = new Chart(document.getElementById('calc-radar'), {
+    type: 'radar',
+    data: {
+      labels: DIMENSIONS.map(d => d.label),
+      datasets: [{ label: 'Custom Prospect', data: DIMENSIONS.map(d => vals[d.key]),
+        backgroundColor: 'rgba(99,102,241,0.15)', borderColor: '#6366f1', pointBackgroundColor: '#6366f1', borderWidth: 2 }]
+    },
+    options: { responsive: true, scales: { r: { min: 0, max: 10, ticks: { color: '#94a3b8', stepSize: 2 }, grid: { color: '#2d3148' }, pointLabels: { color: '#94a3b8', font: { size: 10 } } } },
+      plugins: { legend: { display: false } } }
+  });
+}
+
+function addCustomProspect() {
+  const vals = {};
+  document.querySelectorAll('#calculator-inputs input[type="range"]').forEach(slider => {
+    vals[slider.dataset.key] = parseInt(slider.value);
+  });
+  const name = prompt('Enter distributor name:') || 'Custom Prospect';
+  const country = prompt('Country code (DE/NL/AT/FR/BE/IT/PL):') || 'DE';
+  const p = { name, country: country.toUpperCase(), type: 'Custom', ...vals, score: calcScore({ ...vals }), notes: 'Custom-added via calculator' };
+  p.tier = getTier(p.score);
+  PROSPECTS.push(p);
+  PROSPECTS.sort((a, b) => b.score - a.score);
+  renderProspects(PROSPECTS);
+  document.getElementById('kpi-prospects').textContent = PROSPECTS.length;
+  alert(`Added "${name}" (Score: ${p.score.toFixed(1)}, ${p.tier})`);
+}
+
+updateCalc();
+
+// ========== COMPARISON ==========
+let comparisonRendered = false;
+function renderComparison() {
+  if (comparisonRendered) return;
+  comparisonRendered = true;
+
+  const tier12 = PROSPECTS.filter(p => p.tier === 'Tier 1' || p.tier === 'Tier 2').slice(0, 8);
+  const colors = ['#6366f1', '#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c', '#94a3b8'];
+
+  new Chart(document.getElementById('comparison-radar'), {
+    type: 'radar',
+    data: {
+      labels: DIMENSIONS.map(d => d.label),
+      datasets: tier12.map((p, i) => ({
+        label: p.name,
+        data: DIMENSIONS.map(d => p[d.key]),
+        backgroundColor: colors[i] + '15',
+        borderColor: colors[i],
+        borderWidth: 1.5,
+        pointRadius: 2
+      }))
+    },
+    options: { responsive: true, scales: { r: { min: 0, max: 10, ticks: { color: '#94a3b8', stepSize: 2 }, grid: { color: '#2d3148' }, pointLabels: { color: '#94a3b8' } } },
+      plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 12 } } } }
+  });
+
+  // Dimension bar chart
+  const dimAvgs = DIMENSIONS.map(d => {
+    const vals = PROSPECTS.map(p => p[d.key]);
+    return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
+  });
+  new Chart(document.getElementById('dim-bar'), {
+    type: 'bar',
+    data: {
+      labels: DIMENSIONS.map(d => d.label),
+      datasets: [{ label: 'Avg Score', data: dimAvgs, backgroundColor: ['#6366f1', '#22d3ee', '#34d399', '#fbbf24', '#a78bfa'], borderRadius: 6 }]
+    },
+    options: { responsive: true, scales: { y: { min: 0, max: 10, ticks: { color: '#94a3b8' }, grid: { color: '#2d3148' } }, x: { ticks: { color: '#94a3b8', font: { size: 9 } } } },
+      plugins: { legend: { display: false } } }
+  });
+
+  // Heatmap
+  const countries = ['DE', 'NL', 'AT', 'FR', 'BE', 'IT', 'PL'];
+  const heatmap = document.getElementById('heatmap');
+  countries.forEach(c => {
+    const cp = PROSPECTS.filter(p => p.country === c);
+    const avg = cp.length ? (cp.reduce((s, p) => s + p.score, 0) / cp.length) : 0;
+    const intensity = avg / 100;
+    heatmap.innerHTML += `<div class="rounded p-1.5 text-center" style="background:rgba(99,102,241,${intensity});border:1px solid var(--border)">
+      <div class="font-bold" style="color:${scoreColor(avg)}">${avg.toFixed(0)}</div>
+      <div class="text-[var(--text-dim)]">${cp.length}</div>
+    </div>`;
+  });
+}
+
+// ========== OUTREACH PLAN ==========
+function renderOutreach() {
+  const tier1 = PROSPECTS.filter(p => p.tier === 'Tier 1');
+  const tier2 = PROSPECTS.filter(p => p.tier === 'Tier 2');
+
+  document.getElementById('tier1-plan').innerHTML = tier1.map((p, i) => `
+    <div class="border border-[var(--border)] rounded-lg p-3 animate-in" style="animation-delay:${i * 0.05}s">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-semibold">${p.name}</span>
+        <span class="text-sm" style="color:${scoreColor(p.score)}">${p.score.toFixed(1)} / 100</span>
+      </div>
+      <div class="text-xs text-[var(--text-dim)] mb-2"><span class="country-flag">${COUNTRY_MAP[p.country]}</span> ${p.country} • ${p.type}</div>
+      <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+        <div class="text-[var(--text-dim)]">Strength: ${DIMENSIONS.reduce((max, d) => p[d.key] > (p[max.key] || 0) ? d : max, DIMENSIONS[0]).label}</div>
+        <div class="text-[var(--text-dim)]">Weakness: ${DIMENSIONS.reduce((min, d) => p[d.key] < (p[min.key] || 10) ? d : min, DIMENSIONS[0]).label}</div>
+      </div>
+      <div class="text-xs text-[var(--accent)]">📧 Action: Send EPBD/BACS compliance intro email + SRI calculator demo link</div>
+    </div>`).join('');
+
+  document.getElementById('tier2-plan').innerHTML = tier2.map((p, i) => `
+    <div class="border border-[var(--border)] rounded-lg p-3 animate-in" style="animation-delay:${i * 0.05}s">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-semibold">${p.name}</span>
+        <span class="text-sm" style="color:${scoreColor(p.score)}">${p.score.toFixed(1)} / 100</span>
+      </div>
+      <div class="text-xs text-[var(--text-dim)] mb-2"><span class="country-flag">${COUNTRY_MAP[p.country]}</span> ${p.country} • ${p.type}</div>
+      <div class="text-xs text-[var(--yellow)]">📋 Action: LinkedIn connection → warm intro → compliance angle follow-up</div>
+    </div>`).join('');
+
+  // Outreach projection chart
+  new Chart(document.getElementById('outreach-chart'), {
+    type: 'bar',
+    data: {
+      labels: tier1.map(p => p.name.split(' ')[0]),
+      datasets: [
+        { label: 'Current Score', data: tier1.map(p => p.score), backgroundColor: '#6366f1', borderRadius: 4 },
+        { label: 'Projected (post-outreach)', data: tier1.map(p => Math.min(95, p.score + 8 + Math.random() * 5)), backgroundColor: '#34d399', borderRadius: 4 }
+      ]
+    },
+    options: { responsive: true, scales: { y: { min: 0, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#2d3148' } }, x: { ticks: { color: '#94a3b8', font: { size: 10 } } } },
+      plugins: { legend: { labels: { color: '#94a3b8' } } } }
+  });
+}
+
+// ========== CLOCK ==========
+function updateClock() {
+  const now = new Date();
+  const options = { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', options) + ' CST';
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>

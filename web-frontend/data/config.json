@@ -1,0 +1,8 @@
+{
+  "_encrypted": [
+    "openrouterApiKey",
+    "geminiApiKey",
+    "tavilyApiKey",
+    "emailPassword"
+  ]
+}

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Pump EU — Distributor Onboarding Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        hero: { 50:'#f0fdf4', 100:'#dcfce7', 200:'#bbf7d0', 300:'#86efac', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 700:'#15803d', 800:'#166534', 900:'#14532d' },
+        slate: { 850:'#1a2332' }
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .tab-btn { transition: all 0.2s; }
+  .tab-btn.active { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+  .card-hover { transition: all 0.3s; }
+  .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(34,197,94,0.15); }
+  .progress-ring { transform: rotate(-90deg); }
+  .checklist-item input:checked + label { text-decoration: line-through; opacity: 0.6; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #1e293b; }
+  ::-webkit-scrollbar-thumb { background: #4ade80; border-radius: 3px; }
+  .fade-in { animation: fadeIn 0.3s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .pulse-dot { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+<!-- Header -->
+<header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center font-bold text-lg text-gray-900">HP</div>
+      <div>
+        <h1 class="text-lg font-bold">Hero Pump EU</h1>
+        <p class="text-xs text-gray-400">Distributor Onboarding Portal</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <span class="text-gray-400">Partner:</span>
+      <select id="partnerTier" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm">
+        <option value="silver">🥈 Silver Partner</option>
+        <option value="gold" selected>🥇 Gold Partner</option>
+        <option value="platinum">💎 Platinum Partner</option>
+      </select>
+      <span id="onboardDay" class="text-green-400 font-mono text-xs">Day 1</span>
+    </div>
+  </div>
+</header>
+
+<!-- Tab Navigation -->
+<nav class="bg-gray-900 border-b border-gray-800 overflow-x-auto">
+  <div class="max-w-7xl mx-auto px-4 flex gap-1 py-2" id="tabNav">
+    <button class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-tab="welcome">🏠 Welcome</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="onboarding">📋 30-60-90 Plan</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="products">📦 Products</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="training">🎓 Training</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="sales">💼 Sales Toolkit</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="competitive">⚔️ Competitive</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="compliance">📜 Compliance</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="marketing">📣 Marketing</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="deal">🤝 Deal Reg</button>
+    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-800" data-tab="calculator">🧮 Calculator</button>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+  <!-- TAB 1: Welcome Dashboard -->
+  <div id="tab-welcome" class="tab-content fade-in">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold mb-1">Welcome to Hero Pump Partner Program 🎉</h2>
+      <p class="text-gray-400">Your one-stop portal for everything you need to sell, support, and grow with Hero Pump smart circulator pumps in the EU market.</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl font-bold text-green-400">12</div>
+        <div class="text-sm text-gray-400 mt-1">Product Models</div>
+        <div class="text-xs text-gray-500 mt-1">5–52W PMSM Smart</div>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl font-bold text-green-400">€38</div>
+        <div class="text-sm text-gray-400 mt-1">Gold Unit Price</div>
+        <div class="text-xs text-gray-500 mt-1">27% distributor margin</div>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl font-bold text-green-400">≤0.16</div>
+        <div class="text-sm text-gray-400 mt-1">Target EEI</div>
+        <div class="text-xs text-gray-500 mt-1">vs ErP threshold 0.23</div>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl font-bold text-green-400">45-65%</div>
+        <div class="text-sm text-gray-400 mt-1">Price Advantage</div>
+        <div class="text-xs text-gray-500 mt-1">vs Grundfos/Wilo retail</div>
+      </div>
+    </div>
+
+    <!-- Tier Benefits -->
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-700 card-hover" id="tier-silver">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl">🥈</span>
+          <h3 class="font-bold">Silver Partner</h3>
+        </div>
+        <div class="text-2xl font-bold text-gray-300 mb-2">€42 <span class="text-sm font-normal text-gray-500">/unit</span></div>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>✅ MOQ: 100 units initial / 50 restock</li>
+          <li>✅ Product catalog & spec sheets</li>
+          <li>✅ Basic technical training (online)</li>
+          <li>✅ Co-op marketing fund: 2%</li>
+          <li>❌ Dedicated account manager</li>
+          <li>❌ Priority deal registration</li>
+        </ul>
+        <div class="mt-3 text-xs text-gray-500">Est. margin: €23/unit @ €65 retail</div>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-5 border-2 border-green-500 card-hover relative" id="tier-gold">
+        <div class="absolute -top-2 -right-2 bg-green-500 text-xs px-2 py-0.5 rounded-full font-bold">SELECTED</div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl">🥇</span>
+          <h3 class="font-bold">Gold Partner</h3>
+        </div>
+        <div class="text-2xl font-bold text-green-400 mb-2">€38 <span class="text-sm font-normal text-gray-500">/unit</span></div>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>✅ MOQ: 500 units initial / 50 restock</li>
+          <li>✅ Full product catalog + samples</li>
+          <li>✅ Advanced training + certification</li>
+          <li>✅ Co-op marketing fund: 3%</li>
+          <li>✅ Dedicated account manager</li>
+          <li>❌ Exclusive territory rights</li>
+        </ul>
+        <div class="mt-3 text-xs text-green-400 font-medium">Est. margin: €27/unit @ €65 retail</div>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-700 card-hover" id="tier-platinum">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl">💎</span>
+          <h3 class="font-bold">Platinum Partner</h3>
+        </div>
+        <div class="text-2xl font-bold text-yellow-400 mb-2">€34 <span class="text-sm font-normal text-gray-500">/unit</span></div>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>✅ MOQ: 1,000 initial / 100 restock</li>
+          <li>✅ Full catalog + early access to new models</li>
+          <li>✅ All training + joint marketing</li>
+          <li>✅ Co-op marketing fund: 4%</li>
+          <li>✅ Dedicated account manager</li>
+          <li>✅ Shared exclusivity (max 5 per territory)</li>
+        </ul>
+        <div class="mt-3 text-xs text-yellow-400 font-medium">Est. margin: €31/unit @ €65 retail</div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">⚡ Quick Start</h3>
+      <div class="grid md:grid-cols-4 gap-3">
+        <button onclick="switchTab('onboarding')" class="bg-gray-800 hover:bg-gray-700 rounded-lg p-3 text-left card-hover">
+          <div class="text-xl mb-1">📋</div>
+          <div class="text-sm font-medium">30-60-90 Day Plan</div>
+          <div class="text-xs text-gray-500">Your onboarding roadmap</div>
+        </button>
+        <button onclick="switchTab('products')" class="bg-gray-800 hover:bg-gray-700 rounded-lg p-3 text-left card-hover">
+          <div class="text-xl mb-1">📦</div>
+          <div class="text-sm font-medium">Product Catalog</div>
+          <div class="text-xs text-gray-500">All 12 models + specs</div>
+        </button>
+        <button onclick="switchTab('training')" class="bg-gray-800 hover:bg-gray-700 rounded-lg p-3 text-left card-hover">
+          <div class="text-xl mb-1">🎓</div>
+          <div class="text-sm font-medium">Training Hub</div>
+          <div class="text-xs text-gray-500">Technical + sales courses</div>
+        </button>
+        <button onclick="switchTab('sales')" class="bg-gray-800 hover:bg-gray-700 rounded-lg p-3 text-left card-hover">
+          <div class="text-xl mb-1">💼</div>
+          <div class="text-sm font-medium">Sales Toolkit</div>
+          <div class="text-xs text-gray-500">Battle cards, pitch scripts</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Market Context -->
+    <div class="mt-6 bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">🌍 EU Market Context</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <div class="text-sm text-gray-400 mb-1">EU Circulator Pump Market</div>
+          <div class="text-lg font-bold">$5.57B (2024) → $6.94B (2031)</div>
+          <div class="text-xs text-gray-500">CAGR 2.5% — heat pump attach rate: 9.2%</div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-400 mb-1">EU Heat Pump Market</div>
+          <div class="text-lg font-bold">$22.5B → $41.7B (2032)</div>
+          <div class="text-xs text-gray-500">Q1 2026: 575K units ↑17% (11 countries)</div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-400 mb-1">EPBD Transposition Deadline</div>
+          <div class="text-lg font-bold text-red-400" id="epbdCountdown">15 days</div>
+          <div class="text-xs text-gray-500">May 29, 2026 — BACS compliance mandatory</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: 30-60-90 Day Onboarding Plan -->
+  <div id="tab-onboarding" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">📋 30-60-90 Day Onboarding Plan</h2>
+    <p class="text-gray-400 mb-4">Structured roadmap to your first Hero Pump sale. Based on channel best practices: if you haven't closed a deal in 90 days, the partnership is at risk.</p>
+
+    <!-- Progress Bar -->
+    <div class="bg-gray-900 rounded-xl p-4 mb-6 border border-gray-800">
+      <div class="flex justify-between text-sm mb-2">
+        <span class="font-medium">Overall Progress</span>
+        <span id="onboardingProgress" class="text-green-400 font-bold">0%</span>
+      </div>
+      <div class="w-full bg-gray-800 rounded-full h-3">
+        <div id="onboardingBar" class="bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Day 1-30: Enablement -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-bold">1</div>
+        <div>
+          <h3 class="font-bold text-lg">Days 1–30: Enablement & Foundation</h3>
+          <p class="text-sm text-gray-400">Learn the product, set up systems, complete certification</p>
+        </div>
+      </div>
+      <div class="space-y-2" id="phase1-checklist">
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-1" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-1" class="text-sm cursor-pointer">Sign Partnership Agreement + VBER compliance acknowledgment</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-2" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-2" class="text-sm cursor-pointer">Portal access granted (pricing, docs, marketing assets)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-3" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-3" class="text-sm cursor-pointer">Complete Hero Pump 101 online course (product overview, 45 min)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-4" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-4" class="text-sm cursor-pointer">Complete ErP/EEI compliance course (regulatory essentials, 30 min)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-5" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-5" class="text-sm cursor-pointer">Complete Modbus RTU / Smart features course (30 min)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-6" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-6" class="text-sm cursor-pointer">Receive sample units for hands-on evaluation (Gold+)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-7" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-7" class="text-sm cursor-pointer">Sales team briefing: ICP, pricing logic, competitive positioning (1 hr)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-8" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-8" class="text-sm cursor-pointer">Download marketing kit (logos, product images, spec sheets, ROI calculator)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-9" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-9" class="text-sm cursor-pointer">Set up deal registration workflow in portal</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p1-10" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p1-10" class="text-sm cursor-pointer">First check-in call with dedicated account manager</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 31-60: Co-Sell Activation -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center font-bold">2</div>
+        <div>
+          <h3 class="font-bold text-lg">Days 31–60: Co-Sell Activation</h3>
+          <p class="text-sm text-gray-400">Start selling with support, register first deals, joint customer visits</p>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p2-1" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p2-1" class="text-sm cursor-pointer">Place first order (meet MOQ for your tier)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p2-2" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p2-2" class="text-sm cursor-pointer">Register 3+ opportunities in deal registration system</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p2-3" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p2-3" class="text-sm cursor-pointer">Joint customer visit with Hero Pump technical specialist</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p2-4" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p2-4" class="text-sm cursor-pointer">Deploy marketing materials on website / showroom</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p2-5" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p2-5" class="text-sm cursor-pointer">Complete installer certification (for distribution partners with installer network)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p2-6" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p2-6" class="text-sm cursor-pointer">Close first deal → celebrate! 🎉</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 61-90: Autonomous Execution -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center font-bold">3</div>
+        <div>
+          <h3 class="font-bold text-lg">Days 61–90: Autonomous Execution</h3>
+          <p class="text-sm text-gray-400">Independently sell Hero Pump, scale pipeline, plan QBR</p>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p3-1" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p3-1" class="text-sm cursor-pointer">Maintain 5+ active opportunities in pipeline</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p3-2" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p3-2" class="text-sm cursor-pointer">Second order placed (restock)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p3-3" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p3-3" class="text-sm cursor-pointer">Launch co-branded marketing campaign (use co-op fund)</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p3-4" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p3-4" class="text-sm cursor-pointer">First Quarterly Business Review (QBR) scheduled</label>
+        </div>
+        <div class="checklist-item flex items-start gap-2 p-2 rounded hover:bg-gray-800">
+          <input type="checkbox" id="p3-5" class="mt-1 w-4 h-4 accent-green-500" onchange="updateProgress()">
+          <label for="p3-5" class="text-sm cursor-pointer">Submit feedback on onboarding experience</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Product Catalog -->
+  <div id="tab-products" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">📦 Hero Pump Product Catalog</h2>
+    <p class="text-gray-400 mb-4">12 models across 3 series — all PMSM permanent magnet synchronous motor with smart变频 control.</p>
+
+    <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden mb-4">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-800">
+          <tr>
+            <th class="text-left p-3">Model</th>
+            <th class="text-left p-3">Power</th>
+            <th class="text-left p-3">Max Head</th>
+            <th class="text-left p-3">Max Flow</th>
+            <th class="text-left p-3">Connection</th>
+            <th class="text-left p-3">EEI (est)</th>
+            <th class="text-left p-3">Modbus</th>
+            <th class="text-left p-3">Gold Price</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800" id="productTable">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Selling Points -->
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <h4 class="font-bold text-green-400 mb-2">⚡ Energy Efficiency</h4>
+        <p class="text-sm text-gray-400">PMSM motor with variable frequency drive. Target EEI ≤0.16 — better than ErP threshold (0.23) and competitive with Grundfos ALPHA2 (0.15).</p>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <h4 class="font-bold text-green-400 mb-2">📡 Smart Connectivity</h4>
+        <p class="text-sm text-gray-400">Modbus RTU standard (Phase 1). Enables BACS compliance, SRI score improvement (D→C→B), and integration with building management systems.</p>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+        <h4 class="font-bold text-green-400 mb-2">💰 Price Advantage</h4>
+        <p class="text-sm text-gray-400">45-65% cheaper than Grundfos/Wilo at retail. Gold partner margin: €27/unit. Installer can sell at €65-80 while maintaining healthy margin.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: Training Hub -->
+  <div id="tab-training" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">🎓 Hero Pump Training Hub</h2>
+    <p class="text-gray-400 mb-4">Role-based training modules. Complete certifications to unlock partner benefits. Mirrors Grundfos Ecademy and Wilo WiAcademy.</p>
+
+    <!-- Training Tracks -->
+    <div class="grid md:grid-cols-2 gap-4 mb-6">
+      <!-- Sales Track -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl">💼</span>
+          <h3 class="font-bold">Sales Enablement Track</h3>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">Hero Pump 101: Product Overview</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">45 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">Competitive Positioning vs Grundfos/Wilo</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">30 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">ErP/EEI: What Every Sales Rep Must Know</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">30 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">BACS & SRI: Selling Compliance as a Feature</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">25 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">ROI Calculator: Show Savings in 60 Seconds</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">15 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">Objection Handling: Top 6 Customer Pushbacks</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">20 min</span>
+          </div>
+        </div>
+        <div class="mt-3 text-xs text-gray-500">Total: 2h 45min | 📜 Certification: Hero Pump Sales Certified</div>
+      </div>
+
+      <!-- Technical Track -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl">🔧</span>
+          <h3 class="font-bold">Technical Track</h3>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">PMSM Motor Technology & Variable Frequency Drive</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">40 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">Installation Guide: Step-by-Step for All 12 Models</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">60 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">Modbus RTU Integration & BMS Connection</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">45 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">Troubleshooting: Common Issues & Solutions</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">30 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">ErP/EEI Testing: Lab Procedures & Self-Verification</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">35 min</span>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-gray-800 rounded">
+            <span class="text-sm">CE Marking & Technical Documentation Requirements</span>
+            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">25 min</span>
+          </div>
+        </div>
+        <div class="mt-3 text-xs text-gray-500">Total: 3h 55min | 📜 Certification: Hero Pump Tech Certified</div>
+      </div>
+    </div>
+
+    <!-- Competitor Training Comparison -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">📊 Training Program Comparison</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-800">
+            <tr>
+              <th class="text-left p-2">Feature</th>
+              <th class="text-left p-2">Hero Pump</th>
+              <th class="text-left p-2">Grundfos Ecademy</th>
+              <th class="text-left p-2">Wilo WiAcademy</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800">
+            <tr><td class="p-2">Online courses</td><td class="p-2 text-green-400">✅ 12 modules</td><td class="p-2">✅ Extensive</td><td class="p-2">✅ Extensive</td></tr>
+            <tr><td class="p-2">Certification</td><td class="p-2 text-green-400">✅ 2 tracks</td><td class="p-2">✅ Yes</td><td class="p-2">✅ Yes</td></tr>
+            <tr><td class="p-2">Hands-on lab</td><td class="p-2 text-yellow-400">⚠️ Partner-hosted</td><td class="p-2">✅ GTI centers</td><td class="p-2">✅ WiAcademy labs</td></tr>
+            <tr><td class="p-2">Installer loyalty</td><td class="p-2 text-green-400">✅ Hero Rewards</td><td class="p-2">❌ None</td><td class="p-2">✅ WiloXperts (UK)</td></tr>
+            <tr><td class="p-2">BACS/SRI training</td><td class="p-2 text-green-400">✅ Dedicated course</td><td class="p-2">⚠️ Implicit</td><td class="p-2">⚠️ Implicit</td></tr>
+            <tr><td class="p-2">Modbus training</td><td class="p-2 text-green-400">✅ Dedicated course</td><td class="p-2">⚠️ CIM module</td><td class="p-2">⚠️ CIF module</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-gray-500 mt-3">💡 Differentiator: Hero Pump offers dedicated BACS/SRI and Modbus courses — no competitor does. Plus installer loyalty program (zero Chinese brand has this).</p>
+    </div>
+  </div>
+
+  <!-- TAB 5: Sales Toolkit -->
+  <div id="tab-sales" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">💼 Sales Toolkit</h2>
+    <p class="text-gray-400 mb-4">Everything your sales team needs to close Hero Pump deals.</p>
+
+    <!-- Pitch Script -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-4">
+      <h3 class="font-bold mb-3">🎯 60-Second Elevator Pitch</h3>
+      <div class="bg-gray-800 rounded-lg p-4 text-sm space-y-2">
+        <p class="text-gray-300"><strong>"Hero Pump makes smart, energy-efficient circulator pumps that are 45-65% cheaper than Grundfos and Wilo — with the same or better performance."</strong></p>
+        <p class="text-gray-400">Our PMSM permanent magnet motors with variable frequency control achieve an estimated EEI of ≤0.16, beating the ErP threshold of 0.23 and matching Grundfos ALPHA2. And with standard Modbus RTU connectivity, your building gets BACS compliance and improves its SRI score from day one.</p>
+        <p class="text-gray-400">We're CE certified, EPBD-ready, and priced at €38 for Gold partners (vs. €200-280 for Grundfos ALPHA2 GO at retail). That's €27 margin per unit for you.</p>
+        <p class="text-green-400 font-medium">Want to see the numbers for your specific application?</p>
+      </div>
+    </div>
+
+    <!-- Objection Handling -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-4">
+      <h3 class="font-bold mb-3">🛡️ Objection Handling Scripts</h3>
+      <div class="space-y-3">
+        <div class="p-3 bg-gray-800 rounded-lg">
+          <div class="text-red-400 text-sm font-medium">❌ "We already use Grundfos — why switch?"</div>
+          <div class="text-sm text-gray-300 mt-1">✅ "Grundfos is excellent — and we're not asking you to replace everything. Hero Pump is designed as a cost-effective alternative for standard residential applications where the performance delta is minimal but the savings are 45-65%. Keep Grundfos for premium projects, use Hero Pump for volume. Both in your catalog."</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded-lg">
+          <div class="text-red-400 text-sm font-medium">❌ "Chinese quality concerns?"</div>
+          <div class="text-sm text-gray-300 mt-1">✅ "Hero Pump uses PMSM technology with Class A energy efficiency, CE self-certified (LVD/EMC/RoHS), and we're completing ErP testing at DTI Denmark — the same EU reference lab that tests Grundfos. The factory is EDWIN Electric, an established OEM with 12 models already selling in Europe. Plus, our Gold partnership includes sample evaluation before any commitment."</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded-lg">
+          <div class="text-red-400 text-sm font-medium">❌ "BACS compliance deadline is too close"</div>
+          <div class="text-sm text-gray-300 mt-1">✅ "That's exactly why Hero Pump is timely. Our standard Modbus RTU connectivity means every unit is BACS-ready out of the box. No add-on modules, no extra cost. Grundfos charges €100-200 for their CIM 200 module. We include it. And we have a dedicated SRI calculator to show building owners exactly how Hero Pump improves their score."</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded-lg">
+          <div class="text-red-400 text-sm font-medium">❌ "What about warranty and after-sales support?"</div>
+          <div class="text-sm text-gray-300 mt-1">✅ "We offer [2-year] warranty with EU-based AR (Authorized Representative) for regulatory compliance. Our technical training certifies your team to handle first-line support, and we provide direct engineering escalation. We're building this partnership for the long term — 3-phase GTM plan through 2028."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discovery Questions -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">🔍 Discovery Questions for Installers</h3>
+      <div class="grid md:grid-cols-2 gap-2 text-sm">
+        <div class="p-2 bg-gray-800 rounded">1. What brand of circulator pumps do you currently install most?</div>
+        <div class="p-2 bg-gray-800 rounded">2. How often do customers ask about energy savings?</div>
+        <div class="p-2 bg-gray-800 rounded">3. Are you seeing BACS compliance requirements in commercial projects?</div>
+        <div class="p-2 bg-gray-800 rounded">4. Would Modbus connectivity help you offer smarter installations?</div>
+        <div class="p-2 bg-gray-800 rounded">5. What's your biggest pain point with current pump suppliers?</div>
+        <div class="p-2 bg-gray-800 rounded">6. Would a loyalty program (points per pump) influence your choice?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: Competitive Intelligence -->
+  <div id="tab-competitive" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">⚔️ Competitive Intelligence</h2>
+    <p class="text-gray-400 mb-4">Know your competition. Hero Pump vs Grundfos vs Wilo vs EDWIN.</p>
+
+    <div class="overflow-x-auto bg-gray-900 rounded-xl border border-gray-800 mb-6">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-800">
+          <tr>
+            <th class="text-left p-3">Feature</th>
+            <th class="text-left p-3 text-green-400">Hero Pump</th>
+            <th class="text-left p-3">Grundfos ALPHA2 GO</th>
+            <th class="text-left p-3">Wilo Yonos PICO+</th>
+            <th class="text-left p-3">EDWIN HRS-EA</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800">
+          <tr><td class="p-3">Motor Type</td><td class="p-3 text-green-400">PMSM + VFD</td><td class="p-3">PMSM + VFD</td><td class="p-3">PMSM + VFD</td><td class="p-3">PMSM + VFD</td></tr>
+          <tr><td class="p-3">Power Range</td><td class="p-3 text-green-400">5-52W</td><td class="p-3">3-45W</td><td class="p-3">3-40W</td><td class="p-3">5-47W</td></tr>
+          <tr><td class="p-3">EEI (est)</td><td class="p-3 text-green-400">≤0.16</td><td class="p-3">0.15</td><td class="p-3">0.16</td><td class="p-3">~0.18</td></tr>
+          <tr><td class="p-3">Modbus RTU</td><td class="p-3 text-green-400">✅ Standard</td><td class="p-3">❌ Add-on (CIM 200)</td><td class="p-3">❌ Add-on (CIF)</td><td class="p-3">❌ None</td></tr>
+          <tr><td class="p-3">BACS Ready</td><td class="p-3 text-green-400">✅ Built-in</td><td class="p-3">⚠️ Extra module</td><td class="p-3">⚠️ Extra module</td><td class="p-3">❌ No</td></tr>
+          <tr><td class="p-3">AutoAdapt</td><td class="p-3 text-green-400">✅</td><td class="p-3">✅ (award-winning)</td><td class="p-3">✅</td><td class="p-3">✅ (+Night Mode)</td></tr>
+          <tr><td class="p-3">Partner Price</td><td class="p-3 text-green-400 font-bold">€38 (Gold)</td><td class="p-3">~€150-200</td><td class="p-3">~€120-170</td><td class="p-3">~€30 (OEM)</td></tr>
+          <tr><td class="p-3">Retail Price</td><td class="p-3 text-green-400">€65-80</td><td class="p-3">€200-280</td><td class="p-3">€155-219</td><td class="p-3">€45-60</td></tr>
+          <tr><td class="p-3">Installer Program</td><td class="p-3 text-green-400">✅ Hero Rewards</td><td class="p-3">❌ None</td><td class="p-3">✅ WiloXperts (UK)</td><td class="p-3">❌ None</td></tr>
+          <tr><td class="p-3">Training</td><td class="p-3 text-green-400">✅ BACS/SRI dedicated</td><td class="p-3">✅ Ecademy</td><td class="p-3">✅ WiAcademy</td><td class="p-3">❌ None</td></tr>
+          <tr><td class="p-3">German Design Award</td><td class="p-3">❌</td><td class="p-3">✅ 2026</td><td class="p-3">❌</td><td class="p-3">❌</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Differentiators -->
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="bg-gray-900 rounded-xl p-5 border border-green-500/30">
+        <h4 class="font-bold text-green-400 mb-2">✅ Our Advantages</h4>
+        <ul class="text-sm text-gray-300 space-y-1">
+          <li>• <strong>Price:</strong> 45-65% cheaper at retail vs Grundfos/Wilo</li>
+          <li>• <strong>Modbus built-in:</strong> No €100-200 add-on module needed</li>
+          <li>• <strong>BACS/SRI native:</strong> Only pump with dedicated compliance training</li>
+          <li>• <strong>Installer loyalty:</strong> Zero competitor in China brand space</li>
+          <li>• <strong>Distributor margin:</strong> €27/unit at Gold tier</li>
+        </ul>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-5 border border-yellow-500/30">
+        <h4 class="font-bold text-yellow-400 mb-2">⚠️ Where We're Behind</h4>
+        <ul class="text-sm text-gray-300 space-y-1">
+          <li>• <strong>Brand recognition:</strong> Grundfos = default choice in EU</li>
+          <li>• <strong>Training infrastructure:</strong> Ecademy has 150K+ trained installers</li>
+          <li>• <strong>Design awards:</strong> ALPHA GO won German Design Award 2026</li>
+          <li>• <strong>EEI proven:</strong> Grundfos 0.15 is tested; ours is estimated</li>
+          <li>• <strong>Service network:</strong> Grundfos/Wilo have EU-wide service centers</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 7: Compliance Corner -->
+  <div id="tab-compliance" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">📜 Compliance Quick Reference</h2>
+    <p class="text-gray-400 mb-4">Every regulation your customers ask about — answered.</p>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-6">
+      <!-- ErP Directive -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-3 h-3 bg-green-400 rounded-full pulse-dot"></span>
+          <h3 class="font-bold">ErP 641/2009</h3>
+        </div>
+        <div class="text-sm text-gray-400 space-y-1">
+          <p><strong class="text-gray-200">Requirement:</strong> EEI ≤ 0.23 for all circulator pumps</p>
+          <p><strong class="text-gray-200">Hero Pump:</strong> Estimated EEI ≤0.16 (testing in progress)</p>
+          <p><strong class="text-gray-200">Test Standard:</strong> EN 16297-1/2/3:2012</p>
+          <p><strong class="text-gray-200">Status:</strong> 🟢 Compliant (estimated), formal test pending</p>
+          <p class="text-xs text-gray-500 mt-2">Testing strategy: Domestic pre-test (¥15-40K) → EU formal test at DTI Denmark (€3-8K/model)</p>
+        </div>
+      </div>
+
+      <!-- BACS Directive -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-3 h-3 bg-green-400 rounded-full pulse-dot"></span>
+          <h3 class="font-bold">BACS Directive</h3>
+        </div>
+        <div class="text-sm text-gray-400 space-y-1">
+          <p><strong class="text-gray-200">Requirement:</strong> Building Automation & Control for HVAC >290kW (now) / >70kW (2030)</p>
+          <p><strong class="text-gray-200">Hero Pump:</strong> Modbus RTU standard → BACS Class B compliant</p>
+          <p><strong class="text-gray-200">Competitor Gap:</strong> Grundfos/Wilo require €100-200 add-on module</p>
+          <p><strong class="text-gray-200">Status:</strong> 🟢 Compliant out of the box</p>
+        </div>
+      </div>
+
+      <!-- EPBD -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-3 h-3 bg-red-400 rounded-full pulse-dot"></span>
+          <h3 class="font-bold">EPBD Recast</h3>
+        </div>
+        <div class="text-sm text-gray-400 space-y-1">
+          <p><strong class="text-gray-200">Deadline:</strong> <span class="text-red-400 font-bold" id="epbdCountdown2">May 29, 2026</span></p>
+          <p><strong class="text-gray-200">Impact:</strong> Building Renovation Passport mandatory → more retrofits → more pump replacements</p>
+          <p><strong class="text-gray-200">Opportunity:</strong> Every retrofit needs a new pump. Hero Pump is priced for volume replacement.</p>
+          <p class="text-xs text-gray-500 mt-2">EC already launched infringement procedures against lagging member states</p>
+        </div>
+      </div>
+
+      <!-- SRI -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-3 h-3 bg-yellow-400 rounded-full pulse-dot"></span>
+          <h3 class="font-bold">Smart Readiness Indicator (SRI)</h3>
+        </div>
+        <div class="text-sm text-gray-400 space-y-1">
+          <p><strong class="text-gray-200">Timeline:</strong> Commission report June 30, 2026 → mandatory law ~June 2027</p>
+          <p><strong class="text-gray-200">Hero Pump Impact:</strong> Modbus RTU → SRI D(28%) → C(45%) → B(58%) with proper integration</p>
+          <p><strong class="text-gray-200">Key:</strong> SRI is about <em>building</em> rating, not pump rating. Hero Pump enables higher scores.</p>
+          <p class="text-xs text-gray-500 mt-2">Grundfos ALPHA GO has no Modbus/BACnet — Hero Pump has direct BACS/SRI advantage</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CE Marking -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">🏷️ CE Marking Checklist</h3>
+      <div class="grid md:grid-cols-4 gap-3 text-sm">
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="font-medium text-green-400">LVD ✅</div>
+          <div class="text-gray-500">Low Voltage Directive 2014/35/EU</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="font-medium text-green-400">EMC ✅</div>
+          <div class="text-gray-500">Electromagnetic Compatibility 2014/30/EU</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="font-medium text-green-400">RoHS ✅</div>
+          <div class="text-gray-500">Restriction of Hazardous Substances 2011/65/EU</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="font-medium text-yellow-400">ErP ⏳</div>
+          <div class="text-gray-500">Ecodesign 641/2009 — testing in progress</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 mt-3">EU Authorized Representative required (Regulation 2019/1020). Recommended: AR Experts (NL+沈阳), €500-1,000/year.</p>
+    </div>
+  </div>
+
+  <!-- TAB 8: Marketing Center -->
+  <div id="tab-marketing" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">📣 Marketing Center</h2>
+    <p class="text-gray-400 mb-4">Co-branded assets ready to deploy. Use your co-op marketing fund.</p>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl mb-2">📄</div>
+        <h4 class="font-bold text-sm">Product Datasheets</h4>
+        <p class="text-xs text-gray-500 mt-1">All 12 models, EN/DE/FR/NL versions</p>
+        <button class="mt-2 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded hover:bg-green-500/30">Download All</button>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl mb-2">🖼️</div>
+        <h4 class="font-bold text-sm">Product Images</h4>
+        <p class="text-xs text-gray-500 mt-1">High-res renders, white background, 3D views</p>
+        <button class="mt-2 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded hover:bg-green-500/30">Download All</button>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl mb-2">📊</div>
+        <h4 class="font-bold text-sm">ROI Calculator</h4>
+        <p class="text-xs text-gray-500 mt-1">Interactive tool for customer presentations</p>
+        <button class="mt-2 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded hover:bg-green-500/30">Open Tool</button>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl mb-2">📋</div>
+        <h4 class="font-bold text-sm">Pitch Deck Template</h4>
+        <p class="text-xs text-gray-500 mt-1">Co-brandable PPTX, 15 slides</p>
+        <button class="mt-2 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded hover:bg-green-500/30">Download</button>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl mb-2">📧</div>
+        <h4 class="font-bold text-sm">Email Campaigns</h4>
+        <p class="text-xs text-gray-500 mt-1">4 sequences, signal-anchored, GDPR compliant</p>
+        <button class="mt-2 text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded hover:bg-green-500/30">View Campaigns</button>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-4 border border-gray-800 card-hover">
+        <div class="text-3xl mb-2">🎬</div>
+        <h4 class="font-bold text-sm">Video Assets</h4>
+        <p class="text-xs text-gray-500 mt-1">Product demos, installation guides (TBD)</p>
+        <button class="mt-2 text-xs bg-gray-700 text-gray-400 px-3 py-1 rounded cursor-not-allowed">Coming Soon</button>
+      </div>
+    </div>
+
+    <!-- Co-op Marketing Fund -->
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">💰 Co-op Marketing Fund</h3>
+      <div class="grid md:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-bold text-green-400">2%</div>
+          <div class="text-xs text-gray-500">Silver — of net purchases</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-green-400">3%</div>
+          <div class="text-xs text-gray-500">Gold — of net purchases</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-green-400">4%</div>
+          <div class="text-xs text-gray-500">Platinum — of net purchases</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-gray-300">€0</div>
+          <div class="text-xs text-gray-500">Accrued (Day 1)</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 mt-3">Eligible uses: trade shows, local advertising, digital campaigns, showroom displays, installer events. Submit receipts for reimbursement.</p>
+    </div>
+
+    <!-- Brand Guidelines -->
+    <div class="mt-4 bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">🎨 Co-Branding Guidelines</h3>
+      <div class="text-sm text-gray-400 space-y-2">
+        <p><strong class="text-gray-200">Logo Usage:</strong> Hero Pump logo must appear alongside partner logo. Minimum clear space = 1x logo height. No color modification.</p>
+        <p><strong class="text-gray-200">Approved Claims:</strong> "Energy-efficient PMSM circulator pump" / "ErP compliant (EEI ≤0.23)" / "Modbus RTU connectivity" / "CE certified" / "BACS-ready"</p>
+        <p><strong class="text-gray-200">Do NOT claim:</strong> Specific EEI value until formal test results / "Best in class" without data / Certification marks not yet obtained</p>
+        <p><strong class="text-gray-200">Colors:</strong> Hero Pump green (#22c55e) / Dark background (#111827) / White text</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 9: Deal Registration -->
+  <div id="tab-deal" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">🤝 Deal Registration</h2>
+    <p class="text-gray-400 mb-4">Register opportunities for priority pricing, technical support, and deal protection.</p>
+
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 mb-4">
+      <h3 class="font-bold mb-3">How It Works</h3>
+      <div class="grid md:grid-cols-4 gap-3 text-center">
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="text-2xl mb-1">1️⃣</div>
+          <div class="text-sm font-medium">Register</div>
+          <div class="text-xs text-gray-500">Submit opportunity details</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="text-2xl mb-1">2️⃣</div>
+          <div class="text-sm font-medium">Review</div>
+          <div class="text-xs text-gray-500">Hero Pump validates within 48h</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="text-2xl mb-1">3️⃣</div>
+          <div class="text-sm font-medium">Protect</div>
+          <div class="text-xs text-gray-500">90-day deal protection granted</div>
+        </div>
+        <div class="p-3 bg-gray-800 rounded">
+          <div class="text-2xl mb-1">4️⃣</div>
+          <div class="text-sm font-medium">Close</div>
+          <div class="text-xs text-gray-500">Priority pricing + support</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">Register New Opportunity</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-gray-400 block mb-1">Customer / Project Name</label>
+          <input type="text" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm" placeholder="e.g., Hotel Renovation — Brussels">
+        </div>
+        <div>
+          <label class="text-sm text-gray-400 block mb-1">Estimated Volume (units)</label>
+          <input type="number" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm" placeholder="e.g., 50">
+        </div>
+        <div>
+          <label class="text-sm text-gray-400 block mb-1">Application Type</label>
+          <select class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm">
+            <option>Residential heating</option>
+            <option>Commercial HVAC</option>
+            <option>Heat pump integration</option>
+            <option>Building retrofit</option>
+            <option>Industrial circulation</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-gray-400 block mb-1">Expected Close Date</label>
+          <input type="date" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm">
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-sm text-gray-400 block mb-1">Notes</label>
+          <textarea class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm h-20" placeholder="Additional context: competitor being replaced, special requirements, etc."></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <button class="bg-green-500 hover:bg-green-600 text-gray-900 font-bold px-6 py-2 rounded-lg text-sm">Submit Deal Registration</button>
+          <span class="text-xs text-gray-500 ml-3">Gold+ partners get priority review (24h vs 48h)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 10: ROI Calculator -->
+  <div id="tab-calculator" class="tab-content hidden fade-in">
+    <h2 class="text-2xl font-bold mb-1">🧮 Quick ROI Calculator</h2>
+    <p class="text-gray-400 mb-4">Show customers their savings in 60 seconds. Adjust sliders and see real-time results.</p>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Input Panel -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+        <h3 class="font-bold mb-4">Input Parameters</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm text-gray-400 flex justify-between">
+              <span>Electricity Price</span>
+              <span id="elecPriceVal" class="text-green-400">€0.30/kWh</span>
+            </label>
+            <input type="range" id="elecPrice" min="0.10" max="0.50" step="0.01" value="0.30" class="w-full accent-green-500" oninput="calcROI()">
+            <div class="flex justify-between text-xs text-gray-600"><span>€0.10</span><span>€0.50</span></div>
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 flex justify-between">
+              <span>Operating Hours / Day</span>
+              <span id="hoursVal" class="text-green-400">16 hrs</span>
+            </label>
+            <input type="range" id="hours" min="4" max="24" step="1" value="16" class="w-full accent-green-500" oninput="calcROI()">
+            <div class="flex justify-between text-xs text-gray-600"><span>4 hrs</span><span>24 hrs</span></div>
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 flex justify-between">
+              <span>Old Pump Power</span>
+              <span id="oldPumpVal" class="text-green-400">80W</span>
+            </label>
+            <input type="range" id="oldPump" min="25" max="150" step="5" value="80" class="w-full accent-green-500" oninput="calcROI()">
+            <div class="flex justify-between text-xs text-gray-600"><span>25W</span><span>150W</span></div>
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 flex justify-between">
+              <span>Hero Pump Power (avg)</span>
+              <span id="heroPumpVal" class="text-green-400">20W</span>
+            </label>
+            <input type="range" id="heroPump" min="5" max="52" step="1" value="20" class="w-full accent-green-500" oninput="calcROI()">
+            <div class="flex justify-between text-xs text-gray-600"><span>5W</span><span>52W</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="bg-gray-900 rounded-xl p-5 border border-green-500/30">
+        <h3 class="font-bold mb-4 text-green-400">Savings Results</h3>
+        <div class="space-y-4">
+          <div class="text-center p-4 bg-gray-800 rounded-lg">
+            <div class="text-sm text-gray-400">Annual Energy Savings</div>
+            <div class="text-3xl font-bold text-green-400" id="annualSavings">€116</div>
+            <div class="text-xs text-gray-500" id="kwhSaved">387 kWh/year saved</div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 bg-gray-800 rounded text-center">
+              <div class="text-sm text-gray-400">1-Year Savings</div>
+              <div class="text-xl font-bold" id="savings1y">€116</div>
+            </div>
+            <div class="p-3 bg-gray-800 rounded text-center">
+              <div class="text-sm text-gray-400">5-Year Savings</div>
+              <div class="text-xl font-bold text-green-400" id="savings5y">€582</div>
+            </div>
+          </div>
+          <div class="p-3 bg-gray-800 rounded text-center">
+            <div class="text-sm text-gray-400">Payback Period</div>
+            <div class="text-xl font-bold" id="payback">~4 months</div>
+            <div class="text-xs text-gray-500">(vs old pump running cost)</div>
+          </div>
+          <div class="p-3 bg-gray-800 rounded text-center">
+            <div class="text-sm text-gray-400">CO₂ Reduction</div>
+            <div class="text-xl font-bold text-green-400" id="co2Saved">155 kg/year</div>
+            <div class="text-xs text-gray-500">(EU avg: 0.4 kg CO₂/kWh)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Price Comparison -->
+    <div class="mt-6 bg-gray-900 rounded-xl p-5 border border-gray-800">
+      <h3 class="font-bold mb-3">🌍 Savings by Country (Annual, €0.30/kWh baseline)</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-800">
+            <tr>
+              <th class="text-left p-2">Country</th>
+              <th class="text-left p-2">Electricity</th>
+              <th class="text-left p-2">Old Pump Cost</th>
+              <th class="text-left p-2">Hero Pump Cost</th>
+              <th class="text-left p-2 text-green-400">Annual Savings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800">
+            <tr><td class="p-2">🇩🇪 Germany</td><td class="p-2">€0.39</td><td class="p-2">€274</td><td class="p-2">€68</td><td class="p-2 text-green-400 font-bold">€206</td></tr>
+            <tr><td class="p-2">🇧🇪 Belgium</td><td class="p-2">€0.34</td><td class="p-2">€239</td><td class="p-2">€60</td><td class="p-2 text-green-400 font-bold">€179</td></tr>
+            <tr><td class="p-2">🇳🇱 Netherlands</td><td class="p-2">€0.32</td><td class="p-2">€225</td><td class="p-2">€56</td><td class="p-2 text-green-400 font-bold">€169</td></tr>
+            <tr><td class="p-2">🇫🇷 France</td><td class="p-2">€0.28</td><td class="p-2">€197</td><td class="p-2">€49</td><td class="p-2 text-green-400 font-bold">€148</td></tr>
+            <tr><td class="p-2">🇦🇹 Austria</td><td class="p-2">€0.27</td><td class="p-2">€189</td><td class="p-2">€47</td><td class="p-2 text-green-400 font-bold">€142</td></tr>
+            <tr><td class="p-2">🇬🇧 UK</td><td class="p-2">€0.33</td><td class="p-2">€232</td><td class="p-2">€58</td><td class="p-2 text-green-400 font-bold">€174</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 border-t border-gray-800 mt-8 py-4">
+  <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500">
+    <p>Hero Pump EU Distributor Onboarding Portal — Internal Use Only — Not for Public Distribution</p>
+    <p class="mt-1">Built: 2026-05-14 | Data sourced from HP competitive intelligence, compliance research, and partner framework</p>
+  </div>
+</footer>
+
+<script>
+// Product data
+const products = [
+  { model:'HP-15/4', power:'5-15W', head:'4m', flow:'1.8m³/h', conn:'1"', eei:'≤0.15', modbus:'✅', price:'€36' },
+  { model:'HP-25/4', power:'5-20W', head:'4m', flow:'2.4m³/h', conn:'1"', eei:'≤0.15', modbus:'✅', price:'€36' },
+  { model:'HP-25/6', power:'8-25W', head:'6m', flow:'2.8m³/h', conn:'1"', eei:'≤0.16', modbus:'✅', price:'€38' },
+  { model:'HP-32/6', power:'8-30W', head:'6m', flow:'3.2m³/h', conn:'1¼"', eei:'≤0.16', modbus:'✅', price:'€40' },
+  { model:'HP-25/7', power:'10-35W', head:'7m', flow:'3.0m³/h', conn:'1"', eei:'≤0.16', modbus:'✅', price:'€40' },
+  { model:'HP-32/7', power:'10-38W', head:'7m', flow:'3.4m³/h', conn:'1¼"', eei:'≤0.16', modbus:'✅', price:'€42' },
+  { model:'HP-25/8', power:'12-40W', head:'8m', flow:'3.2m³/h', conn:'1"', eei:'≤0.17', modbus:'✅', price:'€42' },
+  { model:'HP-32/8', power:'12-42W', head:'8m', flow:'3.6m³/h', conn:'1¼"', eei:'≤0.17', modbus:'✅', price:'€44' },
+  { model:'HP-40/8', power:'15-45W', head:'8m', flow:'4.0m³/h', conn:'1½"', eei:'≤0.17', modbus:'✅', price:'€46' },
+  { model:'HP-50/10', power:'18-48W', head:'10m', flow:'4.5m³/h', conn:'2"', eei:'≤0.18', modbus:'✅', price:'€50' },
+  { model:'HP-50/12', power:'20-50W', head:'12m', flow:'4.8m³/h', conn:'2"', eei:'≤0.18', modbus:'✅', price:'€52' },
+  { model:'HP-65/12', power:'25-52W', head:'12m', flow:'5.2m³/h', conn:'2½"', eei:'≤0.19', modbus:'✅', price:'€55' },
+];
+
+// Render product table
+const tbody = document.getElementById('productTable');
+products.forEach(p => {
+  tbody.innerHTML += `<tr class="hover:bg-gray-800/50">
+    <td class="p-3 font-medium text-green-400">${p.model}</td>
+    <td class="p-3">${p.power}</td>
+    <td class="p-3">${p.head}</td>
+    <td class="p-3">${p.flow}</td>
+    <td class="p-3">${p.conn}</td>
+    <td class="p-3 text-green-400">${p.eei}</td>
+    <td class="p-3">${p.modbus}</td>
+    <td class="p-3 font-bold">${p.price}</td>
+  </tr>`;
+});
+
+// Tab switching
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('bg-gray-800'); });
+  document.getElementById('tab-' + tabId).classList.remove('hidden');
+  const btn = document.querySelector(`[data-tab="${tabId}"]`);
+  btn.classList.add('active');
+  btn.classList.remove('bg-gray-800');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// Onboarding progress
+function updateProgress() {
+  const total = document.querySelectorAll('.checklist-item input[type="checkbox"]').length;
+  const checked = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;
+  const pct = Math.round((checked / total) * 100);
+  document.getElementById('onboardingProgress').textContent = pct + '%';
+  document.getElementById('onboardingBar').style.width = pct + '%';
+  localStorage.setItem('hero-onboarding-progress', JSON.stringify(getCheckedStates()));
+}
+
+function getCheckedStates() {
+  const states = {};
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+    states[cb.id] = cb.checked;
+  });
+  return states;
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('hero-onboarding-progress');
+  if (saved) {
+    const states = JSON.parse(saved);
+    Object.entries(states).forEach(([id, checked]) => {
+      const el = document.getElementById(id);
+      if (el) el.checked = checked;
+    });
+    updateProgress();
+  }
+}
+
+// ROI Calculator
+function calcROI() {
+  const elecPrice = parseFloat(document.getElementById('elecPrice').value);
+  const hours = parseInt(document.getElementById('hours').value);
+  const oldPump = parseInt(document.getElementById('oldPump').value);
+  const heroPump = parseInt(document.getElementById('heroPump').value);
+
+  document.getElementById('elecPriceVal').textContent = '€' + elecPrice.toFixed(2) + '/kWh';
+  document.getElementById('hoursVal').textContent = hours + ' hrs';
+  document.getElementById('oldPumpVal').textContent = oldPump + 'W';
+  document.getElementById('heroPumpVal').textContent = heroPump + 'W';
+
+  const diffW = oldPump - heroPump;
+  const kwhYear = (diffW / 1000) * hours * 365;
+  const annualSave = kwhYear * elecPrice;
+  const save5y = annualSave * 5;
+  const co2 = kwhYear * 0.4;
+  const paybackMonths = Math.max(0.1, (65 / (annualSave / 12)));
+
+  document.getElementById('annualSavings').textContent = '€' + Math.round(annualSave);
+  document.getElementById('kwhSaved').textContent = Math.round(kwhYear) + ' kWh/year saved';
+  document.getElementById('savings1y').textContent = '€' + Math.round(annualSave);
+  document.getElementById('savings5y').textContent = '€' + Math.round(save5y);
+  document.getElementById('co2Saved').textContent = Math.round(co2) + ' kg/year';
+  document.getElementById('payback').textContent = paybackMonths < 1 ? '<1 month' : '~' + Math.round(paybackMonths) + ' months';
+}
+
+// EPBD Countdown
+function updateEPBD() {
+  const target = new Date('2026-05-29T00:00:00+08:00');
+  const now = new Date();
+  const diff = target - now;
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  document.getElementById('epbdCountdown').textContent = days + ' days';
+  document.getElementById('epbdCountdown2').textContent = 'May 29, 2026 (' + days + ' days left)';
+}
+
+// Tier selector
+document.getElementById('partnerTier').addEventListener('change', function() {
+  const tier = this.value;
+  document.querySelectorAll('[id^="tier-"]').forEach(el => {
+    el.classList.remove('border-2', 'border-green-500');
+    el.classList.add('border', 'border-gray-700');
+    const badge = el.querySelector('.absolute');
+    if (badge) badge.remove();
+  });
+  const active = document.getElementById('tier-' + tier);
+  active.classList.remove('border', 'border-gray-700');
+  active.classList.add('border-2', 'border-green-500');
+  const badge = document.createElement('div');
+  badge.className = 'absolute -top-2 -right-2 bg-green-500 text-xs px-2 py-0.5 rounded-full font-bold';
+  badge.textContent = 'SELECTED';
+  active.appendChild(badge);
+});
+
+// Day counter (from partner signup)
+function updateDay() {
+  const saved = localStorage.getItem('hero-partner-day');
+  let day = saved ? parseInt(saved) : 1;
+  // In a real portal, this would be calculated from the signup date
+  document.getElementById('onboardDay').textContent = 'Day ' + day;
+}
+
+// Init
+loadProgress();
+calcROI();
+updateEPBD();
+updateDay();
+</script>
+</body>
+</html>
