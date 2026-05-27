@@ -42,6 +42,7 @@ import type {
 import { getWorkspaceAdapter } from "./workspaces";
 import { readJsonFile, ensureSsaDataPath } from "../ssa-data-paths";
 import { createMemoryEngine, type MemoryEngine } from "./memory-engine";
+import { createRuntimeTaskQueue } from "./task-queue";
 
 type LeadRecord = Lead;
 
@@ -509,10 +510,6 @@ function approvalStorePath(): string {
   return ensureSsaDataPath("runtime", "approvals.json");
 }
 
-function runtimeJobsPath(): string {
-  return ensureSsaDataPath("runtime", "jobs.json");
-}
-
 function readApprovalStore(): ApprovalRecord[] {
   return readJsonFile<ApprovalRecord[]>(approvalStorePath(), []);
 }
@@ -562,7 +559,7 @@ function mergeApprovals(workspaceId: WorkspaceId): ApprovalRecord[] {
 }
 
 function readRuntimeJobs(): Array<{ workspaceId: string; workflow: string; status: string; createdAt: string }> {
-  return readJsonFile<Array<{ workspaceId: string; workflow: string; status: string; createdAt: string }>>(runtimeJobsPath(), []);
+  return createRuntimeTaskQueue().listSummaries(500);
 }
 
 function isToday(value: string): boolean {

@@ -63,7 +63,7 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
         openclawEquivalent: "agent tasks / cron jobs",
         ssaPrimitive: "Runtime jobs",
         status: "partial",
-        notes: "Jobs are persisted and auditable; durable scheduling/worker leases are still planned.",
+        notes: "Jobs are persisted in SSA-owned SQLite with worker lease metadata; standalone worker entrypoints and retries remain next.",
       },
       {
         id: "approval-gates",
@@ -101,12 +101,12 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
     dataContracts: [
       "SSA_DATA_ROOT stores runtime state outside the repo.",
       "Runtime events live under runtime/events.json.",
-      "Runtime jobs live under runtime/jobs.json.",
+      "Runtime jobs live under runtime/ssa-runtime.db.",
       "Side-effect decisions live under runtime/side-effect-decisions.json.",
       "Sales memory lives under memory/<workspace>/records.json.",
     ],
     nextGaps: [
-      "Durable SQLite-backed task queue with worker lease/retry semantics.",
+      "Standalone worker entrypoints and retry policy for SQLite runtime jobs.",
       "Sales tool registry for reusable actions such as quote, draft, classify, import, and approve.",
       "Policy engine for when LLM is required, optional, or forbidden.",
       "Worker entrypoints that run without Next.js request lifecycle.",

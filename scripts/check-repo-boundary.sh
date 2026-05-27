@@ -21,6 +21,7 @@ is_blocked_path() {
     *__pycache__/*|*/__pycache__/*) return 0 ;;
     *.pyc|*.pyo) return 0 ;;
     *.log|logs/*|*/logs/*) return 0 ;;
+    *.db-wal|*.db-shm|*.sqlite-wal|*.sqlite-shm) return 0 ;;
     *.tsbuildinfo) return 0 ;;
     .next/*|*/.next/*) return 0 ;;
     screenshots/*|*/screenshots/*|*__screenshot__*|*.screenshot.png) return 0 ;;

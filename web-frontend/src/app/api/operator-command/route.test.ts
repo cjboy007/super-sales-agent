@@ -60,7 +60,8 @@ describe("/api/operator-command route", () => {
       sideEffects: "blocked",
     });
 
-    const jobs = JSON.parse(fs.readFileSync(path.join(tempRoot, "runtime", "jobs.json"), "utf-8"));
+    const { createRuntimeTaskQueue } = await import("@/lib/runtime");
+    const jobs = createRuntimeTaskQueue().list(10);
     expect(jobs[0]).toMatchObject({
       id: json.data.jobId,
       workspaceId: "demo-exporter",

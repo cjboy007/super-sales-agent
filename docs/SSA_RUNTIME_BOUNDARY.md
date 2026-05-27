@@ -48,6 +48,7 @@ Recommended local paths:
 - Intelligence/news/trade data: `~/.ssa/data/intelligence/`
 - Farreach runtime data: `~/.ssa/data/farreach/`
 - Hero Pumps runtime data: `~/.ssa/data/hero-pumps/`
+- Runtime job queue: `~/.ssa/data/runtime/ssa-runtime.db`
 - Mailbox scans and IMAP output: `~/.ssa/data/mail/`
 - Generated quotes/documents: `~/.ssa/data/documents/`
 - Logs: `~/.ssa/logs/`
