@@ -81,6 +81,10 @@ hero-pumps/leads/*-scan-*.csv
 ssa-runtime/
 runtime-data/
 mail/
+*.db-wal
+*.db-shm
+*.sqlite-wal
+*.sqlite-shm
 
 # Secrets
 *.env

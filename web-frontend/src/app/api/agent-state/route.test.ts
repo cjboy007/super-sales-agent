@@ -26,28 +26,29 @@ function request(url: string): NextRequest {
 
 describe("/api/agent-state route", () => {
   it("returns runtime-derived agent summaries for the operator dashboard", async () => {
-    fs.mkdirSync(path.join(tempRoot, "runtime"), { recursive: true });
-    fs.writeFileSync(
-      path.join(tempRoot, "runtime", "jobs.json"),
-      JSON.stringify([
-        {
-          id: "job-1",
-          workspaceId: "demo-exporter",
-          workflow: "email.reply",
-          status: "queued",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: "job-2",
-          workspaceId: "demo-exporter",
-          workflow: "quotation.prepare",
-          status: "completed",
-          createdAt: new Date().toISOString(),
-        },
-      ]),
-      "utf-8"
-    );
-
+    const { createRuntimeTaskQueue } = await import("@/lib/runtime");
+    const createdAt = new Date().toISOString();
+    const queue = createRuntimeTaskQueue();
+    queue.enqueue({
+      id: "job-1",
+      workspaceId: "demo-exporter",
+      workflow: "email.reply",
+      status: "queued",
+      input: {},
+      steps: [],
+      createdAt,
+      updatedAt: createdAt,
+    });
+    queue.enqueue({
+      id: "job-2",
+      workspaceId: "demo-exporter",
+      workflow: "quotation.prepare",
+      status: "completed",
+      input: {},
+      steps: [],
+      createdAt,
+      updatedAt: createdAt,
+    });
     const { GET } = await import("./route");
 
     const response = await GET(request("http://localhost/api/agent-state?project=demo-exporter&limit=20"));

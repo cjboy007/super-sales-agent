@@ -157,6 +157,10 @@ export interface RuntimeJob {
   steps: RuntimeWorkflowStep[];
   createdAt: string;
   updatedAt: string;
+  attempts?: number;
+  claimedBy?: string;
+  leaseUntil?: string;
+  output?: Record<string, unknown>;
   error?: string;
 }
 

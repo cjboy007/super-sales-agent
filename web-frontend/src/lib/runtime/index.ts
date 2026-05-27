@@ -14,6 +14,7 @@ export * from "./memory-engine";
 export * from "./sales-memory";
 export * from "./sales-packs";
 export * from "./side-effect-gate";
+export * from "./task-queue";
 export * from "./workflow";
 export * from "./operator-commands";
 export * from "./activity-stream";

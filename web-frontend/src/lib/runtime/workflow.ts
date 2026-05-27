@@ -1,4 +1,3 @@
-import fs from "fs";
 import type {
   RuntimeJob,
   RuntimeJobStatus,
@@ -8,7 +7,7 @@ import type {
   SideEffectKind,
   WorkspaceId,
 } from "./types";
-import { ensureSsaDataPath, readJsonFile } from "../ssa-data-paths";
+import { createRuntimeTaskQueue, type SqliteTaskQueue } from "./task-queue";
 
 interface WorkflowRuntimeHost {
   runLlm(input: {
@@ -27,34 +26,12 @@ interface WorkflowRuntimeHost {
   recordEvent(type: string, workspaceId: WorkspaceId, payload: Record<string, unknown>): unknown;
 }
 
-function jobsPath() {
-  return ensureSsaDataPath("runtime", "jobs.json");
-}
-
 function nowIso() {
   return new Date().toISOString();
 }
 
 function makeJobId(workflow: RuntimeWorkflowType) {
   return `${workflow.replace(/[^a-zA-Z0-9._-]/g, "-")}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function readJobs(): RuntimeJob[] {
-  return readJsonFile<RuntimeJob[]>(jobsPath(), []);
-}
-
-function writeJobs(jobs: RuntimeJob[]) {
-  fs.writeFileSync(jobsPath(), JSON.stringify(jobs, null, 2), "utf-8");
-}
-
-function saveJob(job: RuntimeJob) {
-  const jobs = readJobs();
-  const existingIndex = jobs.findIndex((candidate) => candidate.id === job.id);
-  const nextJob = { ...job, updatedAt: nowIso() };
-  if (existingIndex >= 0) jobs[existingIndex] = nextJob;
-  else jobs.unshift(nextJob);
-  writeJobs(jobs.slice(0, 1000));
-  return nextJob;
 }
 
 function makeStep(
@@ -80,7 +57,11 @@ function sideEffectKindForWorkflow(workflow: RuntimeWorkflowType): SideEffectKin
 }
 
 export class WorkflowEngine {
-  constructor(private readonly host: WorkflowRuntimeHost) {}
+  private readonly queue: SqliteTaskQueue;
+
+  constructor(private readonly host: WorkflowRuntimeHost, queue = createRuntimeTaskQueue()) {
+    this.queue = queue;
+  }
 
   enqueue(workspaceId: WorkspaceId, workflow: RuntimeWorkflowType, input: Record<string, unknown>): RuntimeJob {
     const createdAt = nowIso();
@@ -98,22 +79,26 @@ export class WorkflowEngine {
       createdAt,
       updatedAt: createdAt,
     };
-    return saveJob(job);
+    return this.queue.enqueue(job);
   }
 
   listJobs(limit = 50): RuntimeJob[] {
-    return readJobs().slice(0, limit);
+    return this.queue.list(limit);
   }
 
   getJob(id: string): RuntimeJob | null {
-    return readJobs().find((job) => job.id === id) || null;
+    return this.queue.get(id);
+  }
+
+  claimNext(workerId: string, options?: { leaseMs?: number; now?: Date }): RuntimeJob | null {
+    return this.queue.claimNext(workerId, options);
   }
 
   async run(jobId: string): Promise<RuntimeJob> {
     const existing = this.getJob(jobId);
     if (!existing) throw new Error(`Runtime job not found: ${jobId}`);
 
-    let job = saveJob({ ...existing, status: "running" });
+    let job = this.queue.save({ ...existing, status: "running" });
     try {
       const text = inputText(job.input);
       const llm = await this.host.runLlm({
@@ -155,10 +140,10 @@ export class WorkflowEngine {
         sideEffectStatus: sideEffect.status,
       });
       job = this.completeStep(job, "record", { event: "workflow.completed" });
-      return saveJob({ ...job, status: "completed" });
+      return this.queue.save({ ...job, status: "completed" });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      return saveJob({ ...job, status: "failed", error: message });
+      return this.queue.save({ ...job, status: "failed", error: message });
     }
   }
 
@@ -169,6 +154,6 @@ export class WorkflowEngine {
         step.id === stepId ? { ...step, status: "completed", output } : step
       ),
     };
-    return saveJob(next);
+    return this.queue.save(next);
   }
 }

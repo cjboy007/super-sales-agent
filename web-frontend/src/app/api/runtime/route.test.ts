@@ -68,7 +68,8 @@ describe("/api/runtime route", () => {
     ]));
     expect(json.data.workflowTypes).toContain("operator.command");
     expect(json.data.sideEffectKinds).toContain("email.send");
-    expect(json.data.nextGaps).toContain("Durable SQLite-backed task queue with worker lease/retry semantics.");
+    expect(json.data.dataContracts).toContain("Runtime jobs live under runtime/ssa-runtime.db.");
+    expect(json.data.nextGaps).toContain("Standalone worker entrypoints and retry policy for SQLite runtime jobs.");
   });
 
   it("registers a new local workspace through the runtime API", async () => {
