@@ -9,6 +9,7 @@ export * from "./inbox";
 export * from "./intake";
 export * from "./lead-import";
 export * from "./llm";
+export * from "./manifest";
 export * from "./memory-engine";
 export * from "./sales-memory";
 export * from "./sales-packs";

@@ -14,6 +14,27 @@ SSA runtime may depend on:
 
 SSA runtime must not depend on OpenClaw, Hermes, PHOENIX, Codex, or any agent framework. Those tools may supervise development, generate suggestions, or run operator workflows, but SSA must still run without them.
 
+## OpenClaw-for-Sales Direction
+
+SSA should become the sales-specific operating layer that OpenClaw used to provide generically:
+
+| OpenClaw Primitive | SSA Sales OS Primitive |
+| --- | --- |
+| Skills | Sales packs |
+| Agent tasks / cron jobs | Runtime jobs and worker scripts |
+| Exec approvals | Side-effect decisions and approval records |
+| Workspace memory/context | SSA-owned sales memory |
+| Agent supervision UI | Battle Station cockpit and focus mode |
+| Model provider runtime | LLM provider adapters |
+
+The runtime exposes this contract at:
+
+```bash
+GET /api/runtime?action=manifest
+```
+
+That manifest is the current source of truth for implemented capabilities and remaining gaps.
+
 ## Data Locations
 
 Use `SSA_DATA_ROOT` when a custom runtime data directory is needed. If it is not set, SSA code should use:

@@ -40,6 +40,37 @@ describe("/api/runtime route", () => {
     expect(json.data.jobs).toEqual([]);
   });
 
+  it("returns the Sales OS manifest", async () => {
+    const response = await GET(request("http://localhost/api/runtime?action=manifest"));
+    const json = await response.json();
+
+    expect(json.success).toBe(true);
+    expect(json.data).toMatchObject({
+      id: "ssa-sales-os",
+      runtimeBoundary: {
+        standalone: true,
+        requiresOpenClaw: false,
+        requiresHermes: false,
+        sideEffectsBlockedByDefault: true,
+      },
+    });
+    expect(json.data.capabilities).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: "sales-packs",
+        openclawEquivalent: "skills",
+        status: "implemented",
+      }),
+      expect.objectContaining({
+        id: "runtime-workflows",
+        openclawEquivalent: "agent tasks / cron jobs",
+        status: "partial",
+      }),
+    ]));
+    expect(json.data.workflowTypes).toContain("operator.command");
+    expect(json.data.sideEffectKinds).toContain("email.send");
+    expect(json.data.nextGaps).toContain("Durable SQLite-backed task queue with worker lease/retry semantics.");
+  });
+
   it("registers a new local workspace through the runtime API", async () => {
     const response = await POST(request("http://localhost/api/runtime", {
       method: "POST",

@@ -44,6 +44,7 @@ import {
 import { listIntakeSessions, processIntake, type IntakeInput } from "./intake";
 import { importWorkspaceLeads, type LeadImportInput } from "./lead-import";
 import { runLlmTask } from "./llm";
+import { getSalesRuntimeManifest } from "./manifest";
 import { createOperatorCommand } from "./operator-commands";
 import { getSentLogSnapshot, runtimeEventsToAgentEvents } from "./activity-stream";
 import { createSalesMemory, type SalesMemory } from "./sales-memory";
@@ -104,6 +105,10 @@ export class SalesRuntime {
 
   listPacks() {
     return listSalesPacks();
+  }
+
+  manifest() {
+    return getSalesRuntimeManifest();
   }
 
   getMaskedSettings() {

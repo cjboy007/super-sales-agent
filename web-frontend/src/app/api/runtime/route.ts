@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSalesRuntime, type RuntimeWorkflowType, type WorkspaceInput } from "@/lib/runtime";
+import { createSalesRuntime, RUNTIME_WORKFLOWS, type RuntimeWorkflowType, type WorkspaceInput } from "@/lib/runtime";
 
 export const dynamic = "force-dynamic";
 
-const WORKFLOWS = new Set<RuntimeWorkflowType>([
-  "lead.import",
-  "email.reply",
-  "follow_up.plan",
-  "quotation.prepare",
-  "operator.command",
-  "side_effect.request",
-]);
+const WORKFLOWS = new Set<RuntimeWorkflowType>(RUNTIME_WORKFLOWS);
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -36,18 +29,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: runtime.workflows.listJobs(50) });
   }
 
-    if (action === "workspaces") {
-      return NextResponse.json({ success: true, data: runtime.listWorkspaces() });
-    }
+  if (action === "manifest") {
+    return NextResponse.json({ success: true, data: runtime.manifest() });
+  }
 
-    if (action === "side-effects") {
-      const limit = Math.min(500, Math.max(1, Number(request.nextUrl.searchParams.get("limit") || "50")));
-      return NextResponse.json({ success: true, data: runtime.listSideEffects(limit) });
-    }
+  if (action === "workspaces") {
+    return NextResponse.json({ success: true, data: runtime.listWorkspaces() });
+  }
 
-    if (action === "packs") {
-      return NextResponse.json({ success: true, data: runtime.listPacks() });
-    }
+  if (action === "side-effects") {
+    const limit = Math.min(500, Math.max(1, Number(request.nextUrl.searchParams.get("limit") || "50")));
+    return NextResponse.json({ success: true, data: runtime.listSideEffects(limit) });
+  }
+
+  if (action === "packs") {
+    return NextResponse.json({ success: true, data: runtime.listPacks() });
+  }
 
   return NextResponse.json({ success: true, data: runtime.snapshot() });
 }

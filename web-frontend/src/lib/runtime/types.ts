@@ -168,6 +168,35 @@ export interface SalesRuntimeSnapshot {
   events: RuntimeEvent[];
 }
 
+export interface SalesRuntimeManifestCapability {
+  id: string;
+  openclawEquivalent: string;
+  ssaPrimitive: string;
+  status: "implemented" | "partial" | "planned";
+  notes: string;
+}
+
+export interface SalesRuntimeManifest {
+  id: "ssa-sales-os";
+  name: string;
+  positioning: string;
+  runtimeBoundary: {
+    standalone: boolean;
+    requiresOpenClaw: boolean;
+    requiresHermes: boolean;
+    dataRoot: string;
+    sideEffectsBlockedByDefault: boolean;
+  };
+  operatorSurfaces: string[];
+  capabilities: SalesRuntimeManifestCapability[];
+  salesPacks: SalesPack[];
+  workflowTypes: RuntimeWorkflowType[];
+  sideEffectKinds: SideEffectKind[];
+  llmTasks: LlmTask[];
+  dataContracts: string[];
+  nextGaps: string[];
+}
+
 export type MemoryRecordKind = "fact" | "episode";
 export type MemoryAuthority = "authoritative" | "imported" | "suggested";
 
