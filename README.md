@@ -2,6 +2,20 @@
 
 **AI 驱动的全自动销售助手** — 邮件自动处理、报价单生成、客户跟进、订单追踪，一站式销售自动化。
 
+## Runtime Boundary
+
+SSA should remain runnable without OpenClaw, Hermes, PHOENIX, Codex, or any agent framework. Those tools may supervise development, but they are not runtime dependencies.
+
+Keep generated data out of this repo. Runtime data, mailbox scans, intelligence/news files, generated documents, logs, screenshots, and local experiments belong under `~/.ssa`, normally `~/.ssa/data`.
+
+Before and after Hermes/operator work, run:
+
+```bash
+scripts/check-repo-boundary.sh
+```
+
+Details: [docs/SSA_RUNTIME_BOUNDARY.md](./docs/SSA_RUNTIME_BOUNDARY.md)
+
 ---
 
 ## 📖 目录

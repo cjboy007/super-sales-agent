@@ -43,7 +43,48 @@ skills/*/data/*.json.e2e-backup
 skills/*/logs/*.log
 skills/*/cache/*.json
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Next.js / frontend build
+.next/
+*.tsbuildinfo
+
+# Runtime screenshots (generated during testing/monitoring)
+screenshots/
+*__screenshot__*
+*.screenshot.png
+dashboard-*.png
+ssa-*.png
+
+# Runtime logs and local caches
+logs/
+*.log
+.cache/
+
+# New generated data in repo data/ dir (existing tracked files unaffected)
+data/*.json
+data/*.csv
+data/*.html
+data/*.xlsx
+data/*.pdf
+data/intelligence/
+!data/README*
+
+# New lead CSVs from runtime scans (keep tracked samples)
+hero-pumps/leads/*-scan-*.csv
+
+# Local runtime state belongs under ~/.ssa, not the repo
+ssa-runtime/
+runtime-data/
+mail/
+
 # Secrets
 *.env
 .env
 .env.*
+!.env.example
+!**/.env.example
