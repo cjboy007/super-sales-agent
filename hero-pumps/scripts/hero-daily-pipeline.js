@@ -23,7 +23,7 @@ const execAsync = promisify(exec);
 // ==================== 路径配置 ====================
 const BASE = path.join(__dirname, '..');
 const LEADS_DIR = path.join(BASE, 'leads');
-const SENT_LOG = path.join(BASE, 'sent-log.json');
+const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 const RESEARCH_DIR = path.join(BASE, 'research/companies');
 const DRAFTS_DIR = path.join(BASE, 'campaign-tracker/templates');
 const IRON_PROMPTS_DIR = path.join(BASE, 'iron-prompts');
@@ -190,9 +190,8 @@ function stepSendNewTemplates(dryRun, limit) {
   
   const sentLog = loadSentLog();
   const sentEmails = new Set(sentLog.map(s => s.email.toLowerCase()));
-  const logFile = path.join(BASE, 'sent-log.json');
   let logMtime = 0;
-  try { logMtime = fs.statSync(logFile).mtimeMs; } catch(e) {}
+  try { logMtime = fs.statSync(SENT_LOG).mtimeMs; } catch(e) {}
   
   // 查找今日新模板（今天创建或修改，且比 sent-log 新）
   const todayFiles = [];

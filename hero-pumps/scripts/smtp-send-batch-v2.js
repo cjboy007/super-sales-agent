@@ -17,8 +17,8 @@
 const fs = require('fs');
 const path = require('path');
 const { SalesState } = require('../../shared/sales-state-db');
-const nodemailer = require('/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/node_modules/nodemailer');
-const dotenv = require('/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/node_modules/dotenv');
+const nodemailer = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/nodemailer');
+const dotenv = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/dotenv');
 
 // 读取项目自己的 .env（Hero Pump SMTP 配置）
 const envPath = path.join(__dirname, '../.env');
@@ -27,9 +27,9 @@ if (fs.existsSync(envPath)) {
 }
 
 const PROJECT = 'hero-pumps';
-const SIGNATURE_PATH = '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/signatures/signature-hero-jordan.html';
+const SIGNATURE_PATH = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/signatures/signature-hero-jordan.html';
 const DRAFTS_DIR = path.join(__dirname, '../campaign-tracker/templates');
-const SENT_LOG = path.join(__dirname, '../sent-log.json');
+const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 
 // 从 CSV 加载联系人信息
 function loadLeadsMap() {
@@ -120,6 +120,26 @@ function parseDraft(filePath) {
   if (!emailMatch || !subjectMatch || !bodyMatch) return null;
   
   let email = emailMatch[1] ? emailMatch[1].trim() : '';
+  let subject = subjectMatch[1].trim();
+  
+  // Validate subject: reject placeholder-like subjects
+  const placeholderPatterns = [
+    /^subject\s*\d*$/i,           // "Subject 1", "Subject"
+    /^\[.*\]$/,                   // "[推荐主题]", "[placeholder]"
+    /^[推荐主题备选]\s*[\d:\-\.]*$/i, // "推荐主题", "备选1"
+    /^subject\s*line\s*\d*$/i,    // "Subject Line 1"
+    /^[tT]itle\s*\d*$/i,          // "Title 1"
+    /^test/i,                     // "Test", "TEST 1"
+    /^placeholder/i,              // "placeholder"
+    /^todo/i,                     // "TODO"
+  ];
+  for (const pattern of placeholderPatterns) {
+    if (pattern.test(subject)) {
+      console.log(`   ⚠️  跳过占位符主题: "${subject}" (${filePath})`);
+      return null;
+    }
+  }
+  
   if (!email.includes('@') || email.includes('IncompleteRead')) return null;
   
   // Extract clean contact name from **To:** field
@@ -134,7 +154,7 @@ function parseDraft(filePath) {
 
   return {
     email,
-    subject: subjectMatch[1].trim(),
+    subject: subject,
     body: bodyMatch[1].trim(),
     filePath,
     company: companyMatch?.[1]?.trim() || '',
