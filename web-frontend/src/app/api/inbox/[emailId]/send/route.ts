@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/inbox/[emailId]/send — confirm and send the email via farreach SMTP
 export async function POST(
   req: Request,

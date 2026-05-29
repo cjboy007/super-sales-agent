@@ -11,10 +11,10 @@ beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-pipeline-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
 
-  const leadsDir = path.join(tempRoot, "hero-pumps", "leads");
+  const leadsDir = path.join(tempRoot, "companies", "hero-pumps", "leads");
   fs.mkdirSync(leadsDir, { recursive: true });
-  fs.mkdirSync(path.join(tempRoot, "hero-pumps", "tracking"), { recursive: true });
-  fs.mkdirSync(path.join(tempRoot, "mail"), { recursive: true });
+  fs.mkdirSync(path.join(tempRoot, "companies", "hero-pumps", "tracking"), { recursive: true });
+  fs.mkdirSync(path.join(tempRoot, "companies", "hero-pumps", "mail"), { recursive: true });
 
   fs.writeFileSync(
     path.join(leadsDir, "western-europe.csv"),
@@ -26,19 +26,19 @@ beforeEach(() => {
     "utf-8"
   );
   fs.writeFileSync(
-    path.join(tempRoot, "mail", "sent-log.json"),
+    path.join(tempRoot, "companies", "hero-pumps", "mail", "sent-log.json"),
     JSON.stringify([{ email: "ada@example.com", sent_at: "2026-05-26T10:00:00.000Z", subject: "Initial pump offer" }]),
     "utf-8"
   );
   fs.writeFileSync(
-    path.join(tempRoot, "hero-pumps", "follow-up-state.json"),
+    path.join(tempRoot, "companies", "hero-pumps", "follow-up-state.json"),
     JSON.stringify({
       "ada@example.com": { email: "ada@example.com", follow_up_stage: 2, has_reply: true, is_due: false },
       "nils@example.com": { email: "nils@example.com", follow_up_stage: 1, has_reply: false, is_due: true },
     }),
     "utf-8"
   );
-  fs.writeFileSync(path.join(tempRoot, "hero-pumps", "tracking", "replies.json"), JSON.stringify([]), "utf-8");
+  fs.writeFileSync(path.join(tempRoot, "companies", "hero-pumps", "tracking", "replies.json"), JSON.stringify([]), "utf-8");
 });
 
 afterEach(() => {

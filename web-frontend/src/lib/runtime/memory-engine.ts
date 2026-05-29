@@ -9,7 +9,7 @@ import type {
   MemoryWriteInput,
   WorkspaceId,
 } from "./types";
-import { ensureSsaDataPath, readJsonFile } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath, readJsonFile } from "../ssa-data-paths";
 
 const MAX_RECORDS_PER_WORKSPACE = 5000;
 const STOP_WORDS = new Set([
@@ -44,7 +44,7 @@ const STOP_WORDS = new Set([
 ]);
 
 function recordsPath(workspaceId: WorkspaceId) {
-  return ensureSsaDataPath("memory", workspaceId, "records.json");
+  return ensureSsaCompanyDataPath(workspaceId, "memory", "records.json");
 }
 
 function nowIso() {

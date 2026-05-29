@@ -18,7 +18,7 @@ beforeEach(() => {
   process.env.HERO_DATA_API_URL = "http://hero-data.test";
   delete process.env.SSA_ENABLE_REAL_DATA_READ;
 
-  const leadsDir = path.join(tempRoot, "hero-pumps", "leads");
+  const leadsDir = path.join(tempRoot, "companies", "hero-pumps", "leads");
   fs.mkdirSync(leadsDir, { recursive: true });
   fs.writeFileSync(
     path.join(leadsDir, "western-europe.csv"),

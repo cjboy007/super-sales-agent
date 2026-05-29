@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 interface GenerateRequestBody {
   type: "QT" | "PI" | "PN" | "SPL";
   customer: string;

@@ -105,6 +105,7 @@ function jsonLiteral(value: unknown): string {
 }
 
 export function runtimeQueueDbPath(): string {
+  // Shared scheduler index. Every row still carries workspace_id, while company artifacts live under companies/<workspace>.
   return ensureSsaDataPath("runtime", "ssa-runtime.db");
 }
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;

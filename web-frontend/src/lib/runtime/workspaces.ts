@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import type { SalesPackId, WorkspaceAdapter, WorkspaceId, WorkspaceInput } from "./types";
-import { ensureSsaDataPath, readJsonFile, ssaDataPath } from "../ssa-data-paths";
+import { ensureSsaDataPath, readJsonFile, ssaCompanyDataPath, ssaDataPath } from "../ssa-data-paths";
 
 const DEFAULT_PACKS: SalesPackId[] = ["email-reply", "follow-up"];
 
@@ -24,7 +24,7 @@ const DEFAULT_WORKSPACES: WorkspaceAdapter[] = [
       documents: true,
     },
     data: {
-      leadsPath: ssaDataPath("leads", "farreach", "tier1-v2-complete.json"),
+      leadsPath: ssaCompanyDataPath("farreach", "leads", "tier1-v2-complete.json"),
       productCatalogPath: path.join(process.cwd(), "..", "farreach", "config", "products.json"),
       templatesPath: path.join(process.cwd(), "..", "farreach", "config", "templates"),
       rulesPath: path.join(process.cwd(), "..", "skills", "workflow-engine", "config", "rules"),
@@ -49,9 +49,9 @@ const DEFAULT_WORKSPACES: WorkspaceAdapter[] = [
       documents: true,
     },
     data: {
-      leadsPath: ssaDataPath("hero-pumps", "leads"),
+      leadsPath: ssaCompanyDataPath("hero-pumps", "leads"),
       productCatalogPath: path.join(process.cwd(), "..", "hero-pumps", "product-specs"),
-      templatesPath: ssaDataPath("hero-pumps", "campaign-tracker"),
+      templatesPath: ssaCompanyDataPath("hero-pumps", "campaign-tracker"),
       rulesPath: path.join(process.cwd(), "..", "hero-pumps", "email-rules.md"),
     },
     packs: ["email-reply", "follow-up", "product-catalog", "export-b2b"],
@@ -116,10 +116,10 @@ export function createLocalWorkspaceAdapter(id: WorkspaceId, input: Partial<Work
       documents: input.capabilities?.documents ?? false,
     },
     data: {
-      leadsPath: input.data?.leadsPath || ssaDataPath("workspaces", safeId, "leads"),
-      productCatalogPath: input.data?.productCatalogPath || ssaDataPath("workspaces", safeId, "catalog"),
-      templatesPath: input.data?.templatesPath || ssaDataPath("workspaces", safeId, "templates"),
-      rulesPath: input.data?.rulesPath || ssaDataPath("workspaces", safeId, "rules"),
+      leadsPath: input.data?.leadsPath || ssaCompanyDataPath(safeId, "leads"),
+      productCatalogPath: input.data?.productCatalogPath || ssaCompanyDataPath(safeId, "catalog"),
+      templatesPath: input.data?.templatesPath || ssaCompanyDataPath(safeId, "templates"),
+      rulesPath: input.data?.rulesPath || ssaCompanyDataPath(safeId, "rules"),
     },
     packs: input.packs?.length ? input.packs : DEFAULT_PACKS,
   };

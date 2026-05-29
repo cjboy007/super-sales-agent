@@ -89,7 +89,7 @@ describe("/api/approvals route", () => {
     expect(lookup.data).toHaveLength(1);
     expect(lookup.data[0].status).toBe("approved");
 
-    const events = JSON.parse(fs.readFileSync(path.join(tempRoot, "runtime", "events.json"), "utf-8"));
+    const events = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "events", "events.json"), "utf-8"));
     expect(events[0]).toMatchObject({
       type: "approval.updated",
       workspaceId: "demo-exporter",

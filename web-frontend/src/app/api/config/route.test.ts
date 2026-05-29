@@ -16,7 +16,7 @@ function jsonRequest(method: "POST" | "PUT", body: Record<string, unknown>): Nex
 }
 
 function readRuntimeEvents(): Array<{ type: string; payload: Record<string, unknown> }> {
-  const eventsPath = path.join(tempRoot, "runtime", "events.json");
+  const eventsPath = path.join(tempRoot, "companies", "farreach", "events", "events.json");
   return JSON.parse(fs.readFileSync(eventsPath, "utf-8"));
 }
 

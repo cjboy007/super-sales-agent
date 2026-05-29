@@ -41,7 +41,7 @@ describe("hero-data adapter", () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     const decisions = JSON.parse(
-      fs.readFileSync(path.join(tempRoot, "runtime", "side-effect-decisions.json"), "utf-8")
+      fs.readFileSync(path.join(tempRoot, "companies", "hero-pumps", "approvals", "side-effect-decisions.json"), "utf-8")
     );
     expect(decisions[0]).toMatchObject({
       kind: "data.read",

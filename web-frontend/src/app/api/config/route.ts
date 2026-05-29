@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/inbox/[emailId] — single email detail from farreach (fallback to mock)
 export async function GET(
   req: Request,

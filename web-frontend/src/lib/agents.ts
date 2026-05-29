@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ssaDataPath } from "./ssa-data-paths";
+import { ssaCompanyDataPath } from "./ssa-data-paths";
 
 const PROJECT_ROOT = process.cwd();
 
@@ -96,7 +96,7 @@ function getHeroShadowTasks(): AgentTask[] {
 // ── Iron tasks: Hero-pumps sent emails ──
 
 function getHeroIronTasks(): AgentTask[] {
-  const sentLogPath = ssaDataPath("mail", "sent-log.json");
+  const sentLogPath = ssaCompanyDataPath("hero-pumps", "mail", "sent-log.json");
   const emails = safeReadJson<Array<{ email: string; company: string; sent_at: string; subject: string }>>(sentLogPath) || [];
   return emails
     .sort((a, b) => b.sent_at.localeCompare(a.sent_at))
@@ -114,8 +114,8 @@ function getHeroIronTasks(): AgentTask[] {
 // ── Oracle tasks: Hero-pumps intelligence ──
 
 function getHeroOracleTasks(): AgentTask[] {
-  const trendsPath = ssaDataPath("intelligence", "trends.json");
-  const competitorsPath = ssaDataPath("intelligence", "competitors.json");
+  const trendsPath = ssaCompanyDataPath("hero-pumps", "intelligence", "trends.json");
+  const competitorsPath = ssaCompanyDataPath("hero-pumps", "intelligence", "competitors.json");
   const trends = safeReadJson<{ updatedAt?: string; trends?: Array<{ label: string }> }>(trendsPath);
   const competitors = safeReadJson<{ updatedAt?: string; competitors?: Array<{ company: string }> }>(competitorsPath);
 

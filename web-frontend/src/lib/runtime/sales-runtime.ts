@@ -59,18 +59,33 @@ import {
 } from "./side-effect-gate";
 import { WorkflowEngine } from "./workflow";
 import { getWorkspaceAdapter, listWorkspaceAdapters, registerWorkspaceAdapter } from "./workspaces";
-import { ensureSsaDataPath, readJsonFile } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath, readJsonFile, ssaDataPath } from "../ssa-data-paths";
 
-function eventsPath() {
-  return ensureSsaDataPath("runtime", "events.json");
+function eventsPath(workspaceId: WorkspaceId) {
+  return ensureSsaCompanyDataPath(workspaceId, "events", "events.json");
 }
 
-function readEvents(): RuntimeEvent[] {
-  return readJsonFile<RuntimeEvent[]>(eventsPath(), []);
+function readEvents(workspaceId: WorkspaceId): RuntimeEvent[] {
+  return readJsonFile<RuntimeEvent[]>(eventsPath(workspaceId), []);
 }
 
-function writeEvents(events: RuntimeEvent[]) {
-  fs.writeFileSync(eventsPath(), JSON.stringify(events, null, 2), "utf-8");
+function writeEvents(workspaceId: WorkspaceId, events: RuntimeEvent[]) {
+  fs.writeFileSync(eventsPath(workspaceId), JSON.stringify(events, null, 2), "utf-8");
+}
+
+function discoverEventWorkspaces(): WorkspaceId[] {
+  const ids = new Set<WorkspaceId>(listWorkspaceAdapters().map((workspace) => workspace.id));
+  const companiesDir = ssaDataPath("companies");
+  try {
+    if (fs.existsSync(companiesDir)) {
+      for (const entry of fs.readdirSync(companiesDir, { withFileTypes: true })) {
+        if (entry.isDirectory()) ids.add(entry.name);
+      }
+    }
+  } catch {
+    // Missing or unreadable company folders are treated as empty.
+  }
+  return Array.from(ids);
 }
 
 function makeEventId(type: string) {
@@ -320,14 +335,18 @@ export class SalesRuntime {
       payload,
       createdAt: new Date().toISOString(),
     };
-    const events = readEvents();
+    const events = readEvents(workspace.id);
     events.unshift(event);
-    writeEvents(events.slice(0, 1000));
+    writeEvents(workspace.id, events.slice(0, 1000));
     return event;
   }
 
-  listEvents(limit = 50): RuntimeEvent[] {
-    return readEvents().slice(0, limit);
+  listEvents(limit = 50, workspaceId?: WorkspaceId): RuntimeEvent[] {
+    const workspaceIds = workspaceId ? [this.getWorkspace(workspaceId).id] : discoverEventWorkspaces();
+    return workspaceIds
+      .flatMap((workspace) => readEvents(workspace))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, limit);
   }
 
   listActivityEvents(limit = 20) {

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { repoPath, ssaDataPath } from "./ssa-data-paths";
+import { repoPath, ssaCompanyDataPath } from "./ssa-data-paths";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -33,8 +33,8 @@ export interface QuotationStats {
 // ─── Scan paths ────────────────────────────────────────────────────────────
 
 const SCAN_PATHS = [
-  ssaDataPath("quotations"),
-  ssaDataPath("documents"),
+  ssaCompanyDataPath("farreach", "quotations"),
+  ssaCompanyDataPath("farreach", "documents"),
   repoPath("skills", "quotation-workflow", "examples"),
   repoPath("skills", "quotation-workflow", "tests", "output"),
 ];

@@ -100,10 +100,10 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
     llmTasks: LLM_TASKS,
     dataContracts: [
       "SSA_DATA_ROOT stores runtime state outside the repo.",
-      "Runtime events live under runtime/events.json.",
+      "Runtime events live under companies/<workspace>/events/events.json.",
       "Runtime jobs live under runtime/ssa-runtime.db.",
-      "Side-effect decisions live under runtime/side-effect-decisions.json.",
-      "Sales memory lives under memory/<workspace>/records.json.",
+      "Side-effect decisions live under companies/<workspace>/approvals/side-effect-decisions.json.",
+      "Sales memory lives under companies/<workspace>/memory/records.json.",
     ],
     nextGaps: [
       "Standalone worker entrypoints and retry policy for SQLite runtime jobs.",

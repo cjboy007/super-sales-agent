@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/lib/api-types";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get("action");

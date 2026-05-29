@@ -4,9 +4,10 @@ import os from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const execFileMock = vi.fn();
+const execFileMock = vi.hoisted(() => vi.fn());
 
-vi.mock("child_process", () => ({
+vi.mock("child_process", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("child_process")>()),
   execFile: (...args: unknown[]) => execFileMock(...args),
 }));
 
@@ -108,7 +109,7 @@ describe("/api/documents/generate route", () => {
     expect(execFileMock).not.toHaveBeenCalled();
 
     const decisions = JSON.parse(
-      fs.readFileSync(path.join(tempRoot, "runtime", "side-effect-decisions.json"), "utf-8")
+      fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8")
     );
     expect(decisions[0]).toMatchObject({
       kind: "document.generate",

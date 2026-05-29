@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { ssaDataPath } from "./ssa-data-paths";
+import { ssaCompanyDataPath } from "./ssa-data-paths";
 
-const SENT_LOG = ssaDataPath("mail", "sent-log.json");
-const MAIL_ARCHIVE = ssaDataPath("mail", "archive");
-const DRAFTS_PATH = ssaDataPath("mail", "drafts");
+const SENT_LOG = ssaCompanyDataPath("farreach", "mail", "sent-log.json");
+const MAIL_ARCHIVE = ssaCompanyDataPath("farreach", "mail", "archive");
+const DRAFTS_PATH = ssaCompanyDataPath("farreach", "mail", "drafts");
 
 export interface SentEmail {
   email: string;

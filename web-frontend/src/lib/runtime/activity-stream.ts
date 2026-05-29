@@ -1,7 +1,7 @@
 import fs from "fs";
 import type { AgentEvent, AgentEventType } from "../events";
 import type { RuntimeEvent } from "./types";
-import { ssaDataPath } from "../ssa-data-paths";
+import { ssaCompanyDataPath } from "../ssa-data-paths";
 
 function eventTypeForRuntimeEvent(event: RuntimeEvent): AgentEventType {
   if (event.type === "operator.command.queued") return "operator-command";
@@ -48,7 +48,7 @@ export interface SentLogSnapshotEntry {
 
 export function getSentLogSnapshot(limit = 10): SentLogSnapshotEntry[] {
   try {
-    const logPath = ssaDataPath("mail", "sent-log.json");
+    const logPath = ssaCompanyDataPath("farreach", "mail", "sent-log.json");
     if (!fs.existsSync(logPath)) return [];
     const entries = JSON.parse(fs.readFileSync(logPath, "utf-8")) as SentLogSnapshotEntry[];
     return entries.slice(-limit).reverse();
