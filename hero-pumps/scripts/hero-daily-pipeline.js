@@ -22,9 +22,9 @@ const execAsync = promisify(exec);
 
 // ==================== 路径配置 ====================
 const BASE = path.join(__dirname, '..');
-const LEADS_DIR = path.join(BASE, 'leads');
+const LEADS_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
 const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
-const RESEARCH_DIR = path.join(BASE, 'research/companies');
+const RESEARCH_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'research', 'companies');
 const DRAFTS_DIR = path.join(BASE, 'campaign-tracker/templates');
 const IRON_PROMPTS_DIR = path.join(BASE, 'iron-prompts');
 const SMTP_SCRIPT = path.join(__dirname, 'smtp-send-batch-v2.js');

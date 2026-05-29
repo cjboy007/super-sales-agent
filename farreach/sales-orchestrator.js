@@ -24,7 +24,7 @@ const CONFIG = {
   SMTP_CLI: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js',
   TEMPLATES_DIR: path.join(__dirname, 'config/templates'),
   COUNTRIES_FILE: path.join(__dirname, 'config/okki-countries.json'),
-  LOG_DIR: path.join(__dirname, 'logs'),
+  LOG_DIR: path.join(process.env.HOME, '.ssa', 'logs', 'companies', 'farreach', 'sales-orchestrator'),
   SEND_INTERVAL_MIN: 2 * 60 * 1000, // 2 分钟
   SEND_INTERVAL_MAX: 3 * 60 * 1000, // 3 分钟
   COOLDOWN_DAYS: 90,

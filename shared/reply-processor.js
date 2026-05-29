@@ -21,7 +21,7 @@ const execAsync = promisify(exec);
 
 // ==================== 配置 ====================
 const IMAP_CLI = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/scripts/imap.js';
-const LOG_DIR = path.join(__dirname, 'logs');
+const LOG_DIR = path.join(process.env.HOME, '.ssa', 'logs', 'reply-processor');
 const CHECK_LIMIT = 20;
 
 if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
@@ -222,14 +222,14 @@ class ReplyProcessor {
 
   loadProcessedUids() {
     try {
-      const file = path.join(__dirname, 'state/processed-uids.json');
+      const file = path.join(process.env.HOME, '.ssa', 'data', 'state', 'processed-uids.json');
       if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8'));
     } catch(e) {}
     return [];
   }
 
   saveProcessedUids() {
-    const dir = path.join(__dirname, 'state');
+    const dir = path.join(process.env.HOME, '.ssa', 'data', 'state');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'processed-uids.json'), JSON.stringify(this.processedUids.slice(-1000)));
   }

@@ -77,8 +77,8 @@ const P4_POSITION_KEYWORDS = [
 // ─── 目录常量（全部相对于脚本所在目录） ─────────────────────
 
 const BASE_DIR = path.join(__dirname, "..");
-const LEADS_DIR = path.join(BASE_DIR, "leads");
-const RESEARCH_DIR = path.join(BASE_DIR, "research", "companies");
+const LEADS_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
+const RESEARCH_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'research', 'companies');
 const DRAFTS_DIR = path.join(BASE_DIR, "campaign-tracker", "templates");
 const PROMPTS_DIR = path.join(BASE_DIR, "iron-prompts");
 

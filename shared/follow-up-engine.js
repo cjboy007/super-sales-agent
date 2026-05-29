@@ -84,7 +84,7 @@ const PROJECTS = {
 // ==================== 日志 ====================
 class Logger {
   constructor() {
-    const logDir = path.join(__dirname, 'logs');
+    const logDir = path.join(process.env.HOME, '.ssa', 'logs', 'follow-up-engine');
     if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
     this.logFile = path.join(logDir, `followup-${new Date().toISOString().split('T')[0]}.log`);
   }

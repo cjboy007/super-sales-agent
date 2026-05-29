@@ -13,8 +13,8 @@ const fs = require('fs');
 const path = require('path');
 
 const DRAFTS_DIR = path.join(__dirname, '../campaign-tracker/templates');
-const RESEARCH_DIR = path.join(__dirname, '../research/companies');
-const LEADS_DIR = path.join(__dirname, '../leads');
+const RESEARCH_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'research', 'companies');
+const LEADS_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
 
 function main() {
   // 统计草稿

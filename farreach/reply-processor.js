@@ -16,13 +16,14 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 
 const execAsync = promisify(exec);
+const FARREACH_DATA_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'farreach');
 
 // ==================== 配置 ====================
 const CONFIG = {
   IMAP_CLI: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/imap.js',
   KNOWLEDGE_BASE: '/Users/wilson/obsidian-vault/Farreach 知识库',
-  STATE_FILE: path.join(__dirname, 'state/reply-state.json'),
-  LOG_DIR: path.join(__dirname, 'logs'),
+  STATE_FILE: path.join(FARREACH_DATA_DIR, 'state', 'reply-state.json'),
+  LOG_DIR: path.join(process.env.HOME, '.ssa', 'logs', 'companies', 'farreach', 'reply-processor'),
   CHECK_LIMIT: 20 // 每次检查最新 20 封邮件
 };
 
