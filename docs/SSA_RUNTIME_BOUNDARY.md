@@ -45,14 +45,74 @@ Use `SSA_DATA_ROOT` when a custom runtime data directory is needed. If it is not
 
 Recommended local paths:
 
-- Intelligence/news/trade data: `~/.ssa/data/intelligence/`
-- Farreach runtime data: `~/.ssa/data/farreach/`
-- Hero Pumps runtime data: `~/.ssa/data/hero-pumps/`
+- Farreach company data: `~/.ssa/data/companies/farreach/`
+- Hero Pumps company data: `~/.ssa/data/companies/hero-pumps/`
 - Runtime job queue: `~/.ssa/data/runtime/ssa-runtime.db`
-- Mailbox scans and IMAP output: `~/.ssa/data/mail/`
-- Generated quotes/documents: `~/.ssa/data/documents/`
 - Logs: `~/.ssa/logs/`
 - Temporary experiments: `~/.ssa/tmp/`
+
+Company folders are the default home for business material:
+
+```bash
+~/.ssa/data/companies/<workspace>/inbox/
+~/.ssa/data/companies/<workspace>/mail/
+~/.ssa/data/companies/<workspace>/leads/
+~/.ssa/data/companies/<workspace>/documents/
+~/.ssa/data/companies/<workspace>/quotations/
+~/.ssa/data/companies/<workspace>/intelligence/
+~/.ssa/data/companies/<workspace>/memory/
+~/.ssa/data/companies/<workspace>/approvals/
+~/.ssa/data/companies/<workspace>/events/
+~/.ssa/data/companies/<workspace>/operator-commands/
+```
+
+`~/.ssa/data/runtime/ssa-runtime.db` is a shared local scheduler index. Runtime rows carry `workspace_id`; company artifacts and customer-facing material stay under `companies/<workspace>/`.
+
+## Standalone Workers
+
+SSA workers must be runnable without Hermes or OpenClaw. The first mailbox worker is:
+
+```bash
+node scripts/workers/inbox-monitor.mjs --workspace farreach
+node scripts/workers/inbox-monitor.mjs --workspace hero-pumps
+node scripts/workers/inbox-monitor.mjs --workspace farreach --source himalaya --himalaya-account farreach
+```
+
+The worker supports two read-only source modes:
+
+- `local`: reads optional local scan input from:
+
+```bash
+~/.ssa/data/companies/<workspace>/inbox/incoming.json
+~/.ssa/data/companies/<workspace>/inbox/incoming.jsonl
+```
+
+- `himalaya`: runs `himalaya envelope list --account <account> --folder INBOX --output json`, then records only normalized envelope metadata in SSA state/events.
+
+It writes dedupe state to:
+
+```bash
+~/.ssa/data/companies/<workspace>/inbox/monitor-state.json
+```
+
+and writes runtime events to:
+
+```bash
+~/.ssa/data/companies/<workspace>/events/events.json
+```
+
+The worker never sends email and does not call OKKI, Feishu, payment, bank, or customer-facing APIs. Himalaya mode performs a read-only mailbox listing through the local Himalaya CLI config. Any future send/reply/write adapter must go through the side-effect gate and explicit runtime flags before any external call.
+
+Hermes may optionally call the compatibility wrappers:
+
+```bash
+bash farreach/scripts/inbox-monitor-scan.sh
+bash hero-pumps/scripts/inbox-monitor-scan.sh
+```
+
+Those wrappers delegate to the SSA-owned worker. They are not the source of runtime behavior.
+
+The wrappers default to `--source himalaya`; set `SSA_INBOX_SOURCE=local` when a local-only dry run is needed.
 
 ## Side Effect Policy
 
@@ -74,7 +134,7 @@ Human approval in the UI is not enough by itself. Real execution still requires 
 Hermes and other operator tools must not write generated data into this repo. Before writing any file, classify it:
 
 - Source code, docs, templates, tests, and intentional fixtures may live in the repo.
-- Runtime output, generated reports, mailbox scans, news data, intelligence data, screenshots, cache files, temporary HTML/PDF/CSV/JSON, and logs must live under `~/.ssa`.
+- Runtime output, generated reports, mailbox scans, news data, intelligence data, screenshots, cache files, temporary HTML/PDF/CSV/JSON, and logs must live under `~/.ssa`, normally under `~/.ssa/data/companies/<workspace>/...` when they belong to a company.
 
 Run this before and after Hermes work:
 

@@ -1,13 +1,15 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { ensureDir, repoPath, ssaDataPath } from "../ssa-data-paths";
+import { ensureDir, repoPath, ssaCompanyDataPath } from "../ssa-data-paths";
 import type { DocumentGenerationRequest, SideEffectDecision } from "./types";
 import { requestSideEffect } from "./side-effect-gate";
 import type { SalesRuntime } from "./sales-runtime";
 
 const QUOTATION_GENERATE_SCRIPT = repoPath("skills", "quotation-workflow", "scripts", "generate-all.sh");
-const QUOTATION_OUTPUT_DIR = ssaDataPath("quotations");
+function quotationOutputDir(workspaceId: string) {
+  return ssaCompanyDataPath(workspaceId, "quotations");
+}
 
 export interface TradeProduct {
   description: string;
@@ -108,8 +110,8 @@ function tradeDocsDir() {
   return process.env.TRADE_DOCS_DIR || repoPath("skills", "sales", "trade-docs");
 }
 
-function tradeDocsOutputDir() {
-  return ssaDataPath("documents", "trade-docs");
+function tradeDocsOutputDir(workspaceId = "farreach") {
+  return ssaCompanyDataPath(workspaceId, "documents", "trade-docs");
 }
 
 export function requestDocumentGeneration(request: DocumentGenerationRequest): SideEffectDecision {
@@ -132,13 +134,13 @@ function makeQuotationNo(type: string) {
   return `${type}-${dateStr}-${randomNum}`;
 }
 
-function findGeneratedQuotationFiles(quotationNo: string): Array<{ format: string; path: string }> {
+function findGeneratedQuotationFiles(workspaceId: string, quotationNo: string): Array<{ format: string; path: string }> {
   const extensions = ["xlsx", "docx", "html", "pdf"];
   const results: Array<{ format: string; path: string }> = [];
 
   for (const ext of extensions) {
     const candidates = [
-      path.join(QUOTATION_OUTPUT_DIR, `${quotationNo}.${ext}`),
+      path.join(quotationOutputDir(workspaceId), `${quotationNo}.${ext}`),
       path.join(os.tmpdir(), `${quotationNo}.${ext}`),
       path.join(path.dirname(QUOTATION_GENERATE_SCRIPT), "..", "output", `${quotationNo}.${ext}`),
     ];
@@ -173,7 +175,7 @@ export async function generateQuotationDocuments(
   runtime: SalesRuntime,
   input: QuotationGenerationInput
 ): Promise<QuotationGenerationResult> {
-  ensureDir(QUOTATION_OUTPUT_DIR);
+  ensureDir(quotationOutputDir(input.workspaceId));
 
   const quotationNo = makeQuotationNo(input.type);
   const sideEffect = runtime.requestDocumentGeneration({
@@ -227,7 +229,7 @@ export async function generateQuotationDocuments(
     return {
       success: true,
       quotationNo,
-      files: findGeneratedQuotationFiles(quotationNo),
+      files: findGeneratedQuotationFiles(input.workspaceId, quotationNo),
       sideEffect,
       detail: "Document generated successfully",
       log: stdout.slice(-500),
@@ -291,7 +293,7 @@ export async function generateTradeDocuments(
   runtime: SalesRuntime,
   input: TradeDocumentGenerationInput
 ): Promise<TradeDocumentGenerationResult> {
-  const outputDir = tradeDocsOutputDir();
+  const outputDir = tradeDocsOutputDir(input.workspaceId);
   ensureDir(outputDir);
 
   const sideEffect = runtime.requestDocumentGeneration({

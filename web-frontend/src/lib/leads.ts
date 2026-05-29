@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 import type { ApiResponse, PaginatedResponse } from "./api-types";
-import { ssaDataPath } from "./ssa-data-paths";
+import { ssaCompanyDataPath } from "./ssa-data-paths";
 
 function resolveDataPath(): string {
   if (process.env.LEADS_DATA_PATH) return process.env.LEADS_DATA_PATH;
-  return ssaDataPath("leads", "farreach", "tier1-v2-complete.json");
+  return ssaCompanyDataPath("farreach", "leads", "tier1-v2-complete.json");
 }
 
 export interface Lead {

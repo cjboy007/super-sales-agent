@@ -23,7 +23,6 @@ import {
   type QuotationStats,
 } from "../quotations";
 import { getAgentById, getAgents, type Agent } from "../agents";
-import { ssaDataPath } from "../ssa-data-paths";
 import type { InboundEmail, InboxStats } from "../../types/inbox";
 import type {
   AgentStateReadModel,
@@ -40,7 +39,7 @@ import type {
   WorkspaceId,
 } from "./types";
 import { getWorkspaceAdapter } from "./workspaces";
-import { readJsonFile, ensureSsaDataPath } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath, readJsonFile, ssaCompanyDataPath, ssaDataPath } from "../ssa-data-paths";
 import { createMemoryEngine, type MemoryEngine } from "./memory-engine";
 import { createRuntimeTaskQueue } from "./task-queue";
 
@@ -335,7 +334,7 @@ function loadWorkspaceLeads(workspaceId: string): LeadRecord[] {
 function loadHeroLeadRows(): Array<Record<string, string>> {
   if (heroLeadCache) return heroLeadCache;
 
-  const leadsDir = ssaDataPath("hero-pumps", "leads");
+  const leadsDir = ssaCompanyDataPath("hero-pumps", "leads");
   if (!fs.existsSync(leadsDir)) return [];
 
   const records: Array<Record<string, string>> = [];
@@ -506,16 +505,16 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-function approvalStorePath(): string {
-  return ensureSsaDataPath("runtime", "approvals.json");
+function approvalStorePath(workspaceId: WorkspaceId): string {
+  return ensureSsaCompanyDataPath(workspaceId, "approvals", "approvals.json");
 }
 
-function readApprovalStore(): ApprovalRecord[] {
-  return readJsonFile<ApprovalRecord[]>(approvalStorePath(), []);
+function readApprovalStore(workspaceId: WorkspaceId): ApprovalRecord[] {
+  return readJsonFile<ApprovalRecord[]>(approvalStorePath(workspaceId), []);
 }
 
-function writeApprovalStore(records: ApprovalRecord[]): void {
-  fs.writeFileSync(approvalStorePath(), JSON.stringify(records.slice(0, 1000), null, 2), "utf-8");
+function writeApprovalStore(workspaceId: WorkspaceId, records: ApprovalRecord[]): void {
+  fs.writeFileSync(approvalStorePath(workspaceId), JSON.stringify(records.slice(0, 1000), null, 2), "utf-8");
 }
 
 function sanitizeText(value: unknown, fallback = ""): string {
@@ -551,7 +550,7 @@ function defaultApprovals(workspaceId: WorkspaceId): ApprovalRecord[] {
 
 function mergeApprovals(workspaceId: WorkspaceId): ApprovalRecord[] {
   const workspace = getWorkspaceAdapter(workspaceId);
-  const persisted = readApprovalStore().filter((approval) => approval.workspaceId === workspace.id);
+  const persisted = readApprovalStore(workspace.id);
   const byId = new Map<string, ApprovalRecord>();
   for (const approval of defaultApprovals(workspace.id)) byId.set(approval.id, approval);
   for (const approval of persisted) byId.set(approval.id, approval);
@@ -583,7 +582,7 @@ function agentStateFor(
 }
 
 function getHeroSentLog(): SentEmail[] {
-  return safeReadJson<SentEmail[]>(ssaDataPath("mail", "sent-log.json")) || [];
+  return safeReadJson<SentEmail[]>(ssaCompanyDataPath("hero-pumps", "mail", "sent-log.json")) || [];
 }
 
 function getHeroFollowUpState(): Record<string, {
@@ -603,15 +602,15 @@ function getHeroFollowUpState(): Record<string, {
     has_reply?: boolean;
     is_due?: boolean;
     template_path?: string;
-  }>>(ssaDataPath("hero-pumps", "follow-up-state.json")) || {};
+  }>>(ssaCompanyDataPath("hero-pumps", "follow-up-state.json")) || {};
 }
 
 function getHeroReplies(): Array<Record<string, unknown>> {
-  return safeReadJson<Array<Record<string, unknown>>>(ssaDataPath("hero-pumps", "tracking", "replies.json")) || [];
+  return safeReadJson<Array<Record<string, unknown>>>(ssaCompanyDataPath("hero-pumps", "tracking", "replies.json")) || [];
 }
 
 function getHeroEmailDrafts(): EmailDraft[] {
-  const templatesDir = ssaDataPath("mail", "drafts");
+  const templatesDir = ssaCompanyDataPath("hero-pumps", "mail", "drafts");
   try {
     if (!fs.existsSync(templatesDir)) return [];
     const files = fs.readdirSync(templatesDir)
@@ -772,8 +771,8 @@ function interleaveByField(items: Array<Record<string, unknown>>, field: string)
   return result;
 }
 
-function readIntelligenceFile<T>(fileName: string, fallback: T): T {
-  return readJsonFile<T>(ssaDataPath("intelligence", fileName), fallback);
+function readIntelligenceFile<T>(workspaceId: string, fileName: string, fallback: T): T {
+  return readJsonFile<T>(ssaCompanyDataPath(workspaceId, "intelligence", fileName), fallback);
 }
 
 function scoreTextMatch(fields: string[], terms: string[]): number {
@@ -836,9 +835,12 @@ function findQuotationMatches(terms: string[], quotations: Quotation[]): IntakeM
     }));
 }
 
-function scanDocumentMatches(terms: string[]): IntakeMemoryMatch[] {
+function scanDocumentMatches(workspaceId: string, terms: string[]): IntakeMemoryMatch[] {
   if (terms.length === 0) return [];
-  const roots = [ssaDataPath("documents"), ssaDataPath("quotations")];
+  const roots = [
+    ssaCompanyDataPath(workspaceId, "documents"),
+    ssaCompanyDataPath(workspaceId, "quotations"),
+  ];
   const results: IntakeMemoryMatch[] = [];
 
   function visit(dir: string) {
@@ -995,7 +997,7 @@ export class SalesMemory {
     if (!id) throw new Error("Approval id is required");
 
     const timestamp = nowIso();
-    const current = readApprovalStore();
+    const current = readApprovalStore(workspace.id);
     const existing = mergeApprovals(workspace.id).find((approval) => approval.id === id);
     const dealId = sanitizeText(input.dealId, sanitizeText(input.deal_id, existing?.dealId || ""));
     const approval: ApprovalRecord = {
@@ -1021,7 +1023,7 @@ export class SalesMemory {
       updatedAt: timestamp,
     };
 
-    writeApprovalStore([approval, ...current.filter((item) => !(item.workspaceId === workspace.id && item.id === id))]);
+    writeApprovalStore(workspace.id, [approval, ...current.filter((item) => item.id !== id)]);
     recorder?.("approval.upserted", workspace.id, {
       approvalId: approval.id,
       dealId: approval.dealId,
@@ -1051,8 +1053,8 @@ export class SalesMemory {
       updatedAt: timestamp,
     };
 
-    const current = readApprovalStore();
-    writeApprovalStore([approval, ...current.filter((item) => !(item.workspaceId === workspace.id && item.id === id))]);
+    const current = readApprovalStore(workspace.id);
+    writeApprovalStore(workspace.id, [approval, ...current.filter((item) => item.id !== id)]);
     recorder?.("approval.updated", workspace.id, {
       approvalId: approval.id,
       dealId: approval.dealId,
@@ -1082,15 +1084,16 @@ export class SalesMemory {
   }
 
   getIntelligenceFeed(workspaceId: string, feed: IntelligenceFeedType): IntelligenceFeedReadModel {
-    getWorkspaceAdapter(workspaceId);
+    const workspace = getWorkspaceAdapter(workspaceId);
 
     if (feed === "alerts") {
-      const data = readIntelligenceFile<Record<string, unknown>>("alerts.json", {});
+      const data = readIntelligenceFile<Record<string, unknown>>(workspace.id, "alerts.json", {});
       return { success: true, alerts: [], ...data };
     }
 
     if (feed === "competitors") {
       const data = readIntelligenceFile<{ competitors?: Array<Record<string, unknown>>; updatedAt?: string }>(
+        workspace.id,
         "competitors.json",
         {}
       );
@@ -1106,7 +1109,7 @@ export class SalesMemory {
     }
 
     if (feed === "insights") {
-      const data = readIntelligenceFile<{ insights?: unknown[]; generatedAt?: string }>("insights.json", {});
+      const data = readIntelligenceFile<{ insights?: unknown[]; generatedAt?: string }>(workspace.id, "insights.json", {});
       return {
         success: true,
         insights: data.insights || [],
@@ -1117,6 +1120,7 @@ export class SalesMemory {
 
     if (feed === "news") {
       const data = readIntelligenceFile<{ news?: Array<Record<string, unknown>>; updatedAt?: string }>(
+        workspace.id,
         "news.json",
         {}
       );
@@ -1131,7 +1135,7 @@ export class SalesMemory {
       };
     }
 
-    const data = readIntelligenceFile<Record<string, unknown>>("trends.json", {});
+    const data = readIntelligenceFile<Record<string, unknown>>(workspace.id, "trends.json", {});
     return { success: true, trends: [], ...data };
   }
 
@@ -1302,7 +1306,7 @@ export class SalesMemory {
     return uniqueMatches([
       ...leadMatches,
       ...quotationMatches,
-      ...scanDocumentMatches(terms),
+      ...scanDocumentMatches(workspace.id, terms),
     ])
       .sort((a, b) => b.confidence - a.confidence)
       .slice(0, 8);

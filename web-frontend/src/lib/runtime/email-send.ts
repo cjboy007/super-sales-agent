@@ -1,7 +1,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { ensureSsaDataPath, repoPath } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath, repoPath } from "../ssa-data-paths";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision, WorkspaceId } from "./types";
 
@@ -23,22 +23,22 @@ export interface EmailSendResult {
   detail: string;
 }
 
-function sentLogPath() {
-  return ensureSsaDataPath("mail", "sent-log.json");
+function sentLogPath(workspaceId: WorkspaceId) {
+  return ensureSsaCompanyDataPath(workspaceId, "mail", "sent-log.json");
 }
 
-function sendRequestLogPath() {
-  return ensureSsaDataPath("mail", "send-requests.json");
+function sendRequestLogPath(workspaceId: WorkspaceId) {
+  return ensureSsaCompanyDataPath(workspaceId, "mail", "send-requests.json");
 }
 
 function isSmtpEnabled() {
   return process.env.SSA_ENABLE_REAL_EMAIL_SEND === "true";
 }
 
-function appendToSentLog(email: string, subject: string) {
+function appendToSentLog(workspaceId: WorkspaceId, email: string, subject: string) {
   let entries: Array<{ email: string; sent_at: string; subject: string }> = [];
   try {
-    const raw = fs.readFileSync(sentLogPath(), "utf-8");
+    const raw = fs.readFileSync(sentLogPath(workspaceId), "utf-8");
     entries = JSON.parse(raw);
   } catch {
     // File does not exist yet.
@@ -48,13 +48,13 @@ function appendToSentLog(email: string, subject: string) {
     sent_at: new Date().toISOString(),
     subject,
   });
-  fs.writeFileSync(sentLogPath(), JSON.stringify(entries, null, 2), "utf-8");
+  fs.writeFileSync(sentLogPath(workspaceId), JSON.stringify(entries, null, 2), "utf-8");
 }
 
-function appendToSendRequestLog(email: string, subject: string) {
+function appendToSendRequestLog(workspaceId: WorkspaceId, email: string, subject: string) {
   let entries: Array<{ email: string; requested_at: string; subject: string; status: string }> = [];
   try {
-    const raw = fs.readFileSync(sendRequestLogPath(), "utf-8");
+    const raw = fs.readFileSync(sendRequestLogPath(workspaceId), "utf-8");
     entries = JSON.parse(raw);
   } catch {
     // File does not exist yet.
@@ -65,7 +65,7 @@ function appendToSendRequestLog(email: string, subject: string) {
     subject,
     status: "blocked_local_preview",
   });
-  fs.writeFileSync(sendRequestLogPath(), JSON.stringify(entries, null, 2), "utf-8");
+  fs.writeFileSync(sendRequestLogPath(workspaceId), JSON.stringify(entries, null, 2), "utf-8");
 }
 
 async function runSmtpScript(args: string[]) {
@@ -93,7 +93,7 @@ export async function sendEmailThroughRuntime(runtime: SalesRuntime, input: Emai
   });
 
   if (!isSmtpEnabled()) {
-    appendToSendRequestLog(input.to, input.subject);
+    appendToSendRequestLog(input.workspaceId, input.to, input.subject);
     return {
       success: true,
       blocked: true,
@@ -103,7 +103,7 @@ export async function sendEmailThroughRuntime(runtime: SalesRuntime, input: Emai
   }
 
   if (sideEffect.status !== "allowed") {
-    appendToSendRequestLog(input.to, input.subject);
+    appendToSendRequestLog(input.workspaceId, input.to, input.subject);
     return {
       success: true,
       blocked: true,
@@ -136,7 +136,7 @@ export async function sendEmailThroughRuntime(runtime: SalesRuntime, input: Emai
   const messageId = messageIdMatch ? messageIdMatch[1].trim() : undefined;
 
   try {
-    appendToSentLog(input.to, input.subject);
+  appendToSentLog(input.workspaceId, input.to, input.subject);
   } catch {
     // Sent-log append is non-fatal.
   }

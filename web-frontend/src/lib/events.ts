@@ -78,8 +78,8 @@ export function seedSentLogEvents(): AgentEvent[] {
   try {
     // Dynamic import for server-side only
     const fs = require("fs");
-    const { ssaDataPath } = require("./ssa-data-paths");
-    const logPath = ssaDataPath("mail", "sent-log.json");
+    const { ssaCompanyDataPath } = require("./ssa-data-paths");
+    const logPath = ssaCompanyDataPath("farreach", "mail", "sent-log.json");
     if (!fs.existsSync(logPath)) return getRecentEvents();
 
     const entries = JSON.parse(fs.readFileSync(logPath, "utf-8")) as Array<{

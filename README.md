@@ -16,6 +16,51 @@ scripts/check-repo-boundary.sh
 
 Details: [docs/SSA_RUNTIME_BOUNDARY.md](./docs/SSA_RUNTIME_BOUNDARY.md)
 
+### Standalone Inbox Monitor
+
+SSA owns its inbox-monitor runtime. Hermes can call it, but Hermes is optional:
+
+```bash
+node scripts/workers/inbox-monitor.mjs --workspace farreach
+node scripts/workers/inbox-monitor.mjs --workspace hero-pumps
+node scripts/workers/inbox-monitor.mjs --workspace farreach --source himalaya --himalaya-account farreach
+```
+
+Hermes-compatible wrappers are available at:
+
+```bash
+bash farreach/scripts/inbox-monitor-scan.sh
+bash hero-pumps/scripts/inbox-monitor-scan.sh
+```
+
+The monitor can run in local-file mode or read-only Himalaya mode. Project wrappers default to Himalaya accounts `farreach` and `heropumps`; set `SSA_INBOX_SOURCE=local` to force local-file mode. The worker writes dedupe state under `~/.ssa/data/companies/<workspace>/inbox/` and records SSA runtime events under `~/.ssa/data/companies/<workspace>/events/`.
+
+### SSA Company Data Layout
+
+Runtime files are owned by SSA, but they do not live inside this repo. Each company gets its own folder:
+
+```bash
+~/.ssa/data/companies/farreach/
+~/.ssa/data/companies/hero-pumps/
+```
+
+Common company subfolders:
+
+```bash
+inbox/              # mailbox scan input and monitor state
+mail/               # sent logs, drafts, captured send requests
+leads/              # imported lead CSV/JSON files
+documents/          # generated trade documents
+quotations/         # generated quotes
+intelligence/       # news, market, and competitor signals
+memory/             # SSA-owned customer memory
+approvals/          # approval records and side-effect decisions
+events/             # runtime activity events
+operator-commands/  # page-aware operator instructions
+```
+
+Hermes, OpenClaw, and other operator tools should write company material into those folders when they need SSA to see it. The repo should stay code, templates, docs, tests, and intentional fixtures.
+
 ---
 
 ## 📖 目录
@@ -107,10 +152,13 @@ Details: [docs/SSA_RUNTIME_BOUNDARY.md](./docs/SSA_RUNTIME_BOUNDARY.md)
 
 ### 前置条件
 
-- [OpenClaw](https://github.com/openclaw/openclaw) v0.5+
 - Node.js 18+
-- OKKI CRM 账号（可选）
-- 企业邮箱账号（可选）
+- SQLite CLI（本地任务队列使用）
+- LLM API Key（可选；只在需要 AI 分析/生成时使用）
+- OKKI CRM 账号（可选；默认不写入真实 OKKI）
+- 企业邮箱账号（可选；默认不读取/发送真实邮件）
+
+OpenClaw、Hermes、PHOENIX、Codex 都不是 SSA 运行时依赖。它们可以作为开发、监督、定时调用工具存在，但 SSA 本体必须能独立启动。
 
 ### 安装
 
@@ -119,60 +167,45 @@ Details: [docs/SSA_RUNTIME_BOUNDARY.md](./docs/SSA_RUNTIME_BOUNDARY.md)
 git clone https://github.com/cjboy007/super-sales-agent.git
 cd super-sales-agent
 
-# 安装核心 skill（通过 ClawHub）
-clawhub install auto-evolution
-clawhub install imap-smtp-email
-clawhub install okki-email-sync
-clawhub install email-smart-reply
-clawhub install quotation-workflow
-
-# 或直接从本地加载
-cp -r skills/* ~/.openclaw/workspace/skills/
+# 安装前端依赖
+cd web-frontend
+npm install
 ```
 
 ### 配置
 
-1. **配置邮箱**（`skills/imap-smtp-email/.env`）
+1. **配置本地运行数据目录**（可选）
 ```bash
-IMAP_HOST=imaphz.qiye.163.com
-IMAP_PORT=993
-SMTP_HOST=smtphz.qiye.163.com
-SMTP_PORT=465
-EMAIL=your-email
-PASSWORD=your_password
+export SSA_DATA_ROOT="$HOME/.ssa/data"
 ```
 
-2. **配置 OKKI**（`skills/okki/.env`）
+2. **配置 LLM Provider**（可选）
 ```bash
-OKKI_API_KEY=your_api_key
-OKKI_ORG_ID=your_org_id
+export SSA_LLM_PROVIDER=openai
+export OPENAI_API_KEY=your_key
 ```
 
-3. **启动 Revolution**（可选 - 自动开发）
+3. **启动本地 UI**
 ```bash
-# 配置 coordinator heartbeat
-openclaw cron add --agent wilson \
-  --name "evolution-coordinator" \
-  --every 5m \
-  --session isolated \
-  --message "Evolution heartbeat: scan and process tasks."
+npm run dev
 ```
 
 ### 验证
 
 ```bash
-# 测试邮件连接
-cd skills/imap-smtp-email
-node scripts/imap.js check --limit 5
+# 从 repo 根目录运行
+node --test scripts/workers/inbox-monitor.test.mjs
 
-# 测试 OKKI 同步
-cd skills/okki-email-sync
-node okki-sync.js test
+# 前端构建
+cd web-frontend
+npm run build
 
-# 生成示例报价单
-cd skills/quotation-workflow
-bash scripts/generate-all.sh examples/customer.json QT-TEST-001
+# 检查是否有运行时文件误入 repo
+cd ..
+scripts/check-repo-boundary.sh
 ```
+
+真实 IMAP、SMTP、OKKI、飞书、支付、银行等外部副作用默认关闭。必须有 Wilson 明确授权并设置对应 `SSA_ENABLE_REAL_*` 开关后，适配器才允许执行真实外部调用。
 
 ---
 
@@ -220,27 +253,33 @@ bash scripts/generate-all.sh examples/customer.json QT-TEST-001
 
 ## 配置指南
 
-### OpenClaw 配置
+### SSA Runtime 配置
 
-在 `~/.openclaw/config.json` 中添加：
-```json
-{
-  "agents": {
-    "wilson": {
-      "model": "bailian/qwen3.5-plus",
-      "heartbeat": "skills/auto-evolution/scripts/heartbeat-coordinator.js"
-    }
-  }
-}
+常用运行时变量：
+```bash
+export SSA_DATA_ROOT="$HOME/.ssa/data"
+export SSA_LLM_PROVIDER=openai
+export OPENAI_API_KEY=your_key
 ```
 
-### 环境变量
-
-所有技能共享的环境变量：
+外部副作用开关默认不设置：
 ```bash
-export OPENCLAW_WORKSPACE=/Users/wilson/.openclaw/workspace
-export EVOLUTION_TASKS_DIR=$OPENCLAW_WORKSPACE/evolution/tasks
-export EVOLUTION_SKILLS_DIR=$OPENCLAW_WORKSPACE/skills
+export SSA_ENABLE_REAL_IMAP=true
+export SSA_ENABLE_REAL_EMAIL_SEND=true
+export SSA_ENABLE_REAL_CRM_WRITE=true
+export SSA_ENABLE_REAL_FEISHU=true
+export SSA_ENABLE_REAL_PAYMENT=true
+export SSA_ENABLE_REAL_BANK=true
+```
+
+只有在明确需要真实外部调用时才设置这些变量。
+
+### OpenClaw / Hermes（可选）
+
+旧 skill 和 agent 工作流可以继续作为开发参考或 operator 工具使用，但不能作为 SSA 运行条件。Hermes 如需监控邮件，应调用 SSA 自己的 wrapper：
+```bash
+bash farreach/scripts/inbox-monitor-scan.sh
+bash hero-pumps/scripts/inbox-monitor-scan.sh
 ```
 
 ---
@@ -282,4 +321,4 @@ MIT License
 
 ---
 
-**Built with [OpenClaw](https://openclaw.ai) 🐾**
+SSA can be developed with OpenClaw/Hermes, but it runs without them.

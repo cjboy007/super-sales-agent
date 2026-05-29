@@ -25,7 +25,7 @@ function request(url: string): NextRequest {
 }
 
 function writeIntelligence(fileName: string, data: unknown) {
-  const dir = path.join(tempRoot, "intelligence");
+  const dir = path.join(tempRoot, "companies", "farreach", "intelligence");
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, fileName), JSON.stringify(data), "utf-8");
 }

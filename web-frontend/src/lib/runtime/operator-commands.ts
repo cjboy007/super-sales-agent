@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { AgentEvent } from "../events";
 import { publishAndRemember } from "../events";
-import { ensureSsaDataPath } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath } from "../ssa-data-paths";
 import type { OperatorCommandInput, OperatorCommandRecord, WorkspaceId } from "./types";
 
 interface OperatorCommandRuntime {
@@ -38,7 +38,7 @@ function sanitizeContext(value: unknown): Record<string, unknown> {
 }
 
 function writeCommand(record: OperatorCommandRecord): string {
-  const filePath = ensureSsaDataPath("operator-commands", `${record.id}.json`);
+  const filePath = ensureSsaCompanyDataPath(record.workspaceId, "operator-commands", `${record.id}.json`);
   fs.writeFileSync(filePath, JSON.stringify(record, null, 2), "utf-8");
   return filePath;
 }

@@ -39,7 +39,7 @@ describe("/api/leads route", () => {
   });
 
   it("serves Hero Pumps leads via Sales Memory without route-local parsing", async () => {
-    const leadsDir = path.join(tempRoot, "hero-pumps", "leads");
+    const leadsDir = path.join(tempRoot, "companies", "hero-pumps", "leads");
     fs.mkdirSync(leadsDir, { recursive: true });
     fs.writeFileSync(
       path.join(leadsDir, "nordic-west.csv"),
@@ -60,7 +60,7 @@ describe("/api/leads route", () => {
   });
 
   it("serves CSV leads for a new local workspace without code changes", async () => {
-    const leadsDir = path.join(tempRoot, "workspaces", "new-salesperson", "leads");
+    const leadsDir = path.join(tempRoot, "companies", "new-salesperson", "leads");
     fs.mkdirSync(leadsDir, { recursive: true });
     fs.writeFileSync(
       path.join(leadsDir, "crm-export.csv"),

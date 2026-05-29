@@ -18,11 +18,29 @@ export function ssaDataPath(...segments: string[]): string {
   return path.join(ssaDataRoot(), ...segments);
 }
 
+export function sanitizeSsaPathSegment(value: string | null | undefined, fallback = "local"): string {
+  return String(value || fallback).replace(/[^a-zA-Z0-9._-]/g, "_") || fallback;
+}
+
+export function ssaCompanyDataPath(workspaceId: string | null | undefined, ...segments: string[]): string {
+  return ssaDataPath("companies", sanitizeSsaPathSegment(workspaceId), ...segments);
+}
+
+export const ssaWorkspaceDataPath = ssaCompanyDataPath;
+
 export function ensureSsaDataPath(...segments: string[]): string {
   const filePath = ssaDataPath(...segments);
   ensureDir(path.dirname(filePath));
   return filePath;
 }
+
+export function ensureSsaCompanyDataPath(workspaceId: string | null | undefined, ...segments: string[]): string {
+  const filePath = ssaCompanyDataPath(workspaceId, ...segments);
+  ensureDir(path.dirname(filePath));
+  return filePath;
+}
+
+export const ensureSsaWorkspaceDataPath = ensureSsaCompanyDataPath;
 
 export function repoPath(...segments: string[]): string {
   return path.join(REPO_ROOT, ...segments);

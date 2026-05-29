@@ -51,7 +51,7 @@ describe("/api/operator-command route", () => {
     expect(json.data.jobId).toMatch(/^operator.command-/);
 
     const command = JSON.parse(
-      fs.readFileSync(path.join(tempRoot, "operator-commands", `${json.data.id}.json`), "utf-8")
+      fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "operator-commands", `${json.data.id}.json`), "utf-8")
     );
     expect(command).toMatchObject({
       id: json.data.id,
@@ -69,7 +69,7 @@ describe("/api/operator-command route", () => {
       status: "queued",
     });
 
-    const events = JSON.parse(fs.readFileSync(path.join(tempRoot, "runtime", "events.json"), "utf-8"));
+    const events = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "events", "events.json"), "utf-8"));
     expect(events[0]).toMatchObject({
       type: "operator.command.queued",
       workspaceId: "demo-exporter",

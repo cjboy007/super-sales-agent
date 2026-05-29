@@ -55,7 +55,15 @@ describe("SalesRuntime", () => {
     expect(workspace.id).toBe("new-salesperson");
     expect(workspace.capabilities.crm).toBe("csv");
     expect(workspace.packs).toContain("follow-up");
-    expect(workspace.data.leadsPath).toContain(path.join("workspaces", "new-salesperson", "leads"));
+    expect(workspace.data.leadsPath).toContain(path.join("companies", "new-salesperson", "leads"));
+  });
+
+  it("keeps built-in workspace runtime data under company folders", () => {
+    const runtime = createSalesRuntime();
+
+    expect(runtime.getWorkspace("farreach").data.leadsPath).toContain(path.join("companies", "farreach", "leads"));
+    expect(runtime.getWorkspace("hero-pumps").data.leadsPath).toContain(path.join("companies", "hero-pumps", "leads"));
+    expect(runtime.getWorkspace("hero-pumps").data.templatesPath).toContain(path.join("companies", "hero-pumps", "campaign-tracker"));
   });
 
   it("registers a new workspace and includes it in runtime snapshots", () => {
@@ -196,6 +204,7 @@ describe("SalesRuntime", () => {
       kind: "email.send",
       status: "blocked",
     });
+    expect(fs.existsSync(path.join(tempRoot, "companies", "farreach", "events", "events.json"))).toBe(true);
   });
 
   it("blocks and audits document generation side effects by default", () => {
@@ -250,7 +259,7 @@ describe("SalesRuntime", () => {
   });
 
   it("loads Hero Pumps CSV leads through sales memory", () => {
-    const leadsDir = path.join(tempRoot, "hero-pumps", "leads");
+    const leadsDir = path.join(tempRoot, "companies", "hero-pumps", "leads");
     fs.mkdirSync(leadsDir, { recursive: true });
     fs.writeFileSync(
       path.join(leadsDir, "western-europe.csv"),
@@ -323,7 +332,7 @@ describe("SalesRuntime", () => {
     });
     expect(command.jobId).toBeTruthy();
 
-    const commandPath = path.join(tempRoot, "operator-commands", `${command.id}.json`);
+    const commandPath = path.join(tempRoot, "companies", "demo-exporter", "operator-commands", `${command.id}.json`);
     expect(JSON.parse(fs.readFileSync(commandPath, "utf-8"))).toMatchObject({
       id: command.id,
       jobId: command.jobId,
@@ -459,6 +468,7 @@ describe("SalesRuntime", () => {
 
     expect(authoritative.authority).toBe("authoritative");
     expect(suggested.authority).toBe("suggested");
+    expect(fs.existsSync(path.join(tempRoot, "companies", "demo-exporter", "memory", "records.json"))).toBe(true);
 
     const allHits = runtime.searchMemory({
       workspaceId: "demo-exporter",

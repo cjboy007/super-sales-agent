@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse, PaginatedResponse } from "@/lib/api-types";
 import { createSalesRuntime } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 // Cache-Control helper
 function cachedJson<T>(data: T, maxAge = 60): NextResponse<T> {
   return NextResponse.json(data, {

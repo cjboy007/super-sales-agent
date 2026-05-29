@@ -1,6 +1,7 @@
 import fs from "fs";
 import type { SideEffectDecision, SideEffectKind, SideEffectRequest } from "./types";
-import { ensureSsaDataPath, readJsonFile } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath, readJsonFile, ssaDataPath } from "../ssa-data-paths";
+import { listWorkspaceAdapters } from "./workspaces";
 
 const SIDE_EFFECT_FLAGS: Record<SideEffectKind, string> = {
   "email.send": "SSA_ENABLE_REAL_EMAIL_SEND",
@@ -14,8 +15,8 @@ const SIDE_EFFECT_FLAGS: Record<SideEffectKind, string> = {
   "document.preview": "SSA_ENABLE_REAL_DOCUMENT_PREVIEW",
 };
 
-function decisionPath() {
-  return ensureSsaDataPath("runtime", "side-effect-decisions.json");
+function decisionPath(workspaceId: string) {
+  return ensureSsaCompanyDataPath(workspaceId, "approvals", "side-effect-decisions.json");
 }
 
 function makeDecisionId(kind: SideEffectKind) {
@@ -27,12 +28,33 @@ function isRealExecutionEnabled(kind: SideEffectKind) {
   return process.env[flag] === "true";
 }
 
-function readDecisions(): SideEffectDecision[] {
-  return readJsonFile<SideEffectDecision[]>(decisionPath(), []);
+function readDecisions(workspaceId: string): SideEffectDecision[] {
+  return readJsonFile<SideEffectDecision[]>(decisionPath(workspaceId), []);
 }
 
-function writeDecisions(decisions: SideEffectDecision[]) {
-  fs.writeFileSync(decisionPath(), JSON.stringify(decisions, null, 2), "utf-8");
+function writeDecisions(workspaceId: string, decisions: SideEffectDecision[]) {
+  fs.writeFileSync(decisionPath(workspaceId), JSON.stringify(decisions, null, 2), "utf-8");
+}
+
+function discoverDecisionWorkspaces(): string[] {
+  const ids = new Set<string>(listWorkspaceAdapters().map((workspace) => workspace.id));
+  const companiesDir = ssaDataPath("companies");
+  try {
+    if (fs.existsSync(companiesDir)) {
+      for (const entry of fs.readdirSync(companiesDir, { withFileTypes: true })) {
+        if (entry.isDirectory()) ids.add(entry.name);
+      }
+    }
+  } catch {
+    // Missing or unreadable company folders are treated as empty.
+  }
+  return Array.from(ids);
+}
+
+function readAllDecisions(): SideEffectDecision[] {
+  return discoverDecisionWorkspaces()
+    .flatMap((workspaceId) => readDecisions(workspaceId))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export function requestSideEffect(request: SideEffectRequest): SideEffectDecision {
@@ -54,27 +76,29 @@ export function requestSideEffect(request: SideEffectRequest): SideEffectDecisio
     },
   };
 
-  const decisions = readDecisions();
+  const decisions = readDecisions(request.workspaceId);
   decisions.unshift(decision);
-  writeDecisions(decisions.slice(0, 500));
+  writeDecisions(request.workspaceId, decisions.slice(0, 500));
   return decision;
 }
 
 export function listSideEffectDecisions(limit = 50): SideEffectDecision[] {
-  return readDecisions().slice(0, limit);
+  return readAllDecisions().slice(0, limit);
 }
 
 export function getSideEffectDecision(id: string): SideEffectDecision | null {
-  return readDecisions().find((decision) => decision.id === id) || null;
+  return readAllDecisions().find((decision) => decision.id === id) || null;
 }
 
 function updateDecision(id: string, updater: (decision: SideEffectDecision) => SideEffectDecision): SideEffectDecision {
-  const decisions = readDecisions();
+  const existing = getSideEffectDecision(id);
+  if (!existing) throw new Error(`Side effect decision not found: ${id}`);
+  const decisions = readDecisions(existing.workspaceId);
   const index = decisions.findIndex((decision) => decision.id === id);
   if (index < 0) throw new Error(`Side effect decision not found: ${id}`);
   const updated = updater(decisions[index]);
   decisions[index] = updated;
-  writeDecisions(decisions);
+  writeDecisions(existing.workspaceId, decisions);
   return updated;
 }
 
@@ -126,10 +150,10 @@ export function retrySideEffectDecision(id: string): SideEffectDecision {
       : retry.reason,
   };
 
-  const decisions = readDecisions();
+  const decisions = readDecisions(retried.workspaceId);
   const index = decisions.findIndex((decision) => decision.id === retry.id);
   if (index >= 0) decisions[index] = retried;
   else decisions.unshift(retried);
-  writeDecisions(decisions.slice(0, 500));
+  writeDecisions(retried.workspaceId, decisions.slice(0, 500));
   return retried;
 }

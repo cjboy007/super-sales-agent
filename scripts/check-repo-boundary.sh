@@ -73,9 +73,10 @@ if (( ${#blocked[@]} > 0 )); then
   printf '  %s\n' "${blocked[@]}"
   echo
   echo "Recommended locations:"
-  echo "  intelligence/news: ~/.ssa/data/intelligence/"
-  echo "  mail/IMAP output: ~/.ssa/data/mail/"
-  echo "  generated docs:   ~/.ssa/data/documents/"
+  echo "  company data:      ~/.ssa/data/companies/<workspace>/"
+  echo "  intelligence/news: ~/.ssa/data/companies/<workspace>/intelligence/"
+  echo "  mail/IMAP output: ~/.ssa/data/companies/<workspace>/mail/"
+  echo "  generated docs:   ~/.ssa/data/companies/<workspace>/documents/"
   echo "  logs:             ~/.ssa/logs/"
   echo "  temp work:        ~/.ssa/tmp/"
   exit 1

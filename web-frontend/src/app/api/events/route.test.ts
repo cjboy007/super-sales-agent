@@ -47,9 +47,9 @@ describe("/api/events route", () => {
   });
 
   it("includes recent sent-log entries from runtime activity memory", async () => {
-    fs.mkdirSync(path.join(tempRoot, "mail"), { recursive: true });
+    fs.mkdirSync(path.join(tempRoot, "companies", "farreach", "mail"), { recursive: true });
     fs.writeFileSync(
-      path.join(tempRoot, "mail", "sent-log.json"),
+      path.join(tempRoot, "companies", "farreach", "mail", "sent-log.json"),
       JSON.stringify([
         {
           email: "buyer@example.com",

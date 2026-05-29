@@ -4,9 +4,10 @@ import os from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const execFileMock = vi.fn();
+const execFileMock = vi.hoisted(() => vi.fn());
 
-vi.mock("child_process", () => ({
+vi.mock("child_process", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("child_process")>()),
   execFile: (...args: unknown[]) => execFileMock(...args),
 }));
 
@@ -63,7 +64,7 @@ describe("/api/emails/send route", () => {
     });
     expect(execFileMock).not.toHaveBeenCalled();
 
-    const requests = JSON.parse(fs.readFileSync(path.join(tempRoot, "mail", "send-requests.json"), "utf-8"));
+    const requests = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "mail", "send-requests.json"), "utf-8"));
     expect(requests[0]).toMatchObject({
       email: "buyer@example.com",
       subject: "Quote follow-up",
@@ -94,7 +95,7 @@ describe("/api/emails/send route", () => {
     });
     expect(execFileMock).toHaveBeenCalledOnce();
 
-    const sent = JSON.parse(fs.readFileSync(path.join(tempRoot, "mail", "sent-log.json"), "utf-8"));
+    const sent = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "mail", "sent-log.json"), "utf-8"));
     expect(sent[0]).toMatchObject({
       email: "buyer@example.com",
       subject: "Approved quote",

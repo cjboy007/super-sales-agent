@@ -4,9 +4,10 @@ import os from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const execFileSyncMock = vi.fn();
+const execFileSyncMock = vi.hoisted(() => vi.fn());
 
-vi.mock("child_process", () => ({
+vi.mock("child_process", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("child_process")>()),
   execFileSync: (...args: unknown[]) => execFileSyncMock(...args),
 }));
 
@@ -37,6 +38,10 @@ function requestFor(filePath: string, project = "demo-exporter"): NextRequest {
   return new NextRequest(`http://localhost/api/files/preview?path=${encodeURIComponent(filePath)}&project=${project}`);
 }
 
+function conversionCalls() {
+  return execFileSyncMock.mock.calls.filter((call) => call[0] === "soffice");
+}
+
 describe("/api/files/preview route", () => {
   it("returns direct preview metadata for HTML without a side-effect gate", async () => {
     const htmlPath = path.join(tempRoot, "documents", "preview.html");
@@ -52,7 +57,7 @@ describe("/api/files/preview route", () => {
       reason: "direct",
       inlineUrl: `/api/files?path=${encodeURIComponent(htmlPath)}`,
     });
-    expect(execFileSyncMock).not.toHaveBeenCalled();
+    expect(conversionCalls()).toHaveLength(0);
   });
 
   it("blocks Office document conversion by default without running LibreOffice", async () => {
@@ -76,7 +81,7 @@ describe("/api/files/preview route", () => {
       },
     });
     expect(json.sideEffect.reason).toContain("SSA_ENABLE_REAL_DOCUMENT_PREVIEW=true");
-    expect(execFileSyncMock).not.toHaveBeenCalled();
+    expect(conversionCalls()).toHaveLength(0);
   });
 
   it("runs Office document conversion only when document preview is explicitly enabled", async () => {
@@ -85,6 +90,7 @@ describe("/api/files/preview route", () => {
     fs.mkdirSync(path.dirname(docPath), { recursive: true });
     fs.writeFileSync(docPath, "docx-placeholder", "utf-8");
     execFileSyncMock.mockImplementation((_cmd: string, args: string[]) => {
+      if (_cmd !== "soffice") return "";
       const outdir = args[args.indexOf("--outdir") + 1];
       fs.writeFileSync(path.join(outdir, "quote.html"), "<html>Converted</html>", "utf-8");
       return "";
@@ -97,6 +103,6 @@ describe("/api/files/preview route", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Type")).toBe("text/html");
     expect(text).toContain("Converted");
-    expect(execFileSyncMock).toHaveBeenCalledOnce();
+    expect(conversionCalls()).toHaveLength(1);
   });
 });

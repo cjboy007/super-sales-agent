@@ -12,7 +12,7 @@ beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-customer-context-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
 
-  const leadsDir = path.join(tempRoot, "workspaces", "new-salesperson", "leads");
+  const leadsDir = path.join(tempRoot, "companies", "new-salesperson", "leads");
   fs.mkdirSync(leadsDir, { recursive: true });
   fs.writeFileSync(
     path.join(leadsDir, "crm-export.csv"),

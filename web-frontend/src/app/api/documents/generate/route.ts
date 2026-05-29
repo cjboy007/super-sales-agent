@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime, type TradeDocumentData } from "@/lib/runtime";
 
+export const dynamic = "force-dynamic";
+
 type TradeDocumentType = "PI" | "CI" | "PL" | "ALL";
 
 interface GenerateTradeDocumentsBody {
