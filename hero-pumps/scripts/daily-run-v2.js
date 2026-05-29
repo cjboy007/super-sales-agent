@@ -29,8 +29,8 @@ const DEFAULT_BATCH_SIZE = 20;
 /** 邮箱地址最小长度阈值（低于此值视为无效） */
 const MIN_EMAIL_LENGTH = 5;
 
-/** 已发送日志文件名 */
-const SENT_LOG_FILENAME = "sent-log.json";
+/** 已发送日志路径 — 数据外置到 SSA */
+const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 
 /** CSV 字段分隔符 */
 const CSV_DELIMITER = ",";
@@ -78,7 +78,6 @@ const P4_POSITION_KEYWORDS = [
 
 const BASE_DIR = path.join(__dirname, "..");
 const LEADS_DIR = path.join(BASE_DIR, "leads");
-const SENT_LOG = path.join(BASE_DIR, SENT_LOG_FILENAME);
 const RESEARCH_DIR = path.join(BASE_DIR, "research", "companies");
 const DRAFTS_DIR = path.join(BASE_DIR, "campaign-tracker", "templates");
 const PROMPTS_DIR = path.join(BASE_DIR, "iron-prompts");

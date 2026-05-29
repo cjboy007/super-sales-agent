@@ -14,7 +14,7 @@ const path = require('path');
 const LEADS_DIR = path.join(__dirname, '../leads');
 const DRAFTS_DIR = path.join(__dirname, '../campaign-tracker/templates');
 const RESEARCH_DIR = path.join(__dirname, '../research/companies');
-const SENT_LOG = path.join(__dirname, '../sent-log.json');
+const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 
 // 已背调的公司列表（有 research/companies/*.json）
 function getResearchedCompanies() {

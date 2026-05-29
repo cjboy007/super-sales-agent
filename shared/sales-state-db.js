@@ -15,7 +15,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const DB_DIR = path.join(__dirname, 'state');
+const DB_DIR = path.join(process.env.HOME, '.ssa', 'data', 'runtime', 'legacy-shared-state');
 const DB_PATH = path.join(DB_DIR, 'sales-state.db');
 
 if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });

@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SENT_LOG = path.join(__dirname, '../sent-log.json');
+const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 const TEMPLATES_DIR = path.join(__dirname, '../campaign-tracker/templates');
 
 function main() {
