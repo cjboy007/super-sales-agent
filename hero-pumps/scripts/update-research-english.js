@@ -11,7 +11,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const RESEARCH_DIR = path.join(__dirname, "..", "research", "companies");
+const RESEARCH_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'research', 'companies');
 
 // 手动翻译映射表（基于对每家公司调研笔记的理解）
 const TRANSLATIONS = {

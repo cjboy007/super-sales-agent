@@ -25,7 +25,7 @@ const { execSync } = require("child_process");
 // ─── 常量配置 ───────────────────────────────────────────────
 
 const BASE_DIR = path.join(__dirname, "..");
-const LEADS_DIR = path.join(BASE_DIR, "leads");
+const LEADS_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
 const OUTPUT_DIR = path.join(BASE_DIR, "campaign-tracker", "templates-v2");
 const TAVILY_SCRIPT = "/Users/wilson/.openclaw/workspace/skills/openclaw-tavily-search/scripts/tavily_search.py";
 

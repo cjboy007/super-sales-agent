@@ -28,14 +28,15 @@ const { SalesState } = require('../../shared/sales-state-db');
 
 const execAsync = promisify(exec);
 const PROJECT = 'hero-pumps';
+const HERO_DATA_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps');
 
 // ==================== 配置 ====================
 const CONFIG = {
   SMTP_CLI: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js',
-  LEADS_DIR: path.join(__dirname, '../leads'),
+  LEADS_DIR: path.join(HERO_DATA_DIR, 'leads'),
   SIGNATURE: 'hero-jordan',
   TEMPLATES_DIR: path.join(__dirname, '../config/templates'),
-  LOG_DIR: path.join(__dirname, 'logs'),
+  LOG_DIR: path.join(process.env.HOME, '.ssa', 'logs', 'companies', 'hero-pumps', 'orchestrator'),
   // 发送间隔 3-8 分钟（随机）
   SEND_INTERVAL_MIN: 3 * 60 * 1000,
   SEND_INTERVAL_MAX: 8 * 60 * 1000,

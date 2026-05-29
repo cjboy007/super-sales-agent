@@ -11,9 +11,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const LEADS_DIR = path.join(__dirname, '../leads');
+const LEADS_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
 const DRAFTS_DIR = path.join(__dirname, '../campaign-tracker/templates');
-const RESEARCH_DIR = path.join(__dirname, '../research/companies');
+const RESEARCH_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'research', 'companies');
 const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 
 // 已背调的公司列表（有 research/companies/*.json）

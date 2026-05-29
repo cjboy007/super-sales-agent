@@ -5,10 +5,16 @@
  */
 
 import Database from 'better-sqlite3';
+import * as fs from 'fs';
 import * as path from 'path';
 
 // 数据库文件路径
-const DB_PATH = path.join(__dirname, '..', 'db', 'crm.db');
+const DB_DIR = path.join(process.env.HOME || '.', '.ssa', 'data', 'runtime', 'legacy-crm');
+const DB_PATH = path.join(DB_DIR, 'crm.db');
+
+if (!fs.existsSync(DB_DIR)) {
+  fs.mkdirSync(DB_DIR, { recursive: true });
+}
 
 // 创建数据库连接
 export const db = new Database(DB_PATH);

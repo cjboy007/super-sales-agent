@@ -33,7 +33,7 @@ const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-
 
 // 从 CSV 加载联系人信息
 function loadLeadsMap() {
-  const leadsDir = path.join(__dirname, '../leads');
+  const leadsDir = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
   const map = {};
   if (!fs.existsSync(leadsDir)) return map;
   for (const file of fs.readdirSync(leadsDir).filter(f => f.endsWith('.csv'))) {
