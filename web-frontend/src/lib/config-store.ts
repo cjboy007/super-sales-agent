@@ -7,9 +7,17 @@ const CONFIG_PATH = ensureSsaDataPath("config.json");
 
 export interface AppSettings {
   // API keys
+  deepseekApiKey: string;
+  openaiApiKey: string;
   openrouterApiKey: string;
   geminiApiKey: string;
   tavilyApiKey: string;
+  hunterApiKey: string;
+  apolloApiKey: string;
+  crmProvider: string;
+  crmApiKey: string;
+  notificationProvider: string;
+  notificationWebhookUrl: string;
   defaultModel: string;
   // Email
   smtpHost: string;
@@ -35,10 +43,18 @@ export interface AppSettings {
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
+  deepseekApiKey: "",
+  openaiApiKey: "",
   openrouterApiKey: "",
   geminiApiKey: "",
   tavilyApiKey: "",
-  defaultModel: "qwen3.6-plus",
+  hunterApiKey: "",
+  apolloApiKey: "",
+  crmProvider: "none",
+  crmApiKey: "",
+  notificationProvider: "none",
+  notificationWebhookUrl: "",
+  defaultModel: "deepseek-v4-pro",
   smtpHost: "smtp.qiye.aliyun.com",
   smtpPort: "465",
   smtpEncryption: "ssl",
@@ -62,9 +78,15 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 // Fields that should be Base64-encoded on disk
 const SENSITIVE_FIELDS: (keyof AppSettings)[] = [
+  "deepseekApiKey",
+  "openaiApiKey",
   "openrouterApiKey",
   "geminiApiKey",
   "tavilyApiKey",
+  "hunterApiKey",
+  "apolloApiKey",
+  "crmApiKey",
+  "notificationWebhookUrl",
   "emailPassword",
 ];
 

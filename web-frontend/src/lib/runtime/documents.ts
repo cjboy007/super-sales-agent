@@ -261,8 +261,8 @@ function tradeOutputFilename(data: TradeDocumentData, docType: string) {
   return `${data.pi_info.pi_no.replace("PI", docType)}-${Date.now()}.html`;
 }
 
-function listGeneratedTradeDocuments(): GeneratedTradeDocument[] {
-  const outputDir = tradeDocsOutputDir();
+function listGeneratedTradeDocuments(workspaceId: string): GeneratedTradeDocument[] {
+  const outputDir = tradeDocsOutputDir(workspaceId);
   if (!fs.existsSync(outputDir)) return [];
 
   return fs.readdirSync(outputDir, { withFileTypes: true })
@@ -282,10 +282,10 @@ function listGeneratedTradeDocuments(): GeneratedTradeDocument[] {
     .sort((a, b) => b.created.localeCompare(a.created));
 }
 
-export function listTradeDocuments(): { success: true; documents: GeneratedTradeDocument[] } {
+export function listTradeDocuments(workspaceId = "farreach"): { success: true; documents: GeneratedTradeDocument[] } {
   return {
     success: true,
-    documents: listGeneratedTradeDocuments(),
+    documents: listGeneratedTradeDocuments(workspaceId),
   };
 }
 

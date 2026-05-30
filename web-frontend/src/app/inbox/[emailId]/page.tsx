@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   BattleBadge,
@@ -15,6 +15,7 @@ import {
   type BattleTone,
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
+import { useProject } from "@/lib/project";
 import type { InboundEmail, ReplyOption } from "@/types/inbox";
 
 interface FullEmail {
@@ -24,7 +25,7 @@ interface FullEmail {
 }
 
 interface PageProps {
-  params: { emailId: string };
+  params: Promise<{ emailId: string }>;
 }
 
 function riskTone(value?: string): BattleTone {
@@ -49,7 +50,9 @@ function stateLabel(value: string, language: "en" | "zh") {
 }
 
 export default function InboxFocusPage({ params }: PageProps) {
+  const { emailId } = use(params);
   const router = useRouter();
+  const { apiUrl } = useProject();
   const language = useBattleLanguage();
   const [email, setEmail] = useState<InboundEmail | null>(null);
   const [selectedOption, setSelectedOption] = useState<ReplyOption | null>(null);
@@ -66,7 +69,7 @@ export default function InboxFocusPage({ params }: PageProps) {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/inbox/${params.emailId}`);
+        const res = await fetch(apiUrl(`/api/inbox/${emailId}`));
         const json = await res.json();
         if (!json.success) throw new Error(json.error || "Email not found");
         setEmail(json.data);
@@ -77,7 +80,7 @@ export default function InboxFocusPage({ params }: PageProps) {
       }
     }
     load();
-  }, [params.emailId]);
+  }, [apiUrl, emailId]);
 
   const selectOption = useCallback(async (option: ReplyOption) => {
     setSelectedOption(option);
@@ -86,7 +89,7 @@ export default function InboxFocusPage({ params }: PageProps) {
     setGenerating(true);
     setState("ai-generating");
     try {
-      const res = await fetch(`/api/inbox/${params.emailId}/select`, {
+      const res = await fetch(apiUrl(`/api/inbox/${emailId}/select`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ style: option.style }),
@@ -102,14 +105,14 @@ export default function InboxFocusPage({ params }: PageProps) {
     } finally {
       setGenerating(false);
     }
-  }, [params.emailId]);
+  }, [apiUrl, emailId]);
 
   async function approveSend() {
     if (!email || !selectedOption || !fullEmail) return;
     setSending(true);
     setState("approval-sending");
     try {
-      const res = await fetch(`/api/inbox/${params.emailId}/send`, {
+      const res = await fetch(apiUrl(`/api/inbox/${emailId}/send`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -117,6 +120,12 @@ export default function InboxFocusPage({ params }: PageProps) {
           subject: fullEmail.subject,
           body: editedBody || fullEmail.body,
           style: selectedOption.style,
+          humanApproval: {
+            approved: true,
+            approvedBy: "local-operator",
+            approvedAt: new Date().toISOString(),
+            note: `Approved ${selectedOption.style} reply from inbox review.`,
+          },
         }),
       });
       const json = await res.json();
@@ -225,7 +234,7 @@ export default function InboxFocusPage({ params }: PageProps) {
 
         <BattlePanel
           title={language === "zh" ? "可编辑草稿" : "Editable Draft"}
-          meta={language === "zh" ? "Wilson 批准前不会发给客户" : "will not reach a customer until Wilson approves"}
+          meta={language === "zh" ? "操作员批准前不会发给客户" : "will not reach a customer until an operator approves"}
         >
           <div className="flex h-full min-h-[calc(100vh-125px)] flex-col p-3">
             {!selectedOption ? (
@@ -247,8 +256,8 @@ export default function InboxFocusPage({ params }: PageProps) {
                 />
                 <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
                   <BattleText
-                    en="Wilson must approve before this draft can reach a customer. In safe mode, approval is recorded but no real email is sent."
-                    zh="这封草稿必须由 Wilson 批准后才可发给客户。安全模式下只记录审批，不会真正外发邮件。"
+                    en="An operator must approve before this draft can reach a customer. In safe mode, approval is recorded but no real email is sent."
+                    zh="这封草稿必须由操作员批准后才可发给客户。安全模式下只记录审批，不会真正外发邮件。"
                   />
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">

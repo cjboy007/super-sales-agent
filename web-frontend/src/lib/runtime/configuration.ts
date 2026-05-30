@@ -9,9 +9,15 @@ import {
 export type SettingsInput = Partial<AppSettings>;
 
 const SENSITIVE_SETTINGS_KEYS = [
+  "deepseekApiKey",
   "openrouterApiKey",
+  "openaiApiKey",
   "geminiApiKey",
   "tavilyApiKey",
+  "hunterApiKey",
+  "apolloApiKey",
+  "crmApiKey",
+  "notificationWebhookUrl",
   "emailPassword",
 ] as const satisfies ReadonlyArray<keyof AppSettings>;
 
@@ -52,8 +58,12 @@ function auditPayload(before: AppSettings, after: AppSettings): Record<string, u
   return {
     changedKeys: changed,
     sensitiveKeysChanged: changed.filter((key) => SENSITIVE_SETTINGS_KEYS.includes(key as (typeof SENSITIVE_SETTINGS_KEYS)[number])),
-    llmConfigured: Boolean(after.openrouterApiKey || after.geminiApiKey),
+    llmConfigured: Boolean(after.deepseekApiKey || after.openaiApiKey || after.openrouterApiKey),
     mailboxConfigured: Boolean(after.email && after.imapHost && after.smtpHost),
+    emailVerificationConfigured: Boolean(after.hunterApiKey),
+    leadSourceConfigured: Boolean(after.apolloApiKey),
+    crmConfigured: Boolean(after.crmProvider && after.crmProvider !== "none" && after.crmApiKey),
+    notificationsConfigured: Boolean(after.notificationProvider && after.notificationProvider !== "none" && after.notificationWebhookUrl),
     searchEngine: after.searchEngine,
     defaultModel: after.defaultModel,
     autoCapture: after.autoCapture,

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { SalesRuntime } from "./sales-runtime";
 import type { LlmResult } from "./types";
-import { ensureDir, ensureSsaDataPath, ssaDataPath } from "../ssa-data-paths";
+import { ensureDir, ensureSsaCompanyDataPath, sanitizeSsaPathSegment, ssaCompanyDataPath } from "../ssa-data-paths";
 
 export type IntakeMessageRole = "user" | "assistant";
 
@@ -82,6 +82,7 @@ export interface IntakeSessionSummary {
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const MAX_FILES_PER_REQUEST = 8;
+const MAX_INTAKE_SESSIONS = 25;
 
 const EMPTY_ANALYSIS: IntakeAnalysis = {
   source: "local",
@@ -107,13 +108,13 @@ function sanitizeSegment(value: string) {
   return value.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 140) || "upload";
 }
 
-function sessionPath(sessionId: string) {
-  return ensureSsaDataPath("intake", "sessions", `${sanitizeSegment(sessionId)}.json`);
+function sessionPath(project: string, sessionId: string) {
+  return ensureSsaCompanyDataPath(project, "intake", "sessions", `${sanitizeSegment(sessionId)}.json`);
 }
 
-function readRecord(sessionId: string): IntakeRecord | null {
+function readRecord(project: string, sessionId: string): IntakeRecord | null {
   try {
-    const filePath = sessionPath(sessionId);
+    const filePath = sessionPath(project, sessionId);
     if (!fs.existsSync(filePath)) return null;
     return JSON.parse(fs.readFileSync(filePath, "utf-8")) as IntakeRecord;
   } catch {
@@ -122,7 +123,49 @@ function readRecord(sessionId: string): IntakeRecord | null {
 }
 
 function writeRecord(record: IntakeRecord) {
-  fs.writeFileSync(sessionPath(record.id), JSON.stringify(record, null, 2), "utf-8");
+  fs.writeFileSync(sessionPath(record.project, record.id), JSON.stringify(record, null, 2), "utf-8");
+}
+
+function readSessionRecords(project: string): IntakeRecord[] {
+  const dir = ssaCompanyDataPath(project, "intake", "sessions");
+  if (!fs.existsSync(dir)) return [];
+
+  return fs.readdirSync(dir)
+    .filter((file) => file.endsWith(".json"))
+    .map((file) => {
+      try {
+        return JSON.parse(fs.readFileSync(path.join(dir, file), "utf-8")) as IntakeRecord;
+      } catch {
+        return null;
+      }
+    })
+    .filter((record): record is IntakeRecord => Boolean(record));
+}
+
+function pruneIntakeStorage(project: string) {
+  const sessionsDir = ssaCompanyDataPath(project, "intake", "sessions");
+  const uploadsDir = ssaCompanyDataPath(project, "intake", "uploads");
+  const records = readSessionRecords(project).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const kept = new Set(records.slice(0, MAX_INTAKE_SESSIONS).map((record) => record.id));
+
+  for (const record of records.slice(MAX_INTAKE_SESSIONS)) {
+    try {
+      fs.rmSync(path.join(sessionsDir, `${sanitizeSegment(record.id)}.json`), { force: true });
+    } catch {
+      // Best-effort cleanup should never block intake processing.
+    }
+  }
+
+  try {
+    if (!fs.existsSync(uploadsDir)) return;
+    for (const entry of fs.readdirSync(uploadsDir, { withFileTypes: true })) {
+      if (entry.isDirectory() && !kept.has(entry.name)) {
+        fs.rmSync(path.join(uploadsDir, entry.name), { recursive: true, force: true });
+      }
+    }
+  } catch {
+    // Best-effort cleanup should never block intake processing.
+  }
 }
 
 function createRecord(project: string): IntakeRecord {
@@ -244,7 +287,7 @@ function analyzeRecord(runtime: SalesRuntime, record: IntakeRecord, latestMessag
       {
         id: "archive-original",
         label: "Keep original in intake archive",
-        target: `~/.ssa/data/intake/uploads/${record.id}`,
+        target: `~/.ssa/data/companies/${sanitizeSsaPathSegment(record.project)}/intake/uploads/${record.id}`,
         status: "ready",
       },
       {
@@ -295,7 +338,7 @@ function localAssistantMessage(analysis: IntakeAnalysis) {
 
 async function storeUploads(record: IntakeRecord, files: File[]) {
   if (files.length === 0) return;
-  const uploadDir = ensureDir(ssaDataPath("intake", "uploads", record.id));
+  const uploadDir = ensureDir(ssaCompanyDataPath(record.project, "intake", "uploads", record.id));
 
   for (const file of files.slice(0, MAX_FILES_PER_REQUEST)) {
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -316,22 +359,10 @@ async function storeUploads(record: IntakeRecord, files: File[]) {
   }
 }
 
-export function listIntakeSessions(): IntakeSessionSummary[] {
-  const dir = ssaDataPath("intake", "sessions");
-  if (!fs.existsSync(dir)) return [];
-
-  return fs.readdirSync(dir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => {
-      try {
-        return JSON.parse(fs.readFileSync(path.join(dir, file), "utf-8")) as IntakeRecord;
-      } catch {
-        return null;
-      }
-    })
-    .filter((record): record is IntakeRecord => Boolean(record))
+export function listIntakeSessions(project: string): IntakeSessionSummary[] {
+  return readSessionRecords(project)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-    .slice(0, 20)
+    .slice(0, MAX_INTAKE_SESSIONS)
     .map((record) => ({
       id: record.id,
       project: record.project,
@@ -346,7 +377,7 @@ export function listIntakeSessions(): IntakeSessionSummary[] {
 }
 
 export async function processIntake(runtime: SalesRuntime, input: IntakeInput): Promise<IntakeRecord> {
-  let record = input.sessionId ? readRecord(input.sessionId) : null;
+  let record = input.sessionId ? readRecord(input.project, input.sessionId) : null;
   if (!record) record = createRecord(input.project);
 
   const pastedText = input.pastedText || "";
@@ -381,6 +412,7 @@ export async function processIntake(runtime: SalesRuntime, input: IntakeInput): 
   });
   record.updatedAt = nowIso();
   writeRecord(record);
+  pruneIntakeStorage(record.project);
 
   runtime.recordEvent("intake.processed", record.project, {
     intakeId: record.id,

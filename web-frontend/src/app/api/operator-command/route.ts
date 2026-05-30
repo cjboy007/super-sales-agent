@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +14,13 @@ interface OperatorCommandBody {
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as OperatorCommandBody;
   const runtime = createSalesRuntime();
+  const workspaceId = request.nextUrl.searchParams.get("project") || "farreach";
+  const auth = requireWorkspaceAccess(request, workspaceId);
+  if (!auth.ok) return auth.response;
 
   try {
     const record = runtime.createOperatorCommand({
-      workspaceId: new URL(request.url).searchParams.get("project") || "farreach",
+      workspaceId,
       page: body.page,
       message: body.message,
       context: body.context,

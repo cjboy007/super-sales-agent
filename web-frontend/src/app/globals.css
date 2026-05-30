@@ -147,3 +147,13 @@ html[data-theme="light"] .battle-grid {
 html[data-theme="light"] .battle-scan {
   opacity: 0.18;
 }
+
+html[data-theme="light"] .cockpit-layout [data-cockpit-panel-tab="radar"],
+html[data-theme="light"] .cockpit-layout [data-cockpit-panel-tab="timeline"],
+html[data-theme="light"] .cockpit-layout [data-cockpit-panel-tab="command"] {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .cockpit-layout [data-cockpit-panel-tab][aria-pressed="true"] {
+  color: #047857 !important;
+}

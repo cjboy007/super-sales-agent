@@ -14,6 +14,7 @@ import {
   type BattleTone,
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
+import { localizeMarketNewsText, localizeNewsItem, localizeNewsTag } from "@/lib/intelligence-news-i18n";
 
 interface Insight {
   title: string;
@@ -29,6 +30,12 @@ interface NewsItem {
   publishTime?: string;
   summary: string;
   tag: string;
+  titleZh?: string;
+  summaryZh?: string;
+  zhTitle?: string;
+  zhSummary?: string;
+  title_cn?: string;
+  summary_cn?: string;
   url?: string;
 }
 
@@ -177,7 +184,7 @@ export default function IntelligencePage() {
                       <p className="text-xs font-semibold text-slate-100">{alert.keyword}</p>
                       <BattleBadge tone={impactTone(alert.type)}>{alert.type}</BattleBadge>
                     </div>
-                    <p className="mt-1 text-xs text-slate-400">{alert.message}</p>
+                    <p className="mt-1 text-xs text-slate-400">{localizeMarketNewsText(alert.message, language)}</p>
                     <p className="mt-1 font-mono text-[10px] text-slate-600">{formatTime(alert.time)} {alert.change || ""}</p>
                   </div>
                 ))}
@@ -195,16 +202,19 @@ export default function IntelligencePage() {
               <EmptyState label={language === "zh" ? (loading ? "正在读取市场新闻" : "没有市场新闻") : (loading ? "loading news feed" : "no market news")} />
             ) : (
               <div className="max-h-[520px] divide-y divide-slate-800 overflow-y-auto">
-                {news.slice(0, 30).map((item) => (
-                  <div key={item.id || `${item.title}-${item.source}`} className="px-3 py-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-xs font-semibold text-slate-100">{item.title}</p>
-                      <BattleBadge tone="blue">{item.tag || "news"}</BattleBadge>
+                {news.slice(0, 30).map((item) => {
+                  const localized = localizeNewsItem(item, language);
+                  return (
+                    <div key={item.id || `${item.title}-${item.source}`} className="px-3 py-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-xs font-semibold text-slate-100">{localized.title}</p>
+                        <BattleBadge tone="blue">{localizeNewsTag(item.tag, language)}</BattleBadge>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-xs text-slate-400">{localized.summary}</p>
+                      <p className="mt-1 font-mono text-[10px] text-slate-600">{item.source || "-"} / {formatTime(item.publishTime || item.time)}</p>
                     </div>
-                    <p className="mt-1 line-clamp-2 text-xs text-slate-400">{item.summary}</p>
-                    <p className="mt-1 font-mono text-[10px] text-slate-600">{item.source || "-"} / {formatTime(item.publishTime || item.time)}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </BattlePanel>

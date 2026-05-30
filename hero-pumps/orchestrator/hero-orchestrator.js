@@ -25,6 +25,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const { SalesState } = require('../../shared/sales-state-db');
+const { verifyLegacyOutboundSafety } = require('../../skills/imap-smtp-email/lib/outbound-safety');
 
 const execAsync = promisify(exec);
 const PROJECT = 'hero-pumps';
@@ -183,6 +184,13 @@ class EmailSender {
       return { success: true, dryRun: true };
     }
     try {
+      await verifyLegacyOutboundSafety({
+        workspaceId: PROJECT,
+        to,
+        subject,
+        humanApproval: true,
+      });
+
       // ⭐ 修复：用 nodemailer 直发，不再调用 Farreach smtp.js CLI
       const htmlBody = body
         .replace(/&/g, '&amp;')

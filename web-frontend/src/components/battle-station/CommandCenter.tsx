@@ -17,6 +17,7 @@ interface CommandCenterProps {
     conversionRate: number;
   };
   onOpenFocus: (dealId: string) => void;
+  className?: string;
 }
 
 export default function CommandCenter({
@@ -28,9 +29,10 @@ export default function CommandCenter({
   approvalState,
   stats,
   onOpenFocus,
+  className,
 }: CommandCenterProps) {
   return (
-    <aside className="flex min-h-[520px] flex-col bg-slate-900/45 lg:min-h-0">
+    <aside className={cx("flex min-h-[520px] flex-col bg-slate-900/45 min-[900px]:min-h-0", className)}>
       <SectionChrome title={copy.title} meta={copy.meta} />
 
       <div className="min-h-0 flex-1 overflow-y-auto p-3">

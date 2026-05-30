@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,8 @@ export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequestBody = await request.json();
     const project = new URL(request.url).searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
 
     if (!body.type || !body.customer) {
       return NextResponse.json(

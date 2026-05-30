@@ -14,6 +14,7 @@ vi.mock("child_process", async (importOriginal) => ({
 const originalDataRoot = process.env.SSA_DATA_ROOT;
 const originalTradeDocsDir = process.env.TRADE_DOCS_DIR;
 const originalDocumentFlag = process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
+const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 
 let tempRoot = "";
 let tradeDocsDir = "";
@@ -64,6 +65,7 @@ beforeEach(() => {
   process.env.SSA_DATA_ROOT = tempRoot;
   process.env.TRADE_DOCS_DIR = tradeDocsDir;
   delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
+  delete process.env.SSA_BETA_AUTH_TOKENS;
 });
 
 afterEach(() => {
@@ -76,6 +78,9 @@ afterEach(() => {
   if (originalDocumentFlag === undefined) delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
   else process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = originalDocumentFlag;
 
+  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
+  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
+
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
@@ -83,6 +88,12 @@ function request(url: string, body: Record<string, unknown>): NextRequest {
   return new NextRequest(url, {
     method: "POST",
     body: JSON.stringify(body),
+  });
+}
+
+function getRequest(url: string, token?: string): NextRequest {
+  return new NextRequest(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 }
 
@@ -145,5 +156,25 @@ describe("/api/documents/generate route", () => {
       realExecutionEnabled: true,
     });
     expect(execFileMock).toHaveBeenCalledOnce();
+  });
+
+  it("lists only documents for the requested workspace", async () => {
+    const farreachDir = path.join(tempRoot, "companies", "farreach", "documents", "trade-docs");
+    const heroDir = path.join(tempRoot, "companies", "hero-pumps", "documents", "trade-docs");
+    fs.mkdirSync(farreachDir, { recursive: true });
+    fs.mkdirSync(heroDir, { recursive: true });
+    fs.writeFileSync(path.join(farreachDir, "PI-farreach.html"), "<html>Farreach</html>", "utf-8");
+    fs.writeFileSync(path.join(heroDir, "PI-hero.html"), "<html>Hero</html>", "utf-8");
+    const { GET } = await import("./route");
+
+    const farreachResponse = await GET(getRequest("http://localhost/api/documents/generate?project=farreach"));
+    const farreachJson = await farreachResponse.json();
+    const heroResponse = await GET(getRequest("http://localhost/api/documents/generate?project=hero-pumps"));
+    const heroJson = await heroResponse.json();
+
+    expect(farreachResponse.status).toBe(200);
+    expect(farreachJson.documents.map((item: { filename: string }) => item.filename)).toEqual(["PI-farreach.html"]);
+    expect(heroResponse.status).toBe(200);
+    expect(heroJson.documents.map((item: { filename: string }) => item.filename)).toEqual(["PI-hero.html"]);
   });
 });

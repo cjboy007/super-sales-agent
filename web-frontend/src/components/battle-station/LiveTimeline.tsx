@@ -17,6 +17,7 @@ interface LiveTimelineProps {
   onOpenFocus: (dealId: string) => void;
   approvalState: Record<string, string>;
   approvalStateLabels: BattleStationCopy["approvalStates"];
+  className?: string;
 }
 
 export default function LiveTimeline({
@@ -29,17 +30,18 @@ export default function LiveTimeline({
   onOpenFocus,
   approvalState,
   approvalStateLabels,
+  className,
 }: LiveTimelineProps) {
   const visibleEvents = events.filter((event) => filter === "all" || event.type === filter);
 
   return (
-    <main className="relative flex min-h-[420px] flex-col border-r border-slate-800 bg-slate-950/70 lg:min-h-0">
+    <main className={cx("relative flex min-h-[420px] flex-col border-r border-slate-800 bg-slate-950/70 min-[900px]:min-h-0", className)}>
       <div className="pointer-events-none absolute inset-0 battle-scan" />
       <SectionChrome
         title={copy.title}
         meta={copy.eventsVisible(visibleEvents.length)}
         action={
-          <div className="flex max-w-full gap-1 overflow-x-auto">
+          <div className="flex max-w-full flex-wrap justify-end gap-1">
             {FILTERS.map((item) => (
               <button
                 key={item}

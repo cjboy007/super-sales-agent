@@ -12,7 +12,9 @@ export interface Quotation {
   status: "Draft" | "Sent" | "Confirmed" | "Expired";
   date: string;
   filePath: string;
+  fileName: string;
   fileType: string;
+  mainProducts: string;
 }
 
 export interface QuotationListResult {
@@ -163,6 +165,112 @@ function detectAmount(file: Quotation): string {
   return "—";
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#39;/g, "'");
+}
+
+function htmlToText(html: string): string {
+  return decodeHtmlEntities(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cleanProductCandidate(value: string): string {
+  return value
+    .replace(/\s+/g, " ")
+    .replace(/^(product|description|item|品名|产品|型号|规格)\s*[:：-]\s*/i, "")
+    .trim()
+    .slice(0, 90);
+}
+
+function isLikelyNonProduct(value: string): boolean {
+  const text = value.toLowerCase();
+  return (
+    !value ||
+    value.length < 4 ||
+    /^\d+$/.test(value) ||
+    /^\$?[\d,]+(?:\.\d+)?$/.test(value) ||
+    /^(qty|quantity|unit price|amount|total|subtotal|date|customer|currency|quote no|quotation no)$/i.test(value) ||
+    text.includes("payment:") ||
+    text.includes("bank details")
+  );
+}
+
+function pushProduct(products: string[], seen: Set<string>, value: string): void {
+  const cleaned = cleanProductCandidate(value);
+  if (isLikelyNonProduct(cleaned)) return;
+  const key = cleaned.toLowerCase();
+  if (seen.has(key)) return;
+  seen.add(key);
+  products.push(cleaned);
+}
+
+function extractProductsFromHtml(content: string): string {
+  const products: string[] = [];
+  const seen = new Set<string>();
+  const rows = content.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+  let productColumn = -1;
+
+  for (const row of rows) {
+    const cells = Array.from(row.matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)).map((match) => htmlToText(match[1]));
+    if (cells.length === 0) continue;
+
+    const headerIndex = cells.findIndex((cell) =>
+      /(product|description|item|品名|产品|型号)/i.test(cell)
+    );
+    if (/<th/i.test(row) && headerIndex >= 0) {
+      productColumn = headerIndex;
+      continue;
+    }
+
+    if (productColumn >= 0 && cells[productColumn]) {
+      pushProduct(products, seen, cells[productColumn]);
+      continue;
+    }
+
+    const descriptiveCell = cells.find((cell, index) => index > 0 && !isLikelyNonProduct(cell));
+    if (descriptiveCell && /(cable|adapter|connector|converter|splitter|wire|pump|hdmi|usb|displayport|ethernet|cat\d|ul\d)/i.test(descriptiveCell)) {
+      pushProduct(products, seen, descriptiveCell);
+    }
+  }
+
+  return products.slice(0, 3).join(", ") || "—";
+}
+
+function companionHtmlPath(filePath: string): string | null {
+  const ext = path.extname(filePath);
+  if (ext.toLowerCase() === ".html") return filePath;
+
+  const dir = path.dirname(filePath);
+  const base = path.basename(filePath, ext);
+  const candidates = [
+    path.join(dir, `${base}.html`),
+    path.join(dir, `${base.replace(/-Excel$/i, "")}.html`),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) || null;
+}
+
+function detectMainProducts(file: Quotation): string {
+  const htmlPath = companionHtmlPath(file.filePath);
+  if (!htmlPath) return "—";
+
+  try {
+    return extractProductsFromHtml(fs.readFileSync(htmlPath, "utf-8"));
+  } catch {
+    return "—";
+  }
+}
+
 // ─── Cache ─────────────────────────────────────────────────────────────────
 
 const CACHE_TTL = 30_000; // 30 seconds for file scanning
@@ -191,10 +299,13 @@ function getAllQuotations(): Quotation[] {
         status: "Draft",
         date: parsed.date || "未知",
         filePath,
+        fileName: path.basename(filePath),
         fileType: fileExt,
+        mainProducts: "—",
       };
       file.status = detectStatus(file);
       file.amount = detectAmount(file);
+      file.mainProducts = detectMainProducts(file);
       return file;
     })
     // Sort by date descending
@@ -228,7 +339,10 @@ export function getQuotations(params?: {
     filtered = filtered.filter(
       (q2) =>
         q2.id.toLowerCase().includes(q) ||
-        q2.customer.toLowerCase().includes(q)
+        q2.customer.toLowerCase().includes(q) ||
+        q2.fileName.toLowerCase().includes(q) ||
+        q2.filePath.toLowerCase().includes(q) ||
+        q2.mainProducts.toLowerCase().includes(q)
     );
   }
 

@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const { verifyLegacyOutboundSafety } = require('../../imap-smtp-email/lib/outbound-safety');
 require('dotenv').config({ path: path.resolve(__dirname, '../../imap-smtp-email/.env') });
 
 // Parse command line arguments
@@ -369,6 +370,13 @@ function createTransporter() {
 
 // Send email
 async function sendEmail(to, subject, text) {
+  await verifyLegacyOutboundSafety({
+    workspaceId: process.env.SSA_WORKSPACE_ID || 'farreach',
+    to,
+    subject,
+    humanApproval: true,
+  });
+
   const transporter = createTransporter();
 
   try {

@@ -25,7 +25,9 @@ interface Quotation {
   status: "Draft" | "Sent" | "Confirmed" | "Expired";
   date: string;
   filePath: string;
+  fileName?: string;
   fileType: string;
+  mainProducts?: string;
 }
 
 interface QuotationStats {
@@ -62,6 +64,18 @@ function statusLabel(status: StatusFilter | Quotation["status"], language: "en" 
 function typeLabel(type: TypeFilter | Quotation["type"], language: "en" | "zh") {
   if (language !== "zh") return type;
   return type === "All" ? "全部" : type;
+}
+
+function fileLabel(quote: Quotation): string {
+  return quote.fileName || quote.filePath.split(/[\\/]/).pop() || quote.fileType || "-";
+}
+
+function fileUrl(quote: Quotation): string {
+  const params = new URLSearchParams({
+    path: quote.filePath,
+    project: "farreach",
+  });
+  return `/api/files?${params.toString()}`;
 }
 
 export default function QuotationsPage() {
@@ -187,24 +201,50 @@ export default function QuotationsPage() {
                   <thead className="border-b border-slate-800 bg-slate-950/70 text-[10px] uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2">{language === "zh" ? "报价编号" : "Quote ID"}</th>
+                      <th className="px-3 py-2">{language === "zh" ? "文件" : "File"}</th>
                       <th className="px-3 py-2">{language === "zh" ? "客户" : "Customer"}</th>
+                      <th className="px-3 py-2">{language === "zh" ? "主要产品" : "Main Products"}</th>
                       <th className="px-3 py-2">{language === "zh" ? "类型" : "Type"}</th>
                       <th className="px-3 py-2">{language === "zh" ? "金额" : "Amount"}</th>
                       <th className="px-3 py-2">{language === "zh" ? "状态" : "Status"}</th>
                       <th className="px-3 py-2">{language === "zh" ? "日期" : "Date"}</th>
-                      <th className="px-3 py-2">{language === "zh" ? "文件" : "File"}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80">
                     {quotations.map((quote) => (
                       <tr key={`${quote.id}-${quote.filePath}`} className="hover:bg-slate-800/35">
                         <td className="px-3 py-2 font-mono text-slate-300">{quote.id}</td>
+                        <td className="min-w-[220px] max-w-[260px] px-3 py-2">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate font-mono text-[11px] text-slate-200" title={quote.filePath}>
+                                {fileLabel(quote)}
+                              </p>
+                              <p className="font-mono text-[10px] uppercase text-slate-500">{quote.fileType || "file"}</p>
+                              <p className="mt-1 line-clamp-2 text-[10px] text-slate-400 md:hidden">
+                                {quote.mainProducts || "—"}
+                              </p>
+                            </div>
+                            <a
+                              href={fileUrl(quote)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="shrink-0 rounded border border-slate-700 px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-slate-300 hover:border-emerald-400 hover:text-emerald-300"
+                            >
+                              {language === "zh" ? "打开" : "Open"}
+                            </a>
+                          </div>
+                        </td>
                         <td className="px-3 py-2 text-slate-200">{quote.customer}</td>
+                        <td className="max-w-[260px] px-3 py-2 text-slate-300">
+                          <span className="line-clamp-2" title={quote.mainProducts || undefined}>
+                            {quote.mainProducts || "—"}
+                          </span>
+                        </td>
                         <td className="px-3 py-2"><BattleBadge tone="purple">{quote.type}</BattleBadge></td>
                         <td className="px-3 py-2 font-mono text-slate-300">{quote.amount}</td>
                         <td className="px-3 py-2"><BattleBadge tone={statusTone(quote.status)}>{statusLabel(quote.status, language)}</BattleBadge></td>
                         <td className="px-3 py-2 font-mono text-slate-500">{quote.date}</td>
-                        <td className="px-3 py-2 font-mono text-[10px] text-slate-500">{quote.fileType || "-"}</td>
                       </tr>
                     ))}
                   </tbody>

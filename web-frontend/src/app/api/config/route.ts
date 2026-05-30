@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
+import { requireAdminBetaAuth } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,8 +8,10 @@ function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const auth = requireAdminBetaAuth(request);
+    if (!auth.ok) return auth.response;
     const runtime = createSalesRuntime();
     return NextResponse.json({ success: true, data: runtime.getMaskedSettings() });
   } catch (e: unknown) {
@@ -22,6 +25,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const auth = requireAdminBetaAuth(request);
+    if (!auth.ok) return auth.response;
     const runtime = createSalesRuntime();
     const masked = runtime.updateSettings(body);
     return NextResponse.json({ success: true, data: masked });
@@ -36,6 +41,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    const auth = requireAdminBetaAuth(request);
+    if (!auth.ok) return auth.response;
     const runtime = createSalesRuntime();
     runtime.importSettings(body);
     return NextResponse.json({ success: true, message: "配置已导入" });

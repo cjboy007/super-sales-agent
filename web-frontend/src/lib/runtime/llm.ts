@@ -105,21 +105,144 @@ function systemPrompt(task: LlmRequest["task"]) {
   ].join(" ");
 }
 
-async function runOpenRouterTask(request: LlmRequest): Promise<LlmResult | null> {
-  const settings = readSettings();
-  const apiKey = process.env.OPENROUTER_API_KEY || settings.openrouterApiKey;
-  if (!apiKey) return null;
+type ProviderName = "mock" | "deepseek" | "openai" | "openrouter";
 
-  const model = process.env.SSA_LLM_MODEL || settings.defaultModel || "openai/gpt-4o-mini";
+interface ProviderConfig {
+  provider: ProviderName;
+  apiKey: string;
+  model: string;
+  endpoint: string;
+}
+
+const DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-pro";
+const OPENAI_DEFAULT_MODEL = "gpt-4o-mini";
+const OPENROUTER_DEFAULT_MODEL = "deepseek/deepseek-v4-pro";
+
+function directDeepSeekModel(model: string | undefined): string {
+  const trimmed = model?.trim();
+  if (!trimmed || trimmed === "mock") return DEEPSEEK_DEFAULT_MODEL;
+
+  const lower = trimmed.toLowerCase();
+  const withoutProvider = lower.startsWith("deepseek/") ? lower.slice("deepseek/".length) : lower;
+  const compact = withoutProvider.replace(/[^a-z0-9]/g, "");
+  if (compact === "deepseekv4pro") return "deepseek-v4-pro";
+  if (compact === "deepseekv4flash") return "deepseek-v4-flash";
+  if (withoutProvider.startsWith("deepseek-")) return withoutProvider;
+  return DEEPSEEK_DEFAULT_MODEL;
+}
+
+function directOpenAiModel(model: string | undefined): string {
+  if (!model || model.includes("/") || model === "mock") return OPENAI_DEFAULT_MODEL;
+  if (!model.startsWith("gpt-") && !model.startsWith("o")) return OPENAI_DEFAULT_MODEL;
+  return model;
+}
+
+function openRouterModel(model: string | undefined): string {
+  if (!model || model === "mock") return OPENROUTER_DEFAULT_MODEL;
+  const deepSeekModel = directDeepSeekModel(model);
+  if (deepSeekModel !== DEEPSEEK_DEFAULT_MODEL || /deepseek/i.test(model)) {
+    return `deepseek/${deepSeekModel}`;
+  }
+  return model;
+}
+
+function providerEndpoint(provider: Exclude<ProviderName, "mock">): string {
+  if (provider === "deepseek") {
+    const baseUrl = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
+    return `${baseUrl.replace(/\/+$/, "")}/chat/completions`;
+  }
+  if (provider === "openai") return "https://api.openai.com/v1/chat/completions";
+  return "https://openrouter.ai/api/v1/chat/completions";
+}
+
+function llmTimeoutMs(): number {
+  const configured = Number(process.env.SSA_LLM_TIMEOUT_MS || "");
+  if (Number.isFinite(configured) && configured > 0) return configured;
+  return 8000;
+}
+
+function resolveProvider(): ProviderConfig | null {
+  const settings = readSettings();
+  const requestedProvider = process.env.SSA_LLM_PROVIDER?.toLowerCase();
+  const deepSeekApiKey = process.env.DEEPSEEK_API_KEY || settings.deepseekApiKey;
+  const openAiApiKey = process.env.OPENAI_API_KEY || settings.openaiApiKey;
+  const openRouterApiKey = process.env.OPENROUTER_API_KEY || settings.openrouterApiKey;
+  const configuredModel = process.env.SSA_LLM_MODEL || settings.defaultModel;
+
+  if (requestedProvider === "mock") return null;
+  if (requestedProvider === "deepseek") {
+    return deepSeekApiKey
+      ? {
+        provider: "deepseek",
+        apiKey: deepSeekApiKey,
+        model: directDeepSeekModel(configuredModel),
+        endpoint: providerEndpoint("deepseek"),
+      }
+      : null;
+  }
+  if (requestedProvider === "openai") {
+    return openAiApiKey
+      ? {
+        provider: "openai",
+        apiKey: openAiApiKey,
+        model: directOpenAiModel(configuredModel),
+        endpoint: providerEndpoint("openai"),
+      }
+      : null;
+  }
+  if (requestedProvider === "openrouter") {
+    return openRouterApiKey
+      ? {
+        provider: "openrouter",
+        apiKey: openRouterApiKey,
+        model: openRouterModel(configuredModel),
+        endpoint: providerEndpoint("openrouter"),
+      }
+      : null;
+  }
+
+  if (deepSeekApiKey) {
+    return {
+      provider: "deepseek",
+      apiKey: deepSeekApiKey,
+      model: directDeepSeekModel(configuredModel),
+      endpoint: providerEndpoint("deepseek"),
+    };
+  }
+  if (openAiApiKey) {
+    return {
+      provider: "openai",
+      apiKey: openAiApiKey,
+      model: directOpenAiModel(configuredModel),
+      endpoint: providerEndpoint("openai"),
+    };
+  }
+  if (openRouterApiKey) {
+    return {
+      provider: "openrouter",
+      apiKey: openRouterApiKey,
+      model: openRouterModel(configuredModel),
+      endpoint: providerEndpoint("openrouter"),
+    };
+  }
+
+  return null;
+}
+
+async function runChatCompletionTask(
+  request: LlmRequest,
+  config: ProviderConfig
+): Promise<LlmResult | null> {
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch(config.endpoint, {
       method: "POST",
+      signal: AbortSignal.timeout(llmTimeoutMs()),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify({
-        model,
+        model: config.model,
         temperature: request.task === "draft" ? 0.4 : 0.1,
         messages: [
           { role: "system", content: systemPrompt(request.task) },
@@ -145,14 +268,14 @@ async function runOpenRouterTask(request: LlmRequest): Promise<LlmResult | null>
     if (!text) return null;
 
     return {
-      provider: "openrouter",
+      provider: config.provider,
       source: "provider",
       text,
       confidence: 0.6,
       structured: {
         task: request.task,
         workspaceId: request.workspaceId || null,
-        model: data.model || model,
+        model: data.model || config.model,
       },
     };
   } catch {
@@ -161,10 +284,9 @@ async function runOpenRouterTask(request: LlmRequest): Promise<LlmResult | null>
 }
 
 export async function runLlmTask(request: LlmRequest): Promise<LlmResult> {
-  const provider = (process.env.SSA_LLM_PROVIDER || "mock").toLowerCase();
-
-  if (provider === "openrouter") {
-    const result = await runOpenRouterTask(request);
+  const provider = resolveProvider();
+  if (provider) {
+    const result = await runChatCompletionTask(request, provider);
     if (result) return result;
   }
 

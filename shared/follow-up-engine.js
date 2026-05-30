@@ -26,6 +26,7 @@ const path = require('path');
 const { SalesState } = require('../shared/sales-state-db');
 const nodemailer = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/nodemailer');
 const dotenv = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/dotenv');
+const { verifyLegacyOutboundSafety } = require('../skills/imap-smtp-email/lib/outbound-safety');
 
 // ==================== 配置 ====================
 const SIGNATURE_PATH = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/hero-pumps/config/signatures/signature-jordan.html';
@@ -210,6 +211,12 @@ class FollowUpSender {
 
     const config = PROJECTS[project];
     if (!config) { logger.error(`Unknown project: ${project}`); return { success: false }; }
+    await verifyLegacyOutboundSafety({
+      workspaceId: project,
+      to: email,
+      subject,
+      humanApproval: true,
+    });
 
     // ⭐ Hero Pumps: 直接用 nodemailer 发送，不再调用 Farreach smtp.js
     if (project === 'hero-pumps') {
@@ -218,7 +225,7 @@ class FollowUpSender {
 
     // Farreach: 保持原有 CLI 调用
     try {
-      let cmd = `node "${config.SMTP_CLI}" send --to "${email}" --subject "${subject}" --body "${body.replace(/"/g, '\\"')}" --signature ${config.SIGNATURE} --confirm-send`;
+      let cmd = `node "${config.SMTP_CLI}" send --to "${email}" --subject "${subject}" --body "${body.replace(/"/g, '\\"')}" --signature ${config.SIGNATURE}`;
       
       let execOptions = {};
       if (config.ENV_PATH && fs.existsSync(config.ENV_PATH)) {

@@ -14,6 +14,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const { SalesState } = require('../shared/sales-state-db');
+const { verifyLegacyOutboundSafety } = require('../skills/imap-smtp-email/lib/outbound-safety');
 
 const execAsync = promisify(exec);
 const PROJECT = 'farreach';
@@ -138,7 +139,13 @@ class EmailSender {
       return { success: true, dryRun: true };
     }
     try {
-      const cmd = `node "${CONFIG.SMTP_CLI}" send --to "${to}" --subject "${subject}" --body "${body.replace(/"/g, '\\"')}" --signature jordan --confirm-send`;
+      await verifyLegacyOutboundSafety({
+        workspaceId: PROJECT,
+        to,
+        subject,
+        humanApproval: true,
+      });
+      const cmd = `node "${CONFIG.SMTP_CLI}" send --to "${to}" --subject "${subject}" --body "${body.replace(/"/g, '\\"')}" --signature jordan`;
       const { stdout, stderr } = await execAsync(cmd);
       logger.success(`已发送: ${to}`);
       return { success: true, stdout, stderr };

@@ -5,8 +5,8 @@ import { ProjectProvider } from "@/lib/project";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "Super Sales Agent",
-  description: "AI-powered sales automation platform",
+  title: "JadenOS",
+  description: "Public beta sales cockpit with gated AI workflows",
 };
 
 export const viewport = {

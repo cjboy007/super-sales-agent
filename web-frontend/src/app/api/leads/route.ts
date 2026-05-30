@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse, PaginatedResponse } from "@/lib/api-types";
 import { createSalesRuntime } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get("action");
   const project = searchParams.get("project") || "farreach";
+  const auth = requireWorkspaceAccess(request, project);
+  if (!auth.ok) return auth.response;
   const runtime = createSalesRuntime();
   const memory = runtime.memory;
 

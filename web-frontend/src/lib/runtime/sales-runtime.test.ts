@@ -8,6 +8,11 @@ const originalDataRoot = process.env.SSA_DATA_ROOT;
 const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
 const originalDocumentFlag = process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
 const originalLlmProvider = process.env.SSA_LLM_PROVIDER;
+const originalOpenAiApiKey = process.env.OPENAI_API_KEY;
+const originalOpenRouterApiKey = process.env.OPENROUTER_API_KEY;
+const originalDeepSeekApiKey = process.env.DEEPSEEK_API_KEY;
+const originalDeepSeekBaseUrl = process.env.DEEPSEEK_BASE_URL;
+const originalLlmModel = process.env.SSA_LLM_MODEL;
 
 let tempRoot = "";
 
@@ -18,6 +23,11 @@ beforeEach(() => {
   delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
   process.env.SSA_LLM_PROVIDER = "mock";
+  delete process.env.OPENAI_API_KEY;
+  delete process.env.OPENROUTER_API_KEY;
+  delete process.env.DEEPSEEK_API_KEY;
+  delete process.env.DEEPSEEK_BASE_URL;
+  delete process.env.SSA_LLM_MODEL;
 });
 
 afterEach(() => {
@@ -34,6 +44,21 @@ afterEach(() => {
 
   if (originalLlmProvider === undefined) delete process.env.SSA_LLM_PROVIDER;
   else process.env.SSA_LLM_PROVIDER = originalLlmProvider;
+
+  if (originalOpenAiApiKey === undefined) delete process.env.OPENAI_API_KEY;
+  else process.env.OPENAI_API_KEY = originalOpenAiApiKey;
+
+  if (originalOpenRouterApiKey === undefined) delete process.env.OPENROUTER_API_KEY;
+  else process.env.OPENROUTER_API_KEY = originalOpenRouterApiKey;
+
+  if (originalDeepSeekApiKey === undefined) delete process.env.DEEPSEEK_API_KEY;
+  else process.env.DEEPSEEK_API_KEY = originalDeepSeekApiKey;
+
+  if (originalDeepSeekBaseUrl === undefined) delete process.env.DEEPSEEK_BASE_URL;
+  else process.env.DEEPSEEK_BASE_URL = originalDeepSeekBaseUrl;
+
+  if (originalLlmModel === undefined) delete process.env.SSA_LLM_MODEL;
+  else process.env.SSA_LLM_MODEL = originalLlmModel;
 
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
@@ -180,8 +205,111 @@ describe("SalesRuntime", () => {
       structured: { label: "quotation_request" },
     });
 
-    delete process.env.OPENROUTER_API_KEY;
-    delete process.env.SSA_LLM_MODEL;
+  });
+
+  it("can use the direct DeepSeek provider with the v4 pro model", async () => {
+    process.env.SSA_LLM_PROVIDER = "deepseek";
+    process.env.DEEPSEEK_API_KEY = "test-deepseek-key";
+    process.env.SSA_LLM_MODEL = "deepseekv4pro";
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({
+        model: "deepseek-v4-pro",
+        choices: [{ message: { content: "DeepSeek draft" } }],
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const runtime = createSalesRuntime();
+    const result = await runtime.runLlm({
+      task: "draft",
+      workspaceId: "demo-exporter",
+      input: "Draft a reply for a deep well pump lead.",
+    });
+
+    expect(result).toMatchObject({
+      provider: "deepseek",
+      source: "provider",
+      text: "DeepSeek draft",
+      structured: {
+        model: "deepseek-v4-pro",
+        workspaceId: "demo-exporter",
+      },
+    });
+    expect(fetchMock).toHaveBeenCalledWith("https://api.deepseek.com/chat/completions", expect.objectContaining({
+      method: "POST",
+      headers: expect.objectContaining({ Authorization: "Bearer test-deepseek-key" }),
+    }));
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.model).toBe("deepseek-v4-pro");
+  });
+
+  it("can use the direct OpenAI provider without routing through OpenRouter", async () => {
+    process.env.SSA_LLM_PROVIDER = "openai";
+    process.env.OPENAI_API_KEY = "test-openai-key";
+    process.env.SSA_LLM_MODEL = "openai/gpt-4o-mini";
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({
+        model: "gpt-4o-mini",
+        choices: [{ message: { content: "OpenAI draft" } }],
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const runtime = createSalesRuntime();
+    const result = await runtime.runLlm({
+      task: "draft",
+      workspaceId: "demo-exporter",
+      input: "Draft a reply for an export quote.",
+    });
+
+    expect(result).toMatchObject({
+      provider: "openai",
+      source: "provider",
+      text: "OpenAI draft",
+      structured: {
+        model: "gpt-4o-mini",
+        workspaceId: "demo-exporter",
+      },
+    });
+    expect(fetchMock).toHaveBeenCalledWith("https://api.openai.com/v1/chat/completions", expect.objectContaining({
+      method: "POST",
+      headers: expect.objectContaining({ Authorization: "Bearer test-openai-key" }),
+    }));
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.model).toBe("gpt-4o-mini");
+  });
+
+  it("auto-detects DeepSeek before OpenAI when no explicit LLM provider is set", async () => {
+    delete process.env.SSA_LLM_PROVIDER;
+    process.env.DEEPSEEK_API_KEY = "auto-deepseek-key";
+    process.env.OPENAI_API_KEY = "auto-openai-key";
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({
+        model: "deepseek-v4-pro",
+        choices: [{ message: { content: "Auto DeepSeek summary" } }],
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const runtime = createSalesRuntime();
+    const result = await runtime.runLlm({
+      task: "summarize",
+      workspaceId: "farreach",
+      input: "Summarize the buyer request.",
+    });
+
+    expect(result.provider).toBe("deepseek");
+    expect(result.source).toBe("provider");
+    expect(result.text).toBe("Auto DeepSeek summary");
+    expect(fetchMock).toHaveBeenCalledWith("https://api.deepseek.com/chat/completions", expect.any(Object));
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.model).toBe("deepseek-v4-pro");
   });
 
   it("blocks and audits email side effects by default", () => {

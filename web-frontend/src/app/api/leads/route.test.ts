@@ -6,24 +6,44 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GET } from "./route";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
+const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 let tempRoot = "";
 
-function makeRequest(url: string): NextRequest {
-  return new NextRequest(url);
+function makeRequest(url: string, token?: string): NextRequest {
+  return new NextRequest(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
 }
 
 beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-leads-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
+  delete process.env.SSA_BETA_AUTH_TOKENS;
 });
 
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
+
+  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
+  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
+
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
 describe("/api/leads route", () => {
+  it("does not use legacy beta tokens as a workspace sign-in gate", async () => {
+    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
+      { token: "farreach-token", workspaces: ["farreach"] },
+    ]);
+
+    const response = await GET(makeRequest("http://localhost/api/leads?project=hero-pumps&action=stats", "farreach-token"));
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json).toEqual({ success: true, data: { total: 0, hot: 0, warm: 0, cold: 0, countries: 0 } });
+  });
+
   it("keeps combined response shape for unknown local workspaces", async () => {
     const response = await GET(makeRequest("http://localhost/api/leads?project=new-salesperson&action=combined"));
     const json = await response.json();

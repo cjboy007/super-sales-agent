@@ -256,8 +256,8 @@ export default function LeadsPage() {
           page="leads"
           summary={commandSummary}
           context={commandContext}
-          placeholder="Ask SSA to rank these leads, research a company, explain a risk, or draft outreach for the selected group"
-          zhPlaceholder="让 SSA 给这些线索排序、调研某家公司、解释风险，或为当前筛选结果起草开发邮件"
+          placeholder="Ask Jaden to rank these leads, research a company, explain a risk, or draft outreach for the selected group"
+          zhPlaceholder="让 Jaden 给这些线索排序、调研某家公司、解释风险，或为当前筛选结果起草开发信"
         />
       </BattlePageBody>
     </BattlePageShell>

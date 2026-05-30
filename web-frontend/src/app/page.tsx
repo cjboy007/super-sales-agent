@@ -11,6 +11,7 @@ import LiveTimeline, { type TimelineFilter } from "@/components/battle-station/L
 import QuickCommandBar from "@/components/battle-station/QuickCommandBar";
 import TopStatusBar from "@/components/battle-station/TopStatusBar";
 import { useTheme } from "@/components/ui/ThemeProvider";
+import { cx } from "@/components/battle-station/theme";
 
 interface DashboardOverview {
   stats?: {
@@ -27,6 +28,8 @@ const SAMPLE_STATS = {
   pendingQuotations: 6,
   conversionRate: 18.7,
 };
+
+type CockpitPanel = "radar" | "timeline" | "command";
 
 const APPROVAL_COPY = {
   approved: "approved-by-wilson",
@@ -97,6 +100,7 @@ export default function BattleStationPage() {
   const [stats, setStats] = useState(SAMPLE_STATS);
   const [command, setCommand] = useState("");
   const [lastCommand, setLastCommand] = useState("");
+  const [mobilePanel, setMobilePanel] = useState<CockpitPanel>("timeline");
   const station = battleStationI18n[language];
   const { copy } = station;
   const [approvalState, setApprovalState] = useState<Record<string, string>>({
@@ -290,7 +294,7 @@ export default function BattleStationPage() {
           body: JSON.stringify({
             id: focusCase.approvalId,
             status: mappedStatus,
-            decisionBy: "Wilson",
+            decisionBy: "JadenOS",
             decisionNote: decisionNote || state,
           }),
         });
@@ -312,6 +316,12 @@ export default function BattleStationPage() {
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
     return eventHistory.filter((event) => new Date(event.timestamp).getTime() > fiveMinutesAgo).length;
   }, [eventHistory]);
+
+  const cockpitTabs: Array<{ id: CockpitPanel; label: string }> = [
+    { id: "radar", label: copy.domain.title },
+    { id: "timeline", label: copy.timeline.title },
+    { id: "command", label: copy.commandCenter.title },
+  ];
 
   if (focusCase) {
     const draftKey = `${language}:${focusCase.dealId}`;
@@ -359,17 +369,38 @@ export default function BattleStationPage() {
         activeAgents={station.activeAgents.length}
         connected={isConnected}
         currentTime={currentTime}
-        operator="Wilson Chen"
         activeEvents={eventCount + recentEvents}
       />
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto lg:grid-cols-[320px_minmax(460px,1fr)_340px] lg:overflow-hidden">
+      <div className="cockpit-layout flex min-h-0 flex-1 flex-col">
+        <div className="grid grid-cols-3 gap-1 border-b border-slate-800 bg-slate-950/90 px-2 py-1.5 min-[900px]:hidden">
+          {cockpitTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              aria-pressed={mobilePanel === tab.id}
+              data-cockpit-panel-tab={tab.id}
+              onClick={() => setMobilePanel(tab.id)}
+              className={cx(
+                "min-h-8 rounded border px-2 text-[10px] font-semibold leading-tight transition",
+                mobilePanel === tab.id
+                  ? "border-emerald-400/60 bg-emerald-500/15 text-emerald-100"
+                  : "border-slate-600 bg-slate-900/85 text-slate-200 hover:border-slate-500 hover:text-white"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden min-[900px]:grid-cols-[280px_minmax(360px,1fr)_300px] min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
         <DomainRadar
           copy={copy.domain}
           accounts={station.domainAccounts}
           selectedDealId={selectedDealId}
           onSelectDeal={setSelectedDealId}
           onOpenFocus={openFocus}
+          className={cx(mobilePanel !== "radar" && "max-[899px]:hidden")}
         />
         <LiveTimeline
           copy={copy.timeline}
@@ -381,6 +412,7 @@ export default function BattleStationPage() {
           onOpenFocus={openFocus}
           approvalState={approvalState}
           approvalStateLabels={copy.approvalStates}
+          className={cx(mobilePanel !== "timeline" && "max-[899px]:hidden")}
         />
         <CommandCenter
           copy={copy.commandCenter}
@@ -391,7 +423,9 @@ export default function BattleStationPage() {
           approvalState={approvalState}
           stats={stats}
           onOpenFocus={openFocus}
+          className={cx(mobilePanel !== "command" && "max-[899px]:hidden")}
         />
+      </div>
       </div>
 
       <QuickCommandBar
