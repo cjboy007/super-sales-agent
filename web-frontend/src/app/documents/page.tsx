@@ -326,8 +326,8 @@ export default function DocumentsPage() {
               page="documents"
               summary={commandSummary}
               context={commandContext}
-              placeholder="Ask SSA to inspect document fields, prepare missing details, check shipment terms, or draft a PI/CI/PL note"
-              zhPlaceholder="让 SSA 检查单证字段、补齐缺失信息、核对运输条款，或起草 PI/CI/PL 备注"
+              placeholder="Ask Jaden to inspect document fields, prepare missing details, check shipment terms, or draft a PI/CI/PL note"
+              zhPlaceholder="让 Jaden 检查单证字段、补齐缺失信息、核对运输条款，或起草 PI/CI/PL 备注"
             />
 
             <BattlePanel title={language === "zh" ? "新生成文件" : "New Documents"} meta={language === "zh" ? "本次操作" : "this session"}>

@@ -9,6 +9,7 @@ interface DomainRadarProps {
   selectedDealId: string;
   onSelectDeal: (dealId: string) => void;
   onOpenFocus: (dealId: string) => void;
+  className?: string;
 }
 
 export default function DomainRadar({
@@ -17,9 +18,10 @@ export default function DomainRadar({
   selectedDealId,
   onSelectDeal,
   onOpenFocus,
+  className,
 }: DomainRadarProps) {
   return (
-    <aside className="flex min-h-[360px] flex-col border-r border-slate-800 bg-slate-900/45 lg:min-h-0">
+    <aside className={cx("flex min-h-[360px] flex-col border-r border-slate-800 bg-slate-900/45 min-[900px]:min-h-0", className)}>
       <SectionChrome
         title={copy.title}
         meta={copy.monitoredDomains(accounts.length)}

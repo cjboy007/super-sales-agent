@@ -111,7 +111,7 @@ export default function EmailsPage() {
     setSaving(true);
     setSaveMessage("");
     try {
-      const res = await fetch("/api/emails/send", {
+      const res = await fetch(apiUrl("/api/emails/send"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ to, subject, body }),
@@ -135,8 +135,8 @@ export default function EmailsPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Email Operations"
-        zhTitle="邮件操作台"
+        title="Outreach Operations"
+        zhTitle="开发信操作台"
         meta={`${project.name.toUpperCase()} / SAFE MODE / CUSTOMER SENDS NEED APPROVAL`}
         zhMeta={`${project.name.toUpperCase()} / 安全模式 / 发给客户前需要审批`}
         active="/emails"
@@ -149,7 +149,7 @@ export default function EmailsPage() {
 
       <BattlePageBody className="space-y-3">
         <div className="grid gap-3 md:grid-cols-4">
-          <StatCell label={language === "zh" ? "已记录邮件" : "Saved Emails"} value={stats.totalSent} tone="emerald" />
+          <StatCell label={language === "zh" ? "已记录开发信" : "Saved Outreach"} value={stats.totalSent} tone="emerald" />
           <StatCell label={language === "zh" ? "收到" : "Received"} value={stats.totalReceived} tone="blue" />
           <StatCell label={language === "zh" ? "已回复" : "Replied"} value={stats.totalReplied} tone="purple" />
           <StatCell label={language === "zh" ? "回复率" : "Reply Rate"} value={`${stats.replyRate}%`} tone="amber" />
@@ -157,7 +157,7 @@ export default function EmailsPage() {
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_420px]">
           <BattlePanel
-            title={language === "zh" ? "邮件记录" : "Email Records"}
+            title={language === "zh" ? "开发信记录" : "Outreach Records"}
             meta={language === "zh" ? `${rows.length} 条记录` : `${rows.length} records`}
             action={
               <div className="flex gap-1 rounded-md border border-slate-800 bg-slate-950 p-0.5">
@@ -180,7 +180,7 @@ export default function EmailsPage() {
             {error ? (
               <EmptyState label={error} />
             ) : rows.length === 0 ? (
-              <EmptyState label={language === "zh" ? (loading ? "正在读取邮件记录" : "没有记录") : (loading ? "loading email records" : "no records")} />
+              <EmptyState label={language === "zh" ? (loading ? "正在读取开发信记录" : "没有记录") : (loading ? "loading outreach records" : "no records")} />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-xs">
@@ -224,19 +224,19 @@ export default function EmailsPage() {
           </BattlePanel>
 
           <BattlePanel
-            title={language === "zh" ? "新建待审批邮件" : "New Review Draft"}
+            title={language === "zh" ? "新建待审批开发信" : "New Review Draft"}
             meta={language === "zh" ? "保存草稿，不会直接发给客户" : "saves a draft; does not send to customers"}
           >
             <div className="space-y-3 p-3">
               <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
                 <BattleText
-                  en="This page saves the email for review. Customer sends stay locked until Wilson explicitly approves."
-                  zh="本页只把邮件保存为待审批草稿。Wilson 明确批准前，不会发给客户。"
+                  en="This page saves the email for review. Customer sends stay locked until an operator explicitly approves."
+                  zh="本页只把开发信保存为待审批草稿。操作员明确批准前，不会发给客户。"
                 />
               </div>
               <InputField value={to} onChange={(event) => setTo(event.target.value)} placeholder="recipient@example.com" mono />
               <InputField value={subject} onChange={(event) => setSubject(event.target.value)} placeholder={language === "zh" ? "主题" : "Subject"} />
-              <TextAreaField value={body} onChange={(event) => setBody(event.target.value)} placeholder={language === "zh" ? "邮件草稿" : "Draft body"} className="h-52" />
+              <TextAreaField value={body} onChange={(event) => setBody(event.target.value)} placeholder={language === "zh" ? "开发信草稿" : "Draft body"} className="h-52" />
               <div className="flex items-center justify-between gap-3">
                 <p className="min-w-0 truncate text-[10px] text-slate-500">
                   {saveMessage || (language === "zh" ? "准备保存待审批草稿" : "ready to save for review")}

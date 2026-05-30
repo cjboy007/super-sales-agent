@@ -7,12 +7,20 @@ import { GET, POST } from "./route";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
 const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
+const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
+const originalLlmProvider = process.env.SSA_LLM_PROVIDER;
+const originalOpenAiApiKey = process.env.OPENAI_API_KEY;
+const originalOpenRouterApiKey = process.env.OPENROUTER_API_KEY;
 let tempRoot = "";
 
 beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-runtime-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
   delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
+  delete process.env.SSA_BETA_AUTH_TOKENS;
+  process.env.SSA_LLM_PROVIDER = "mock";
+  delete process.env.OPENAI_API_KEY;
+  delete process.env.OPENROUTER_API_KEY;
 });
 
 afterEach(() => {
@@ -22,14 +30,80 @@ afterEach(() => {
   if (originalEmailFlag === undefined) delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   else process.env.SSA_ENABLE_REAL_EMAIL_SEND = originalEmailFlag;
 
+  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
+  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
+
+  if (originalLlmProvider === undefined) delete process.env.SSA_LLM_PROVIDER;
+  else process.env.SSA_LLM_PROVIDER = originalLlmProvider;
+
+  if (originalOpenAiApiKey === undefined) delete process.env.OPENAI_API_KEY;
+  else process.env.OPENAI_API_KEY = originalOpenAiApiKey;
+
+  if (originalOpenRouterApiKey === undefined) delete process.env.OPENROUTER_API_KEY;
+  else process.env.OPENROUTER_API_KEY = originalOpenRouterApiKey;
+
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(url: string, init?: { method?: string; body?: BodyInit | null }): NextRequest {
-  return new NextRequest(url, init);
+function request(url: string, init?: { method?: string; body?: BodyInit | null; token?: string }): NextRequest {
+  return new NextRequest(url, {
+    method: init?.method,
+    body: init?.body,
+    headers: init?.token ? { Authorization: `Bearer ${init.token}` } : undefined,
+  });
 }
 
 describe("/api/runtime route", () => {
+  it("does not require in-app sign-in for runtime mutations when legacy beta env vars are present", async () => {
+    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
+      { token: "farreach-token", workspaces: ["farreach"] },
+    ]);
+
+    const response = await POST(request("http://localhost/api/runtime", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "register-workspace",
+        workspace: { id: "public-probe", name: "Public Probe" },
+      }),
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.data).toMatchObject({ id: "public-probe", name: "Public Probe" });
+  });
+
+  it("keeps side-effect approval local without workspace-token checks", async () => {
+    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
+      { token: "farreach-token", workspaces: ["farreach"] },
+    ]);
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    const runtime = createSalesRuntime();
+    const decision = runtime.requestSideEffect({
+      kind: "email.send",
+      workspaceId: "hero-pumps",
+      summary: "Hero email",
+      payload: { to: "buyer@example.com" },
+    });
+
+    const response = await POST(request("http://localhost/api/runtime", {
+      method: "POST",
+      token: "farreach-token",
+      body: JSON.stringify({
+        action: "approve-side-effect",
+        input: { decisionId: decision.id },
+      }),
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.data).toMatchObject({
+      id: decision.id,
+      status: "approved",
+      workspaceId: "hero-pumps",
+    });
+  });
+
   it("returns a runtime snapshot", async () => {
     const response = await GET(request("http://localhost/api/runtime"));
     const json = await response.json();

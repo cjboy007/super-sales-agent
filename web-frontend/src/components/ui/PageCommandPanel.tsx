@@ -17,8 +17,8 @@ export default function PageCommandPanel({
   page,
   summary,
   context,
-  placeholder = "Tell SSA what to inspect, draft, verify, or prepare from this page",
-  zhPlaceholder = "告诉 SSA 要检查、整理、起草或准备什么",
+  placeholder = "Tell Jaden what to inspect, draft, verify, or prepare from this page",
+  zhPlaceholder = "告诉 Jaden 要检查、整理、起草或准备什么",
 }: PageCommandPanelProps) {
   const { apiUrl } = useProject();
   const { language } = useTheme();
@@ -55,7 +55,7 @@ export default function PageCommandPanel({
 
   return (
     <BattlePanel
-      title={language === "zh" ? "让 SSA 帮我看" : "Ask SSA About This Page"}
+      title={language === "zh" ? "让 Jaden 帮我看" : "Ask Jaden About This Page"}
       meta={language === "zh" ? "会带上本页筛选和当前数据，不会外发" : "uses the current filters and visible data; no external send"}
       action={
         <BattleBadge tone={status === "error" ? "red" : status === "sending" ? "blue" : status === "queued" ? "emerald" : "neutral"} pulse={status === "sending"}>
@@ -66,12 +66,12 @@ export default function PageCommandPanel({
       <div className="space-y-3 p-3">
         <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
           <p className="text-[10px] uppercase tracking-wide text-slate-500">
-            <BattleText en="What SSA can see" zh="SSA 会参考这些内容" />
+            <BattleText en="What Jaden can see" zh="Jaden 会参考这些内容" />
           </p>
           <p className="mt-1 text-xs leading-5 text-slate-400">
             <BattleText
-              en="Your note is saved with this page's current filters, visible records, and totals so SSA knows what you are looking at."
-              zh="你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，SSA 就知道你正在看什么。"
+              en="Your note is saved with this page's current filters, visible records, and totals so Jaden knows what you are looking at."
+              zh="你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。"
             />
           </p>
           <p className="mt-2 font-mono text-[10px] leading-4 text-slate-500">{summary}</p>
@@ -89,13 +89,13 @@ export default function PageCommandPanel({
           <p className="truncate text-[10px] text-slate-500">
             {receipt || (
               <BattleText
-                en="Nothing is sent to customers. This is saved inside SSA for review."
-                zh="不会发给客户，只会保存到 SSA 内等待复核。"
+                en="Nothing is sent to customers. This is saved inside JadenOS for review."
+                zh="不会发给客户，只会保存到 JadenOS 内等待复核。"
               />
             )}
           </p>
           <CommandButton variant="primary" disabled={!message.trim() || status === "sending"} onClick={submit}>
-            <BattleText en="Ask SSA" zh="提交给 SSA" />
+            <BattleText en="Ask Jaden" zh="提交给 Jaden" />
           </CommandButton>
         </div>
       </div>

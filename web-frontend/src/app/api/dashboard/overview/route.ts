@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/lib/api-types";
 import { createSalesRuntime, type DashboardOverviewReadModel, type SideEffectDecision } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,9 +9,10 @@ interface DashboardOverview extends DashboardOverviewReadModel {
   sideEffect?: SideEffectDecision;
 }
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const project = url.searchParams.get("project") || "farreach";
+export async function GET(request: NextRequest) {
+  const project = request.nextUrl.searchParams.get("project") || "farreach";
+  const auth = requireWorkspaceAccess(request, project);
+  if (!auth.ok) return auth.response;
 
   try {
     const runtime = createSalesRuntime();

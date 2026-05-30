@@ -44,7 +44,7 @@ function conversionCalls() {
 
 describe("/api/files/preview route", () => {
   it("returns direct preview metadata for HTML without a side-effect gate", async () => {
-    const htmlPath = path.join(tempRoot, "documents", "preview.html");
+    const htmlPath = path.join(tempRoot, "companies", "demo-exporter", "documents", "preview.html");
     fs.mkdirSync(path.dirname(htmlPath), { recursive: true });
     fs.writeFileSync(htmlPath, "<html>Preview</html>", "utf-8");
     const { GET } = await import("./route");
@@ -55,13 +55,13 @@ describe("/api/files/preview route", () => {
     expect(json).toMatchObject({
       previewAvailable: false,
       reason: "direct",
-      inlineUrl: `/api/files?path=${encodeURIComponent(htmlPath)}`,
+      inlineUrl: `/api/files?path=${encodeURIComponent(htmlPath)}&project=demo-exporter`,
     });
     expect(conversionCalls()).toHaveLength(0);
   });
 
   it("blocks Office document conversion by default without running LibreOffice", async () => {
-    const docPath = path.join(tempRoot, "documents", "quote.docx");
+    const docPath = path.join(tempRoot, "companies", "demo-exporter", "documents", "quote.docx");
     fs.mkdirSync(path.dirname(docPath), { recursive: true });
     fs.writeFileSync(docPath, "docx-placeholder", "utf-8");
     const { GET } = await import("./route");
@@ -86,7 +86,7 @@ describe("/api/files/preview route", () => {
 
   it("runs Office document conversion only when document preview is explicitly enabled", async () => {
     process.env.SSA_ENABLE_REAL_DOCUMENT_PREVIEW = "true";
-    const docPath = path.join(tempRoot, "documents", "quote.docx");
+    const docPath = path.join(tempRoot, "companies", "demo-exporter", "documents", "quote.docx");
     fs.mkdirSync(path.dirname(docPath), { recursive: true });
     fs.writeFileSync(docPath, "docx-placeholder", "utf-8");
     execFileSyncMock.mockImplementation((_cmd: string, args: string[]) => {

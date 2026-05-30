@@ -1,5 +1,7 @@
+import { NextRequest } from "next/server";
 import { subscribe, getRecentEvents, seedSentLogEvents } from "@/lib/events";
 import { createSalesRuntime } from "@/lib/runtime";
+import { requireBetaAuth } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +25,10 @@ function getActivitySnapshot(limit = 20) {
     .slice(0, limit);
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = requireBetaAuth(request);
+  if (!auth.ok) return auth.response;
+
   let unsubscribe = () => {};
   let heartbeat: ReturnType<typeof setInterval> | null = null;
   let closed = false;

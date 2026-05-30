@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   BattleBadge,
@@ -13,13 +14,22 @@ import {
   SelectField,
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
+import { useProject } from "@/lib/project";
 
 type TabKey = "api" | "email" | "search";
 
 interface ConfigState {
+  deepseekApiKey: string;
+  openaiApiKey: string;
   openrouterApiKey: string;
   geminiApiKey: string;
   tavilyApiKey: string;
+  hunterApiKey: string;
+  apolloApiKey: string;
+  crmProvider: string;
+  crmApiKey: string;
+  notificationProvider: string;
+  notificationWebhookUrl: string;
   defaultModel: string;
   smtpHost: string;
   smtpPort: string;
@@ -43,10 +53,18 @@ interface ConfigState {
 }
 
 const DEFAULT_CONFIG: ConfigState = {
+  deepseekApiKey: "",
+  openaiApiKey: "",
   openrouterApiKey: "",
   geminiApiKey: "",
   tavilyApiKey: "",
-  defaultModel: "qwen3.6-plus",
+  hunterApiKey: "",
+  apolloApiKey: "",
+  crmProvider: "none",
+  crmApiKey: "",
+  notificationProvider: "none",
+  notificationWebhookUrl: "",
+  defaultModel: "deepseek-v4-pro",
   smtpHost: "",
   smtpPort: "465",
   smtpEncryption: "ssl",
@@ -95,10 +113,12 @@ function ConfigInput({
 
 export default function SettingsPage() {
   const language = useBattleLanguage();
+  const { apiUrl } = useProject();
   const [activeTab, setActiveTab] = useState<TabKey>("api");
   const [config, setConfig] = useState<ConfigState>(DEFAULT_CONFIG);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState<"imap" | "smtp" | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -146,6 +166,28 @@ export default function SettingsPage() {
     }
   }, [config, language]);
 
+  const testConnection = useCallback(async (kind: "imap" | "smtp") => {
+    setTesting(kind);
+    setError(null);
+    setMessage("");
+    try {
+      const res = await fetch(apiUrl("/api/email-connection/test"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.success === false) {
+        throw new Error(json.error || (language === "zh" ? "测试失败" : "Connection test failed"));
+      }
+      setMessage(json.detail || (language === "zh" ? "连接测试完成。" : "Connection test completed."));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : (language === "zh" ? "测试失败" : "Connection test failed"));
+    } finally {
+      setTesting(null);
+    }
+  }, [apiUrl, language]);
+
   const tabs: Array<{ key: TabKey; label: string }> = [
     { key: "api", label: language === "zh" ? "AI 与调研" : "AI & Research" },
     { key: "email", label: language === "zh" ? "邮件连接" : "Email Connection" },
@@ -176,6 +218,31 @@ export default function SettingsPage() {
           </div>
         )}
 
+        <BattlePanel
+          title={language === "zh" ? "JadenOS 入门终端" : "JadenOS Onboarding Terminal"}
+          meta={language === "zh" ? "运行 /jadenos onboarding 逐步设置" : "run /jadenos onboarding for guided setup"}
+          action={
+            <Link
+              href="/jadenos/onboarding"
+              className="inline-flex h-7 items-center rounded-md border border-emerald-600 bg-emerald-600 px-3 text-xs font-semibold text-white transition hover:bg-emerald-500"
+            >
+              {language === "zh" ? "打开" : "Open"}
+            </Link>
+          }
+        >
+          <div className="grid gap-3 p-3 md:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2 font-mono text-xs text-slate-300">
+              <span className="text-emerald-300">$ /jadenos onboarding</span>
+              <span className="ml-2 text-slate-500">
+                {language === "zh" ? "逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。" : "step through DeepSeek, email, Hunter, Tavily, and optional connectors."}
+              </span>
+            </div>
+            <p className="self-center text-xs text-slate-500">
+              {language === "zh" ? "完整设置仍可在本页修改。" : "Full setup remains editable here."}
+            </p>
+          </div>
+        </BattlePanel>
+
         <div className="flex gap-1 rounded-md border border-slate-800 bg-slate-900/60 p-1">
           {tabs.map((tab) => (
             <button
@@ -196,15 +263,20 @@ export default function SettingsPage() {
             meta={language === "zh" ? "AI 只辅助阅读、起草和总结；关键动作仍由 SSA 控制" : "AI assists reading, drafting, and summaries; SSA controls final actions"}
           >
             <div className="grid gap-3 p-3 md:grid-cols-2">
+              <ConfigInput label={language === "zh" ? "DeepSeek 密钥" : "DeepSeek Key"} value={config.deepseekApiKey} onChange={(v) => updateConfig({ deepseekApiKey: v })} mono />
+              <ConfigInput label={language === "zh" ? "OpenAI 密钥" : "OpenAI Key"} value={config.openaiApiKey} onChange={(v) => updateConfig({ openaiApiKey: v })} mono />
               <ConfigInput label={language === "zh" ? "OpenRouter 密钥" : "OpenRouter Key"} value={config.openrouterApiKey} onChange={(v) => updateConfig({ openrouterApiKey: v })} mono />
-              <ConfigInput label={language === "zh" ? "Gemini 密钥" : "Gemini Key"} value={config.geminiApiKey} onChange={(v) => updateConfig({ geminiApiKey: v })} mono />
               <ConfigInput label={language === "zh" ? "Tavily 调研密钥" : "Tavily Research Key"} value={config.tavilyApiKey} onChange={(v) => updateConfig({ tavilyApiKey: v })} mono />
               <FieldLabel>
                 {language === "zh" ? "默认 AI 模型" : "Default AI Model"}
                 <SelectField value={config.defaultModel} onChange={(event) => updateConfig({ defaultModel: event.target.value })} className="mt-1 w-full">
-                  <option value="qwen3.6-plus">qwen3.6-plus</option>
+                  <option value="deepseek-v4-pro">deepseek-v4-pro</option>
+                  <option value="deepseekv4pro">deepseekv4pro</option>
+                  <option value="gpt-4o-mini">gpt-4o-mini</option>
                   <option value="gpt-4.1">gpt-4.1</option>
-                  <option value="claude-sonnet-4">claude-sonnet-4</option>
+                  <option value="deepseek/deepseek-v4-pro">deepseek/deepseek-v4-pro</option>
+                  <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
+                  <option value="anthropic/claude-sonnet-4">anthropic/claude-sonnet-4</option>
                   <option value="mock">mock</option>
                 </SelectField>
               </FieldLabel>
@@ -234,6 +306,12 @@ export default function SettingsPage() {
                 />
                 {language === "zh" ? "保存草稿供审批" : "Save drafts for review"}
               </label>
+              <CommandButton type="button" variant="secondary" onClick={() => testConnection("imap")} disabled={Boolean(testing) || loading}>
+                {testing === "imap" ? <BattleText en="Testing inbox" zh="测试收件中" /> : <BattleText en="Test inbox" zh="测试收件" />}
+              </CommandButton>
+              <CommandButton type="button" variant="secondary" onClick={() => testConnection("smtp")} disabled={Boolean(testing) || loading}>
+                {testing === "smtp" ? <BattleText en="Testing sending" zh="测试发信中" /> : <BattleText en="Test sending" zh="测试发信" />}
+              </CommandButton>
             </div>
           </BattlePanel>
         )}
@@ -242,6 +320,9 @@ export default function SettingsPage() {
           <BattlePanel title={language === "zh" ? "搜索与情报设置" : "Search & Intelligence Settings"} meta={language === "zh" ? "用于线索调研和市场情报" : "used for lead research and market intelligence"}>
             <div className="grid gap-3 p-3 md:grid-cols-4">
               <ConfigInput label={language === "zh" ? "搜索服务" : "Search Service"} value={config.searchEngine} onChange={(v) => updateConfig({ searchEngine: v })} mono />
+              <ConfigInput label={language === "zh" ? "Tavily 密钥" : "Tavily Key"} value={config.tavilyApiKey} onChange={(v) => updateConfig({ tavilyApiKey: v })} mono />
+              <ConfigInput label={language === "zh" ? "Hunter 密钥" : "Hunter Key"} value={config.hunterApiKey} onChange={(v) => updateConfig({ hunterApiKey: v })} mono />
+              <ConfigInput label={language === "zh" ? "Apollo 密钥" : "Apollo Key"} value={config.apolloApiKey} onChange={(v) => updateConfig({ apolloApiKey: v })} mono />
               <ConfigInput label={language === "zh" ? "地区" : "Region"} value={config.searchRegion} onChange={(v) => updateConfig({ searchRegion: v })} mono />
               <ConfigInput label={language === "zh" ? "最多结果数" : "Max Results"} value={config.maxResults} type="number" onChange={(v) => updateConfig({ maxResults: Number(v) })} mono />
               <ConfigInput label={language === "zh" ? "搜索深度" : "Search Depth"} value={config.searchDepth} onChange={(v) => updateConfig({ searchDepth: v })} mono />
@@ -263,6 +344,35 @@ export default function SettingsPage() {
           </BattlePanel>
         )}
 
+        {activeTab === "search" && (
+          <BattlePanel title={language === "zh" ? "可选连接器" : "Optional Connectors"} meta={language === "zh" ? "不上线第一天也可以稍后连接" : "can be connected after the first launch"}>
+            <div className="grid gap-3 p-3 md:grid-cols-2">
+              <FieldLabel>
+                {language === "zh" ? "CRM" : "CRM"}
+                <SelectField value={config.crmProvider} onChange={(event) => updateConfig({ crmProvider: event.target.value })} className="mt-1 w-full">
+                  <option value="none">None / Local Workspace</option>
+                  <option value="hubspot">HubSpot</option>
+                  <option value="salesforce">Salesforce</option>
+                  <option value="pipedrive">Pipedrive</option>
+                  <option value="close">Close</option>
+                  <option value="okki">OKKI</option>
+                </SelectField>
+              </FieldLabel>
+              <ConfigInput label={language === "zh" ? "CRM API 密钥" : "CRM API Key"} value={config.crmApiKey} onChange={(v) => updateConfig({ crmApiKey: v })} mono />
+              <FieldLabel>
+                {language === "zh" ? "通知渠道" : "Notification Channel"}
+                <SelectField value={config.notificationProvider} onChange={(event) => updateConfig({ notificationProvider: event.target.value })} className="mt-1 w-full">
+                  <option value="none">None</option>
+                  <option value="slack">Slack</option>
+                  <option value="teams">Microsoft Teams</option>
+                  <option value="feishu">Feishu / Lark</option>
+                </SelectField>
+              </FieldLabel>
+              <ConfigInput label={language === "zh" ? "Webhook 地址" : "Webhook URL"} value={config.notificationWebhookUrl} onChange={(v) => updateConfig({ notificationWebhookUrl: v })} mono />
+            </div>
+          </BattlePanel>
+        )}
+
         <BattlePanel title={language === "zh" ? "安全规则" : "Safety Rules"} meta={language === "zh" ? "哪些可以自动做，哪些必须审批" : "what SSA can do automatically and what needs approval"}>
           <div className="grid gap-3 p-3 md:grid-cols-3">
             <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
@@ -280,7 +390,7 @@ export default function SettingsPage() {
             <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
               <BattleBadge tone="neutral"><BattleText en="Optional Tools" zh="可选工具" /></BattleBadge>
               <p className="mt-2 text-xs text-slate-300">
-                <BattleText en="Developer and supervisor tools can help Wilson, but SSA can run without them." zh="开发和监督工具可以辅助 Wilson，但 SSA 不依赖它们运行。" />
+                <BattleText en="Developer and supervisor tools can help operators, but OpenClaw can run without them." zh="开发和监督工具可以辅助操作员，但 OpenClaw 不依赖它们运行。" />
               </p>
             </div>
           </div>

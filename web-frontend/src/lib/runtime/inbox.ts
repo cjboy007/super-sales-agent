@@ -1,4 +1,7 @@
+import fs from "fs";
 import type { InboundEmail, ReplyStyle } from "../../types/inbox";
+import { ensureSsaCompanyDataPath } from "../ssa-data-paths";
+import { verifyEmailAddress } from "./email-verification";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision } from "./types";
 
@@ -37,6 +40,12 @@ export interface InboxSendInput {
   body?: unknown;
   content?: unknown;
   html?: unknown;
+  humanApproval?: {
+    approved?: boolean;
+    approvedBy?: string;
+    approvedAt?: string;
+    note?: string;
+  };
 }
 
 export interface InboxStyleSelectionInput {
@@ -51,6 +60,39 @@ function farreachUrl() {
 
 function isFarreachBridgeEnabled() {
   return process.env.SSA_ENABLE_FARREACH_BRIDGE === "true";
+}
+
+function canSendWithoutVerification() {
+  return process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND === "true";
+}
+
+function verificationBlockDetail(status: string) {
+  return `Email blocked: recipient verification is ${status}. Configure Hunter verification or approve an explicit unverified-send override.`;
+}
+
+function hasHumanApproval(input: InboxSendInput) {
+  return input.humanApproval?.approved === true;
+}
+
+function sendRequestLogPath(workspaceId: string) {
+  return ensureSsaCompanyDataPath(workspaceId, "mail", "send-requests.json");
+}
+
+function appendToSendRequestLog(workspaceId: string, email: string, subject: string, status = "blocked_local_preview") {
+  let entries: Array<{ email: string; requested_at: string; subject: string; status: string }> = [];
+  try {
+    const raw = fs.readFileSync(sendRequestLogPath(workspaceId), "utf-8");
+    entries = JSON.parse(raw);
+  } catch {
+    // File does not exist yet.
+  }
+  entries.push({
+    email,
+    requested_at: new Date().toISOString(),
+    subject,
+    status,
+  });
+  fs.writeFileSync(sendRequestLogPath(workspaceId), JSON.stringify(entries, null, 2), "utf-8");
 }
 
 function stringValue(value: unknown, fallback = ""): string {
@@ -234,11 +276,45 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
       subject,
       html: Boolean(input.html),
       source: "inbox.send",
+      humanApproval: input.humanApproval || null,
     },
     idempotencyKey: `${workspace.id}:inbox:${input.emailId}:send`,
   });
 
   if (isFarreachBridgeEnabled() && sideEffect.status === "allowed") {
+    if (!hasHumanApproval(input)) {
+      appendToSendRequestLog(workspace.id, to, subject, "blocked_missing_approval");
+      return {
+        success: true,
+        email_id: input.emailId,
+        sent_at: new Date().toISOString(),
+        to,
+        subject,
+        blocked: true,
+        sideEffect,
+        message: "Email blocked: human approval is required before real customer send.",
+      };
+    }
+
+    const verification = await verifyEmailAddress({
+      workspaceId: workspace.id,
+      email: to,
+    });
+    if (verification.status !== "valid" && !canSendWithoutVerification()) {
+      appendToSendRequestLog(workspace.id, to, subject, `blocked_verification_${verification.status}`);
+      return {
+        success: true,
+        email_id: input.emailId,
+        sent_at: new Date().toISOString(),
+        to,
+        subject,
+        blocked: true,
+        sideEffect,
+        verification,
+        message: verificationBlockDetail(verification.status),
+      };
+    }
+
     try {
       const res = await fetch(`${farreachUrl()}/api/v1/email/send`, {
         method: "POST",
@@ -268,6 +344,12 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
   }
 
   await new Promise((resolve) => setTimeout(resolve, 600));
+  appendToSendRequestLog(
+    workspace.id,
+    to,
+    subject,
+    sideEffect.status === "allowed" ? "blocked_bridge_unavailable" : "blocked_local_preview"
+  );
   return {
     success: true,
     email_id: input.emailId,

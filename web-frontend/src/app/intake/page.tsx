@@ -432,14 +432,14 @@ export default function IntakePage() {
             </BattlePanel>
 
             <BattlePanel
-              title={language === "zh" ? "说明给 SSA" : "Notes for SSA"}
-              meta={language === "zh" ? "告诉 SSA 这是什么、该怎么处理" : "tell SSA what this is and what to check"}
+              title={language === "zh" ? "说明给 Jaden" : "Notes for Jaden"}
+              meta={language === "zh" ? "告诉 Jaden 这是什么、该怎么处理" : "tell Jaden what this is and what to check"}
               action={<BattleBadge tone={messages.length ? "emerald" : "neutral"}>{messages.length} <BattleText en="notes" zh="条" /></BattleBadge>}
             >
               <div className="flex h-[460px] flex-col">
                 <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
                   {messages.length === 0 ? (
-                    <EmptyState label={language === "zh" ? "描述这是什么，然后交给 SSA 分析" : "describe what this is, then ask SSA to review it"} />
+                    <EmptyState label={language === "zh" ? "描述这是什么，然后交给 Jaden 分析" : "describe what this is, then ask Jaden to review it"} />
                   ) : (
                     messages.map((chat) => (
                       <div
@@ -453,7 +453,7 @@ export default function IntakePage() {
                       >
                         <div className="mb-1 flex items-center justify-between gap-3">
                           <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
-                            {chat.role === "user" ? "Wilson" : "SSA"}
+                            {chat.role === "user" ? "Operator" : "Jaden"}
                           </p>
                           <p className="font-mono text-[10px] text-slate-600">{formatTime(chat.createdAt)}</p>
                         </div>
@@ -463,7 +463,7 @@ export default function IntakePage() {
                   )}
                   {sending && (
                     <div className="max-w-[88%] rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2">
-                      <p className="font-mono text-[10px] uppercase tracking-wide text-blue-300">SSA</p>
+                      <p className="font-mono text-[10px] uppercase tracking-wide text-blue-300">Jaden</p>
                       <p className="mt-1 text-xs text-slate-300">
                         <BattleText en="Reviewing your notes and saving the item..." zh="正在阅读你的说明并保存这条投递..." />
                       </p>
@@ -482,7 +482,7 @@ export default function IntakePage() {
                         submitIntake();
                       }
                     }}
-                    placeholder={language === "zh" ? "告诉 SSA 这是什么、你认为它属于哪里、或要核对哪个客户关系" : "Tell SSA what this is, where you think it belongs, or what relationship to check"}
+                    placeholder={language === "zh" ? "告诉 Jaden 这是什么、你认为它属于哪里、或要核对哪个客户关系" : "Tell Jaden what this is, where you think it belongs, or what relationship to check"}
                     className="min-h-20 w-full resize-none"
                   />
                   <div className="mt-2 flex items-center justify-between gap-3">
@@ -494,7 +494,7 @@ export default function IntakePage() {
                       disabled={sending || (!message.trim() && !pastedText.trim() && files.length === 0)}
                       onClick={() => submitIntake()}
                     >
-                      {sending ? <BattleText en="Analyzing" zh="分析中" /> : <BattleText en="Ask SSA" zh="交给 SSA" />}
+                      {sending ? <BattleText en="Analyzing" zh="分析中" /> : <BattleText en="Ask Jaden" zh="交给 Jaden" />}
                     </CommandButton>
                   </div>
                 </div>

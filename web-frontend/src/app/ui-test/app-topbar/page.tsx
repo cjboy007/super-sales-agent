@@ -74,11 +74,11 @@ export default function AppTopBarApprovalPage() {
         <div className="grid h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(220px,320px)_minmax(0,1fr)_minmax(220px,320px)]">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/" className="grid h-7 w-7 shrink-0 place-items-center rounded bg-emerald-500 font-mono text-[11px] font-black text-slate-950">
-              FR
+              JO
             </Link>
             <div className="min-w-0">
               <h1 className="truncate text-xs font-semibold uppercase tracking-[0.18em] text-slate-100">Leads Radar</h1>
-              <p className="truncate font-mono text-[10px] text-slate-400">SSA Battle Station / test chrome</p>
+              <p className="truncate font-mono text-[10px] text-slate-400">JadenOS / OpenClaw for salespeople</p>
             </div>
           </div>
 
@@ -177,21 +177,21 @@ export default function AppTopBarApprovalPage() {
           </Panel>
 
           <div className="space-y-3">
-            <Panel title="Ask SSA About This Page" meta="uses current filters and visible records">
+            <Panel title="Ask OpenClaw About This Page" meta="uses current filters and visible records">
               <div className="space-y-3 p-3">
                 <div className="rounded-md border border-slate-600 bg-slate-900 px-3 py-2">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-300">What SSA can see</p>
+                  <p className="text-[10px] uppercase tracking-wide text-slate-300">What OpenClaw can see</p>
                   <p className="mt-1 text-[10px] text-slate-300">
                     Lead List / High Priority / 4 visible / 24 hot / no search
                   </p>
                 </div>
                 <div className="min-h-24 rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-xs text-slate-300">
-                  Prioritize the hot leads and prepare a first outreach angle for Wilson.
+                  Prioritize the hot leads and prepare a first outreach angle for the operator.
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-slate-400">Nothing is sent to customers</span>
                   <button className="h-7 rounded-md border border-emerald-400 bg-emerald-500 px-3 text-xs font-semibold text-slate-950">
-                    Ask SSA
+                    Ask OpenClaw
                   </button>
                 </div>
               </div>

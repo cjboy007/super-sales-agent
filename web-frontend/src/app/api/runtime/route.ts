@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  filterWorkspaceScoped,
+  hasWorkspaceAccess,
+  type BetaAuthSession,
+  requireBetaAuth,
+  requireWorkspaceAccess,
+} from "@/lib/runtime/beta-auth";
 import { createSalesRuntime, RUNTIME_WORKFLOWS, type RuntimeWorkflowType, type WorkspaceInput } from "@/lib/runtime";
 
 export const dynamic = "force-dynamic";
@@ -21,12 +28,27 @@ function parseWorkspaceInput(value: unknown): WorkspaceInput | null {
   return candidate as WorkspaceInput;
 }
 
+function scopedRuntimeSnapshot(runtime: ReturnType<typeof createSalesRuntime>, session: BetaAuthSession) {
+  const snapshot = runtime.snapshot();
+  if (session.workspaces.includes("*")) return snapshot;
+  const allowed = new Set(session.workspaces);
+  return {
+    ...snapshot,
+    workspaces: snapshot.workspaces.filter((workspace) => allowed.has(workspace.id)),
+    jobs: filterWorkspaceScoped(session, snapshot.jobs),
+    sideEffects: filterWorkspaceScoped(session, snapshot.sideEffects),
+    events: filterWorkspaceScoped(session, snapshot.events),
+  };
+}
+
 export async function GET(request: NextRequest) {
   const runtime = createSalesRuntime();
+  const auth = requireBetaAuth(request);
+  if (!auth.ok) return auth.response;
   const action = request.nextUrl.searchParams.get("action") || "snapshot";
 
   if (action === "jobs") {
-    return NextResponse.json({ success: true, data: runtime.workflows.listJobs(50) });
+    return NextResponse.json({ success: true, data: filterWorkspaceScoped(auth.session, runtime.workflows.listJobs(50)) });
   }
 
   if (action === "manifest") {
@@ -34,19 +56,23 @@ export async function GET(request: NextRequest) {
   }
 
   if (action === "workspaces") {
-    return NextResponse.json({ success: true, data: runtime.listWorkspaces() });
+    const workspaces = runtime.listWorkspaces();
+    const data = auth.session.workspaces.includes("*")
+      ? workspaces
+      : workspaces.filter((workspace) => auth.session.workspaces.includes(workspace.id));
+    return NextResponse.json({ success: true, data });
   }
 
   if (action === "side-effects") {
     const limit = Math.min(500, Math.max(1, Number(request.nextUrl.searchParams.get("limit") || "50")));
-    return NextResponse.json({ success: true, data: runtime.listSideEffects(limit) });
+    return NextResponse.json({ success: true, data: filterWorkspaceScoped(auth.session, runtime.listSideEffects(limit)) });
   }
 
   if (action === "packs") {
     return NextResponse.json({ success: true, data: runtime.listPacks() });
   }
 
-  return NextResponse.json({ success: true, data: runtime.snapshot() });
+  return NextResponse.json({ success: true, data: scopedRuntimeSnapshot(runtime, auth.session) });
 }
 
 export async function POST(request: NextRequest) {
@@ -68,6 +94,8 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      const auth = requireWorkspaceAccess(request, workspaceInput.id);
+      if (!auth.ok) return auth.response;
 
       const runtime = createSalesRuntime();
       const workspace = runtime.registerWorkspace(workspaceInput);
@@ -76,6 +104,8 @@ export async function POST(request: NextRequest) {
 
     if (body.action === "import-leads") {
       const workspaceId = body.workspaceId || request.nextUrl.searchParams.get("project") || "farreach";
+      const auth = requireWorkspaceAccess(request, workspaceId);
+      if (!auth.ok) return auth.response;
       const input = body.input || {};
       const runtime = createSalesRuntime();
       const result = runtime.importLeads({
@@ -88,6 +118,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.action === "approve-side-effect" || body.action === "reject-side-effect" || body.action === "retry-side-effect") {
+      const auth = requireBetaAuth(request);
+      if (!auth.ok) return auth.response;
       const decisionId = typeof body.input?.decisionId === "string" ? body.input.decisionId : "";
       if (!decisionId) {
         return NextResponse.json(
@@ -96,6 +128,19 @@ export async function POST(request: NextRequest) {
         );
       }
       const runtime = createSalesRuntime();
+      const existingDecision = runtime.getSideEffect(decisionId);
+      if (!existingDecision) {
+        return NextResponse.json(
+          { success: false, error: `Side effect decision not found: ${decisionId}` },
+          { status: 400 }
+        );
+      }
+      if (!hasWorkspaceAccess(auth.session, existingDecision.workspaceId)) {
+        return NextResponse.json(
+          { success: false, error: "Workspace access denied" },
+          { status: 403 }
+        );
+      }
       if (body.action === "approve-side-effect") {
         return NextResponse.json({
           success: true,
@@ -118,6 +163,8 @@ export async function POST(request: NextRequest) {
     }
 
     const workspaceId = body.workspaceId || request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, workspaceId);
+    if (!auth.ok) return auth.response;
     const workflow = parseWorkflow(body.workflow);
     if (!workflow) {
       return NextResponse.json(

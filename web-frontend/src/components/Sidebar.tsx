@@ -47,7 +47,7 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
           onClick={onToggle}
           className="text-lg font-bold text-white hover:text-[var(--accent)] transition-colors w-full text-left truncate"
         >
-          {collapsed ? "🧠" : "🧠 Super Sales Agent"}
+          {collapsed ? "JO" : "JadenOS"}
         </button>
         <button
           onClick={onCloseMobile}
@@ -121,8 +121,8 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
               W
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-white truncate">Wilson</p>
-              <p className="text-xs text-gray-500 truncate">Admin</p>
+              <p className="text-sm font-medium text-white truncate">JadenOS</p>
+              <p className="text-xs text-gray-500 truncate">OpenClaw for salespeople</p>
             </div>
           </div>
         </div>

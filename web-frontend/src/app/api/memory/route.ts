@@ -5,6 +5,7 @@ import {
   type MemoryRecordKind,
   type MemorySource,
 } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +75,8 @@ function errorMessage(error: unknown): string {
 export async function GET(request: NextRequest) {
   const runtime = createSalesRuntime();
   const project = request.nextUrl.searchParams.get("project") || "farreach";
+  const auth = requireWorkspaceAccess(request, project);
+  if (!auth.ok) return auth.response;
   const query = request.nextUrl.searchParams.get("query") || "";
   const limit = Math.min(50, Math.max(1, Number(request.nextUrl.searchParams.get("limit") || "10")));
   const mode = request.nextUrl.searchParams.get("mode") || "search";
@@ -102,6 +105,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({})) as Record<string, unknown>;
     const project = stringValue(body.workspaceId) || request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
     const title = stringValue(body.title);
     const bodyText = stringValue(body.body);
     if (!title || !bodyText) {

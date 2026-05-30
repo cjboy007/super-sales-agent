@@ -53,6 +53,7 @@ leads/              # imported lead CSV/JSON files
 documents/          # generated trade documents
 quotations/         # generated quotes
 intelligence/       # news, market, and competitor signals
+intake/             # recent intake sessions and uploads
 memory/             # SSA-owned customer memory
 approvals/          # approval records and side-effect decisions
 events/             # runtime activity events
@@ -181,9 +182,29 @@ export SSA_DATA_ROOT="$HOME/.ssa/data"
 
 2. **配置 LLM Provider**（可选）
 ```bash
+export SSA_LLM_PROVIDER=deepseek
+export DEEPSEEK_API_KEY=your_key
+export SSA_LLM_MODEL=deepseek-v4-pro
+export HUNTER_API_KEY=your_hunter_key
+```
+
+OpenRouter is also supported:
+
+```bash
+export SSA_LLM_PROVIDER=openrouter
+export OPENROUTER_API_KEY=your_key
+export SSA_LLM_MODEL=deepseek/deepseek-v4-pro
+```
+
+OpenAI remains available as a fallback:
+
+```bash
 export SSA_LLM_PROVIDER=openai
 export OPENAI_API_KEY=your_key
+export SSA_LLM_MODEL=gpt-4o-mini
 ```
+
+If `SSA_LLM_PROVIDER` is not set, SSA auto-detects `DEEPSEEK_API_KEY` first, then `OPENAI_API_KEY`, then `OPENROUTER_API_KEY`. Without a supported key it falls back to the local mock LLM.
 
 3. **启动本地 UI**
 ```bash
@@ -206,6 +227,40 @@ scripts/check-repo-boundary.sh
 ```
 
 真实 IMAP、SMTP、OKKI、飞书、支付、银行等外部副作用默认关闭。必须有 Wilson 明确授权并设置对应 `SSA_ENABLE_REAL_*` 开关后，适配器才允许执行真实外部调用。
+
+### Runtime File Boundary
+
+SSA does not ship an in-app sign-in system. Keep the app behind your normal
+OpenClaw/private network boundary if needed.
+
+Runtime data is kept outside the repo under `SSA_DATA_ROOT`:
+
+```bash
+export SSA_DATA_ROOT="$HOME/.ssa/data"
+```
+
+Company files live under `~/.ssa/data/companies/<workspace>/`. Intake sessions
+and uploads live under each company folder and are retained as a bounded recent
+set. Generated previews use temporary folders, and `scripts/check-repo-boundary.sh`
+catches accidental runtime files written into the repo.
+
+Keep real email, CRM, Feishu, payment, bank, and document side effects unset or
+`false` unless the exact adapter has been reviewed and approved through the
+side-effect gate.
+
+For public beta, send customer email from the SSA web review flow. Older
+orchestrator and batch-send scripts are guarded, but they are not the preferred
+operator surface.
+
+Production standalone start:
+
+```bash
+cd web-frontend
+npm run build
+PORT=3000 HOSTNAME=0.0.0.0 npm run start:standalone
+```
+
+See [docs/PUBLIC_BETA_READINESS.md](./docs/PUBLIC_BETA_READINESS.md).
 
 ---
 
@@ -258,8 +313,9 @@ scripts/check-repo-boundary.sh
 常用运行时变量：
 ```bash
 export SSA_DATA_ROOT="$HOME/.ssa/data"
-export SSA_LLM_PROVIDER=openai
-export OPENAI_API_KEY=your_key
+export SSA_LLM_PROVIDER=deepseek
+export DEEPSEEK_API_KEY=your_key
+export SSA_LLM_MODEL=deepseek-v4-pro
 ```
 
 外部副作用开关默认不设置：
@@ -272,7 +328,9 @@ export SSA_ENABLE_REAL_PAYMENT=true
 export SSA_ENABLE_REAL_BANK=true
 ```
 
-只有在明确需要真实外部调用时才设置这些变量。
+只有在明确需要真实外部调用时才设置这些变量。真实客户邮件发送还必须带有人工审批标记。
+真实冷邮件发送还需要 Hunter 邮箱核验通过；`SSA_ALLOW_UNVERIFIED_EMAIL_SEND=true`
+仅作为人工明确接受风险时的紧急覆盖，不应作为 public beta 默认配置。
 
 ### OpenClaw / Hermes（可选）
 

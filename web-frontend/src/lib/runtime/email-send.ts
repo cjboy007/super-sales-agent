@@ -2,6 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { ensureSsaCompanyDataPath, repoPath } from "../ssa-data-paths";
+import { verifyEmailAddress, type EmailVerificationResult } from "./email-verification";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision, WorkspaceId } from "./types";
 
@@ -13,12 +14,19 @@ export interface EmailSendInput {
   subject: string;
   body: string;
   html?: boolean;
+  humanApproval?: {
+    approved?: boolean;
+    approvedBy?: string;
+    approvedAt?: string;
+    note?: string;
+  };
 }
 
 export interface EmailSendResult {
   success: true;
   blocked?: true;
   sideEffect?: SideEffectDecision;
+  verification?: EmailVerificationResult;
   messageId?: string;
   detail: string;
 }
@@ -51,7 +59,7 @@ function appendToSentLog(workspaceId: WorkspaceId, email: string, subject: strin
   fs.writeFileSync(sentLogPath(workspaceId), JSON.stringify(entries, null, 2), "utf-8");
 }
 
-function appendToSendRequestLog(workspaceId: WorkspaceId, email: string, subject: string) {
+function appendToSendRequestLog(workspaceId: WorkspaceId, email: string, subject: string, status = "blocked_local_preview") {
   let entries: Array<{ email: string; requested_at: string; subject: string; status: string }> = [];
   try {
     const raw = fs.readFileSync(sendRequestLogPath(workspaceId), "utf-8");
@@ -63,12 +71,40 @@ function appendToSendRequestLog(workspaceId: WorkspaceId, email: string, subject
     email,
     requested_at: new Date().toISOString(),
     subject,
-    status: "blocked_local_preview",
+    status,
   });
   fs.writeFileSync(sendRequestLogPath(workspaceId), JSON.stringify(entries, null, 2), "utf-8");
 }
 
-async function runSmtpScript(args: string[]) {
+function canSendWithoutVerification() {
+  return process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND === "true";
+}
+
+function verificationBlockDetail(status: EmailVerificationResult["status"]) {
+  return `Email blocked: recipient verification is ${status}. Configure Hunter verification or approve an explicit unverified-send override.`;
+}
+
+function hasHumanApproval(input: EmailSendInput) {
+  return input.humanApproval?.approved === true;
+}
+
+function localApprovalId(input: EmailSendInput) {
+  const seed = [
+    input.workspaceId,
+    input.to,
+    input.subject,
+    input.humanApproval?.approvedBy || "local-operator",
+    input.humanApproval?.approvedAt || "",
+  ].join(":");
+  return `ssa-local-${Buffer.from(seed).toString("base64url").slice(0, 32)}`;
+}
+
+async function runApprovedSmtpScript(
+  args: string[],
+  input: EmailSendInput,
+  approvalId: string,
+  verification: EmailVerificationResult
+) {
   const [{ execFile }, { promisify }] = await Promise.all([
     import("child_process"),
     import("util"),
@@ -76,6 +112,16 @@ async function runSmtpScript(args: string[]) {
   return promisify(execFile)("node", args, {
     timeout: 30_000,
     maxBuffer: 1024 * 1024,
+    env: {
+      ...process.env,
+      SSA_RUNTIME_APPROVAL_ID: approvalId,
+      SSA_RUNTIME_APPROVED_TO: input.to,
+      SSA_RUNTIME_APPROVED_SUBJECT: input.subject,
+      SSA_RUNTIME_APPROVED_BY: input.humanApproval?.approvedBy || "local-operator",
+      SSA_RUNTIME_VERIFICATION_STATUS: verification.status,
+      SSA_RUNTIME_VERIFICATION_SCORE: String(verification.score ?? 0),
+      SSA_RUNTIME_VERIFICATION_PROVIDER: verification.provider,
+    },
   });
 }
 
@@ -88,6 +134,7 @@ export async function sendEmailThroughRuntime(runtime: SalesRuntime, input: Emai
       to: input.to,
       subject: input.subject,
       html: Boolean(input.html),
+      humanApproval: input.humanApproval || null,
     },
     idempotencyKey: `${input.workspaceId}:email:${input.to}:${input.subject}`,
   });
@@ -112,7 +159,44 @@ export async function sendEmailThroughRuntime(runtime: SalesRuntime, input: Emai
     };
   }
 
-  const args = [SMTP_SCRIPT, "send", "--to", input.to, "--subject", input.subject];
+  if (!hasHumanApproval(input)) {
+    appendToSendRequestLog(input.workspaceId, input.to, input.subject, "blocked_missing_approval");
+    return {
+      success: true,
+      blocked: true,
+      sideEffect,
+      detail: "Email blocked: human approval is required before real customer send.",
+    };
+  }
+
+  const verification = await verifyEmailAddress({
+    workspaceId: input.workspaceId,
+    email: input.to,
+  });
+
+  if (verification.status !== "valid" && !canSendWithoutVerification()) {
+    appendToSendRequestLog(input.workspaceId, input.to, input.subject, `blocked_verification_${verification.status}`);
+    return {
+      success: true,
+      blocked: true,
+      sideEffect,
+      verification,
+      detail: verificationBlockDetail(verification.status),
+    };
+  }
+
+  const approvalId = localApprovalId(input);
+  const args = [
+    SMTP_SCRIPT,
+    "send",
+    "--to",
+    input.to,
+    "--subject",
+    input.subject,
+    "--confirm-send",
+    "--approval-id",
+    approvalId,
+  ];
   if (input.html) {
     const tmpFile = path.join(os.tmpdir(), `ssa-email-${Date.now()}.html`);
     fs.writeFileSync(tmpFile, input.body, "utf-8");
@@ -128,7 +212,7 @@ export async function sendEmailThroughRuntime(runtime: SalesRuntime, input: Emai
     args.push("--body", input.body);
   }
 
-  const execResult = await runSmtpScript(args);
+  const execResult = await runApprovedSmtpScript(args, input, approvalId, verification);
   const stdout = typeof execResult === "string" ? execResult : execResult.stdout || "";
   const stderr = typeof execResult === "string" ? "" : execResult.stderr || "";
   const messageIdMatch = stdout.match(/Message-ID:\s*<?([^>\n]+)>?/i)

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,9 +8,12 @@ function isUpload(value: FormDataEntryValue): value is File {
   return typeof value === "object" && value !== null && "arrayBuffer" in value && "name" in value;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    return NextResponse.json({ success: true, data: createSalesRuntime().listIntakeSessions() });
+    const project = request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
+    return NextResponse.json({ success: true, data: createSalesRuntime().listIntakeSessions(project) });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ success: false, error: message }, { status: 500 });
@@ -19,6 +23,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const project = request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
     const contentType = request.headers.get("content-type") || "";
     const runtime = createSalesRuntime();
 

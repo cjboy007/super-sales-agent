@@ -11,7 +11,7 @@ export default function SectionChrome({ title, meta, action, className }: Sectio
   return (
     <div
       className={cx(
-        "flex min-h-[42px] items-center justify-between border-b border-slate-800 bg-slate-950/80 px-3",
+        "flex min-h-[42px] flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-950/80 px-3 py-2",
         className
       )}
     >

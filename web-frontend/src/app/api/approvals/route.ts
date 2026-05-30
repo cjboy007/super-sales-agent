@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/lib/api-types";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 import {
   createSalesRuntime,
   type ApprovalInput,
@@ -18,6 +19,8 @@ function errorResponse(error: unknown, fallbackStatus = 500) {
 export async function GET(request: NextRequest) {
   const runtime = createSalesRuntime();
   const project = request.nextUrl.searchParams.get("project") || "farreach";
+  const auth = requireWorkspaceAccess(request, project);
+  if (!auth.ok) return auth.response;
   const id = request.nextUrl.searchParams.get("id");
   const data = runtime.memory.listApprovals(project, id);
   const response: ApiResponse<ApprovalRecord[]> = { success: true, data };
@@ -28,6 +31,8 @@ export async function POST(request: NextRequest) {
   try {
     const runtime = createSalesRuntime();
     const project = request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
     const body = (await request.json().catch(() => ({}))) as ApprovalInput;
     const data = runtime.memory.upsertApproval(
       { ...body, workspaceId: project },
@@ -44,6 +49,8 @@ export async function PATCH(request: NextRequest) {
   try {
     const runtime = createSalesRuntime();
     const project = request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
     const body = (await request.json().catch(() => ({}))) as ApprovalPatchInput;
     const data = runtime.memory.updateApproval(
       project,

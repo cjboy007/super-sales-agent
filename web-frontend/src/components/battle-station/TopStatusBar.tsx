@@ -7,7 +7,6 @@ interface TopStatusBarProps {
   activeAgents: number;
   connected: boolean;
   currentTime: Date;
-  operator: string;
   activeEvents: number;
 }
 
@@ -16,7 +15,6 @@ export default function TopStatusBar({
   activeAgents,
   connected,
   currentTime,
-  operator,
   activeEvents,
 }: TopStatusBarProps) {
   const formatted = currentTime
@@ -32,20 +30,16 @@ export default function TopStatusBar({
     .replace(",", "");
 
   return (
-    <AppTopBar title={copy.title} meta="v2.4.1 / live operations" active="/">
-      <div className="flex min-w-0 items-center justify-end gap-2">
-        <StatusBadge tone={connected ? "safe" : "pending"} pulse={connected} className="px-1.5">
-          <span className="sm:hidden">{connected ? activeAgents : "sync"}</span>
-          <span className="hidden sm:inline">
-            {connected ? copy.activeAgents(activeAgents) : copy.feedReconnecting}
-          </span>
+    <AppTopBar title={copy.title} meta={copy.title} active="/">
+      <div className="flex min-w-0 flex-wrap items-center justify-start gap-1.5 sm:gap-2 2xl:justify-end 2xl:flex-nowrap">
+        <StatusBadge tone={connected ? "safe" : "pending"} pulse={connected} className="shrink-0 px-1.5 normal-case">
+          <span>{connected ? copy.activeAgents(activeAgents) : copy.feedReconnecting}</span>
         </StatusBadge>
-        <span className="hidden font-mono text-[10px] text-slate-300 2xl:inline">{formatted} CST</span>
-        <span className="hidden font-mono text-[10px] text-blue-400 sm:inline">
+        <span className="shrink-0 font-mono text-[10px] text-blue-400">
           {copy.sessionEvents(activeEvents)}
         </span>
-        <span className="hidden rounded border border-slate-600 bg-slate-900/45 px-2 py-1 text-xs text-slate-200 sm:inline">
-          {operator}
+        <span className="shrink-0 font-mono text-[10px] text-slate-300">
+          {formatted} CST
         </span>
       </div>
     </AppTopBar>

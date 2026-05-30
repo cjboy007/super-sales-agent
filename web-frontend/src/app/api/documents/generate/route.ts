@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime, type TradeDocumentData } from "@/lib/runtime";
+import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,8 @@ export async function POST(request: NextRequest) {
   try {
     const body: GenerateTradeDocumentsBody = await request.json();
     const project = new URL(request.url).searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
     const { data, docTypes } = body;
 
     if (!data || !docTypes || docTypes.length === 0) {
@@ -33,9 +36,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    return NextResponse.json(createSalesRuntime().listTradeDocuments());
+    const project = request.nextUrl.searchParams.get("project") || "farreach";
+    const auth = requireWorkspaceAccess(request, project);
+    if (!auth.ok) return auth.response;
+    return NextResponse.json(createSalesRuntime().listTradeDocuments(project));
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     return NextResponse.json(

@@ -552,7 +552,7 @@ export const battleStationI18n: Record<
   en: {
     copy: {
       topBar: {
-        title: "SSA Battle Station",
+        title: "OpenClaw for salespeople",
         activeAgents: (count) => `${count} agents active`,
         feedReconnecting: "event feed reconnecting",
         sessionEvents: (count) => `${count} session events`,
@@ -616,8 +616,8 @@ export const battleStationI18n: Record<
         activeAgents: "Active Agents",
       },
       quickCommand: {
-        placeholder: "Tell SSA what to inspect, draft, compare, or hold for approval...",
-        queue: "Ask SSA",
+        placeholder: "Tell Jaden what to inspect, draft, compare, or hold for approval...",
+        queue: "Ask Jaden",
         queued: "saved:",
       },
       focus: {
@@ -633,13 +633,13 @@ export const battleStationI18n: Record<
         approvalGate: "Approval Gate",
         blocked: "blocked",
         approvalGateBody:
-          "SSA may draft, score, and recommend. It cannot send this message to Amphenol until Wilson explicitly approves the final draft in this view.",
+          "OpenClaw may draft, score, and recommend. It cannot send this message to Amphenol until an operator explicitly approves the final draft in this view.",
         approveSend: "Approve & Send",
         saveDraft: "Save Draft",
         regenerate: "Regenerate with AI",
         reject: "Reject",
         sendGuardrail:
-          "Human approval is required before any customer-facing send. In safe mode, this records Wilson's decision without sending email.",
+          "Human approval is required before any customer-facing send. In safe mode, this records the operator decision without sending email.",
         collapsedMessages:
           "5 earlier messages collapsed: initial inquiry, spec sheet, sample request, compliance check, quote handoff",
       },
@@ -647,13 +647,13 @@ export const battleStationI18n: Record<
         "waiting-human": "needs review",
         "needs-strategy": "needs strategy",
         "ready-after-copper": "ready after copper check",
-        "approved-by-wilson": "approved by Wilson",
+        "approved-by-wilson": "approved by operator",
         "draft-saved": "draft saved",
         "ai-regenerated": "rewritten by AI",
-        "rejected-by-wilson": "rejected by Wilson",
+        "rejected-by-wilson": "rejected by operator",
       },
       regeneratedNote:
-        "Wilson note: Rewritten for a firmer partnership tone. Confirm price floor before sending.",
+        "Operator note: Rewritten for a firmer partnership tone. Confirm price floor before sending.",
     },
     domainAccounts,
     timelineEvents,
@@ -665,7 +665,7 @@ export const battleStationI18n: Record<
   zh: {
     copy: {
       topBar: {
-        title: "SSA 作战指挥台",
+        title: "OpenClaw for salespeople",
         activeAgents: (count) => `${count} 个 Agent 运行中`,
         feedReconnecting: "事件流重连中",
         sessionEvents: (count) => `${count} 条会话事件`,
@@ -675,7 +675,7 @@ export const battleStationI18n: Record<
         chinese: "中文",
       },
       domain: {
-        title: "客户雷达",
+        title: "监控雷达",
         live: "实时",
         monitoredDomains: (count) => `${count} 个监控对象`,
         deal: "项目",
@@ -729,8 +729,8 @@ export const battleStationI18n: Record<
         activeAgents: "运行中 Agent",
       },
       quickCommand: {
-        placeholder: "告诉 SSA 要检查、起草、对比，或锁定等待人工审批的事项...",
-        queue: "提交给 SSA",
+        placeholder: "告诉 Jaden 要检查、起草、对比，或锁定等待人工审批的事项...",
+        queue: "提交给 Jaden",
         queued: "已保存:",
       },
       focus: {
@@ -746,7 +746,7 @@ export const battleStationI18n: Record<
         approvalGate: "审批关卡",
         blocked: "已阻断",
         approvalGateBody:
-          "SSA 可以起草、评分和给出建议，但在 Wilson 明确批准最终草稿之前，不能向 Amphenol 发送这封客户可见邮件。",
+          "OpenClaw 可以起草、评分和给出建议，但在操作员明确批准最终草稿之前，不能向 Amphenol 发送这封客户可见邮件。",
         approveSend: "批准并发送",
         saveDraft: "保存草稿",
         regenerate: "让 AI 重写",
@@ -758,10 +758,10 @@ export const battleStationI18n: Record<
         "waiting-human": "等待人工",
         "needs-strategy": "需要策略",
         "ready-after-copper": "铜价确认后可发",
-        "approved-by-wilson": "Wilson 已批准",
+        "approved-by-wilson": "操作员已批准",
         "draft-saved": "草稿已保存",
         "ai-regenerated": "AI 已重写",
-        "rejected-by-wilson": "Wilson 已拒绝",
+        "rejected-by-wilson": "操作员已拒绝",
       },
       regeneratedNote: "操作备注：已在本地重写为更坚定的合作语气。发送前请再次确认底价。",
     },
@@ -960,7 +960,7 @@ export const battleStationI18n: Record<
         risk: "中等毛利风险",
         due: "现在",
         recommendation: "批准 $0.916/m 的 8% 折扣，并加入季度 LME 复核。",
-        guardrail: "Wilson 批准前，外发邮件已被阻断。",
+        guardrail: "操作员批准前，外发邮件已被阻断。",
       },
       {
         id: "molex-retention",

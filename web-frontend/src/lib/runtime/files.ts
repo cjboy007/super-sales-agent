@@ -1,7 +1,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { repoPath, ssaDataRoot } from "../ssa-data-paths";
+import { repoPath, sanitizeSsaPathSegment, ssaCompanyDataPath, ssaDataRoot } from "../ssa-data-paths";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision } from "./types";
 
@@ -61,6 +61,14 @@ export function allowedFileDirs(): string[] {
   ];
 }
 
+export function allowedWorkspaceFileDirs(workspaceId: string): string[] {
+  return [
+    ssaCompanyDataPath(sanitizeSsaPathSegment(workspaceId)),
+    repoPath("skills", "quotation-workflow", "examples"),
+    repoPath("skills", "quotation-workflow", "tests", "output"),
+  ];
+}
+
 export function getRuntimeFileContentType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   return CONTENT_TYPES[ext] || "application/octet-stream";
@@ -68,15 +76,29 @@ export function getRuntimeFileContentType(filePath: string): string {
 
 export function isRuntimeFileAllowed(resolvedPath: string): boolean {
   const resolved = path.resolve(resolvedPath);
-  return allowedFileDirs().some((dir) => resolved.startsWith(path.resolve(dir)));
+  return allowedFileDirs().some((dir) => resolved === path.resolve(dir) || resolved.startsWith(`${path.resolve(dir)}${path.sep}`));
 }
 
-export function resolveRuntimeFile(filePath: string | null): RuntimeFileRef | { error: string; status: number } {
+export function isWorkspaceRuntimeFileAllowed(resolvedPath: string, workspaceId: string): boolean {
+  const resolved = path.resolve(resolvedPath);
+  return allowedWorkspaceFileDirs(workspaceId).some((dir) => resolved === path.resolve(dir) || resolved.startsWith(`${path.resolve(dir)}${path.sep}`));
+}
+
+export function resolveRuntimeFile(
+  filePath: string | null,
+  options: { workspaceId?: string } = {}
+): RuntimeFileRef | { error: string; status: number } {
   if (!filePath) return { error: "Missing 'path' parameter", status: 400 };
   if (!path.isAbsolute(filePath)) return { error: "Path must be absolute", status: 400 };
 
   const resolved = path.resolve(filePath);
-  if (!isRuntimeFileAllowed(resolved)) {
+  const allowed = options.workspaceId
+    ? isWorkspaceRuntimeFileAllowed(resolved, options.workspaceId)
+    : isRuntimeFileAllowed(resolved);
+  if (!allowed) {
+    if (options.workspaceId) {
+      return { error: "Access denied: path outside allowed workspace directories", status: 403 };
+    }
     return { error: "Access denied: path outside allowed directories", status: 403 };
   }
   if (!fs.existsSync(resolved)) return { error: "File not found", status: 404 };
@@ -97,8 +119,8 @@ export function isRuntimeFileRef(value: RuntimeFileRef | { error: string; status
   return !("error" in value);
 }
 
-export function serveRuntimeFile(filePath: string | null, download = false): RuntimeFileServeResult {
-  const file = resolveRuntimeFile(filePath);
+export function serveRuntimeFile(filePath: string | null, download = false, workspaceId?: string): RuntimeFileServeResult {
+  const file = resolveRuntimeFile(filePath, { workspaceId });
 
   if (!isRuntimeFileRef(file)) {
     return {
@@ -176,7 +198,7 @@ export async function previewRuntimeFile(
   runtime: SalesRuntime,
   input: { path: string | null; workspaceId: string }
 ): Promise<RuntimeFilePreviewResult> {
-  const file = resolveRuntimeFile(input.path);
+  const file = resolveRuntimeFile(input.path, { workspaceId: input.workspaceId });
 
   if (!isRuntimeFileRef(file)) {
     return {
@@ -188,7 +210,7 @@ export async function previewRuntimeFile(
 
   const resolved = file.resolved;
   const extension = path.extname(resolved).toLowerCase();
-  const downloadUrl = `/api/files?path=${encodeURIComponent(resolved)}`;
+  const downloadUrl = `/api/files?path=${encodeURIComponent(resolved)}&project=${encodeURIComponent(input.workspaceId)}`;
 
   if (extension === ".pdf" || extension === ".html" || extension === ".htm") {
     return {
@@ -220,10 +242,7 @@ export async function previewRuntimeFile(
       };
     }
 
-    const outputDir = path.join(os.tmpdir(), "ssa-preview");
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-preview-"));
 
     try {
       await convertOfficeDocumentToHtml(resolved, outputDir);
@@ -241,6 +260,12 @@ export async function previewRuntimeFile(
           downloadUrl: downloadOnlyUrl,
         },
       };
+    } finally {
+      try {
+        fs.rmSync(outputDir, { recursive: true, force: true });
+      } catch {
+        // Preview temp cleanup is best-effort.
+      }
     }
   }
 

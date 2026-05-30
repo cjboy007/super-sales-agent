@@ -30,6 +30,7 @@ import {
   type QuotationGenerationInput,
   type TradeDocumentGenerationInput,
 } from "./documents";
+import { testEmailConnection, type EmailConnectionTestInput } from "./email-connection";
 import { sendEmailThroughRuntime, type EmailSendInput } from "./email-send";
 import { previewRuntimeFile, serveRuntimeFile } from "./files";
 import {
@@ -182,6 +183,13 @@ export class SalesRuntime {
     });
   }
 
+  testEmailConnection(input: EmailConnectionTestInput) {
+    return testEmailConnection(this, {
+      ...input,
+      workspaceId: this.getWorkspace(input.workspaceId).id,
+    });
+  }
+
   async runLlm(request: LlmRequest): Promise<LlmResult> {
     const workspace = this.getWorkspace(request.workspaceId);
     const result = await runLlmTask({ ...request, workspaceId: workspace.id });
@@ -270,8 +278,9 @@ export class SalesRuntime {
     return generateTradeDocuments(this, { ...input, workspaceId: workspace.id });
   }
 
-  listTradeDocuments() {
-    return listTradeDocuments();
+  listTradeDocuments(workspaceId = "farreach") {
+    const workspace = this.getWorkspace(workspaceId);
+    return listTradeDocuments(workspace.id);
   }
 
   previewFile(input: { path: string | null; workspaceId: string }) {
@@ -279,8 +288,8 @@ export class SalesRuntime {
     return previewRuntimeFile(this, { ...input, workspaceId: workspace.id });
   }
 
-  serveFile(input: { path: string | null; download?: boolean }) {
-    return serveRuntimeFile(input.path, input.download);
+  serveFile(input: { path: string | null; workspaceId?: string; download?: boolean }) {
+    return serveRuntimeFile(input.path, input.download, input.workspaceId);
   }
 
   getInbox(workspaceId: string, limit: number) {
@@ -308,8 +317,9 @@ export class SalesRuntime {
     return selectRuntimeInboxReplyStyle(this, { ...input, workspaceId: workspace.id });
   }
 
-  listIntakeSessions() {
-    return listIntakeSessions();
+  listIntakeSessions(workspaceId = "farreach") {
+    const workspace = this.getWorkspace(workspaceId);
+    return listIntakeSessions(workspace.id);
   }
 
   processIntake(input: IntakeInput) {

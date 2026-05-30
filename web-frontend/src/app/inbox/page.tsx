@@ -90,7 +90,7 @@ export default function InboxPage() {
         </div>
 
         <div className="grid min-h-[calc(100vh-190px)] gap-3 lg:grid-cols-[420px_minmax(0,1fr)]">
-          <BattlePanel title={language === "zh" ? "待处理邮件" : "Email Review List"} meta={language === "zh" ? "需要 Wilson 决策的客户邮件" : "customer emails that need Wilson's decision"}>
+          <BattlePanel title={language === "zh" ? "待处理邮件" : "Email Review List"} meta={language === "zh" ? "需要操作员决策的客户邮件" : "customer emails that need operator decision"}>
             {error ? (
               <EmptyState label={error} />
             ) : emails.length === 0 ? (

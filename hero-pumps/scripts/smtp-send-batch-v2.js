@@ -19,6 +19,7 @@ const path = require('path');
 const { SalesState } = require('../../shared/sales-state-db');
 const nodemailer = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/nodemailer');
 const dotenv = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/dotenv');
+const { verifyLegacyOutboundSafety } = require('../../skills/imap-smtp-email/lib/outbound-safety');
 
 // 读取项目自己的 .env（Hero Pump SMTP 配置）
 const envPath = path.join(__dirname, '../.env');
@@ -262,6 +263,13 @@ async function sendEmail(draft, dryRun = false) {
   }
 
   try {
+    await verifyLegacyOutboundSafety({
+      workspaceId: PROJECT,
+      to: draft.email,
+      subject: draft.subject,
+      humanApproval: true,
+    });
+
     // 发送前验证速率限制（防御性检查，虽然 main() 已控制数量）
     const rl = checkRateLimit();
     if (!rl.ok) {
