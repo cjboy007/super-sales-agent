@@ -3,12 +3,13 @@ import path from "path";
 import type { AgentEvent } from "../events";
 import { publishAndRemember } from "../events";
 import { ensureSsaCompanyDataPath } from "../ssa-data-paths";
-import type { OperatorCommandInput, OperatorCommandRecord, WorkspaceId } from "./types";
+import { createJadenPlan } from "./jaden-planner";
+import type { OperatorCommandInput, OperatorCommandRecord, RuntimeWorkflowType, WorkspaceId } from "./types";
 
 interface OperatorCommandRuntime {
   getWorkspace(id?: WorkspaceId | null): { id: WorkspaceId };
   workflows: {
-    enqueue(workspaceId: WorkspaceId, workflow: "operator.command", input: Record<string, unknown>): { id: string };
+    enqueue(workspaceId: WorkspaceId, workflow: RuntimeWorkflowType, input: Record<string, unknown>): { id: string; workflow: RuntimeWorkflowType };
   };
   recordEvent(type: string, workspaceId: WorkspaceId, payload: Record<string, unknown>): unknown;
 }
@@ -55,6 +56,7 @@ function publishOperatorCommand(record: OperatorCommandRecord, filePath: string)
       status: record.status,
       sideEffects: record.sideEffects,
       jobId: record.jobId,
+      jobIds: record.jobIds || (record.jobId ? [record.jobId] : []),
       file: path.basename(filePath),
     },
   });
@@ -81,21 +83,36 @@ export function createOperatorCommand(
     createdAt: nowIso(),
   };
 
-  const job = runtime.workflows.enqueue(workspace.id, "operator.command", {
+  const plan = createJadenPlan({
+    workspaceId: workspace.id,
     commandId: record.id,
     page: record.page,
     url: record.url,
     message: record.message,
     context: record.context,
   });
+  const jobs = plan.jobs.map((planned) => runtime.workflows.enqueue(planned.workspaceId, planned.workflow, planned.input));
+  const jobIds = jobs.map((job) => job.id);
 
-  const recordWithJob = { ...record, jobId: job.id };
+  const recordWithJob = {
+    ...record,
+    jobId: jobIds[0],
+    jobIds,
+    plan: {
+      source: plan.source,
+      jobs: jobs.map((job) => ({ id: job.id, workflow: job.workflow })),
+    },
+  };
+
   const filePath = writeCommand(recordWithJob);
   const liveEvent = publishOperatorCommand(recordWithJob, filePath);
 
   runtime.recordEvent("operator.command.queued", workspace.id, {
-    commandId: recordWithJob.id,
-    jobId: job.id,
+    commandId: record.id,
+    jobId: recordWithJob.jobId,
+    jobIds,
+    planSource: plan.source,
+    workflows: jobs.map((job) => job.workflow),
     page: recordWithJob.page,
     url: recordWithJob.url,
     status: recordWithJob.status,

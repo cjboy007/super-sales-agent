@@ -55,7 +55,9 @@ interface RawLeadItem {
 /** Expose raw lead items for `data.ts` static loader (no caching) */
 export function loadLeadsRaw(): RawLeadItem[] {
   try {
-    const raw = JSON.parse(fs.readFileSync(resolveDataPath(), "utf-8")) as RawLeadItem[];
+    const filePath = resolveDataPath();
+    if (!fs.existsSync(filePath)) return [];
+    const raw = JSON.parse(fs.readFileSync(filePath, "utf-8")) as RawLeadItem[];
     return raw;
   } catch (e: unknown) {
     console.error("[leads] Failed to load raw data:", e);
@@ -66,7 +68,12 @@ export function loadLeadsRaw(): RawLeadItem[] {
 function loadLeads(): Lead[] {
   if (_cache) return _cache;
   try {
-    const raw = JSON.parse(fs.readFileSync(resolveDataPath(), "utf-8")) as RawLeadItem[];
+    const filePath = resolveDataPath();
+    if (!fs.existsSync(filePath)) {
+      _cache = [];
+      return _cache;
+    }
+    const raw = JSON.parse(fs.readFileSync(filePath, "utf-8")) as RawLeadItem[];
     _cache = raw.map((item) => ({
       companyName: item.company_name || "",
       country: item.country || "未知",

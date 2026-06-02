@@ -62,4 +62,21 @@ describe("/api/inbox/[emailId]/select route", () => {
     expect(missingOption.status).toBe(404);
     expect(await missingOption.json()).toEqual({ success: false, error: "Option not found" });
   });
+
+  it("caches selected reply drafts by email and style", async () => {
+    const { POST } = await import("./route");
+
+    const first = await POST(request("http://localhost/api/inbox/email-001/select?project=farreach", {
+      style: "steady",
+    }), { params: { emailId: "email-001" } });
+    const second = await POST(request("http://localhost/api/inbox/email-001/select?project=farreach", {
+      style: "steady",
+    }), { params: { emailId: "email-001" } });
+    const firstJson = await first.json();
+    const secondJson = await second.json();
+
+    expect(firstJson.cache).toMatchObject({ hit: false });
+    expect(secondJson.cache).toMatchObject({ hit: true });
+    expect(secondJson.full_email).toEqual(firstJson.full_email);
+  });
 });

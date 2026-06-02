@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
-  autoNumberDocs,
   createDefaultTradeData,
   type DocType,
   type HistoryDoc,
@@ -32,7 +31,17 @@ interface GeneratedDoc {
   size: number;
 }
 
-const DOC_TYPES: DocType[] = ["ALL", "PI", "CI", "PL"];
+interface PiRecord {
+  piNo: string;
+  customer: string;
+  date: string;
+  amount: string;
+  productSummary: string;
+  updatedAt: string;
+  data: TradeDocumentData;
+}
+
+const SHIPMENT_DOC_TYPES: Array<Extract<DocType, "CI" | "PL">> = ["CI", "PL"];
 
 function fileSize(size: number) {
   if (!size) return "0B";
@@ -43,9 +52,13 @@ function fileSize(size: number) {
 export default function DocumentsPage() {
   const language = useBattleLanguage();
   const [formData, setFormData] = useState<TradeDocumentData>(createDefaultTradeData());
-  const [docTypes, setDocTypes] = useState<DocType[]>(["ALL"]);
+  const [docTypes, setDocTypes] = useState<Array<Extract<DocType, "CI" | "PL">>>(["CI", "PL"]);
   const [generatedDocs, setGeneratedDocs] = useState<GeneratedDoc[]>([]);
   const [historyDocs, setHistoryDocs] = useState<HistoryDoc[]>([]);
+  const [piQuery, setPiQuery] = useState("");
+  const [piRecords, setPiRecords] = useState<PiRecord[]>([]);
+  const [loadingPiRecords, setLoadingPiRecords] = useState(false);
+  const [selectedPiNo, setSelectedPiNo] = useState("");
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +76,7 @@ export default function DocumentsPage() {
     }));
   }, []);
 
-  const updateProduct = useCallback((index: number, field: keyof TradeProduct, value: string | number) => {
+  const updateProduct = useCallback(<K extends keyof TradeProduct>(index: number, field: K, value: TradeProduct[K]) => {
     setFormData((prev) => {
       const products = [...prev.products];
       products[index] = { ...products[index], [field]: value };
@@ -85,29 +98,53 @@ export default function DocumentsPage() {
     fetchHistory();
   }, [fetchHistory]);
 
-  const toggleDocType = useCallback((type: DocType) => {
+  const fetchPiRecords = useCallback(async (query = "") => {
+    setLoadingPiRecords(true);
+    try {
+      const params = new URLSearchParams({ query });
+      const res = await fetch(`/api/documents/pi-records?${params.toString()}`);
+      const json = await res.json();
+      if (json.success) setPiRecords(json.records || []);
+    } catch {
+      setPiRecords([]);
+    } finally {
+      setLoadingPiRecords(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPiRecords("");
+  }, [fetchPiRecords]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      fetchPiRecords(piQuery);
+    }, 250);
+    return () => window.clearTimeout(handle);
+  }, [fetchPiRecords, piQuery]);
+
+  const toggleDocType = useCallback((type: Extract<DocType, "CI" | "PL">) => {
     setDocTypes((prev) => {
-      if (type === "ALL") return ["ALL"];
-      const filtered = prev.filter((item) => item !== "ALL");
-      if (filtered.includes(type)) {
-        const next = filtered.filter((item) => item !== type);
-        return next.length ? next : ["ALL"];
-      }
-      return [...filtered, type];
+      const next = prev.includes(type)
+        ? prev.filter((item) => item !== type)
+        : [...prev, type];
+      return next.length ? next : prev;
     });
   }, []);
 
-  function autoNumber() {
-    const nums = autoNumberDocs("ALL");
-    setFormData((prev) => ({
-      ...prev,
-      pi_info: { ...prev.pi_info, pi_no: nums.pi_no },
-      ci_info: { ...prev.ci_info, ci_no: nums.ci_no },
-      pl_info: { ...prev.pl_info, pl_no: nums.pl_no },
-    }));
+  function loadPiRecord(record: PiRecord) {
+    setFormData(record.data);
+    setSelectedPiNo(record.piNo);
+    setPiQuery(record.piNo);
+    setDocTypes(["CI", "PL"]);
+    setError(null);
   }
 
   async function generate() {
+    if (!selectedPiNo) {
+      setError(language === "zh" ? "请先选择一个已保存的 PI。" : "Select a saved PI first.");
+      return;
+    }
     setGenerating(true);
     setError(null);
     setGeneratedDocs([]);
@@ -155,6 +192,8 @@ export default function DocumentsPage() {
       specification: product.specification,
       quantity: product.quantity,
       unitPrice: product.unit_price,
+      unitCost: product.unit_cost || 0,
+      supplier: product.supplier || "",
     },
     totals: {
       currency: formData.currency,
@@ -166,7 +205,7 @@ export default function DocumentsPage() {
     historyCount: historyDocs.length,
   };
   const commandSummary = [
-    language === "zh" ? "单证工作站" : "Document Station",
+    language === "zh" ? "出货文件" : "Shipment Documents",
     `${language === "zh" ? "文件" : "Files"} ${docTypes.join("+")}`,
     `${language === "zh" ? "客户" : "Customer"} ${formData.customer.company_name || (language === "zh" ? "未填写" : "not set")}`,
     `${language === "zh" ? "金额" : "Amount"} ${formData.currency} ${totalAmount.toFixed(2)}`,
@@ -176,10 +215,10 @@ export default function DocumentsPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Document Station"
-        zhTitle="单证工作站"
-        meta="PI / CI / PL FILES ONLY / NOT SENT"
-        zhMeta="PI / CI / PL 只生成文件 / 不会外发"
+        title="Shipment Documents"
+        zhTitle="出货文件"
+        meta="CI / PL FROM SAVED PI / FILES ONLY"
+        zhMeta="从已保存 PI 生成 CI / PL / 不会外发"
         active="/documents"
       >
         <BattleBadge tone={generating ? "blue" : "emerald"} pulse={generating}>
@@ -190,19 +229,19 @@ export default function DocumentsPage() {
 
       <BattlePageBody className="space-y-3">
         <div className="grid gap-3 md:grid-cols-4">
-          <StatCell label={language === "zh" ? "文件类型" : "Document Set"} value={docTypes.join("+")} tone="purple" />
+          <StatCell label={language === "zh" ? "PI 来源" : "PI Source"} value={selectedPiNo || (language === "zh" ? "未选择" : "Not selected")} tone="purple" />
           <StatCell label={language === "zh" ? "金额" : "Amount"} value={`${formData.currency} ${totalAmount.toFixed(2)}`} tone="emerald" />
           <StatCell label={language === "zh" ? "净重" : "Net Weight"} value={`${totalNetWeight.toFixed(1)}kg`} tone="blue" />
-          <StatCell label={language === "zh" ? "箱数" : "Packages"} value={totalPackages} tone="amber" />
+          <StatCell label={language === "zh" ? "待生成" : "To Create"} value={docTypes.join("+")} tone="amber" />
         </div>
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_420px]">
           <BattlePanel
-            title={language === "zh" ? "单证信息" : "Document Details"}
+            title={language === "zh" ? "PI 后续文件" : "PI Follow-Up Files"}
             meta={`${formData.pi_info.pi_no} / ${formData.shipment.incoterms}`}
             action={
               <div className="flex items-center gap-2">
-                {DOC_TYPES.map((type) => (
+                {SHIPMENT_DOC_TYPES.map((type) => (
                   <button
                     key={type}
                     type="button"
@@ -216,20 +255,67 @@ export default function DocumentsPage() {
                     {type}
                   </button>
                 ))}
-                <CommandButton variant="ghost" onClick={autoNumber}><BattleText en="Fill Numbers" zh="填入编号" /></CommandButton>
               </div>
             }
           >
+            <div className="border-b border-slate-800 bg-slate-950/60 p-3">
+              <div className="grid gap-3 lg:grid-cols-[minmax(240px,360px)_minmax(0,1fr)]">
+                <label className="text-[10px] uppercase tracking-wide text-slate-500">
+                  {language === "zh" ? "检索 PI 编号" : "Search PI Number"}
+                  <InputField
+                    value={piQuery}
+                    onChange={(event) => setPiQuery(event.target.value)}
+                    placeholder={language === "zh" ? "输入 PI 编号或客户名" : "Type PI number or customer"}
+                    className="mt-1 w-full"
+                    mono
+                  />
+                </label>
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-500">
+                    <BattleText en="Choose a saved PI first" zh="先选择已保存的 PI" />
+                  </p>
+                  <div className="mt-1 flex min-h-8 items-center gap-2 overflow-x-auto">
+                    {loadingPiRecords ? (
+                      <span className="font-mono text-[10px] text-slate-500">
+                        <BattleText en="searching PI records..." zh="正在检索 PI 记录..." />
+                      </span>
+                    ) : piRecords.length === 0 ? (
+                      <span className="font-mono text-[10px] text-slate-500">
+                        <BattleText en="No saved PI yet. Create one from Quick Quote first." zh="还没有保存的 PI。请先从快速报价导出 PI。" />
+                      </span>
+                    ) : (
+                      piRecords.slice(0, 6).map((record) => (
+                        <button
+                          key={record.piNo}
+                          type="button"
+                          onClick={() => loadPiRecord(record)}
+                          className={`shrink-0 rounded-md border px-3 py-1.5 text-left transition ${
+                            selectedPiNo === record.piNo
+                              ? "border-emerald-500 bg-emerald-500/15"
+                              : "border-slate-700 bg-slate-900 hover:border-slate-600"
+                          }`}
+                        >
+                          <span className="block font-mono text-[10px] text-slate-200">{record.piNo}</span>
+                          <span className="block max-w-[220px] truncate text-[10px] text-slate-500">
+                            {record.customer} / {record.amount}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="grid gap-3 p-3 lg:grid-cols-2">
               <div className="space-y-3">
                 <div className="grid gap-2 md:grid-cols-2">
                   <label className="text-[10px] uppercase tracking-wide text-slate-500">
-                    Company
-                    <InputField value={formData.company.name} onChange={(e) => updateField("company", "name", e.target.value)} className="mt-1 w-full" />
+                    PI No.
+                    <InputField value={formData.pi_info.pi_no} readOnly className="mt-1 w-full opacity-80" mono />
                   </label>
                   <label className="text-[10px] uppercase tracking-wide text-slate-500">
                     Customer
-                    <InputField value={formData.customer.company_name} onChange={(e) => updateField("customer", "company_name", e.target.value)} className="mt-1 w-full" />
+                    <InputField value={formData.customer.company_name} readOnly className="mt-1 w-full opacity-80" />
                   </label>
                   <label className="text-[10px] uppercase tracking-wide text-slate-500">
                     Contact
@@ -260,7 +346,7 @@ export default function DocumentsPage() {
                   </label>
                   <label className="text-[10px] uppercase tracking-wide text-slate-500">
                     Currency
-                    <SelectField value={formData.currency} onChange={(e) => setFormData((prev) => ({ ...prev, currency: e.target.value }))} className="mt-1 w-full">
+                    <SelectField value={formData.currency} disabled className="mt-1 w-full opacity-80">
                       {["USD", "EUR", "CNY", "GBP"].map((item) => <option key={item}>{item}</option>)}
                     </SelectField>
                   </label>
@@ -276,11 +362,11 @@ export default function DocumentsPage() {
               </div>
 
               <div className="space-y-3">
-                <BattlePanel title={language === "zh" ? "产品明细" : "Product Line"} meta={language === "zh" ? "第 1 项" : "first item"}>
+                <BattlePanel title={language === "zh" ? "装箱与出货补充" : "Packing And Shipment"} meta={language === "zh" ? "按 PI 产品补齐" : "derived from PI products"}>
                   <div className="grid gap-2 p-3 md:grid-cols-2">
                     <label className="md:col-span-2 text-[10px] uppercase tracking-wide text-slate-500">
                       Description
-                      <InputField value={product.description} onChange={(e) => updateProduct(0, "description", e.target.value)} className="mt-1 w-full" />
+                      <InputField value={product.description} readOnly className="mt-1 w-full opacity-80" />
                     </label>
                     <label className="text-[10px] uppercase tracking-wide text-slate-500">
                       HS Code
@@ -288,15 +374,15 @@ export default function DocumentsPage() {
                     </label>
                     <label className="text-[10px] uppercase tracking-wide text-slate-500">
                       Specification
-                      <InputField value={product.specification} onChange={(e) => updateProduct(0, "specification", e.target.value)} className="mt-1 w-full" />
+                      <InputField value={product.specification} readOnly className="mt-1 w-full opacity-80" />
                     </label>
                     <label className="text-[10px] uppercase tracking-wide text-slate-500">
                       Qty
-                      <InputField type="number" value={product.quantity} onChange={(e) => updateProduct(0, "quantity", Number(e.target.value))} className="mt-1 w-full" mono />
+                      <InputField type="number" value={product.quantity} readOnly className="mt-1 w-full opacity-80" mono />
                     </label>
                     <label className="text-[10px] uppercase tracking-wide text-slate-500">
                       Unit Price
-                      <InputField type="number" value={product.unit_price} onChange={(e) => updateProduct(0, "unit_price", Number(e.target.value))} className="mt-1 w-full" mono />
+                      <InputField type="number" value={product.unit_price} readOnly className="mt-1 w-full opacity-80" mono />
                     </label>
                     <label className="text-[10px] uppercase tracking-wide text-slate-500">
                       Net kg
@@ -306,6 +392,22 @@ export default function DocumentsPage() {
                       Gross kg
                       <InputField type="number" value={product.gross_weight_kg} onChange={(e) => updateProduct(0, "gross_weight_kg", Number(e.target.value))} className="mt-1 w-full" mono />
                     </label>
+                    <label className="text-[10px] uppercase tracking-wide text-slate-500">
+                      Packages
+                      <InputField type="number" value={product.packages} onChange={(e) => updateProduct(0, "packages", Number(e.target.value))} className="mt-1 w-full" mono />
+                    </label>
+                    <label className="text-[10px] uppercase tracking-wide text-slate-500">
+                      Carton / Package Type
+                      <InputField value={product.package_type} onChange={(e) => updateProduct(0, "package_type", e.target.value)} className="mt-1 w-full" />
+                    </label>
+                    <label className="text-[10px] uppercase tracking-wide text-slate-500">
+                      Dimensions
+                      <InputField value={product.dimensions_cm} onChange={(e) => updateProduct(0, "dimensions_cm", e.target.value)} placeholder="40x30x20cm" className="mt-1 w-full" />
+                    </label>
+                    <label className="md:col-span-2 text-[10px] uppercase tracking-wide text-slate-500">
+                      Marks
+                      <InputField value={formData.shipment.marks} onChange={(e) => updateField("shipment", "marks", e.target.value)} className="mt-1 w-full" />
+                    </label>
                   </div>
                 </BattlePanel>
 
@@ -313,8 +415,8 @@ export default function DocumentsPage() {
                   <span className="font-mono text-[10px] text-slate-500">
                     {error || (language === "zh" ? `本次已生成 ${generatedDocs.length} 个文件` : `${generatedDocs.length} ready this session`)}
                   </span>
-                  <CommandButton variant="primary" disabled={generating} onClick={generate}>
-                    {generating ? <BattleText en="Creating" zh="生成中" /> : <BattleText en="Create Files" zh="生成文件" />}
+                  <CommandButton variant="primary" disabled={generating || !selectedPiNo} onClick={generate}>
+                    {generating ? <BattleText en="Creating" zh="生成中" /> : <BattleText en="Create CI / PL" zh="生成 CI / PL" />}
                   </CommandButton>
                 </div>
               </div>
@@ -326,8 +428,8 @@ export default function DocumentsPage() {
               page="documents"
               summary={commandSummary}
               context={commandContext}
-              placeholder="Ask Jaden to inspect document fields, prepare missing details, check shipment terms, or draft a PI/CI/PL note"
-              zhPlaceholder="让 Jaden 检查单证字段、补齐缺失信息、核对运输条款，或起草 PI/CI/PL 备注"
+              placeholder="Ask Jaden to inspect CI/PL fields, prepare missing packing details, or check shipment terms"
+              zhPlaceholder="让 Jaden 检查 CI/PL 字段、补齐装箱信息，或核对运输条款"
             />
 
             <BattlePanel title={language === "zh" ? "新生成文件" : "New Documents"} meta={language === "zh" ? "本次操作" : "this session"}>

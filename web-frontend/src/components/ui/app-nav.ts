@@ -11,7 +11,7 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Inbox", zhLabel: "收件箱", href: "/inbox" },
   { label: "Outreach", zhLabel: "开发信", href: "/emails" },
   { label: "Quotes", zhLabel: "报价", href: "/quotations" },
-  { label: "Docs", zhLabel: "单证", href: "/documents" },
+  { label: "Ship Docs", zhLabel: "出货文件", href: "/documents" },
   { label: "Intel", zhLabel: "情报", href: "/intelligence" },
   { label: "Settings", zhLabel: "设置", href: "/settings" },
 ];

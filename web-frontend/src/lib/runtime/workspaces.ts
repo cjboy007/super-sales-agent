@@ -24,7 +24,7 @@ const DEFAULT_WORKSPACES: WorkspaceAdapter[] = [
       documents: true,
     },
     data: {
-      leadsPath: ssaCompanyDataPath("farreach", "leads", "tier1-v2-complete.json"),
+      leadsPath: ssaCompanyDataPath("farreach", "leads"),
       productCatalogPath: path.join(process.cwd(), "..", "farreach", "config", "products.json"),
       templatesPath: path.join(process.cwd(), "..", "farreach", "config", "templates"),
       rulesPath: path.join(process.cwd(), "..", "skills", "workflow-engine", "config", "rules"),
@@ -79,11 +79,19 @@ function sanitizeWorkspaceId(id: WorkspaceId): WorkspaceId {
 }
 
 function cloneWorkspace(workspace: WorkspaceAdapter): WorkspaceAdapter {
+  const data = { ...workspace.data };
+  if (workspace.id === "farreach") {
+    data.leadsPath = ssaCompanyDataPath("farreach", "leads");
+  }
+  if (workspace.id === "hero-pumps") {
+    data.leadsPath = ssaCompanyDataPath("hero-pumps", "leads");
+    data.templatesPath = ssaCompanyDataPath("hero-pumps", "campaign-tracker");
+  }
   return {
     ...workspace,
     identity: { ...workspace.identity },
     capabilities: { ...workspace.capabilities },
-    data: { ...workspace.data },
+    data,
     packs: [...workspace.packs],
   };
 }

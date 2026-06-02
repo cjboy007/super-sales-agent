@@ -40,7 +40,7 @@ const SALES_PACKS: SalesPack[] = [
     id: "export-b2b",
     name: "Export B2B Pack",
     description: "Default export-sales workflows for leads, follow-ups, quotations, and customer replies.",
-    workflows: ["lead.import", "email.reply", "follow_up.plan", "quotation.prepare"],
+    workflows: ["lead.import", "company_intel.run", "email.reply", "follow_up.plan", "quotation.prepare"],
     sideEffects: ["crm.write", "data.read", "email.send", "document.generate", "document.preview"],
   },
 ];

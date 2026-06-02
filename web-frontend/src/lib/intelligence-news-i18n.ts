@@ -19,6 +19,8 @@ export interface LocalizedNewsText {
 }
 
 const TAG_LABELS_ZH: Record<string, string> = {
+  standards: "标准认证",
+  company: "企业动态",
   supply_chain: "供应链",
   tech_industry: "科技产业",
   trade_macro: "贸易宏观",
@@ -169,6 +171,11 @@ function cleanEnglishSummary(summary?: string): string {
   return field(summary)?.replace(/\s*The post .*$/i, "").replace(/\s+#pressrelease\s*$/i, "").trim() || "";
 }
 
+function hasInternalSummaryLanguage(value?: string): boolean {
+  const text = field(value) || "";
+  return /来自.+(英文新闻源|外部英文新闻源)|已归入.+信号|建议结合|影响复核|当前暂无中文摘要|已记录为/.test(text);
+}
+
 export function localizeNewsTag(tag: string | undefined, language: IntelligenceLanguage): string {
   const value = field(tag) || "news";
   if (language !== "zh") return value;
@@ -180,11 +187,23 @@ function zhFallbackTitle(item: LocalizableNewsItem): string {
   return tag === "新闻" || tag === "市场信号" ? "市场信号" : `${tag}市场信号`;
 }
 
+function isGenericZhTitle(value?: string): boolean {
+  const text = field(value) || "";
+  return /^(标准认证|供应链|贸易宏观|科技产业|企业动态|竞品动态|铜价|关税|物流|市场)(动态|市场信号)$/.test(text);
+}
+
 function zhFallbackSummary(item: LocalizableNewsItem): string {
-  const source = field(item.source) || "外部新闻源";
   const tag = localizeNewsTag(item.tag, "zh");
-  const category = tag === "新闻" || tag === "市场信号" ? "市场" : tag;
-  return `来自 ${source} 的英文新闻源，当前暂无中文摘要；已记录为${category}相关外部信号。`;
+  if (tag === "标准认证") return "标准认证相关动态可能影响高速线材的规格说明、认证要求或产品卖点。";
+  if (tag === "供应链") return "供应链相关动态可能影响交付周期、库存安排或采购成本。";
+  if (tag === "贸易宏观") return "贸易与关税环境变化可能影响出口成本、报价有效期和客户采购节奏。";
+  if (tag === "科技产业") return "科技产业动态反映下游应用需求变化，可作为产品组合和客户沟通的市场背景。";
+  if (tag === "企业动态") return "企业与行业动态反映市场需求、渠道变化或产品方向，可作为客户沟通背景。";
+  if (tag === "竞品") return "竞品动态可用于观察行业龙头的订单、库存、产能和产品方向。";
+  if (tag === "铜价") return "铜价变化会影响线缆成本和报价有效期，并改变大货订单的价格窗口。";
+  if (tag === "关税") return "关税变化可能影响到岸成本和采购节奏，适合在报价和交付沟通中提前说明。";
+  if (tag === "物流") return "物流变化可能影响交期、运费和客户备货计划。";
+  return "这条市场动态可作为客户沟通、报价判断和订单节奏安排的背景信息。";
 }
 
 export function localizeNewsItem(item: LocalizableNewsItem, language: IntelligenceLanguage): LocalizedNewsText {
@@ -196,8 +215,8 @@ export function localizeNewsItem(item: LocalizableNewsItem, language: Intelligen
   const explicitSummary = zhField(item, "summaryZh", "zhSummary", "summary_cn");
   if (explicitTitle || explicitSummary) {
     return {
-      title: explicitTitle || title,
-      summary: explicitSummary || summary,
+      title: explicitTitle && !isGenericZhTitle(explicitTitle) ? explicitTitle : title,
+      summary: explicitSummary && !hasInternalSummaryLanguage(explicitSummary) ? explicitSummary : zhFallbackSummary(item),
     };
   }
 

@@ -56,6 +56,7 @@ describe("JadenOS onboarding flow", () => {
     const ready = {
       ...baseConfig,
       deepseekApiKey: "deepseek-secret",
+      openrouterApiKey: "sk-or-vision",
       email: "sales@example.com",
       emailPassword: "mail-secret",
       imapHost: "imap.example.com",
@@ -66,9 +67,33 @@ describe("JadenOS onboarding flow", () => {
 
     const readiness = getOnboardingReadiness(ready);
 
-    expect(readiness.completed).toBe(4);
-    expect(readiness.total).toBe(4);
+    expect(readiness.completed).toBe(5);
+    expect(readiness.total).toBe(5);
     expect(readiness.allReady).toBe(true);
+  });
+
+  it("treats vision LLM as a separate core onboarding item", () => {
+    const textOnly = {
+      ...baseConfig,
+      deepseekApiKey: "deepseek-secret",
+      email: "sales@example.com",
+      emailPassword: "mail-secret",
+      imapHost: "imap.example.com",
+      smtpHost: "smtp.example.com",
+      hunterApiKey: "hunter-secret",
+      tavilyApiKey: "tavily-secret",
+    };
+
+    const readiness = getOnboardingReadiness(textOnly);
+    const steps = getJadenosOnboardingSteps(textOnly);
+
+    expect(readiness.items.find((item) => item.id === "vision")?.done).toBe(false);
+    expect(readiness.allReady).toBe(false);
+    expect(steps.map((step) => step.id)).toContain("vision");
+    expect(steps.find((step) => step.id === "vision")).toMatchObject({
+      status: "missing",
+      core: true,
+    });
   });
 
   it("preserves masked secrets as configured values", () => {

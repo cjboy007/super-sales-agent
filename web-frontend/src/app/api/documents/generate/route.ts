@@ -23,7 +23,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Missing data or docTypes" }, { status: 400 });
     }
 
+    const unsupportedTypes = docTypes.filter((type) => type !== "CI" && type !== "PL");
+    if (unsupportedTypes.length > 0) {
+      return NextResponse.json(
+        { success: false, error: "Shipment document generation only supports CI and PL from a saved PI. Create PI from Quick Quote first." },
+        { status: 400 }
+      );
+    }
+
+    if (!data.pi_info?.pi_no?.trim()) {
+      return NextResponse.json({ success: false, error: "PI number is required before generating CI / PL." }, { status: 400 });
+    }
+
     const runtime = createSalesRuntime();
+    const savedPi = runtime
+      .listPiRecords(project, data.pi_info.pi_no)
+      .records
+      .some((record) => record.piNo === data.pi_info.pi_no);
+    if (!savedPi) {
+      return NextResponse.json(
+        { success: false, error: "Saved PI record not found. Export the PI from Quick Quote before generating CI / PL." },
+        { status: 400 }
+      );
+    }
+
     const result = await runtime.generateTradeDocuments({ workspaceId: project, data, docTypes });
 
     return NextResponse.json(result, { status: result.success ? 200 : 500 });

@@ -1,28 +1,26 @@
 {
-  "scanned_at": "2026-03-28T02:46:54.575Z",
+  "scanned_at": "2026-05-31T12:21:55.809Z",
   "monorepo": "super-sales-agent",
   "skills_dir": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills",
-  "total_count": 24,
+  "total_count": 29,
   "high_risk_count": 2,
-  "requires_api_count": 17,
-  "has_existing_tests_count": 5,
-  "total_estimated_minutes": 220,
+  "requires_api_count": 18,
+  "has_existing_tests_count": 7,
+  "total_estimated_minutes": 245,
   "skills": [
     {
       "name": "after-sales",
       "function": "功能待分析",
-      "external_deps": [
-        "okki"
-      ],
+      "external_deps": [],
       "has_existing_tests": true,
       "test_files": [
         "e2e_test.js",
         "okki_sync_test.js"
       ],
-      "test_type": "integration",
-      "requires_real_api": true,
+      "test_type": "unit",
+      "requires_real_api": false,
       "estimated_minutes": 5,
-      "risk_level": "medium",
+      "risk_level": "low",
       "notes": "已有 2 个测试文件"
     },
     {
@@ -57,11 +55,41 @@
       "notes": "需要创建测试"
     },
     {
+      "name": "back-research",
+      "function": "功能待分析",
+      "external_deps": [
+        "smtp"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 5,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
       "name": "campaign-tracker",
       "function": "功能待分析",
       "external_deps": [
         "okki",
         "smtp"
+      ],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "需要创建测试"
+    },
+    {
+      "name": "company-intel",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp",
+        "excel"
       ],
       "has_existing_tests": false,
       "test_files": [],
@@ -86,12 +114,27 @@
       "notes": "需要创建测试"
     },
     {
+      "name": "dashboard-meta-agent",
+      "function": "功能待分析",
+      "external_deps": [],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "unit",
+      "requires_real_api": false,
+      "estimated_minutes": 5,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
       "name": "email-smart-reply",
       "function": "功能待分析",
       "external_deps": [
         "okki",
         "smtp",
-        "discord"
+        "discord",
+        "pdf",
+        "excel",
+        "word"
       ],
       "has_existing_tests": false,
       "test_files": [],
@@ -140,30 +183,44 @@
         "okki",
         "smtp",
         "discord",
-        "pdf"
+        "pdf",
+        "excel",
+        "word"
       ],
-      "has_existing_tests": false,
-      "test_files": [],
+      "has_existing_tests": true,
+      "test_files": [
+        "e2e-reply-all-test.js",
+        "email-intake-regression.test.js",
+        "forward-test.sh",
+        "okki-api-client.test.js",
+        "okki-sync-native.test.js",
+        "outbound-safety.test.js",
+        "path-validation.test.js",
+        "reply-all-command-sim.js",
+        "reply-all-parser-test.js",
+        "sanitizer-integration-test.js",
+        "test-core-security-paths.js",
+        "test-forward-cleanup.js",
+        "test-forward.js"
+      ],
       "test_type": "integration",
       "requires_real_api": true,
       "estimated_minutes": 10,
       "risk_level": "medium",
-      "notes": "需要创建测试"
+      "notes": "已有 13 个测试文件"
     },
     {
       "name": "logistics",
       "function": "功能待分析",
-      "external_deps": [
-        "okki"
-      ],
+      "external_deps": [],
       "has_existing_tests": true,
       "test_files": [
         "e2e_test.js"
       ],
-      "test_type": "integration",
-      "requires_real_api": true,
+      "test_type": "unit",
+      "requires_real_api": false,
       "estimated_minutes": 5,
-      "risk_level": "medium",
+      "risk_level": "low",
       "notes": "已有 1 个测试文件"
     },
     {
@@ -213,11 +270,22 @@
       "notes": "需要创建测试"
     },
     {
+      "name": "okki-sync-mail",
+      "function": "功能待分析",
+      "external_deps": [],
+      "has_existing_tests": false,
+      "test_files": [],
+      "test_type": "unit",
+      "requires_real_api": false,
+      "estimated_minutes": 5,
+      "risk_level": "low",
+      "notes": "需要创建测试"
+    },
+    {
       "name": "order-tracker",
       "function": "功能待分析",
       "external_deps": [
-        "smtp",
-        "discord"
+        "smtp"
       ],
       "has_existing_tests": true,
       "test_files": [
@@ -225,7 +293,7 @@
       ],
       "test_type": "integration",
       "requires_real_api": true,
-      "estimated_minutes": 10,
+      "estimated_minutes": 5,
       "risk_level": "medium",
       "notes": "已有 1 个测试文件"
     },
@@ -371,18 +439,33 @@
     {
       "name": "word-docx",
       "function": "功能待分析",
-      "external_deps": [
-        "pdf",
-        "excel",
-        "word"
-      ],
+      "external_deps": [],
       "has_existing_tests": false,
       "test_files": [],
-      "test_type": "integration",
+      "test_type": "unit",
       "requires_real_api": false,
-      "estimated_minutes": 10,
+      "estimated_minutes": 5,
       "risk_level": "low",
       "notes": "需要创建测试"
+    },
+    {
+      "name": "workflow-engine",
+      "function": "功能待分析",
+      "external_deps": [
+        "okki",
+        "smtp"
+      ],
+      "has_existing_tests": true,
+      "test_files": [
+        "action-executor.test.js",
+        "e2e.sh",
+        "rule-parser.test.js"
+      ],
+      "test_type": "integration",
+      "requires_real_api": true,
+      "estimated_minutes": 10,
+      "risk_level": "medium",
+      "notes": "已有 3 个测试文件"
     }
   ]
 }

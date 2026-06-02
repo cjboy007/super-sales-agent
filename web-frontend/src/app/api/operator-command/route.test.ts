@@ -48,7 +48,15 @@ describe("/api/operator-command route", () => {
       sideEffects: "blocked",
     });
     expect(json.data.id).toMatch(/^cmd-/);
-    expect(json.data.jobId).toMatch(/^operator.command-/);
+    expect(json.data.jobId).toMatch(/^quotation.prepare-/);
+    expect(json.data.jobIds).toHaveLength(2);
+    expect(json.data.plan).toMatchObject({
+      source: "jaden-planner",
+      jobs: [
+        { workflow: "quotation.prepare" },
+        { workflow: "email.reply" },
+      ],
+    });
 
     const command = JSON.parse(
       fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "operator-commands", `${json.data.id}.json`), "utf-8")
@@ -56,18 +64,20 @@ describe("/api/operator-command route", () => {
     expect(command).toMatchObject({
       id: json.data.id,
       jobId: json.data.jobId,
+      jobIds: json.data.jobIds,
       workspaceId: "demo-exporter",
       sideEffects: "blocked",
     });
 
     const { createRuntimeTaskQueue } = await import("@/lib/runtime");
     const jobs = createRuntimeTaskQueue().list(10);
-    expect(jobs[0]).toMatchObject({
-      id: json.data.jobId,
+    expect(jobs.map((job) => job.id)).toEqual(expect.arrayContaining(json.data.jobIds));
+    expect(jobs.find((job) => job.id === json.data.jobId)).toMatchObject({
       workspaceId: "demo-exporter",
-      workflow: "operator.command",
+      workflow: "quotation.prepare",
       status: "queued",
     });
+    expect(jobs.map((job) => job.workflow)).toEqual(expect.arrayContaining(["quotation.prepare", "email.reply"]));
 
     const events = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "events", "events.json"), "utf-8"));
     expect(events[0]).toMatchObject({
@@ -76,6 +86,8 @@ describe("/api/operator-command route", () => {
       payload: {
         commandId: json.data.id,
         jobId: json.data.jobId,
+        jobIds: json.data.jobIds,
+        planSource: "jaden-planner",
         sideEffects: "blocked",
       },
     });

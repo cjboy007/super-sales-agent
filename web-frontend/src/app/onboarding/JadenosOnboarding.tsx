@@ -200,7 +200,10 @@ function StepBody({
   config,
   updateConfig,
   testConnection,
+  uploadDocumentTemplates,
   testing,
+  templateUploading,
+  templateSummary,
   loading,
   language,
 }: {
@@ -208,7 +211,10 @@ function StepBody({
   config: ConfigState;
   updateConfig: (partial: Partial<ConfigState>) => void;
   testConnection: (kind: "imap" | "smtp") => void;
+  uploadDocumentTemplates: (files: FileList | null) => void;
   testing: "imap" | "smtp" | null;
+  templateUploading: boolean;
+  templateSummary: string;
   loading: boolean;
   language: "en" | "zh";
 }) {
@@ -276,12 +282,39 @@ function StepBody({
             <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
             <option value="gpt-4o-mini">gpt-4o-mini</option>
             <option value="gpt-4.1">gpt-4.1</option>
+            <option value="google/gemini-2.5-flash">google/gemini-2.5-flash</option>
             <option value="anthropic/claude-sonnet-4">anthropic/claude-sonnet-4</option>
             <option value="mock">mock</option>
           </SelectField>
         </FieldLabel>
         <ConfigInput label={language === "zh" ? "OpenRouter 备用密钥" : "OpenRouter fallback key"} value={config.openrouterApiKey} onChange={(v) => updateConfig({ openrouterApiKey: v })} mono placeholder="sk-or-..." />
         <ConfigInput label={language === "zh" ? "OpenAI 备用密钥" : "OpenAI fallback key"} value={config.openaiApiKey} onChange={(v) => updateConfig({ openaiApiKey: v })} mono placeholder="sk-..." />
+      </div>
+    );
+  }
+
+  if (step.id === "vision") {
+    return (
+      <div className="grid gap-3 p-3 md:grid-cols-2 xl:grid-cols-3">
+        <ConfigInput label={language === "zh" ? "OpenRouter 识图密钥" : "OpenRouter vision key"} value={config.openrouterApiKey} onChange={(v) => updateConfig({ openrouterApiKey: v })} mono placeholder="sk-or-..." />
+        <ConfigInput label={language === "zh" ? "OpenAI 识图密钥" : "OpenAI vision key"} value={config.openaiApiKey} onChange={(v) => updateConfig({ openaiApiKey: v })} mono placeholder="sk-..." />
+        <ConfigInput label={language === "zh" ? "Gemini 识图密钥" : "Gemini vision key"} value={config.geminiApiKey} onChange={(v) => updateConfig({ geminiApiKey: v })} mono placeholder="AIza..." />
+        <FieldLabel>
+          {language === "zh" ? "推荐识图模型" : "Recommended vision model"}
+          <SelectField value={config.defaultModel} onChange={(event) => updateConfig({ defaultModel: event.target.value })} className="mt-1 w-full">
+            <option value="google/gemini-2.5-flash">google/gemini-2.5-flash</option>
+            <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
+            <option value="gpt-4o-mini">gpt-4o-mini</option>
+            <option value="gpt-4.1">gpt-4.1</option>
+            <option value="anthropic/claude-sonnet-4">anthropic/claude-sonnet-4</option>
+          </SelectField>
+        </FieldLabel>
+        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3 text-xs leading-5 text-slate-300 md:col-span-2">
+          <BattleText
+            en="This powers Intake image reading for product drawings, catalogs, datasheets, and screenshots. SSA will still keep files approval-gated."
+            zh="这项用于投递台读取产品图纸、产品目录、规格书和截图。SSA 仍会保持文件审批边界。"
+          />
+        </div>
       </div>
     );
   }
@@ -416,6 +449,45 @@ function StepBody({
     );
   }
 
+  if (step.id === "documentTemplates") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
+          <BattleBadge tone="purple"><BattleText en="PI / CI / PL templates" zh="PI / CI / PL 模板" /></BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            <BattleText
+              en="Upload 3-5 approved PI, CI, and PL examples. JadenOS saves them as template references and produces a confirmation draft."
+              zh="上传 3-5 份客户已确认的 PI、CI、PL 样本。JadenOS 会保存为模板参考，并生成待确认的模板草案。"
+            />
+          </p>
+          <label className="mt-3 block rounded-md border border-dashed border-slate-700 bg-slate-900/70 px-3 py-4 text-center text-xs text-slate-300 transition hover:border-emerald-500">
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.html,.htm,.csv"
+              className="hidden"
+              onChange={(event) => uploadDocumentTemplates(event.target.files)}
+              disabled={templateUploading || loading}
+            />
+            {templateUploading
+              ? <BattleText en="Uploading samples..." zh="正在上传样本..." />
+              : <BattleText en="Choose 3-5 template sample files" zh="选择 3-5 份模板样本文件" />}
+          </label>
+        </div>
+        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
+          <BattleBadge tone={templateSummary ? "emerald" : "amber"}>
+            {templateSummary ? <BattleText en="Draft ready" zh="草案已生成" /> : <BattleText en="Waiting" zh="等待样本" />}
+          </BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            {templateSummary || (language === "zh"
+              ? "上传后会显示归纳结果。模板确认后，单证页会按该模板生成。"
+              : "After upload, the template draft summary appears here. Once confirmed, document generation follows the template.")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-3 p-3 md:grid-cols-3">
       <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
@@ -457,6 +529,8 @@ export default function JadenosOnboarding() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState<"imap" | "smtp" | null>(null);
+  const [templateUploading, setTemplateUploading] = useState(false);
+  const [templateSummary, setTemplateSummary] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -536,6 +610,33 @@ export default function JadenosOnboarding() {
     }
   }, [apiUrl, language]);
 
+  const uploadDocumentTemplates = useCallback(async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setTemplateUploading(true);
+    setError(null);
+    setMessage("");
+    try {
+      const form = new FormData();
+      Array.from(files).slice(0, 5).forEach((file) => form.append("files", file));
+      const res = await fetch(apiUrl("/api/documents/templates"), {
+        method: "POST",
+        body: form,
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || (language === "zh" ? "上传失败" : "Upload failed"));
+      const status = json.templateDraft?.status;
+      const sampleCount = json.sampleCount || 0;
+      setTemplateSummary(language === "zh"
+        ? `已保存 ${sampleCount} 份样本。状态：${status === "ready_for_confirmation" ? "可确认模板草案" : "样本不足，请补到 3-5 份"}。`
+        : `Saved ${sampleCount} samples. Status: ${status === "ready_for_confirmation" ? "ready for confirmation" : "needs 3-5 samples"}.`);
+      setMessage(language === "zh" ? "单证模板样本已保存。" : "Document template samples saved.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : (language === "zh" ? "上传失败" : "Upload failed"));
+    } finally {
+      setTemplateUploading(false);
+    }
+  }, [apiUrl, language]);
+
   return (
     <BattlePageShell>
       <BattlePageHeader
@@ -594,7 +695,10 @@ export default function JadenosOnboarding() {
                 config={config}
                 updateConfig={updateConfig}
                 testConnection={testConnection}
+                uploadDocumentTemplates={uploadDocumentTemplates}
                 testing={testing}
+                templateUploading={templateUploading}
+                templateSummary={templateSummary}
                 loading={loading}
                 language={language}
               />

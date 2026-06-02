@@ -6,6 +6,10 @@ export interface TradeProduct {
   hs_code: string;
   quantity: number;
   unit_price: number;
+  unit_cost?: number;
+  cost_currency?: string;
+  supplier?: string;
+  supplier_candidates?: string[];
   net_weight_kg: number;
   gross_weight_kg: number;
   dimensions_cm: string;
@@ -116,6 +120,10 @@ export function createDefaultTradeData(): TradeDocumentData {
         hs_code: "",
         quantity: 0,
         unit_price: 0,
+        unit_cost: 0,
+        cost_currency: "USD",
+        supplier: "",
+        supplier_candidates: [],
         net_weight_kg: 0,
         gross_weight_kg: 0,
         dimensions_cm: "",

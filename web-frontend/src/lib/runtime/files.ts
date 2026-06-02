@@ -53,11 +53,25 @@ export type RuntimeFileServeResult =
       headers: Record<string, string>;
     };
 
+export type RuntimeFileOpenResult =
+  | {
+      kind: "error";
+      status: number;
+      body: { success: false; error: string };
+    }
+  | {
+      kind: "opened";
+      status: 200;
+      body: { success: true; fileName: string; path: string };
+    };
+
 export function allowedFileDirs(): string[] {
   return [
     ssaDataRoot(),
     repoPath("skills", "quotation-workflow", "examples"),
     repoPath("skills", "quotation-workflow", "tests", "output"),
+    repoPath("skills", "sample-workflow", "examples"),
+    repoPath("skills", "pi-workflow", "examples"),
   ];
 }
 
@@ -66,6 +80,8 @@ export function allowedWorkspaceFileDirs(workspaceId: string): string[] {
     ssaCompanyDataPath(sanitizeSsaPathSegment(workspaceId)),
     repoPath("skills", "quotation-workflow", "examples"),
     repoPath("skills", "quotation-workflow", "tests", "output"),
+    repoPath("skills", "sample-workflow", "examples"),
+    repoPath("skills", "pi-workflow", "examples"),
   ];
 }
 
@@ -140,6 +156,38 @@ export function serveRuntimeFile(filePath: string | null, download = false, work
       "Content-Length": String(file.size),
       "Content-Disposition": `${disposition}; filename="${encodeURIComponent(file.fileName)}"`,
     },
+  };
+}
+
+export async function openRuntimeFile(filePath: string | null, workspaceId?: string): Promise<RuntimeFileOpenResult> {
+  const file = resolveRuntimeFile(filePath, { workspaceId });
+
+  if (!isRuntimeFileRef(file)) {
+    return {
+      kind: "error",
+      status: file.status,
+      body: { success: false, error: file.error },
+    };
+  }
+
+  const [{ execFile }, { promisify }] = await Promise.all([
+    import("child_process"),
+    import("util"),
+  ]);
+  const run = promisify(execFile);
+
+  if (process.platform === "darwin") {
+    await run("open", [file.resolved], { timeout: 10_000 });
+  } else if (process.platform === "win32") {
+    await run("cmd", ["/c", "start", "", file.resolved], { timeout: 10_000, windowsHide: true });
+  } else {
+    await run("xdg-open", [file.resolved], { timeout: 10_000 });
+  }
+
+  return {
+    kind: "opened",
+    status: 200,
+    body: { success: true, fileName: file.fileName, path: file.resolved },
   };
 }
 

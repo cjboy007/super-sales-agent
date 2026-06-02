@@ -204,7 +204,7 @@ def _call_openrouter(images_b64: list[str], model: str) -> dict:
 
     api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key:
-        api_key = "OPENROUTER_API_KEY_PLACEHOLDER"
+        raise RuntimeError("OPENROUTER_API_KEY is required for OpenRouter Vision extraction.")
 
     content = [{"type": "text", "text": EXTRACTION_PROMPT}]
     for img_b64 in images_b64:

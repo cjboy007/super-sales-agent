@@ -1,5 +1,6 @@
 import type { LlmRequest, LlmResult } from "./types";
 import { readSettings } from "../config-store";
+import { getLlmCacheEntry, setLlmCacheEntry } from "./llm-cache";
 
 function summarize(input: string, max = 260): string {
   const compact = input.replace(/\s+/g, " ").trim();
@@ -117,6 +118,7 @@ interface ProviderConfig {
 const DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-pro";
 const OPENAI_DEFAULT_MODEL = "gpt-4o-mini";
 const OPENROUTER_DEFAULT_MODEL = "deepseek/deepseek-v4-pro";
+const LLM_PROMPT_VERSION = "jadenos.llm.v1";
 
 function directDeepSeekModel(model: string | undefined): string {
   const trimmed = model?.trim();
@@ -285,10 +287,30 @@ async function runChatCompletionTask(
 
 export async function runLlmTask(request: LlmRequest): Promise<LlmResult> {
   const provider = resolveProvider();
+  const modelName = provider?.model || "mock";
+  const workspaceId = request.workspaceId || "local";
+  const cacheInput = {
+    workspaceId,
+    taskType: request.task,
+    modelName,
+    promptVersion: String(request.context?.promptVersion || LLM_PROMPT_VERSION),
+    input: JSON.stringify({
+      input: request.input,
+      context: request.context || {},
+    }),
+  };
+  const cached = getLlmCacheEntry(cacheInput);
+  if (cached) return cached;
+
   if (provider) {
     const result = await runChatCompletionTask(request, provider);
-    if (result) return result;
+    if (result) {
+      setLlmCacheEntry(cacheInput, result);
+      return result;
+    }
   }
 
-  return fallbackForTask(request);
+  const fallback = fallbackForTask(request);
+  setLlmCacheEntry(cacheInput, fallback);
+  return fallback;
 }

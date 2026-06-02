@@ -7,6 +7,10 @@ import pytest
 import json
 import os
 import sys
+import subprocess
+
+from openpyxl import load_workbook
+from openpyxl.utils.cell import coordinate_to_tuple
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 from pi_generator import generate_pi_excel
@@ -50,6 +54,59 @@ def test_pi_excel_created():
     
     assert os.path.exists(output_path), f"PI 文件应该被创建：{output_path}"
     assert result.success, f"生成应该成功：{result.error}"
+
+
+def find_cell_value(ws, value):
+    for row in ws.iter_rows():
+        for cell in row:
+            if cell.value == value:
+                return cell.coordinate
+    return None
+
+
+def test_pi_excel_uses_external_pdf_source_layout():
+    """对外 PI Excel 应该使用与 PDF 对应的完整源文件版式"""
+    data = load_fixture('pi_customer.json')
+    output_path = os.path.join(os.path.dirname(__file__), 'output', 'test-pi-layout.xlsx')
+
+    result = generate_pi_excel(data, output_path)
+    assert result.success, f"生成应该成功：{result.error}"
+
+    wb = load_workbook(output_path, data_only=False)
+    ws = wb.active
+
+    assert ws['D1'].value == 'PROFORMA INVOICE'
+    assert find_cell_value(ws, 'BILL TO:') is not None
+    assert find_cell_value(ws, 'GOODS DESCRIPTION:') is not None
+    assert find_cell_value(ws, 'PAYMENT TERMS & CONDITIONS:') is not None
+    assert find_cell_value(ws, 'BANK DETAILS FOR PAYMENT:') is not None
+    goods_cell = find_cell_value(ws, 'GOODS DESCRIPTION:')
+    assert goods_cell is not None
+    header_row = coordinate_to_tuple(goods_cell)[0] + 1
+    assert [ws.cell(row=header_row, column=col).value for col in range(1, 6)] == [
+        'No.', 'Description & Specifications', 'Qty', 'Unit Price', 'Amount'
+    ]
+    assert ws.freeze_panes == f'A{header_row + 1}'
+    assert ws.print_area, "Excel 源文件必须设置打印区域，才能稳定导出 PDF"
+    assert ws.page_setup.fitToWidth == 1
+
+
+def test_pi_script_generates_matching_excel_source(tmp_path):
+    """生成对外 HTML/PDF 时应同步生成同名 Excel 源文件"""
+    fixture_path = os.path.join(FIXTURES_DIR, 'pi_customer.json')
+    output_html = tmp_path / 'PI-20260328-001.html'
+    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'generate_pi.py')
+
+    completed = subprocess.run(
+        [sys.executable, script_path, '--data', fixture_path, '--output', str(output_html)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    assert output_html.exists()
+    assert output_html.with_suffix('.xlsx').exists()
 
 
 def test_pi_number_format():

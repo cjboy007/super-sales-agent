@@ -1,10 +1,12 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { ensureDir, repoPath, ssaCompanyDataPath } from "../ssa-data-paths";
+import { ensureDir, repoPath, sanitizeSsaPathSegment, ssaCompanyDataPath } from "../ssa-data-paths";
 import type { DocumentGenerationRequest, SideEffectDecision } from "./types";
 import { requestSideEffect } from "./side-effect-gate";
 import type { SalesRuntime } from "./sales-runtime";
+import { upsertFileManifestRecords, type FileManifestRecord } from "./file-manifest";
+import { recordPiPrices } from "./price-memory";
 
 const QUOTATION_GENERATE_SCRIPT = repoPath("skills", "quotation-workflow", "scripts", "generate-all.sh");
 function quotationOutputDir(workspaceId: string) {
@@ -17,6 +19,10 @@ export interface TradeProduct {
   hs_code: string;
   quantity: number;
   unit_price: number;
+  unit_cost?: number;
+  cost_currency?: string;
+  supplier?: string;
+  supplier_candidates?: string[];
   net_weight_kg: number;
   gross_weight_kg: number;
   dimensions_cm: string;
@@ -61,6 +67,17 @@ export interface GeneratedTradeDocument {
   created?: string;
 }
 
+export interface PiRecord {
+  piNo: string;
+  customer: string;
+  date: string;
+  amount: string;
+  productSummary: string;
+  updatedAt: string;
+  source: string;
+  data: TradeDocumentData;
+}
+
 export type TradeDocumentGenerationResult =
   | {
       success: true;
@@ -83,7 +100,7 @@ export type TradeDocumentGenerationResult =
 
 export interface QuotationGenerationInput {
   workspaceId: string;
-  type: "QT" | "PI" | "PN" | "SPL";
+  type: "QT" | "PI" | "SPL";
   customer: string;
   items?: Array<{
     name: string;
@@ -112,6 +129,10 @@ function tradeDocsDir() {
 
 function tradeDocsOutputDir(workspaceId = "farreach") {
   return ssaCompanyDataPath(workspaceId, "documents", "trade-docs");
+}
+
+function piRecordsDir(workspaceId = "farreach") {
+  return ssaCompanyDataPath(workspaceId, "documents", "pi-records");
 }
 
 export function requestDocumentGeneration(request: DocumentGenerationRequest): SideEffectDecision {
@@ -154,6 +175,27 @@ function findGeneratedQuotationFiles(workspaceId: string, quotationNo: string): 
   }
 
   return results;
+}
+
+function upsertGeneratedQuotationManifest(workspaceId: string, input: QuotationGenerationInput, quotationNo: string, files: Array<{ format: string; path: string }>) {
+  const updatedAt = new Date().toISOString();
+  const amountValue = (input.items || []).reduce((sum, item) => sum + (item.amount || (item.qty || 0) * (item.unitPrice || 0)), 0);
+  const mainProducts = (input.items || []).map((item) => item.name || item.description).filter(Boolean).slice(0, 3).join(", ") || "—";
+  const kind = input.type === "SPL" ? "sample_order" : input.type === "PI" ? "PI" : "quotation";
+  const records: FileManifestRecord[] = files.map((file) => ({
+    id: `${quotationNo}:${file.format}:${file.path}`,
+    kind,
+    documentNo: quotationNo,
+    fileName: path.basename(file.path),
+    path: file.path,
+    format: file.format,
+    customer: input.customer,
+    amount: amountValue ? `USD ${amountValue.toFixed(2)}` : "—",
+    mainProducts,
+    sourceAction: "quotation.generate",
+    updatedAt,
+  }));
+  if (records.length) upsertFileManifestRecords(workspaceId, records);
 }
 
 async function runExecFile(command: string, args: string[], options: Record<string, unknown>) {
@@ -226,10 +268,12 @@ export async function generateQuotationDocuments(
       }
     }, 10_000);
 
+    const files = findGeneratedQuotationFiles(input.workspaceId, quotationNo);
+    upsertGeneratedQuotationManifest(input.workspaceId, input, quotationNo, files);
     return {
       success: true,
       quotationNo,
-      files: findGeneratedQuotationFiles(input.workspaceId, quotationNo),
+      files,
       sideEffect,
       detail: "Document generated successfully",
       log: stdout.slice(-500),
@@ -261,6 +305,71 @@ function tradeOutputFilename(data: TradeDocumentData, docType: string) {
   return `${data.pi_info.pi_no.replace("PI", docType)}-${Date.now()}.html`;
 }
 
+function piRecordPath(workspaceId: string, piNo: string) {
+  return path.join(piRecordsDir(workspaceId), `${sanitizeSsaPathSegment(piNo)}.json`);
+}
+
+function formatAmount(data: TradeDocumentData) {
+  const total = data.products.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
+  return `${data.currency} ${total.toFixed(2)}`;
+}
+
+function productSummary(data: TradeDocumentData) {
+  return data.products
+    .map((item) => item.description || item.specification)
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(", ") || "—";
+}
+
+export function savePiRecord(workspaceId: string, data: TradeDocumentData, source = "documents.generate"): PiRecord {
+  const piNo = data.pi_info.pi_no.trim();
+  if (!piNo) throw new Error("PI number is required");
+  ensureDir(piRecordsDir(workspaceId));
+  const record: PiRecord = {
+    piNo,
+    customer: data.customer.company_name || data.customer.email || "Unknown customer",
+    date: data.shipment.date || data.ci_info.ci_date || new Date().toISOString().slice(0, 10),
+    amount: formatAmount(data),
+    productSummary: productSummary(data),
+    updatedAt: new Date().toISOString(),
+    source,
+    data,
+  };
+  fs.writeFileSync(piRecordPath(workspaceId, piNo), JSON.stringify(record, null, 2), "utf-8");
+  recordPiPrices(workspaceId, data, source);
+  return record;
+}
+
+function readPiRecord(filePath: string): PiRecord | null {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8")) as PiRecord;
+  } catch {
+    return null;
+  }
+}
+
+export function listPiRecords(workspaceId = "farreach", query = ""): { success: true; records: PiRecord[] } {
+  const dir = piRecordsDir(workspaceId);
+  if (!fs.existsSync(dir)) return { success: true, records: [] };
+  const normalized = query.trim().toLowerCase();
+  const records = fs.readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+    .map((entry) => readPiRecord(path.join(dir, entry.name)))
+    .filter((record): record is PiRecord => Boolean(record))
+    .filter((record) => {
+      if (!normalized) return true;
+      return [
+        record.piNo,
+        record.customer,
+        record.amount,
+        record.productSummary,
+      ].some((value) => value.toLowerCase().includes(normalized));
+    })
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return { success: true, records };
+}
+
 function listGeneratedTradeDocuments(workspaceId: string): GeneratedTradeDocument[] {
   const outputDir = tradeDocsOutputDir(workspaceId);
   if (!fs.existsSync(outputDir)) return [];
@@ -282,6 +391,24 @@ function listGeneratedTradeDocuments(workspaceId: string): GeneratedTradeDocumen
     .sort((a, b) => b.created.localeCompare(a.created));
 }
 
+function upsertTradeDocumentManifest(workspaceId: string, data: TradeDocumentData, documents: GeneratedTradeDocument[]) {
+  const updatedAt = new Date().toISOString();
+  const records: FileManifestRecord[] = documents.map((document) => ({
+    id: `${document.type}:${document.filename}:${document.path}`,
+    kind: document.type === "PI" || document.type === "CI" || document.type === "PL" ? document.type : "other",
+    documentNo: document.filename.replace(/\.[^.]+$/, ""),
+    fileName: document.filename,
+    path: document.path,
+    format: path.extname(document.filename).toLowerCase().replace(/^\./, "") || "html",
+    customer: data.customer.company_name || data.customer.email || "Unknown customer",
+    amount: formatAmount(data),
+    mainProducts: productSummary(data),
+    sourceAction: "documents.generate",
+    updatedAt,
+  }));
+  if (records.length) upsertFileManifestRecords(workspaceId, records);
+}
+
 export function listTradeDocuments(workspaceId = "farreach"): { success: true; documents: GeneratedTradeDocument[] } {
   return {
     success: true,
@@ -295,6 +422,9 @@ export async function generateTradeDocuments(
 ): Promise<TradeDocumentGenerationResult> {
   const outputDir = tradeDocsOutputDir(input.workspaceId);
   ensureDir(outputDir);
+  if (input.data.pi_info.pi_no.trim() && input.docTypes.includes("PI")) {
+    savePiRecord(input.workspaceId, input.data);
+  }
 
   const sideEffect = runtime.requestDocumentGeneration({
     workspaceId: input.workspaceId,
@@ -373,6 +503,8 @@ export async function generateTradeDocuments(
       error: "No documents were generated. Check Python dependencies.",
     };
   }
+
+  upsertTradeDocumentManifest(input.workspaceId, input.data, documents);
 
   return {
     success: true,

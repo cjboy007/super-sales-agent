@@ -126,6 +126,7 @@ describe("/api/runtime route", () => {
         requiresOpenClaw: false,
         requiresHermes: false,
         sideEffectsBlockedByDefault: true,
+        dataRoot: tempRoot,
       },
     });
     expect(json.data.capabilities).toEqual(expect.arrayContaining([
@@ -137,13 +138,13 @@ describe("/api/runtime route", () => {
       expect.objectContaining({
         id: "runtime-workflows",
         openclawEquivalent: "agent tasks / cron jobs",
-        status: "partial",
+        status: "implemented",
       }),
     ]));
     expect(json.data.workflowTypes).toContain("operator.command");
     expect(json.data.sideEffectKinds).toContain("email.send");
     expect(json.data.dataContracts).toContain("Runtime jobs live under runtime/ssa-runtime.db.");
-    expect(json.data.nextGaps).toContain("Standalone worker entrypoints and retry policy for SQLite runtime jobs.");
+    expect(json.data.nextGaps).not.toContain("Standalone worker entrypoints and retry policy for SQLite runtime jobs.");
   });
 
   it("registers a new local workspace through the runtime API", async () => {
@@ -214,6 +215,10 @@ describe("/api/runtime route", () => {
         workspaceId: "csv-exporter",
         count: 1,
         format: "csv",
+        companyIntel: {
+          queued: 1,
+          skipped: 0,
+        },
       },
     });
 
@@ -226,15 +231,30 @@ describe("/api/runtime route", () => {
       email: "nils@csv.example",
       score: "Warm",
     });
-    expect(runtime.snapshot().events[0]).toMatchObject({
-      type: "lead.imported",
+    expect(runtime.snapshot().jobs[0]).toMatchObject({
       workspaceId: "csv-exporter",
-      payload: {
-        count: 1,
-        format: "csv",
-        sideEffects: "local-only",
-      },
+      workflow: "company_intel.run",
+      status: "queued",
     });
+    expect(runtime.snapshot().events).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        type: "lead.imported",
+        workspaceId: "csv-exporter",
+        payload: expect.objectContaining({
+          count: 1,
+          format: "csv",
+          sideEffects: "local-only",
+        }),
+      }),
+      expect.objectContaining({
+        type: "company_intel.queued",
+        workspaceId: "csv-exporter",
+        payload: expect.objectContaining({
+          companyName: "CSV Buyer",
+          sideEffects: "local-only",
+        }),
+      }),
+    ]));
   });
 
   it("previews, approves, rejects, retries, and audits side-effect decisions", async () => {

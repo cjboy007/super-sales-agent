@@ -11,15 +11,15 @@ export default function SectionChrome({ title, meta, action, className }: Sectio
   return (
     <div
       className={cx(
-        "flex min-h-[42px] flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-950/80 px-3 py-2",
+        "flex min-h-[var(--ui-section-header-height)] flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-950/80 px-3 py-2",
         className
       )}
     >
       <div className="min-w-0">
-        <h2 className="truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+        <h2 className="truncate text-[length:var(--ui-section-title)] font-semibold text-slate-400">
           {title}
         </h2>
-        {meta && <p className="mt-0.5 truncate font-mono text-[10px] text-slate-600">{meta}</p>}
+        {meta && <p className="mt-0.5 truncate font-mono text-[length:var(--ui-section-meta)] text-slate-600">{meta}</p>}
       </div>
       {action}
     </div>

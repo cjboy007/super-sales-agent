@@ -34,6 +34,8 @@ export async function POST(request: NextRequest) {
         status: record.status,
         sideEffects: record.sideEffects,
         jobId: record.jobId,
+        jobIds: record.jobIds || (record.jobId ? [record.jobId] : []),
+        plan: record.plan,
       },
     });
   } catch (error) {

@@ -1,6 +1,6 @@
 import fs from "fs";
 import type { InboundEmail, ReplyStyle } from "../../types/inbox";
-import { ensureSsaCompanyDataPath } from "../ssa-data-paths";
+import { ensureSsaCompanyDataPath, readJsonFile } from "../ssa-data-paths";
 import { verifyEmailAddress } from "./email-verification";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision } from "./types";
@@ -76,6 +76,54 @@ function hasHumanApproval(input: InboxSendInput) {
 
 function sendRequestLogPath(workspaceId: string) {
   return ensureSsaCompanyDataPath(workspaceId, "mail", "send-requests.json");
+}
+
+function inboxDraftCachePath(workspaceId: string) {
+  return ensureSsaCompanyDataPath(workspaceId, ".jadenos", "cache", "inbox-drafts.json");
+}
+
+type FullInboxEmail = { subject: string; body: string; attachments: string[] };
+
+interface InboxDraftCacheEntry {
+  key: string;
+  emailId: string;
+  style: ReplyStyle;
+  promptVersion: string;
+  updatedAt: string;
+  fullEmail: FullInboxEmail;
+}
+
+const INBOX_DRAFT_PROMPT_VERSION = "inbox.select.v1";
+
+function readInboxDraftCache(workspaceId: string): InboxDraftCacheEntry[] {
+  return readJsonFile<InboxDraftCacheEntry[]>(inboxDraftCachePath(workspaceId), []);
+}
+
+function writeInboxDraftCache(workspaceId: string, entries: InboxDraftCacheEntry[]) {
+  fs.writeFileSync(inboxDraftCachePath(workspaceId), JSON.stringify(entries.slice(-500), null, 2), "utf-8");
+}
+
+function draftCacheKey(emailId: string, style: ReplyStyle) {
+  return `${emailId}:${style}:${INBOX_DRAFT_PROMPT_VERSION}`;
+}
+
+function getCachedInboxDraft(workspaceId: string, emailId: string, style: ReplyStyle): InboxDraftCacheEntry | null {
+  const key = draftCacheKey(emailId, style);
+  return readInboxDraftCache(workspaceId).find((entry) => entry.key === key) || null;
+}
+
+function setCachedInboxDraft(workspaceId: string, emailId: string, style: ReplyStyle, fullEmail: FullInboxEmail) {
+  const key = draftCacheKey(emailId, style);
+  const entries = readInboxDraftCache(workspaceId).filter((entry) => entry.key !== key);
+  entries.push({
+    key,
+    emailId,
+    style,
+    promptVersion: INBOX_DRAFT_PROMPT_VERSION,
+    updatedAt: new Date().toISOString(),
+    fullEmail,
+  });
+  writeInboxDraftCache(workspaceId, entries);
 }
 
 function appendToSendRequestLog(workspaceId: string, email: string, subject: string, status = "blocked_local_preview") {
@@ -381,10 +429,29 @@ export async function selectRuntimeInboxReplyStyle(runtime: SalesRuntime, input:
     return { success: false as const, error: "Option not found", status: 404 };
   }
 
+  const cached = getCachedInboxDraft(workspace.id, input.emailId, input.style);
+  if (cached) {
+    return {
+      success: true as const,
+      full_email: cached.fullEmail,
+      cache: {
+        hit: true,
+        promptVersion: cached.promptVersion,
+        updatedAt: cached.updatedAt,
+      },
+    };
+  }
+
   await new Promise((resolve) => setTimeout(resolve, 800));
+  const fullEmail = getFullEmail(input.emailId, input.style, email.data.from_name);
+  setCachedInboxDraft(workspace.id, input.emailId, input.style, fullEmail);
   return {
     success: true as const,
-    full_email: getFullEmail(input.emailId, input.style, email.data.from_name),
+    full_email: fullEmail,
+    cache: {
+      hit: false,
+      promptVersion: INBOX_DRAFT_PROMPT_VERSION,
+    },
   };
 }
 
@@ -396,7 +463,7 @@ function getFullEmail(
   emailId: string,
   style: ReplyStyle,
   fromName: string
-): { subject: string; body: string; attachments: string[] } {
+): FullInboxEmail {
   const firstName = fromName.split(" ")[0] || "there";
   const emails = MOCK_FULL_EMAILS[emailId];
   if (emails?.[style]) return emails[style];

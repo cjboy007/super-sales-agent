@@ -17,12 +17,15 @@ Product Drawing Extractor v5.0 - Hybrid Mode (Text-First)
 
 import argparse
 import base64
+import copy
+import hashlib
 import json
 import os
 import re
 import subprocess
 import sys
 import glob
+import tempfile
 from pathlib import Path
 from typing import Optional
 
@@ -31,13 +34,48 @@ from typing import Optional
 # 1. PDF → PNG（用于 Vision API，300 DPI）
 # ---------------------------------------------------------------------------
 
-def pdf_to_images(pdf_path: str, dpi: int = 300) -> list[str]:
+SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_DIR = SCRIPT_DIR.parent
+DEFAULT_CONFIG_PATH = SKILL_DIR / "config" / "default.json"
+
+
+def deep_merge(base: dict, override: dict) -> dict:
+    """Merge config dictionaries without mutating inputs."""
+    merged = copy.deepcopy(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def load_config(config_path: Optional[str] = None) -> dict:
+    """Load default config plus an optional override file."""
+    with open(DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
+        config = json.load(f)
+
+    if config_path:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = deep_merge(config, json.load(f))
+
+    return config
+
+
+def detect_template(text: str, config: dict) -> dict:
+    """Detect the drawing template from configured regex patterns."""
+    for template in config.get("templates", []):
+        for pattern in template.get("patterns", []):
+            if re.search(pattern, text, re.IGNORECASE | re.MULTILINE):
+                return template
+    return {"id": "unknown", "label": "Unknown template", "patterns": []}
+
+
+def pdf_to_images(pdf_path: str, dpi: int = 300, output_dir: Optional[str] = None) -> list[str]:
     """PDF 转 PNG，返回图片路径列表（300 DPI 高分辨率）"""
     stem = Path(pdf_path).stem[:20]
-    prefix = f"/tmp/hybrid_{stem}"
-
-    for f in glob.glob(f"{prefix}*.png"):
-        os.remove(f)
+    output_root = output_dir or tempfile.mkdtemp(prefix="product-doc-reader-")
+    prefix = str(Path(output_root) / f"hybrid_{stem}")
 
     subprocess.run(
         ["pdftoppm", "-r", str(dpi), "-png", pdf_path, prefix],
@@ -69,7 +107,7 @@ def extract_text_with_pdftotext(pdf_path: str) -> str:
     return result.stdout
 
 
-def parse_model_no_from_text(text: str) -> str:
+def parse_model_no_from_text(text: str, config: Optional[dict] = None) -> str:
     """从 pdftotext 文本中提取模具号（Model No.）
     
     规则：
@@ -95,12 +133,9 @@ def parse_model_no_from_text(text: str) -> str:
         if match:
             model = match.group(1)
             
-            # 排除 BJ 开头的包装规范
-            if model.upper().startswith('BJ'):
-                continue
-            
-            # 排除 599 开头的 drawing no
-            if model.startswith('599'):
+            validation = (config or {}).get("validation", {})
+            reject_prefixes = validation.get("reject_model_prefixes", ["BJ", "599"])
+            if any(model.upper().startswith(prefix.upper()) for prefix in reject_prefixes):
                 continue
             
             # 校验：必须包含字母和数字
@@ -112,7 +147,87 @@ def parse_model_no_from_text(text: str) -> str:
     return ""
 
 
-def parse_products_from_text(text: str) -> list[dict]:
+def parse_drawing_no_from_text(text: str, config: Optional[dict] = None, template: Optional[dict] = None) -> str:
+    """Extract drawing number/material code from text."""
+    patterns = []
+    if template and template.get("drawing_no_regex"):
+        patterns.append(template["drawing_no_regex"])
+    patterns.extend([
+        r'DRAWING NO\.?\s*[:：]?\s*(599-\d{2,3})',
+        r'\b(599-\d{2,3})\b',
+    ])
+
+    for pattern in patterns:
+        match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
+        if match:
+            return match.group(1).upper()
+    return ""
+
+
+def should_reject_product_token(token: str, config: Optional[dict]) -> bool:
+    validation = (config or {}).get("validation", {})
+    upper = token.upper()
+    if upper in set(validation.get("exclude_words", [])):
+        return True
+    for prefix in validation.get("reject_product_prefixes", ["BJ", "599"]):
+        if upper.startswith(prefix.upper()):
+            return True
+    for pattern in validation.get("reject_product_regexes", [r"^\d+$", r"^\d+[A-Z]+$", r".*BC$"]):
+        if re.match(pattern, upper):
+            return True
+    if len(token) < validation.get("min_product_name_length", 4):
+        return True
+    return False
+
+
+def parse_products_from_table_region(lines: list[str], header_idx: int, config: Optional[dict] = None) -> list[dict]:
+    """Extract product rows from obvious product matrix lines before loose token fallback."""
+    table_cfg = (config or {}).get("table_extraction", {})
+    stop_keywords = table_cfg.get("stop_keywords", ["NO.", "部件名称", "PART NAME", "规格", "用量", "UNIT"])
+    max_rows = int(table_cfg.get("max_rows_after_header", 16))
+    required_any = set(table_cfg.get("require_any_field", ["length_mm", "packaging_spec", "material_code"]))
+    products = []
+    for line in lines[header_idx + 1:header_idx + max_rows]:
+        if not line.strip():
+            continue
+        if any(kw in line for kw in stop_keywords):
+            break
+
+        packaging_match = re.search(r'(BJ\d{4}-\d{4})', line)
+        product_match = None
+        if packaging_match:
+            after_package = line[packaging_match.end():]
+            product_match = re.search(r'\b([A-Z0-9\xad\u00ad]{4,}(?:-[A-Z0-9\xad\u00ad]+)*)\b', after_package)
+        if not product_match:
+            product_match = re.search(r'\b([A-Z0-9\xad\u00ad]{4,}(?:-[A-Z0-9\xad\u00ad]+)*)\b', line)
+        length_match = re.search(r'(?<!BJ)(\d{4,}[±\+\-]\d+(?:[±\+\-]\d+)?)', line)
+        material_match = re.search(r'\b(599-\d{2,3})\b', line)
+        if not product_match:
+            continue
+
+        raw_product = product_match.group(1).replace('\xad', '').replace('\u00ad', '')
+        candidate = raw_product.upper()
+        if should_reject_product_token(candidate, config):
+            continue
+        field_hits = {
+            "length_mm": bool(length_match),
+            "packaging_spec": bool(packaging_match),
+            "material_code": bool(material_match),
+        }
+        if required_any and not any(field_hits.get(field, False) for field in required_any):
+            continue
+
+        products.append({
+            "customer_item": raw_product,
+            "length_mm": length_match.group(1) if length_match else "",
+            "packaging_spec": packaging_match.group(1) if packaging_match else "",
+            "material_code": material_match.group(1) if material_match else "",
+        })
+
+    return products
+
+
+def parse_products_from_text(text: str, config: Optional[dict] = None) -> list[dict]:
     """从 pdftotext 文本中解析产品规格矩阵（跨行收集）"""
     # 清理软连字符（PDF 换行导致的 \xad）和多余空白
     text = text.replace('\xad', '').replace('\u00ad', '')
@@ -120,42 +235,29 @@ def parse_products_from_text(text: str) -> list[dict]:
 
     # 找产品表格区域
     header_idx = -1
+    table_cfg = (config or {}).get("table_extraction", {})
+    header_keywords = table_cfg.get("header_keywords", ["客人品名", "CUSTOMER ITEM"])
     for i, line in enumerate(lines):
-        if "客人品名" in line or "CUSTOMER ITEM" in line:
+        if any(keyword in line for keyword in header_keywords):
             header_idx = i
             break
 
     if header_idx < 0:
         return []
 
+    table_products = parse_products_from_table_region(lines, header_idx, config)
+    if table_products:
+        return table_products
+
     # 收集所有产品名（大写字母串，长度>3，排除 BOM 词汇）
     product_names = []
-    exclude_words = {
-        'HDMI', 'AWM', 'STYLE', 'VW', 'PIN', 'SHELL', 'ROHS', 'REACH', 'PVC', 'SKW', 'FARREACH',
-        'DP', 'USB', 'AOC', 'CABLE', 'GRIP', 'HDR', 'GR', 'CM', 'FM', 'AM', 'AF', 'MM', 'MLS',
-        'MODEL', 'SCREW', 'PLATED', 'NUT', 'PLUG', 'PASS', 'TEST', 'HDPE', 'SKIN', 'BLACK', 'TPE',
-        'DRAIN', 'WIRE', 'AL', 'MY', 'BC', 'PE', 'OD', 'CONDUCTOR', 'BRAID', 'JACKET', 'COLOR',
-        'COPPER', 'FOIL', 'FABRIC', 'RUBBERIZED', 'IRON', 'GOLD', 'SHEATH', 'CLIP', 'WIRE', 'NI',
-        'ETHERNET', 'HIGH', 'SPEED', 'WITH', 'ETHERNET', 'E358026', 'AWM', 'STYLE', 'VW-1',
-        'OPEN', 'SHORT', 'MISS', 'WIRE', 'CONTACT', 'RESISTANCE', 'INSULATION', 'HI-POT', 'HDTV-DVD'
-    }
     
     for i, line in enumerate(lines[header_idx + 1:header_idx + 40]):
         # 使用更宽松的正则（允许数字开头，如 HDMI2CABLE）
         matches = re.findall(r'\b([A-Z0-9]{3,}(?:-[A-Z0-9]+)*)\b', line)
         for m in matches:
             m_upper = m.upper()
-            # 排除纯数字（长度值）
-            if m.isdigit():
-                continue
-            # 排除电气参数（300V/60HZ 等）
-            if re.match(r'^\d+[A-Z]+$', m):
-                continue
-            # 排除线材规格（32BC/511BC 等）
-            if m.endswith('BC'):
-                continue
-            if (not m.startswith('599') and not m.startswith('BJ') and 
-                m_upper not in exclude_words and len(m) > 3):
+            if not should_reject_product_token(m_upper, config):
                 if m not in product_names:
                     product_names.append(m)
 
@@ -217,6 +319,7 @@ def parse_bom_from_text(text: str) -> list[dict]:
     """从 pdftotext 文本中解析 BOM 物料清单"""
     bom = []
     lines = text.split('\n')
+    lines = [line.replace('\xad', '').replace('\u00ad', '') for line in lines]
 
     # 找 BOM 区域
     bom_start = -1
@@ -227,6 +330,10 @@ def parse_bom_from_text(text: str) -> list[dict]:
 
     if bom_start < 0:
         return []
+
+    reverse_bom = parse_bom_before_header(lines, bom_start)
+    if len(reverse_bom) >= 3:
+        return reverse_bom
 
     in_bom = False
     current_row = {}
@@ -270,6 +377,77 @@ def parse_bom_from_text(text: str) -> list[dict]:
     ]
 
     return bom
+
+
+def parse_bom_before_header(lines: list[str], bom_start: int) -> list[dict]:
+    """Parse right-side BOM rows that appear above the visible header in pdftotext output."""
+    rows = []
+    continuation = ""
+
+    for raw_line in reversed(lines[max(0, bom_start - 35):bom_start]):
+        line = raw_line.strip()
+        if not line:
+            continue
+
+        row = parse_reverse_bom_row(line)
+        if row:
+            if continuation:
+                row["spec"] = f"{row['spec']} {continuation}".strip()
+                continuation = ""
+            row["spec"] = " ".join(row["spec"].split())
+            rows.append(row)
+            continue
+
+        if rows:
+            right_side = re.sub(r'^.*?(?=(\[|Lock Type|with IC|D1/|[(（]1/))', '', line)
+            if right_side and right_side != line:
+                continuation = f"{right_side} {continuation}".strip()
+
+    rows.reverse()
+    return rows
+
+
+def parse_reverse_bom_row(line: str) -> Optional[dict]:
+    """Parse a single BOM row from compact pdftotext right-side layout."""
+    circled = re.search(
+        r'([①②③④⑤⑥⑦⑧⑨⑩])\s+(.+?)\s+(\d*\s*(?:PCS|M|G|SET|PC|KG))\s*$',
+        line,
+        re.IGNORECASE,
+    )
+    if circled:
+        body = circled.group(2).strip()
+        quantity = circled.group(3).replace(" ", "").upper()
+        part_name, spec = split_bom_body(body)
+        return {"no": circled.group(1), "part_name": part_name, "spec": spec, "quantity": quantity}
+
+    leading = re.search(
+        r'^\s*(\d+)\s+(.+?)\s+(\d*\s*(?:PCS|M|G|SET|PC|KG)|g)\s*$',
+        line,
+        re.IGNORECASE,
+    )
+    if leading:
+        body = leading.group(2).strip()
+        quantity = leading.group(3).replace(" ", "").upper()
+        part_name, spec = split_bom_body(body)
+        return {"no": leading.group(1), "part_name": part_name, "spec": spec, "quantity": quantity}
+
+    return None
+
+
+def split_bom_body(body: str) -> tuple[str, str]:
+    tokens = body.split()
+    if not tokens:
+        return "", ""
+
+    known_parts = {"CABLE", "PLUG", "MODEL", "CAP", "SHELL", "PCB", "外模", "内模", "接头"}
+    first = tokens[0]
+    if first.upper() in known_parts or first in known_parts:
+        return first, " ".join(tokens[1:])
+
+    if len(tokens) >= 2 and tokens[0].upper() == "PART":
+        return " ".join(tokens[:2]), " ".join(tokens[2:])
+
+    return first, " ".join(tokens[1:])
 
 
 # ---------------------------------------------------------------------------
@@ -348,10 +526,65 @@ VISION_PROMPT = """你是一个产品工程图纸分析专家。请仔细查看�
 8. 变更记录在图纸边栏，提取版本号、日期、变更内容"""
 
 
-def call_vision_api(images_b64: list[str], provider: str = "openrouter", model: str = None) -> dict:
+def pdf_hash(pdf_path: str) -> str:
+    h = hashlib.sha256()
+    with open(pdf_path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def vision_cache_key(pdf_path: str, model: str, prompt: str = VISION_PROMPT) -> str:
+    raw = json.dumps({
+        "pdf_sha256": pdf_hash(pdf_path),
+        "model": model,
+        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+    }, sort_keys=True)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def read_vision_cache(pdf_path: str, model: str, cache_dir: Optional[str]) -> Optional[dict]:
+    if not cache_dir:
+        return None
+    cache_path = Path(cache_dir) / f"{vision_cache_key(pdf_path, model)}.json"
+    if not cache_path.exists():
+        return None
+    try:
+        with open(cache_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def write_vision_cache(pdf_path: str, model: str, cache_dir: Optional[str], data: dict) -> None:
+    if not cache_dir:
+        return
+    cache_path = Path(cache_dir) / f"{vision_cache_key(pdf_path, model)}.json"
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(cache_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def call_vision_api(
+    images_b64: list[str],
+    provider: str = "openrouter",
+    model: str = None,
+    pdf_path: Optional[str] = None,
+    cache_dir: Optional[str] = None,
+    use_cache: bool = True,
+) -> dict:
     """调用 Vision API 提取图纸信息（仅作为兜底）"""
     if provider == "openrouter":
-        return _call_openrouter(images_b64, model or "google/gemini-2.5-flash")
+        resolved_model = model or "google/gemini-2.5-flash"
+        if use_cache and pdf_path:
+            cached = read_vision_cache(pdf_path, resolved_model, cache_dir)
+            if cached is not None:
+                cached["_cache"] = "hit"
+                return cached
+        data = _call_openrouter(images_b64, resolved_model)
+        if use_cache and pdf_path and "error" not in data:
+            write_vision_cache(pdf_path, resolved_model, cache_dir, data)
+        return data
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
@@ -362,7 +595,7 @@ def _call_openrouter(images_b64: list[str], model: str) -> dict:
 
     api_key = os.environ.get("OPENROUTER_API_KEY", "")
     if not api_key:
-        api_key = "OPENROUTER_API_KEY_PLACEHOLDER"
+        raise RuntimeError("OPENROUTER_API_KEY is required for Vision extraction.")
 
     content = [{"type": "text", "text": VISION_PROMPT}]
     for img_b64 in images_b64:
@@ -494,8 +727,64 @@ def merge_text_and_vision(text_data: dict, vision_data: dict) -> dict:
     return result
 
 
-def extract_hybrid(pdf_path: str, use_vision: bool = True, use_text: bool = True) -> dict:
+def evaluate_quality(data: dict, config: dict) -> tuple[float, list[str], bool]:
+    """Return confidence, warnings, and whether the result needs review."""
+    warnings = []
+    required_fields = config.get("vision", {}).get("fallback_required_fields", ["product_name", "drawing_no", "packaging_spec"])
+
+    for field in required_fields:
+        if not data.get(field):
+            warnings.append(f"⚠️ 缺失字段：{field}")
+
+    validation = config.get("validation", {})
+    model_no = data.get("model_no", "")
+    if model_no:
+        if len(model_no) < validation.get("min_model_length", 3):
+            warnings.append(f"⚠️ 模具号异常：'{model_no}' (可能识别错误)")
+            data["model_no"] = ""
+        elif not any(c.isdigit() for c in model_no):
+            warnings.append(f"⚠️ 模具号格式异常：'{model_no}' (应包含数字)")
+            data["model_no"] = ""
+
+    product_name = data.get("product_name", "")
+    if product_name and len(product_name) < validation.get("min_product_name_length", 4):
+        warnings.append(f"⚠️ 产品名异常：'{product_name}' (可能识别错误)")
+        data["product_name"] = ""
+
+    if not data.get("bom"):
+        warnings.append("⚠️ BOM 物料清单为空")
+    elif len(data.get("bom", [])) < 3:
+        warnings.append(f"⚠️ BOM 行数过少：{len(data.get('bom', []))} 行 (可能提取不完整)")
+
+    checks = sum(1 for f in required_fields if data.get(f))
+    if data.get("bom"):
+        checks += 1
+
+    base_confidence = (checks / (len(required_fields) + 1)) * 100
+    confidence = max(0, base_confidence - (len(warnings) * 10)) if warnings else base_confidence
+    threshold = config.get("confidence_threshold", 80)
+    return round(confidence, 1), warnings, confidence < threshold or bool(warnings)
+
+
+def should_use_vision(text_data: dict, config: dict, force_vision: bool = False) -> bool:
+    if force_vision:
+        return True
+    confidence, warnings, _needs_review = evaluate_quality(copy.deepcopy(text_data), config)
+    required_fields = config.get("vision", {}).get("fallback_required_fields", ["product_name", "drawing_no", "packaging_spec"])
+    missing_required = any(not text_data.get(field) for field in required_fields)
+    return missing_required or not text_data.get("bom") or confidence < config.get("confidence_threshold", 80) or bool(warnings)
+
+
+def extract_hybrid(
+    pdf_path: str,
+    use_vision: bool = True,
+    use_text: bool = True,
+    config: Optional[dict] = None,
+    dpi: int = 300,
+    no_cache: bool = False,
+) -> dict:
     """混合提取主入口（v5.0：pdftotext 优先）"""
+    config = config or load_config(None)
     result = {
         "source_file": os.path.basename(pdf_path),
         "extraction_method": "hybrid",
@@ -511,16 +800,18 @@ def extract_hybrid(pdf_path: str, use_vision: bool = True, use_text: bool = True
         try:
             text = extract_text_with_pdftotext(pdf_path)
             print(f"  提取到 {len(text)} 字符", file=sys.stderr)
+            template = detect_template(text, config)
 
             # 解析各字段
             text_data["product_name"] = ""
-            text_data["model_no"] = parse_model_no_from_text(text)
-            text_data["drawing_no"] = ""
-            text_data["material_code"] = ""
+            text_data["template_id"] = template.get("id", "unknown")
+            text_data["model_no"] = parse_model_no_from_text(text, config)
+            text_data["drawing_no"] = parse_drawing_no_from_text(text, config, template)
+            text_data["material_code"] = text_data["drawing_no"]
             text_data["packaging_spec"] = parse_packaging_from_text(text)
             text_data["length_mm"] = ""
             text_data["bom"] = parse_bom_from_text(text)
-            text_data["products"] = parse_products_from_text(text)
+            text_data["products"] = parse_products_from_text(text, config)
 
             # 从 products 中提取产品名
             if text_data["products"]:
@@ -535,38 +826,47 @@ def extract_hybrid(pdf_path: str, use_vision: bool = True, use_text: bool = True
         except Exception as e:
             print(f"  pdftotext 失败：{e}", file=sys.stderr)
 
-    # Step 2: PDF → PNG (300 DPI)
-    print("[2/4] PDF 转图片 (300 DPI)...", file=sys.stderr)
-    try:
-        images = pdf_to_images(pdf_path, dpi=300)
-        result["pages"] = len(images)
-        print(f"  生成 {len(images)} 张图片", file=sys.stderr)
-    except Exception as e:
-        print(f"  PDF 转图片失败：{e}", file=sys.stderr)
-        images = []
-
-    # Step 3: Vision API（仅兜底）
-    if use_vision and images:
-        print("[3/4] Vision API 提取（兜底）...", file=sys.stderr)
+    images = []
+    need_vision = use_vision and should_use_vision(text_data, config, force_vision=not use_text)
+    if need_vision:
+        print(f"[2/4] PDF 转图片 ({dpi} DPI)...", file=sys.stderr)
         try:
-            images_b64 = [image_to_base64(img) for img in images]
-            vision_data = call_vision_api(images_b64)
+            with tempfile.TemporaryDirectory(prefix="product-doc-reader-") as tmp_dir:
+                images = pdf_to_images(pdf_path, dpi=dpi, output_dir=tmp_dir)
+                result["pages"] = len(images)
+                print(f"  生成 {len(images)} 张图片", file=sys.stderr)
 
-            if "error" in vision_data:
-                print(f"  Vision API 错误：{vision_data['error']}", file=sys.stderr)
-                vision_data = {}
-            else:
-                print(f"  Model No: {vision_data.get('model_no', '未识别')}", file=sys.stderr)
-                print(f"  BOM: {len(vision_data.get('bom', []))} 行", file=sys.stderr)
+                print("[3/4] Vision API 提取（兜底）...", file=sys.stderr)
+                images_b64 = [image_to_base64(img) for img in images]
+                vision_cfg = config.get("vision", {})
+                vision_data = call_vision_api(
+                    images_b64,
+                    provider=vision_cfg.get("provider", "openrouter"),
+                    model=vision_cfg.get("model", "google/gemini-2.5-flash"),
+                    pdf_path=pdf_path,
+                    cache_dir=config.get("cache_dir"),
+                    use_cache=not no_cache,
+                )
+
+                if "error" in vision_data:
+                    print(f"  Vision API 错误：{vision_data['error']}", file=sys.stderr)
+                    vision_data = {}
+                else:
+                    cache_note = " (cache hit)" if vision_data.get("_cache") == "hit" else ""
+                    print(f"  Model No: {vision_data.get('model_no', '未识别')}{cache_note}", file=sys.stderr)
+                    print(f"  BOM: {len(vision_data.get('bom', []))} 行", file=sys.stderr)
         except Exception as e:
-            print(f"  Vision API 失败：{e}", file=sys.stderr)
+            print(f"  PDF 转图片/Vision API 失败：{e}", file=sys.stderr)
+            images = []
     elif not use_vision:
-        print("[3/4] 跳过 Vision API", file=sys.stderr)
+        print("[2/4] 跳过 Vision API", file=sys.stderr)
+    else:
+        print("[2/4] pdftotext 结果达到阈值，跳过 Vision API", file=sys.stderr)
 
     # Step 4: 合并结果（pdftotext 优先）
     print("[4/4] 合并提取结果（pdftotext 优先）...", file=sys.stderr)
 
-    if use_text and use_vision:
+    if use_text and vision_data:
         result = merge_text_and_vision(text_data, vision_data)
         result["extraction_method"] = "hybrid"
     elif use_text:
@@ -579,53 +879,13 @@ def extract_hybrid(pdf_path: str, use_vision: bool = True, use_text: bool = True
     # 补充元数据
     result["source_file"] = os.path.basename(pdf_path)
     result["pages"] = result.get("pages", len(images) if images else 0)
+    result["template_id"] = result.get("template_id") or text_data.get("template_id") or vision_data.get("template_id") or "unknown"
 
     # 字段校验 + 数据质量检查（v5.0）
-    warnings = []
-    
-    # 必填字段检查
-    required_fields = ["product_name", "drawing_no", "packaging_spec"]
-    for field in required_fields:
-        if not result.get(field):
-            warnings.append(f"⚠️ 缺失字段：{field}")
-    
-    # 模具号数据质量检查
-    model_no = result.get("model_no", "")
-    if model_no:
-        if len(model_no) <= 2:
-            warnings.append(f"⚠️ 模具号异常：'{model_no}' (可能识别错误)")
-            result["model_no"] = ""
-        elif not any(c.isdigit() for c in model_no):
-            warnings.append(f"⚠️ 模具号格式异常：'{model_no}' (应包含数字)")
-            result["model_no"] = ""
-    
-    # 产品名数据质量检查
-    product_name = result.get("product_name", "")
-    if product_name and len(product_name) <= 3:
-        warnings.append(f"⚠️ 产品名异常：'{product_name}' (可能识别错误)")
-        result["product_name"] = ""
-    
-    # BOM 检查
-    if not result.get("bom"):
-        warnings.append("⚠️ BOM 物料清单为空")
-    elif len(result.get("bom", [])) < 3:
-        warnings.append(f"⚠️ BOM 行数过少：{len(result.get('bom', []))} 行 (可能提取不完整)")
-
+    confidence, warnings, needs_review = evaluate_quality(result, config)
     result["warnings"] = warnings
-
-    # 计算置信度（带惩罚）
-    checks = sum(1 for f in required_fields if result.get(f))
-    if result.get("bom"):
-        checks += 1
-    
-    base_confidence = (checks / (len(required_fields) + 1)) * 100
-    if warnings:
-        penalty = len(warnings) * 10
-        confidence = max(0, base_confidence - penalty)
-    else:
-        confidence = base_confidence
-    
-    result["confidence"] = round(confidence, 1)
+    result["confidence"] = confidence
+    result["needs_review"] = needs_review
 
     print(f"  置信度：{confidence:.1f}%", file=sys.stderr)
     if warnings:
@@ -735,14 +995,19 @@ def to_markdown(data: dict) -> str:
 def main():
     parser = argparse.ArgumentParser(description="产品图纸混合提取器 v5.0（pdftotext 优先）")
     parser.add_argument("pdf_path", help="PDF 文件路径")
-    parser.add_argument("-o", "--output-dir", default="./output")
-    parser.add_argument("-f", "--format", choices=["json", "md", "both"], default="both")
+    parser.add_argument("-o", "--output-dir", default=None)
+    parser.add_argument("-f", "--format", choices=["json", "md", "both"], default=None)
+    parser.add_argument("--config", help="配置文件路径")
     parser.add_argument("--vision-only", action="store_true", help="仅用 Vision API")
     parser.add_argument("--text-only", action="store_true", help="仅用 pdftotext")
     parser.add_argument("--dpi", type=int, default=300, help="OCR DPI（默认 300）")
+    parser.add_argument("--no-cache", action="store_true", help="禁用 Vision 缓存")
     parser.add_argument("--stdout", action="store_true")
 
     args = parser.parse_args()
+    config = load_config(args.config)
+    output_format = args.format or config.get("format", "both")
+    output_dir = args.output_dir or config.get("output_dir", "./output")
 
     if not os.path.exists(args.pdf_path):
         print(f"❌ 文件不存在：{args.pdf_path}", file=sys.stderr)
@@ -756,27 +1021,34 @@ def main():
         sys.exit(1)
 
     # 提取
-    data = extract_hybrid(args.pdf_path, use_vision=use_vision, use_text=use_text)
+    data = extract_hybrid(
+        args.pdf_path,
+        use_vision=use_vision,
+        use_text=use_text,
+        config=config,
+        dpi=args.dpi,
+        no_cache=args.no_cache,
+    )
 
     # 输出
     if args.stdout:
-        if args.format in ("json", "both"):
+        if output_format in ("json", "both"):
             print(json.dumps(data, ensure_ascii=False, indent=2))
-        if args.format in ("md", "both"):
+        if output_format in ("md", "both"):
             print(to_markdown(data))
         return
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     stem = Path(args.pdf_path).stem
 
-    if args.format in ("json", "both"):
-        json_path = os.path.join(args.output_dir, f"{stem}.json")
+    if output_format in ("json", "both"):
+        json_path = os.path.join(output_dir, f"{stem}.json")
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"✅ JSON: {json_path}", file=sys.stderr)
 
-    if args.format in ("md", "both"):
-        md_path = os.path.join(args.output_dir, f"{stem}.md")
+    if output_format in ("md", "both"):
+        md_path = os.path.join(output_dir, f"{stem}.md")
         with open(md_path, "w", encoding="utf-8") as f:
             f.write(to_markdown(data))
         print(f"✅ Markdown: {md_path}", file=sys.stderr)

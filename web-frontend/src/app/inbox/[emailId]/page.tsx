@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   BattleBadge,
   BattleText,
@@ -15,6 +15,18 @@ import {
   type BattleTone,
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
+import {
+  chineseEmailTranslation,
+  localizedAnalysisPoint,
+  localizedExpectedOutcome,
+  localizedIntent,
+  localizedKeyMetricValue,
+  localizedReplyOutline,
+  localizedReplySubtitle,
+  localizedReplyTitle,
+  localizedSentiment,
+  localizedUrgency,
+} from "@/lib/inbox-i18n";
 import { useProject } from "@/lib/project";
 import type { InboundEmail, ReplyOption } from "@/types/inbox";
 
@@ -26,12 +38,6 @@ interface FullEmail {
 
 interface PageProps {
   params: Promise<{ emailId: string }>;
-}
-
-function riskTone(value?: string): BattleTone {
-  if (value === "high") return "red";
-  if (value === "medium") return "amber";
-  return "emerald";
 }
 
 function stateLabel(value: string, language: "en" | "zh") {
@@ -52,11 +58,13 @@ function stateLabel(value: string, language: "en" | "zh") {
 export default function InboxFocusPage({ params }: PageProps) {
   const { emailId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { apiUrl } = useProject();
   const language = useBattleLanguage();
+  const requestedStyle = searchParams.get("style");
   const [email, setEmail] = useState<InboundEmail | null>(null);
   const [selectedOption, setSelectedOption] = useState<ReplyOption | null>(null);
-  const [fullEmail, setFullEmail] = useState<FullEmail | null>(null);
+  const [draftsByOptionId, setDraftsByOptionId] = useState<Record<string, FullEmail>>({});
   const [editedBody, setEditedBody] = useState("");
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -73,6 +81,7 @@ export default function InboxFocusPage({ params }: PageProps) {
         const json = await res.json();
         if (!json.success) throw new Error(json.error || "Email not found");
         setEmail(json.data);
+        setSelectedOption(json.data.options?.[0] || null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Email not found");
       } finally {
@@ -82,21 +91,73 @@ export default function InboxFocusPage({ params }: PageProps) {
     load();
   }, [apiUrl, emailId]);
 
-  const selectOption = useCallback(async (option: ReplyOption) => {
+  const fullEmail = selectedOption ? draftsByOptionId[selectedOption.id] || null : null;
+  const draftOptions = useMemo(() => email?.options || [], [email?.options]);
+
+  useEffect(() => {
+    if (!email?.id || draftOptions.length === 0) return;
+    const emailIdForDrafts = email.id;
+    let cancelled = false;
+    async function prepareDrafts() {
+      setGenerating(true);
+      setState("ai-generating");
+      try {
+        const prepared = await Promise.all(
+          draftOptions.map(async (option) => {
+            const res = await fetch(apiUrl(`/api/inbox/${emailIdForDrafts}/select`), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ style: option.style }),
+            });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.error || "Draft generation failed");
+            return [option.id, json.full_email] as const;
+          })
+        );
+        if (!cancelled) {
+          setDraftsByOptionId(Object.fromEntries(prepared));
+          const preparedDrafts = Object.fromEntries(prepared);
+          const requested = draftOptions.find((option) => option.style === requestedStyle);
+          const initial = requested || draftOptions[0] || null;
+          setSelectedOption(initial);
+          setEditedBody(initial ? preparedDrafts[initial.id]?.body || "" : "");
+          setState("human-review");
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Draft generation failed");
+          setState("error");
+        }
+      } finally {
+        if (!cancelled) setGenerating(false);
+      }
+    }
+    prepareDrafts();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiUrl, draftOptions, email?.id, requestedStyle]);
+
+  const selectOption = useCallback((option: ReplyOption) => {
     setSelectedOption(option);
-    setFullEmail(null);
-    setEditedBody("");
+    const draft = draftsByOptionId[option.id];
+    setEditedBody(draft?.body || "");
+    setState(draft ? "human-review" : "ai-generating");
+  }, [draftsByOptionId]);
+
+  const regenerateSelected = useCallback(async () => {
+    if (!selectedOption) return;
     setGenerating(true);
     setState("ai-generating");
     try {
       const res = await fetch(apiUrl(`/api/inbox/${emailId}/select`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ style: option.style }),
+        body: JSON.stringify({ style: selectedOption.style }),
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Draft generation failed");
-      setFullEmail(json.full_email);
+      setDraftsByOptionId((current) => ({ ...current, [selectedOption.id]: json.full_email }));
       setEditedBody(json.full_email.body);
       setState("human-review");
     } catch (err) {
@@ -105,7 +166,12 @@ export default function InboxFocusPage({ params }: PageProps) {
     } finally {
       setGenerating(false);
     }
-  }, [apiUrl, emailId]);
+  }, [apiUrl, emailId, selectedOption]);
+
+  const optionOutlines = useMemo(
+    () => selectedOption ? localizedReplyOutline(selectedOption, language) : [],
+    [language, selectedOption]
+  );
 
   async function approveSend() {
     if (!email || !selectedOption || !fullEmail) return;
@@ -180,18 +246,25 @@ export default function InboxFocusPage({ params }: PageProps) {
               <p className="text-sm font-semibold text-slate-100">{email.from_name}</p>
               <p className="font-mono text-[10px] text-slate-500">{email.from_email}</p>
             </div>
-            <pre className="max-h-[calc(100vh-190px)] overflow-y-auto whitespace-pre-wrap rounded-md border border-slate-800 bg-slate-950/60 px-3 py-3 text-xs leading-6 text-slate-300">
-              {email.body_text}
-            </pre>
+            <div className="max-h-[calc(100vh-190px)] overflow-y-auto rounded-md border border-slate-800 bg-slate-950/60">
+              <div className="border-b border-slate-800 px-3 py-3">
+                <p className="mb-2 text-[10px] uppercase tracking-wide text-slate-500"><BattleText en="Original" zh="原文" /></p>
+                <pre className="whitespace-pre-wrap text-xs leading-6 text-slate-300">{email.body_text}</pre>
+              </div>
+              <div className="px-3 py-3">
+                <p className="mb-2 text-[10px] uppercase tracking-wide text-slate-500"><BattleText en="Chinese Translation" zh="中文译文" /></p>
+                <pre className="whitespace-pre-wrap text-xs leading-6 text-slate-300">{chineseEmailTranslation(email)}</pre>
+              </div>
+            </div>
           </div>
         </BattlePanel>
 
         <BattlePanel title={language === "zh" ? "SSA 交易分析" : "SSA Deal Analysis"} meta={email.analysis?.customer_level || (language === "zh" ? "分析" : "analysis")}>
           <div className="space-y-3 p-3">
             <div className="flex flex-wrap gap-2">
-              <BattleBadge tone={email.analysis?.urgency === "high" ? "red" : "amber"}>{email.analysis?.urgency || "urgency"}</BattleBadge>
-              <BattleBadge tone="purple">{email.analysis?.intent || "intent"}</BattleBadge>
-              <BattleBadge tone="blue">{email.analysis?.sentiment || "sentiment"}</BattleBadge>
+              <BattleBadge tone={email.analysis?.urgency === "high" ? "red" : "amber"}>{localizedUrgency(email.analysis?.urgency, language)}</BattleBadge>
+              <BattleBadge tone="purple">{localizedIntent(email.analysis?.intent, language)}</BattleBadge>
+              <BattleBadge tone="blue">{localizedSentiment(email.analysis?.sentiment, language)}</BattleBadge>
             </div>
             <div className="rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-slate-500">
@@ -199,7 +272,7 @@ export default function InboxFocusPage({ params }: PageProps) {
               </p>
               <ul className="mt-2 space-y-2 text-xs text-slate-300">
                 {(email.analysis?.key_points || []).map((point) => (
-                  <li key={point} className="border-l border-slate-700 pl-2">{point}</li>
+                  <li key={point} className="border-l border-slate-700 pl-2">{localizedAnalysisPoint(point, language)}</li>
                 ))}
               </ul>
             </div>
@@ -216,15 +289,15 @@ export default function InboxFocusPage({ params }: PageProps) {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-slate-100">{option.title}</p>
-                    <BattleBadge tone={riskTone(option.risk_level)}>{option.risk_level}</BattleBadge>
+                    <p className="text-sm font-semibold text-slate-100">{localizedReplyTitle(option, language)}</p>
+                    {selectedOption?.id === option.id && <BattleBadge tone="emerald"><BattleText en="Selected" zh="已选" /></BattleBadge>}
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">{option.subtitle}</p>
+                  <p className="mt-1 text-xs text-slate-500">{localizedReplySubtitle(option, language)}</p>
                   <div className="mt-2 grid grid-cols-2 gap-2 font-mono text-[10px] text-slate-500">
-                    <span>discount {option.key_metrics.discount}</span>
-                    <span>margin {option.key_metrics.margin}</span>
-                    <span>lead {option.key_metrics.lead_time}</span>
-                    <span>{option.key_metrics.special}</span>
+                    <span><BattleText en="discount" zh="让利" /> {localizedKeyMetricValue("discount", option.key_metrics.discount, language)}</span>
+                    <span><BattleText en="margin" zh="毛利" /> {localizedKeyMetricValue("margin", option.key_metrics.margin, language)}</span>
+                    <span><BattleText en="lead" zh="交期" /> {localizedKeyMetricValue("lead_time", option.key_metrics.lead_time, language)}</span>
+                    <span>{localizedKeyMetricValue("special", option.key_metrics.special, language)}</span>
                   </div>
                 </button>
               ))}
@@ -238,9 +311,9 @@ export default function InboxFocusPage({ params }: PageProps) {
         >
           <div className="flex h-full min-h-[calc(100vh-125px)] flex-col p-3">
             {!selectedOption ? (
-              <EmptyState label={language === "zh" ? "请选择一种回复方式来生成草稿" : "select a reply approach to draft"} />
+              <EmptyState label={language === "zh" ? "请选择一种回复方式" : "select a reply approach"} />
             ) : generating ? (
-              <EmptyState label={language === "zh" ? "SSA 正在起草" : "SSA is drafting"} />
+              <EmptyState label={language === "zh" ? "Jaden 正在准备三种回复文案" : "Jaden is preparing all three reply drafts"} />
             ) : !fullEmail ? (
               <EmptyState label={language === "zh" ? "还没有生成草稿" : "no draft generated"} />
             ) : (
@@ -248,6 +321,13 @@ export default function InboxFocusPage({ params }: PageProps) {
                 <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
                   <p className="text-[10px] uppercase tracking-wide text-slate-500"><BattleText en="Subject" zh="主题" /></p>
                   <p className="mt-1 text-sm text-slate-100">{fullEmail.subject}</p>
+                </div>
+                <div className="mt-3 rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
+                  <p className="text-xs font-semibold text-slate-100">{localizedReplyTitle(selectedOption, language)}</p>
+                  <p className="mt-1 text-xs text-slate-500">{localizedExpectedOutcome(selectedOption, language)}</p>
+                  <ul className="mt-2 space-y-1 text-xs text-slate-300">
+                    {optionOutlines.map((point) => <li key={point} className="border-l border-slate-700 pl-2">{point}</li>)}
+                  </ul>
                 </div>
                 <TextAreaField
                   value={editedBody}
@@ -265,7 +345,7 @@ export default function InboxFocusPage({ params }: PageProps) {
                     {sending ? <BattleText en="Processing" zh="处理中" /> : <BattleText en="Approve & Send" zh="批准并发送" />}
                   </CommandButton>
                   <CommandButton variant="secondary" onClick={() => setState("draft-saved")}><BattleText en="Save Draft" zh="保存草稿" /></CommandButton>
-                  <CommandButton variant="ghost" onClick={() => selectedOption && selectOption(selectedOption)}><BattleText en="Regenerate" zh="重新生成" /></CommandButton>
+                  <CommandButton variant="ghost" onClick={regenerateSelected}><BattleText en="Regenerate" zh="重新生成" /></CommandButton>
                   <CommandButton variant="danger" onClick={() => setState("rejected-by-wilson")}><BattleText en="Reject" zh="拒绝" /></CommandButton>
                 </div>
               </>

@@ -44,7 +44,13 @@ interface CompetitorEvent {
   company: string;
   type: string;
   title: string;
+  titleZh?: string;
+  zhTitle?: string;
+  title_cn?: string;
   detail: string;
+  detailZh?: string;
+  zhDetail?: string;
+  detail_cn?: string;
   time: string;
   publishTime?: string;
   url?: string;
@@ -57,6 +63,8 @@ interface Alert {
   message: string;
   time: string;
   change?: string;
+  source?: string;
+  url?: string;
 }
 
 function impactTone(value?: string): BattleTone {
@@ -79,6 +87,63 @@ function formatTime(value?: string) {
   });
 }
 
+function localizedCompetitorType(type: string | undefined, language: "en" | "zh") {
+  const value = type || "event";
+  if (language !== "zh") return value;
+  const labels: Record<string, string> = {
+    disclosure: "企业披露",
+    market: "市场动态",
+    product: "产品动态",
+    price: "价格动态",
+    factory: "产能动态",
+    official_newsroom: "官方动态",
+    event: "动态",
+  };
+  return labels[value] || "竞品动态";
+}
+
+function field(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function localizeCompetitor(item: CompetitorEvent, language: "en" | "zh") {
+  if (language !== "zh") return { title: item.title, detail: item.detail };
+  return {
+    title: field(item.titleZh) || field(item.zhTitle) || field(item.title_cn) || item.title,
+    detail: field(item.detailZh) || field(item.zhDetail) || field(item.detail_cn) || item.detail,
+  };
+}
+
+function isExternalUrl(value?: string) {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function SourceLink({ href, language, compact = false }: { href?: string; language: "en" | "zh"; compact?: boolean }) {
+  if (!isExternalUrl(href)) return null;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="shrink-0 rounded border border-slate-700 px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-slate-300 transition hover:border-emerald-400 hover:text-emerald-300"
+    >
+      {compact ? (language === "zh" ? "打开来源" : "Open Source") : (language === "zh" ? "打开资讯" : "Open Source")}
+    </a>
+  );
+}
+
+function alertSourceUrl(alert: Alert) {
+  if (alert.id === "copper-price") return "https://finance.yahoo.com/quote/HG=F/";
+  if (alert.id === "usd-cny") return "https://www.xe.com/currencyconverter/convert/?Amount=1&From=USD&To=CNY";
+  return alert.url;
+}
+
 export default function IntelligencePage() {
   const language = useBattleLanguage();
   const [insights, setInsights] = useState<Insight[]>([]);
@@ -87,6 +152,7 @@ export default function IntelligencePage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [updatedAt, setUpdatedAt] = useState("");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -123,6 +189,21 @@ export default function IntelligencePage() {
     load();
   }, [load]);
 
+  const refreshExternalIntel = useCallback(async () => {
+    setRefreshing(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/intelligence/refresh", { method: "POST" });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || "Failed to refresh intelligence");
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to refresh intelligence");
+    } finally {
+      setRefreshing(false);
+    }
+  }, [load]);
+
   return (
     <BattlePageShell>
       <BattlePageHeader
@@ -135,7 +216,10 @@ export default function IntelligencePage() {
         <BattleBadge tone={loading ? "blue" : "purple"} pulse={loading}>
           {loading ? <BattleText en="SCAN" zh="扫描" /> : <BattleText en="INTEL" zh="情报" />}
         </BattleBadge>
-        <CommandButton variant="ghost" onClick={load}><BattleText en="Refresh" zh="刷新" /></CommandButton>
+        <CommandButton variant="ghost" onClick={load} disabled={loading || refreshing}><BattleText en="Reload" zh="重载" /></CommandButton>
+        <CommandButton variant="secondary" onClick={refreshExternalIntel} disabled={loading || refreshing}>
+          {refreshing ? <BattleText en="Collecting" zh="采集中" /> : <BattleText en="Refresh News" zh="刷新新闻" />}
+        </CommandButton>
       </BattlePageHeader>
 
       <BattlePageBody className="space-y-3">
@@ -151,7 +235,7 @@ export default function IntelligencePage() {
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_420px]">
           <BattlePanel
             title={language === "zh" ? "AI 情报摘要" : "AI Insights"}
-            meta={language === "zh" ? "市场判断与建议" : "reasoning summaries"}
+            meta={language === "zh" ? "市场影响摘要" : "market impact summaries"}
           >
             {insights.length === 0 ? (
               <EmptyState label={language === "zh" ? (loading ? "正在读取情报摘要" : "没有情报摘要") : (loading ? "loading insight feed" : "no insights found")} />
@@ -172,7 +256,7 @@ export default function IntelligencePage() {
 
           <BattlePanel
             title={language === "zh" ? "风险提醒" : "Alerts"}
-            meta={language === "zh" ? "需要 Wilson 关注" : "operator attention"}
+            meta={language === "zh" ? "成本、汇率与来源状态" : "cost, FX, and source status"}
           >
             {alerts.length === 0 ? (
               <EmptyState label={language === "zh" ? "暂无风险提醒" : "no active alerts"} />
@@ -185,7 +269,12 @@ export default function IntelligencePage() {
                       <BattleBadge tone={impactTone(alert.type)}>{alert.type}</BattleBadge>
                     </div>
                     <p className="mt-1 text-xs text-slate-400">{localizeMarketNewsText(alert.message, language)}</p>
-                    <p className="mt-1 font-mono text-[10px] text-slate-600">{formatTime(alert.time)} {alert.change || ""}</p>
+                    <div className="mt-1 flex items-center justify-between gap-3">
+                      <p className="min-w-0 truncate font-mono text-[10px] text-slate-600">
+                        {[alert.source, formatTime(alert.time), alert.change].filter(Boolean).join(" / ")}
+                      </p>
+                      <SourceLink href={alertSourceUrl(alert)} language={language} compact />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -211,7 +300,10 @@ export default function IntelligencePage() {
                         <BattleBadge tone="blue">{localizeNewsTag(item.tag, language)}</BattleBadge>
                       </div>
                       <p className="mt-1 line-clamp-2 text-xs text-slate-400">{localized.summary}</p>
-                      <p className="mt-1 font-mono text-[10px] text-slate-600">{item.source || "-"} / {formatTime(item.publishTime || item.time)}</p>
+                      <div className="mt-1 flex items-center justify-between gap-3">
+                        <p className="min-w-0 truncate font-mono text-[10px] text-slate-600">{item.source || "-"} / {formatTime(item.publishTime || item.time)}</p>
+                        <SourceLink href={item.url} language={language} />
+                      </div>
                     </div>
                   );
                 })}
@@ -227,19 +319,25 @@ export default function IntelligencePage() {
               <EmptyState label={language === "zh" ? (loading ? "正在读取竞品动态" : "没有竞品动态") : (loading ? "loading competitor feed" : "no competitor mentions")} />
             ) : (
               <div className="max-h-[520px] divide-y divide-slate-800 overflow-y-auto">
-                {competitors.slice(0, 30).map((item) => (
-                  <div key={item.id || `${item.company}-${item.title}`} className="px-3 py-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-semibold text-slate-100">{item.company}</p>
-                        <p className="mt-0.5 text-xs text-slate-300">{item.title}</p>
+                {competitors.slice(0, 30).map((item) => {
+                  const localized = localizeCompetitor(item, language);
+                  return (
+                    <div key={item.id || `${item.company}-${item.title}`} className="px-3 py-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-semibold text-slate-100">{item.company}</p>
+                          <p className="mt-0.5 text-xs text-slate-300">{localized.title}</p>
+                        </div>
+                        <BattleBadge tone="purple">{localizedCompetitorType(item.type, language)}</BattleBadge>
                       </div>
-                      <BattleBadge tone="purple">{item.type || "event"}</BattleBadge>
+                      <p className="mt-1 line-clamp-2 text-xs text-slate-400">{localized.detail}</p>
+                      <div className="mt-1 flex items-center justify-between gap-3">
+                        <p className="min-w-0 truncate font-mono text-[10px] text-slate-600">{formatTime(item.publishTime || item.time)}</p>
+                        <SourceLink href={item.url} language={language} />
+                      </div>
                     </div>
-                    <p className="mt-1 line-clamp-2 text-xs text-slate-400">{item.detail}</p>
-                    <p className="mt-1 font-mono text-[10px] text-slate-600">{formatTime(item.publishTime || item.time)}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </BattlePanel>

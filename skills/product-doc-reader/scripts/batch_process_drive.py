@@ -1,310 +1,335 @@
 #!/usr/bin/env python3
 """
-批量处理 Google Drive 中的产品图纸，提取信息并归档到知识库
+Batch process product drawing PDFs with resume support and review splitting.
 
-用法：
-  python3 batch_process_drive.py --drive-folder-id <folder_id> --output-dir <knowledge_base_path>
+Examples:
+  python3 scripts/batch_process_drive.py --input-dir ./drawings --output-dir ./output --resume
+  python3 scripts/batch_process_drive.py --drive-folder-id <folder_id> --output-dir ./output --resume
 """
 
 import argparse
 import json
-import os
+import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
-from datetime import datetime
+from typing import Iterable
 
-# 配置
-WORKSPACE = "/path/to/your/.openclaw/workspace"
-TEMP_DIR = Path(WORKSPACE + "/temp/599-batch")
-KB_DIR = Path(WORKSPACE + "/obsidian-vault/Your Company 知识库/02-产品目录/599 系列")
+SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_DIR = SCRIPT_DIR.parent
+EXTRACT_SCRIPT = SCRIPT_DIR / "extract_hybrid.py"
+DEFAULT_STATE_FILE = ".product-doc-reader-state.json"
 
-# 599 系列所有 PDF 文件 ID（共 58 个）
-PDF_FILES = {
-    "599-001": "file_id_here",
-    "599-002": "file_id_here",
-    # ... 需要完整的 58 个文件 ID
-}
 
-def get_drive_files(folder_id: str) -> dict:
-    """从 Google Drive 获取文件夹中的所有 PDF 文件"""
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def read_json(path: Path, fallback):
+    try:
+        if not path.exists():
+            return fallback
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return fallback
+
+
+def write_json(path: Path, data) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def get_drive_files(folder_id: str) -> dict[str, str]:
+    """Return {drawing_no: file_id} for PDFs in a Google Drive folder."""
     cmd = ["gog", "drive", "ls", "--parent", folder_id]
     result = subprocess.run(cmd, capture_output=True, text=True)
-    
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or "gog drive ls failed")
+
     files = {}
-    for line in result.stdout.split('\n'):
-        if '.pdf' in line.lower():
-            parts = line.split()
-            if len(parts) >= 2:
-                file_id = parts[0]
-                file_name = parts[1]
-                if file_name.endswith('.pdf'):
-                    drawing_no = file_name.replace('.pdf', '')
-                    files[drawing_no] = file_id
-    
+    for line in result.stdout.splitlines():
+        if ".pdf" not in line.lower():
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        file_id = parts[0]
+        file_name = parts[1]
+        if file_name.lower().endswith(".pdf"):
+            files[Path(file_name).stem] = file_id
     return files
 
+
 def download_file(file_id: str, output_path: Path) -> bool:
-    """下载单个文件"""
+    """Download a Google Drive file through gog."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["gog", "drive", "download", file_id]
     result = subprocess.run(cmd, capture_output=True, text=True)
-    
-    for line in result.stdout.split('\n'):
-        if line.startswith('path'):
-            downloaded_path = line.split('\t')[1].strip()
-            subprocess.run(["mv", downloaded_path, str(output_path)], check=True)
+    if result.returncode != 0:
+        return False
+
+    for line in result.stdout.splitlines():
+        if line.startswith("path"):
+            downloaded_path = Path(line.split("\t")[1].strip())
+            shutil.move(str(downloaded_path), str(output_path))
             return True
     return False
 
-def extract_drawing_info(pdf_path: Path) -> dict:
-    """用 product-doc-reader 提取图纸信息"""
-    script_path = Path(WORKSPACE + "/skills/product-doc-reader/scripts/extract_hybrid.py")
-    
-    cmd = [
-        "python3", str(script_path),
-        str(pdf_path),
-        "--stdout", "-f", "json"
-    ]
-    
+
+def extract_drawing_info(pdf_path: Path, config_path: Path | None = None, no_cache: bool = False) -> dict:
+    """Run the product-doc-reader extractor and return JSON data."""
+    cmd = [sys.executable, str(EXTRACT_SCRIPT), str(pdf_path), "--stdout", "-f", "json"]
+    if config_path:
+        cmd.extend(["--config", str(config_path)])
+    if no_cache:
+        cmd.append("--no-cache")
+
     result = subprocess.run(cmd, capture_output=True, text=True)
-    
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or "extract_hybrid.py failed")
+
     try:
-        # 解析 JSON（跳过 stderr）
-        json_str = result.stdout.strip()
-        if json_str.startswith('{'):
-            return json.loads(json_str)
-    except Exception as e:
-        print(f"  ⚠️ JSON 解析失败：{e}")
-    
-    return {}
+        return json.loads(result.stdout.strip())
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"JSON parse failed: {exc}") from exc
 
-def create_kb_entry(drawing_data: dict, output_dir: Path) -> Path:
-    """创建知识库条目"""
-    drawing_no = drawing_data.get("drawing_no", "unknown")
-    product_name = drawing_data.get("product_name", "未知产品")
-    model_no = drawing_data.get("model_no", "")
-    
-    # 创建 Markdown 文档
-    md_content = f"""# {drawing_no} - {product_name}
 
-> 📅 **提取日期：** {datetime.now().strftime('%Y-%m-%d')}  
-> 📐 **模具编号 (Model No.)：** {model_no or '未标注'}  
-> 📋 **Drawing No.：** {drawing_no}  
-> 🏭 **公司：** {drawing_data.get('company', '珠海福睿电子 FARREACH')}
+def is_review_item(data: dict, confidence_threshold: int) -> bool:
+    return (
+        float(data.get("confidence") or 0) < confidence_threshold
+        or bool(data.get("needs_review"))
+        or bool(data.get("warnings"))
+    )
 
----
 
-## 📊 基本信息
+def output_stem(pdf_path: Path, data: dict) -> str:
+    drawing_no = str(data.get("drawing_no") or "").strip()
+    if drawing_no:
+        return drawing_no.replace("/", "_")
+    return pdf_path.stem
 
-| 项目 | 内容 |
-|------|------|
-| **客人品名** | {product_name} |
-| **模具编号** | {model_no or '—'} |
-| **Drawing No.** | {drawing_no} |
-| **包装规范** | {drawing_data.get('packaging_spec', '—')} |
-| **长度 (mm)** | {drawing_data.get('length_mm', '—')} |
 
----
+def write_outputs(data: dict, pdf_path: Path, output_dir: Path, confidence_threshold: int) -> dict:
+    bucket = "review" if is_review_item(data, confidence_threshold) else "accepted"
+    bucket_dir = output_dir / bucket
+    bucket_dir.mkdir(parents=True, exist_ok=True)
+    stem = output_stem(pdf_path, data)
+    json_path = bucket_dir / f"{stem}.json"
+    write_json(json_path, data)
+    return {
+        "bucket": bucket,
+        "json_path": str(json_path),
+    }
 
-## 🔧 BOM 物料清单
 
-| NO. | 部件名称 | 规格 | 用量 |
-|-----|----------|------|------|
-"""
-    
-    # 添加 BOM 行
-    for row in drawing_data.get("bom", [])[:20]:  # 限制 20 行
-        md_content += f"| {row.get('no', '')} | {row.get('part_name', '')} | {row.get('spec', '')} | {row.get('quantity', '')} |\n"
-    
-    # 添加测试要求
-    tests = drawing_data.get("test_requirements", {})
-    if tests:
-        md_content += f"""
----
+def initial_state() -> dict:
+    return {
+        "version": 1,
+        "updated_at": now_iso(),
+        "files": {},
+    }
 
-## 🧪 测试要求
 
-"""
-        test_table = tests.get("table", [])
-        if test_table:
-            md_content += "| 长度范围 | 导通阻抗 | 绝缘阻抗 | DC V/S |\n|----------|----------|----------|--------|\n"
-            for t in test_table:
-                md_content += f"| {t.get('length_range', '')} | {t.get('resistance', '')} | {t.get('insulation', '')} | {t.get('dc_vs', '')} |\n"
-        
-        other_tests = tests.get("other_tests", [])
-        if other_tests:
-            for t in other_tests:
-                md_content += f"- {t}\n"
-    
-    # 添加模具信息
-    mold_info = drawing_data.get("mold_info", "")
-    if mold_info:
-        md_content += f"""
----
+def state_key(pdf_path: Path) -> str:
+    return str(pdf_path.resolve())
 
-## 🏗️ 模具信息
 
-{mold_info}
-"""
-    
-    # 添加注意事项
-    notes = drawing_data.get("notes", [])
-    if notes:
-        md_content += f"""
----
+def find_existing_state(files_state: dict, pdf_path: Path) -> tuple[str, dict]:
+    """Find state by current canonical key or older raw-path keys."""
+    candidates = [
+        state_key(pdf_path),
+        str(pdf_path),
+        str(pdf_path.absolute()),
+    ]
+    for candidate in candidates:
+        if candidate in files_state:
+            return candidate, files_state[candidate]
+    return candidates[0], {}
 
-## ⚠️ 注意事项
 
-"""
-        for note in notes:
-            md_content += f"- {note}\n"
-    
-    # 添加变更记录
-    revs = drawing_data.get("revision_history", [])
-    if revs:
-        md_content += f"""
----
-
-## 📝 变更记录
-
-| 版本 | 日期 | 内容 |
-|------|------|------|
-"""
-        for r in revs:
-            md_content += f"| {r.get('revision', '')} | {r.get('date', '')} | {r.get('description', '')} |\n"
-    
-    md_content += f"""
----
-
-*本文档由 Product Doc Reader v4.0 自动提取*
-"""
-    
-    # 保存文件
+def process_local_pdfs(
+    pdf_paths: Iterable[Path],
+    output_dir: Path,
+    state_path: Path,
+    confidence_threshold: int = 80,
+    resume: bool = True,
+    force: bool = False,
+    config_path: Path | None = None,
+    no_cache: bool = False,
+) -> dict:
+    """Process local PDFs, recording resumable status and accepted/review outputs."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    md_path = output_dir / f"{drawing_no}.md"
-    with open(md_path, 'w', encoding='utf-8') as f:
-        f.write(md_content)
-    
-    return md_path
+    state = read_json(state_path, initial_state())
+    files_state = state.setdefault("files", {})
+
+    summary = {
+        "total": 0,
+        "processed": 0,
+        "skipped": 0,
+        "accepted": 0,
+        "review": 0,
+        "failed": 0,
+    }
+
+    for raw_path in pdf_paths:
+        pdf_path = Path(raw_path)
+        key, existing = find_existing_state(files_state, pdf_path)
+        summary["total"] += 1
+
+        if resume and not force and existing.get("status") == "success":
+            summary["skipped"] += 1
+            continue
+
+        try:
+            data = extract_drawing_info(pdf_path, config_path=config_path, no_cache=no_cache)
+            output = write_outputs(data, pdf_path, output_dir, confidence_threshold)
+            bucket = output["bucket"]
+            summary["processed"] += 1
+            summary[bucket] += 1
+            files_state[key] = {
+                "status": "success",
+                "bucket": bucket,
+                "output_path": output["json_path"],
+                "confidence": data.get("confidence"),
+                "warnings": data.get("warnings", []),
+                "updated_at": now_iso(),
+            }
+        except Exception as exc:
+            summary["failed"] += 1
+            files_state[key] = {
+                "status": "failed",
+                "error": str(exc),
+                "updated_at": now_iso(),
+            }
+        finally:
+            state["updated_at"] = now_iso()
+            write_json(state_path, state)
+
+    write_summary_report(output_dir, summary, state)
+    return summary
+
+
+def write_summary_report(output_dir: Path, summary: dict, state: dict) -> Path:
+    report_path = output_dir / "batch-summary.md"
+    successful = [
+        (path, info)
+        for path, info in state.get("files", {}).items()
+        if info.get("status") == "success"
+    ]
+    failed = [
+        (path, info)
+        for path, info in state.get("files", {}).items()
+        if info.get("status") == "failed"
+    ]
+    review = [
+        (path, info)
+        for path, info in state.get("files", {}).items()
+        if info.get("bucket") == "review"
+    ]
+    accepted = [
+        (path, info)
+        for path, info in successful
+        if info.get("bucket") == "accepted"
+    ]
+
+    lines = [
+        "# Product Doc Reader Batch Summary",
+        "",
+        f"- Updated: {state.get('updated_at', now_iso())}",
+        "",
+        "## Current State",
+        "",
+        f"- Current Success: {len(successful)}",
+        f"- Current Accepted: {len(accepted)}",
+        f"- Current Review: {len(review)}",
+        f"- Current Failed: {len(failed)}",
+        "",
+        "## This Run",
+        "",
+        f"- Total: {summary['total']}",
+        f"- Processed: {summary['processed']}",
+        f"- Skipped: {summary['skipped']}",
+        f"- Accepted: {summary['accepted']}",
+        f"- Review: {summary['review']}",
+        f"- Failed: {summary['failed']}",
+        "",
+        "## Review Items",
+        "",
+    ]
+    if review:
+        for path, info in review:
+            reason = "; ".join(info.get("warnings", [])) or f"confidence {info.get('confidence')}"
+            lines.append(f"- `{Path(path).name}`: {reason}")
+    else:
+        lines.append("- None")
+
+    lines.extend(["", "## Failed Items", ""])
+    if failed:
+        for path, info in failed:
+            lines.append(f"- `{Path(path).name}`: {info.get('error', 'unknown error')}")
+    else:
+        lines.append("- None")
+
+    report_path.write_text("\n".join(lines), encoding="utf-8")
+    return report_path
+
+
+def collect_input_pdfs(input_dir: Path, limit: int = 0) -> list[Path]:
+    pdfs = sorted(input_dir.glob("*.pdf"))
+    return pdfs[:limit] if limit > 0 else pdfs
+
+
+def collect_drive_pdfs(folder_id: str, temp_dir: Path, limit: int = 0) -> list[Path]:
+    files = get_drive_files(folder_id)
+    items = list(files.items())[:limit] if limit > 0 else list(files.items())
+    pdf_paths = []
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    for drawing_no, file_id in items:
+        pdf_path = temp_dir / f"{drawing_no}.pdf"
+        if pdf_path.exists() or download_file(file_id, pdf_path):
+            pdf_paths.append(pdf_path)
+    return pdf_paths
+
 
 def main():
-    parser = argparse.ArgumentParser(description="批量处理产品图纸并归档到知识库")
-    parser.add_argument("--drive-folder-id", required=True, help="Google Drive 文件夹 ID")
-    parser.add_argument("--output-dir", default=str(KB_DIR), help="知识库输出目录")
-    parser.add_argument("--temp-dir", default=str(TEMP_DIR), help="临时目录")
+    parser = argparse.ArgumentParser(description="批量处理产品图纸并分离待复核结果")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--input-dir", help="本地 PDF 目录")
+    source.add_argument("--drive-folder-id", help="Google Drive 文件夹 ID")
+    parser.add_argument("--output-dir", required=True, help="输出目录")
+    parser.add_argument("--temp-dir", default=".product-doc-reader-tmp", help="Drive 下载临时目录")
+    parser.add_argument("--state-file", default=None, help="断点状态文件")
+    parser.add_argument("--confidence-threshold", type=int, default=80)
+    parser.add_argument("--config", help="extract_hybrid 配置文件")
     parser.add_argument("--limit", type=int, default=0, help="限制处理数量（0=全部）")
-    
+    parser.add_argument("--resume", action="store_true", help="跳过已成功项目")
+    parser.add_argument("--force", action="store_true", help="重新处理已成功项目")
+    parser.add_argument("--no-cache", action="store_true", help="禁用 Vision 缓存")
+
     args = parser.parse_args()
-    
-    print(f"=== 批量处理产品图纸 ===")
-    print(f"Drive 文件夹：{args.drive_folder_id}")
-    print(f"知识库目录：{args.output_dir}")
-    print()
-    
-    # 1. 获取文件列表
-    print("[1/4] 获取文件列表...")
-    files = get_drive_files(args.drive_folder_id)
-    print(f"  找到 {len(files)} 个 PDF 文件")
-    
-    if args.limit > 0:
-        files = dict(list(files.items())[:args.limit])
-        print(f"  限制处理 {len(files)} 个")
-    
-    # 2. 创建目录
-    temp_dir = Path(args.temp_dir)
     output_dir = Path(args.output_dir)
-    temp_dir.mkdir(parents=True, exist_ok=True)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # 3. 批量处理
-    print(f"\n[2/4] 批量处理图纸...")
-    results = []
-    
-    for i, (drawing_no, file_id) in enumerate(files.items(), 1):
-        print(f"\n[{i}/{len(files)}] {drawing_no}")
-        
-        # 下载
-        pdf_path = temp_dir / f"{drawing_no}.pdf"
-        if not pdf_path.exists():
-            print(f"  下载...")
-            if not download_file(file_id, pdf_path):
-                print(f"  ❌ 下载失败")
-                continue
-        
-        # 提取
-        print(f"  提取信息...")
-        drawing_data = extract_drawing_info(pdf_path)
-        
-        if not drawing_data:
-            print(f"  ❌ 提取失败")
-            continue
-        
-        # 显示关键信息
-        product_name = drawing_data.get("product_name", "")
-        model_no = drawing_data.get("model_no", "")
-        print(f"  ✅ 产品：{product_name[:50]}")
-        print(f"     模具：{model_no}")
-        
-        # 归档
-        md_path = create_kb_entry(drawing_data, output_dir)
-        print(f"  📁 已归档：{md_path.name}")
-        
-        results.append({
-            "drawing_no": drawing_no,
-            "product_name": product_name,
-            "model_no": model_no,
-            "md_path": str(md_path),
-        })
-    
-    # 4. 生成汇总
-    print(f"\n[3/4] 生成汇总...")
-    
-    summary_md = f"""# 599 系列产品图纸汇总
+    state_path = Path(args.state_file) if args.state_file else output_dir / DEFAULT_STATE_FILE
+    config_path = Path(args.config) if args.config else None
 
-> 📅 生成日期：{datetime.now().strftime('%Y-%m-%d %H:%M')}  
-> 📊 图纸总数：{len(results)}  
-> 🏭 公司：珠海福睿电子 FARREACH
+    if args.input_dir:
+        pdf_paths = collect_input_pdfs(Path(args.input_dir), limit=args.limit)
+    else:
+        pdf_paths = collect_drive_pdfs(args.drive_folder_id, Path(args.temp_dir), limit=args.limit)
 
----
+    summary = process_local_pdfs(
+        pdf_paths,
+        output_dir=output_dir,
+        state_path=state_path,
+        confidence_threshold=args.confidence_threshold,
+        resume=args.resume or not args.force,
+        force=args.force,
+        config_path=config_path,
+        no_cache=args.no_cache,
+    )
 
-## 📋 模具对照表
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
 
-| Drawing No. | 模具编号 (Model No.) | 产品名称 | 知识库 |
-|-------------|---------------------|----------|--------|
-"""
-    
-    for r in sorted(results, key=lambda x: x['drawing_no']):
-        summary_md += f"| {r['drawing_no']} | {r['model_no']} | {r['product_name'][:50]} | [查看]({Path(r['md_path']).name}) |\n"
-    
-    summary_md += f"""
----
-
-## 📊 统计
-
-- **总图纸数：** {len(results)}
-- **已归档：** {len(results)}
-- **失败：** {len(files) - len(results)}
-
----
-
-*由 Product Doc Reader v4.0 自动生成*
-"""
-    
-    summary_path = output_dir / "00-599 系列汇总.md"
-    with open(summary_path, 'w', encoding='utf-8') as f:
-        f.write(summary_md)
-    
-    print(f"  ✅ 汇总：{summary_path}")
-    
-    # 5. 清理临时文件
-    print(f"\n[4/4] 清理临时文件...")
-    subprocess.run(["rm", "-rf", str(temp_dir)], check=True)
-    print(f"  ✅ 已清理：{temp_dir}")
-    
-    # 完成
-    print(f"\n✅ 完成！")
-    print(f"   处理：{len(results)}/{len(files)}")
-    print(f"   知识库：{output_dir}")
 
 if __name__ == "__main__":
     main()

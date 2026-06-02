@@ -41,6 +41,7 @@ import type {
 import { getWorkspaceAdapter } from "./workspaces";
 import { ensureSsaCompanyDataPath, readJsonFile, ssaCompanyDataPath, ssaDataPath } from "../ssa-data-paths";
 import { createMemoryEngine, type MemoryEngine } from "./memory-engine";
+import { searchMemoryIndex } from "./memory-index";
 import { createRuntimeTaskQueue } from "./task-queue";
 
 type LeadRecord = Lead;
@@ -566,12 +567,14 @@ function isToday(value: string): boolean {
 }
 
 function agentStateFor(
+  id: string,
   name: string,
   role: string,
   jobs: Array<{ status: string; createdAt: string }>,
   approvalGated = 0
 ): AgentStateSummary {
   return {
+    id,
     name,
     role,
     tasksCompletedToday: jobs.filter((job) => job.status === "completed" && isToday(job.createdAt)).length,
@@ -903,21 +906,18 @@ export class SalesMemory {
   ): PaginatedResponse<LeadRecord> {
     const workspace = getWorkspaceAdapter(workspaceId);
     if (workspace.id === "hero-pumps") return getHeroLeads(params);
-    if (workspace.id === "farreach") return getLeads(params);
     return filterAndPaginateLeads(loadWorkspaceLeads(workspace.id), params);
   }
 
   getLeadCountries(workspaceId: string): ApiResponse<string[]> {
     const workspace = getWorkspaceAdapter(workspaceId);
     if (workspace.id === "hero-pumps") return getHeroCountries();
-    if (workspace.id === "farreach") return getCountries();
     return { success: true, data: Array.from(new Set(loadWorkspaceLeads(workspace.id).map((lead) => lead.country).filter(Boolean))).sort() };
   }
 
   getLeadStats(workspaceId: string): ApiResponse<LeadStats> {
     const workspace = getWorkspaceAdapter(workspaceId);
     if (workspace.id === "hero-pumps") return getHeroLeadStats();
-    if (workspace.id === "farreach") return getLeadStats();
     return getStatsFromLeads(loadWorkspaceLeads(workspace.id));
   }
 
@@ -1074,10 +1074,12 @@ export class SalesMemory {
 
     return {
       agents: [
-        agentStateFor("Inbox Agent", "Email triage and drafts", jobsFor("email.reply"), pendingApprovals),
-        agentStateFor("Docs Agent", "Quotations and trade documents", jobsFor("quotation.prepare")),
-        agentStateFor("Follow-up Agent", "Follow-up planning", jobsFor("follow_up.plan")),
-        agentStateFor("Runtime Agent", "Local workflow orchestration", jobs),
+        agentStateFor("lead-research", "Lead Research", "Prospect research and CRM import", [...jobsFor("lead.import"), ...jobsFor("company_intel.run")]),
+        agentStateFor("outreach-drafts", "Outreach Drafts", "Inbox triage and cold-email drafts", jobsFor("email.reply")),
+        agentStateFor("quote-docs", "Quotes and Ship Docs", "Quotations, PI export, and CI/PL follow-up files", jobsFor("quotation.prepare")),
+        agentStateFor("follow-up-plan", "Follow-up Plan", "Follow-up cadence and reminders", jobsFor("follow_up.plan")),
+        agentStateFor("approval-gates", "Approval Gates", "Customer-facing action approvals", [], pendingApprovals),
+        agentStateFor("jaden-runtime", "Jaden Runtime", "Local planner and worker queue", jobs),
       ].slice(0, Math.max(1, limit)),
       updatedAt: nowIso(),
     };
@@ -1300,6 +1302,18 @@ export class SalesMemory {
 
   findIntakeMatches(workspaceId: string, terms: string[]): IntakeMemoryMatch[] {
     const workspace = getWorkspaceAdapter(workspaceId);
+    try {
+      const indexedMatches = searchMemoryIndex(workspace.id, terms, 8).map((match) => ({
+        kind: match.kind,
+        title: match.title,
+        detail: match.detail,
+        confidence: match.confidence,
+      }));
+      if (indexedMatches.length > 0) return indexedMatches;
+    } catch {
+      // The SQLite/FTS index is an optimization layer; scanning remains the safe fallback.
+    }
+
     const leadMatches = this.findLeadMatches(workspace.id, terms);
     const quotationMatches = findQuotationMatches(terms, this.getQuotations(workspace.id, { page: 1, pageSize: 100 }).quotations);
 

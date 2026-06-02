@@ -143,6 +143,37 @@ describe("SqliteTaskQueue", () => {
     ]);
   });
 
+  it("requeues failed attempts without resetting the attempt counter", () => {
+    const queue = new SqliteTaskQueue();
+    queue.enqueue(job("job-retry"));
+    const claimed = queue.claimNext("worker-1", {
+      now: new Date("2026-05-27T04:00:00.000Z"),
+      leaseMs: 60_000,
+    });
+
+    expect(claimed).toMatchObject({
+      id: "job-retry",
+      status: "running",
+      attempts: 1,
+    });
+    expect(queue.requeue("job-retry", "temporary failure")).toMatchObject({
+      id: "job-retry",
+      status: "queued",
+      attempts: 1,
+      claimedBy: undefined,
+      leaseUntil: undefined,
+      error: "temporary failure",
+    });
+    expect(queue.claimNext("worker-2", {
+      now: new Date("2026-05-27T04:01:00.000Z"),
+      leaseMs: 60_000,
+    })).toMatchObject({
+      id: "job-retry",
+      attempts: 2,
+      claimedBy: "worker-2",
+    });
+  });
+
   it("keeps blocked side-effect jobs inspectable in the queue ledger", () => {
     const queue = new SqliteTaskQueue();
     const saved = queue.enqueue({

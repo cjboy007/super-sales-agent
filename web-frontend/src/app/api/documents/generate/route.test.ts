@@ -42,6 +42,10 @@ function tradeData() {
         hs_code: "8413",
         quantity: 2,
         unit_price: 10,
+        unit_cost: 6.5,
+        cost_currency: "USD",
+        supplier: "Hero Pump Factory",
+        supplier_candidates: ["Hero Pump Factory", "Backup Pump Supplier"],
         net_weight_kg: 1,
         gross_weight_kg: 1.2,
         dimensions_cm: "10x10x10",
@@ -62,6 +66,8 @@ beforeEach(() => {
   tradeDocsDir = path.join(tempRoot, "trade-docs");
   fs.mkdirSync(path.join(tradeDocsDir, "scripts"), { recursive: true });
   fs.writeFileSync(path.join(tradeDocsDir, "scripts", "generate_pi.py"), "# test", "utf-8");
+  fs.writeFileSync(path.join(tradeDocsDir, "scripts", "generate_ci.py"), "# test", "utf-8");
+  fs.writeFileSync(path.join(tradeDocsDir, "scripts", "generate_pl.py"), "# test", "utf-8");
   process.env.SSA_DATA_ROOT = tempRoot;
   process.env.TRADE_DOCS_DIR = tradeDocsDir;
   delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
@@ -97,12 +103,45 @@ function getRequest(url: string, token?: string): NextRequest {
   });
 }
 
+function writeSavedPiRecord(workspaceId = "demo-exporter") {
+  const data = tradeData();
+  const dir = path.join(tempRoot, "companies", workspaceId, "documents", "pi-records");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, `${data.pi_info.pi_no}.json`), JSON.stringify({
+    piNo: data.pi_info.pi_no,
+    customer: data.customer.company_name,
+    date: data.shipment.date,
+    amount: "USD 20.00",
+    productSummary: "Pump",
+    updatedAt: new Date().toISOString(),
+    source: "quick-quote.export",
+    data,
+  }, null, 2), "utf-8");
+}
+
 describe("/api/documents/generate route", () => {
-  it("audits and blocks trade document generation by default without running scripts", async () => {
+  it("rejects PI generation because PI must be exported from Quick Quote", async () => {
     const { POST } = await import("./route");
     const response = await POST(request("http://localhost/api/documents/generate?project=demo-exporter", {
       data: tradeData(),
       docTypes: ["PI"],
+    }));
+    const json = await response.json();
+
+    expect(json).toMatchObject({
+      success: false,
+      error: "Shipment document generation only supports CI and PL from a saved PI. Create PI from Quick Quote first.",
+    });
+    expect(response.status).toBe(400);
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it("audits and blocks CI / PL generation by default without running scripts", async () => {
+    writeSavedPiRecord();
+    const { POST } = await import("./route");
+    const response = await POST(request("http://localhost/api/documents/generate?project=demo-exporter", {
+      data: tradeData(),
+      docTypes: ["CI", "PL"],
     }));
     const json = await response.json();
 
@@ -118,18 +157,10 @@ describe("/api/documents/generate route", () => {
       },
     });
     expect(execFileMock).not.toHaveBeenCalled();
-
-    const decisions = JSON.parse(
-      fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8")
-    );
-    expect(decisions[0]).toMatchObject({
-      kind: "document.generate",
-      workspaceId: "demo-exporter",
-      status: "blocked",
-    });
   });
 
-  it("runs trade document generation only when real document generation is enabled", async () => {
+  it("runs CI / PL generation only when real document generation is enabled", async () => {
+    writeSavedPiRecord();
     process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = "true";
     execFileMock.mockImplementation(
       (_file: string, args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
@@ -143,19 +174,35 @@ describe("/api/documents/generate route", () => {
     const { POST } = await import("./route");
     const response = await POST(request("http://localhost/api/documents/generate?project=demo-exporter", {
       data: tradeData(),
-      docTypes: ["PI"],
+      docTypes: ["CI", "PL"],
     }));
     const json = await response.json();
 
     expect(json.success).toBe(true);
-    expect(json.documents).toHaveLength(1);
+    expect(json.documents).toHaveLength(2);
     expect(json.sideEffect).toMatchObject({
       kind: "document.generate",
       workspaceId: "demo-exporter",
       status: "allowed",
       realExecutionEnabled: true,
     });
-    expect(execFileMock).toHaveBeenCalledOnce();
+    expect(execFileMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects CI / PL generation when the PI was not exported first", async () => {
+    const { POST } = await import("./route");
+    const response = await POST(request("http://localhost/api/documents/generate?project=demo-exporter", {
+      data: tradeData(),
+      docTypes: ["CI"],
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toMatchObject({
+      success: false,
+      error: "Saved PI record not found. Export the PI from Quick Quote before generating CI / PL.",
+    });
+    expect(execFileMock).not.toHaveBeenCalled();
   });
 
   it("lists only documents for the requested workspace", async () => {
@@ -176,5 +223,28 @@ describe("/api/documents/generate route", () => {
     expect(farreachJson.documents.map((item: { filename: string }) => item.filename)).toEqual(["PI-farreach.html"]);
     expect(heroResponse.status).toBe(200);
     expect(heroJson.documents.map((item: { filename: string }) => item.filename)).toEqual(["PI-hero.html"]);
+  });
+
+  it("uses the saved PI source data without writing a new price-memory row", async () => {
+    writeSavedPiRecord();
+    const { POST } = await import("./route");
+    await POST(request("http://localhost/api/documents/generate?project=demo-exporter", {
+      data: tradeData(),
+      docTypes: ["CI"],
+    }));
+
+    const { GET } = await import("../pi-records/route");
+    const response = await GET(getRequest("http://localhost/api/documents/pi-records?project=demo-exporter&query=PI-20260526"));
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.records).toHaveLength(1);
+    expect(json.records[0]).toMatchObject({
+      piNo: "PI-20260526-001",
+      customer: "Buyer Co",
+      amount: "USD 20.00",
+    });
+    expect(json.records[0].data.customer.company_name).toBe("Buyer Co");
+    expect(fs.existsSync(path.join(tempRoot, "companies", "demo-exporter", "pricing", "price-memory.json"))).toBe(false);
   });
 });

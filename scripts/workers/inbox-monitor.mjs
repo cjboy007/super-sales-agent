@@ -226,20 +226,39 @@ function recordRuntimeEvent(dataRoot, workspace, event) {
   writeJson(filePath, next);
 }
 
+function formatTimestamp(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return ts;
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function stripEmailAngleBrackets(raw) {
+  const m = String(raw).match(/^(.*?)\s*</);
+  return m ? m[1].trim() : String(raw).trim() || "—";
+}
+
 function reportForMessages(workspace, messages) {
   if (messages.length === 0) return "";
+  const importantCount = messages.filter((m) => m.important).length;
   const lines = [
-    `SSA inbox monitor: ${workspace}`,
-    `NEW_EMAILS=${messages.length}`,
-    `IMPORTANT=${messages.filter((message) => message.important).length}`,
-    "---",
+    `📬 **${workspace}** 收件箱监控`,
+    `新邮件 **${messages.length}** 封` + (importantCount > 0 ? ` | ⚠️ 重要 **${importantCount}** 封` : ""),
+    "",
+    "| 时间 | 发件人 | 主题 |",
+    "|------|--------|------|",
   ];
 
   for (const message of messages.slice(0, 10)) {
-    lines.push(`${message.receivedAt || "unknown"} | ${message.from || "unknown sender"} | ${message.subject}`);
+    const time = formatTimestamp(message.receivedAt);
+    const sender = stripEmailAngleBrackets(message.from);
+    const subject = message.subject || "（无主题）";
+    const prefix = message.important ? "🔴 " : "";
+    lines.push(`| ${time} | ${prefix}${sender} | ${subject} |`);
   }
 
-  if (messages.length > 10) lines.push(`... ${messages.length - 10} more`);
+  if (messages.length > 10) lines.push(`| | | ... 还有 ${messages.length - 10} 封 |`);
   return `${lines.join("\n")}\n`;
 }
 
