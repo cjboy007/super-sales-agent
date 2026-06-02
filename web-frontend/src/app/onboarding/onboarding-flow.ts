@@ -5,9 +5,11 @@ export type ConfigState = AppSettings;
 export type OnboardingStepId =
   | "identity"
   | "llm"
+  | "vision"
   | "email"
   | "verification"
   | "research"
+  | "documentTemplates"
   | "optional"
   | "finish";
 
@@ -25,7 +27,7 @@ export interface JadenosOnboardingStep {
 }
 
 export interface ReadinessItem {
-  id: "llm" | "email" | "verification" | "research";
+  id: "llm" | "vision" | "email" | "verification" | "research";
   label: string;
   zhLabel: string;
   done: boolean;
@@ -84,6 +86,12 @@ export function getReadinessItems(config: ConfigState): ReadinessItem[] {
       done: isConfiguredSecret(config.deepseekApiKey) || isConfiguredSecret(config.openaiApiKey) || isConfiguredSecret(config.openrouterApiKey),
     },
     {
+      id: "vision",
+      label: "Vision LLM",
+      zhLabel: "识图模型",
+      done: isConfiguredSecret(config.openrouterApiKey) || isConfiguredSecret(config.openaiApiKey) || isConfiguredSecret(config.geminiApiKey),
+    },
+    {
       id: "email",
       label: "Work email",
       zhLabel: "工作邮箱",
@@ -118,6 +126,9 @@ export function getOnboardingReadiness(config: ConfigState) {
 
 export function getJadenosOnboardingSteps(config: ConfigState): JadenosOnboardingStep[] {
   const readiness = getOnboardingReadiness(config);
+  const statusFor = (id: ReadinessItem["id"]) => (
+    readiness.items.find((item) => item.id === id)?.done ? "done" : "missing"
+  );
   const isOptionalConnected = isConfiguredSecret(config.apolloApiKey)
     || (config.crmProvider !== "none" && isConfiguredSecret(config.crmApiKey))
     || (config.notificationProvider !== "none" && isConfiguredSecret(config.notificationWebhookUrl));
@@ -140,7 +151,17 @@ export function getJadenosOnboardingSteps(config: ConfigState): JadenosOnboardin
       command: "$ connect deepseek",
       prompt: "Paste the DeepSeek key and keep deepseek-v4-pro as the default model unless you intentionally change it.",
       zhPrompt: "填入 DeepSeek 密钥，默认模型保持 deepseek-v4-pro，除非你明确要换。",
-      status: readiness.items[0].done ? "done" : "missing",
+      status: statusFor("llm"),
+      core: true,
+    },
+    {
+      id: "vision",
+      title: "Connect vision model",
+      zhTitle: "连接识图模型",
+      command: "$ connect vision-llm",
+      prompt: "Connect OpenRouter, OpenAI, or Gemini for Intake image reading. Product drawings, catalogs, and screenshots can still be saved without it, but visual extraction will be limited.",
+      zhPrompt: "连接 OpenRouter、OpenAI 或 Gemini，用于投递台识图。没有它也能保存产品图纸、目录和截图，但视觉提取会降级。",
+      status: statusFor("vision"),
       core: true,
     },
     {
@@ -150,7 +171,7 @@ export function getJadenosOnboardingSteps(config: ConfigState): JadenosOnboardin
       command: "$ connect mailbox",
       prompt: "Connect IMAP for reading and SMTP for drafts. Customer sends still require approval.",
       zhPrompt: "连接 IMAP 收信和 SMTP 草稿。客户邮件发送仍需要审批。",
-      status: readiness.items[1].done ? "done" : "missing",
+      status: statusFor("email"),
       core: true,
     },
     {
@@ -160,7 +181,7 @@ export function getJadenosOnboardingSteps(config: ConfigState): JadenosOnboardin
       command: "$ connect hunter",
       prompt: "Hunter is the first verifier before cold outbound. Keep checks on before sending to new leads.",
       zhPrompt: "Hunter 是冷邮件的第一版核验器。给新线索发信前建议保持核验开启。",
-      status: readiness.items[2].done ? "done" : "missing",
+      status: statusFor("verification"),
       core: true,
     },
     {
@@ -170,8 +191,18 @@ export function getJadenosOnboardingSteps(config: ConfigState): JadenosOnboardin
       command: "$ connect tavily",
       prompt: "Tavily gives JadenOS company context, lead research, and personalization inputs.",
       zhPrompt: "Tavily 为 JadenOS 提供公司背景、线索调研和个性化素材。",
-      status: readiness.items[3].done ? "done" : "missing",
+      status: statusFor("research"),
       core: true,
+    },
+    {
+      id: "documentTemplates",
+      title: "Train document templates",
+      zhTitle: "训练单证模板",
+      command: "$ upload docs --pi-ci-pl --samples 3-5",
+      prompt: "Upload 3-5 approved PI, CI, and PL files. JadenOS will summarize the layout rules into a template draft for customer confirmation.",
+      zhPrompt: "上传 3-5 份已确认的 PI、CI、PL 样本。JadenOS 会归纳版式规则，形成模板草案给客户确认。",
+      status: "optional",
+      core: false,
     },
     {
       id: "optional",

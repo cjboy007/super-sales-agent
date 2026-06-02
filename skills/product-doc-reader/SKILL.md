@@ -103,7 +103,7 @@ PDF 图纸
 
 ### 基本提取（混合模式，推荐）
 ```bash
-cd /path/to/your/.openclaw/workspace/skills/product-doc-reader
+cd skills/product-doc-reader
 python3 scripts/extract_hybrid.py <图纸.pdf>
 # 输出到 ./output/<图纸名>.json 和 .md
 ```
@@ -132,12 +132,57 @@ python3 scripts/extract_hybrid.py <图纸.pdf> --text-only
 | 参数 | 说明 | 默认 |
 |------|------|------|
 | `pdf_path` | PDF 文件路径（必填） | - |
-| `-o, --output-dir` | 输出目录 | `./output` |
-| `-f, --format` | 输出格式：`json` / `md` / `both` | `both` |
+| `-o, --output-dir` | 输出目录 | 配置文件 `output_dir` |
+| `-f, --format` | 输出格式：`json` / `md` / `both` | 配置文件 `format` |
+| `--config` | 覆盖配置文件路径 | `config/default.json` |
 | `--vision-only` | 仅用 Vision API | 关闭 |
 | `--text-only` | 仅用 pdftotext | 关闭 |
 | `--stdout` | 输出到 stdout | 关闭 |
 | `--dpi` | OCR DPI（默认 300） | `300` |
+| `--no-cache` | 禁用 Vision 缓存 | 关闭 |
+
+### 配置文件
+
+默认配置位于 `config/default.json`，包含：
+- 默认输出格式、输出目录、置信度阈值、Vision 缓存目录
+- Vision provider/model
+- 模板识别规则：`farreach_599` / `customer_c331` / `english_title_block`
+- 数据校验规则：模具号排除前缀、产品名排除词、线材规格/电气参数过滤规则
+
+CLI 参数优先级高于配置文件。
+
+### Vision 兜底与缓存
+
+混合模式下，脚本先跑 `pdftotext`。只有关键字段缺失、BOM 为空、结果低于置信度阈值，或使用 `--vision-only` 时，才会调用 Vision。
+
+Vision 结果按 PDF 内容 hash + prompt hash + model 生成缓存 key，默认写入配置中的 `cache_dir`。重复处理同一文件会复用缓存；需要强制重新调用时使用 `--no-cache`。
+
+### 批量处理与断点续跑
+
+```bash
+python3 scripts/batch_process_drive.py --input-dir ./drawings --output-dir ./output --resume
+python3 scripts/batch_process_drive.py --drive-folder-id <folder_id> --output-dir ./output --resume
+```
+
+批处理会生成：
+- `.product-doc-reader-state.json`：每个文件的成功/失败、输出路径、错误原因、更新时间
+- `accepted/`：置信度达标且无关键 warning 的结果
+- `review/`：置信度低于阈值或存在 warning 的结果
+- `batch-summary.md`：成功、失败、待复核数量和原因
+
+可用参数：
+- `--resume`：跳过已成功项目
+- `--force`：重新处理已成功项目
+- `--confidence-threshold 80`：设置待复核阈值
+- `--state-file <path>`：指定断点状态文件
+
+### SSA 投递台集成
+
+投递台 runtime 会在本地保存上传文件后，对疑似产品图纸 PDF 触发 product-doc-reader。触发条件包括：
+- 本地分类为 `Product Spec`
+- 文件名或说明包含 `599-xxx`、`drawing`、`technical`、`spec`、`datasheet`、`catalog`
+
+提取摘要会写入 intake record 的 `analysis.productDoc`，包含产品名、模具号、图纸号、包装规范、BOM 行数、置信度、warnings、是否需人工复核。该集成只保存分析结果，不移动文件、不同步 CRM、不发送外部消息。
 
 ---
 
@@ -230,10 +275,8 @@ python3 scripts/extract_hybrid.py <图纸.pdf> --text-only
 
 **解决：** 已添加 50+ 排除词，后续发现新词继续添加。
 
-### 3. 批量处理无断点续传
-**问题：** 58 个文件处理到一半失败，需要重来。
-
-**建议：** 记录已处理文件列表，支持从断点继续。
+### 3. 批量处理断点续传
+**现状：** `batch_process_drive.py` 已支持状态文件、`--resume`、`--force`、失败隔离和低置信度分离。
 
 ### 4. 特殊模板适配
 **问题：** 客户图纸（如 C331 模板）字段位置不同。
@@ -241,9 +284,7 @@ python3 scripts/extract_hybrid.py <图纸.pdf> --text-only
 **解决：** 已支持跨行关联（上下 5 行搜索）。
 
 ### 5. 数据校验需人工审核
-**问题：** 置信度 <80% 的结果需要人工检查。
-
-**建议：** 添加自动标记功能，低置信度结果单独输出。
+**现状：** 置信度低于阈值或存在 warning 的结果会自动进入 `review/`，仍需人工确认后再入库。
 
 ---
 
@@ -253,10 +294,15 @@ python3 scripts/extract_hybrid.py <图纸.pdf> --text-only
 product-doc-reader/
 ├── SKILL.md                      ← 本文件
 ├── DEVELOPMENT_SUMMARY.md        ← 开发总结（踩坑记录）
+├── config/
+│   └── default.json              ← 默认输出、模板、校验、缓存配置
 ├── scripts/
 │   ├── extract_hybrid.py         ← v5.0.1 核心提取脚本
-│   ├── batch_599_full.py         ← 批量处理脚本
-│   └── batch_process_drive.py    ← Drive 批量处理
+│   ├── batch_599_full.py         ← 旧 599 批处理脚本
+│   └── batch_process_drive.py    ← 可续跑批处理脚本
+├── tests/
+│   ├── test_extract_hybrid.py    ← parser/cache/config 回归测试
+│   └── test_batch_processor.py   ← 续跑和复核分离测试
 ├── examples/
 │   └── hybrid/                   ← 测试输出示例
 └── output/                       ← 默认输出目录

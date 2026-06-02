@@ -7,6 +7,9 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from sample_generator import generate_sample_excel
+
 def generate_sample_html(output_path, data):
     """生成样品单 HTML"""
     
@@ -439,6 +442,13 @@ def main():
         
         output = generate_sample_html(args.output, data)
         print(f"✅ 样品单已生成：{output}")
+
+        excel_output = str(Path(output).with_suffix('.xlsx'))
+        excel_result = generate_sample_excel(data, excel_output)
+        if excel_result.success:
+            print(f"✅ Excel 源文件已生成：{excel_result.output_path}")
+        else:
+            print(f"⚠️  Excel 源文件生成失败：{excel_result.error}")
         
         # 如果输出是 HTML，自动生成 PDF（去掉页脚和页眉）
         if str(output).endswith('.html'):

@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { SalesRuntime } from "./sales-runtime";
 import type { LlmResult } from "./types";
+import type { ProductDocReaderSummary } from "./product-doc-reader";
 import { ensureDir, ensureSsaCompanyDataPath, sanitizeSsaPathSegment, ssaCompanyDataPath } from "../ssa-data-paths";
 
 export type IntakeMessageRole = "user" | "assistant";
@@ -20,6 +21,15 @@ export interface IntakeUpload {
   size: number;
   path: string;
   storedAt: string;
+  processing?: IntakeUploadProcessing;
+}
+
+export interface IntakeUploadProcessing {
+  status: "saved" | "queued" | "processing" | "completed" | "needs_review" | "failed";
+  kind: "product_doc" | "lead_list" | "trade_doc" | "unknown";
+  error?: string;
+  resultRef?: string;
+  updatedAt?: string;
 }
 
 export interface IntakeMatch {
@@ -46,6 +56,7 @@ export interface IntakeAnalysis {
   evidence: string[];
   matches: IntakeMatch[];
   actions: IntakeAction[];
+  productDoc?: ProductDocReaderSummary;
 }
 
 export interface IntakeRecord {
@@ -68,6 +79,13 @@ export interface IntakeInput {
   files?: File[];
 }
 
+interface QueuedUploadProcessingTask {
+  intakeId: string;
+  uploadId: string;
+  uploadPath: string;
+  kind: IntakeUploadProcessing["kind"];
+}
+
 export interface IntakeSessionSummary {
   id: string;
   project: string;
@@ -80,7 +98,8 @@ export interface IntakeSessionSummary {
   messages: number;
 }
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024;
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const MAX_TOTAL_UPLOAD_SIZE = 150 * 1024 * 1024;
 const MAX_FILES_PER_REQUEST = 8;
 const MAX_INTAKE_SESSIONS = 25;
 
@@ -251,6 +270,45 @@ function detectItemType(text: string, uploads: IntakeUpload[]) {
   return { itemType: "Unclassified", destination: "intake/review", confidence: uploads.length || text ? 38 : 0 };
 }
 
+function isPdfUpload(file: File) {
+  return file.type === "application/pdf" || path.extname(file.name || "").toLowerCase() === ".pdf";
+}
+
+function isProductDocSignal(name: string, message = "", pastedText = "") {
+  return /(599-\d{2,3}|drawing|technical|spec|datasheet|catalog|catalogue|model no|product sheet)/i.test(`${name} ${message} ${pastedText}`);
+}
+
+function inferProcessingKind(file: File, message = "", pastedText = ""): IntakeUploadProcessing["kind"] {
+  const name = file.name || "";
+  const ext = path.extname(name).toLowerCase();
+  const haystack = `${name} ${message} ${pastedText}`.toLowerCase();
+  if (isPdfUpload(file) && isProductDocSignal(name, message, pastedText)) return "product_doc";
+  if ([".csv", ".xlsx", ".xls"].includes(ext) || /lead list|prospect|company list|contact list/.test(haystack)) return "lead_list";
+  if (/(commercial invoice|\bci[-_\s]|\bc\/i\b|packing list|\bpl[-_\s]|\bp\/l\b|proforma invoice|\bpi[-_\s])/.test(haystack)) return "trade_doc";
+  return "unknown";
+}
+
+function formatMb(bytes: number) {
+  return `${Math.ceil(bytes / (1024 * 1024))}MB`;
+}
+
+function declaredFileSize(file: File) {
+  const size = Number(file.size || 0);
+  return Number.isFinite(size) ? Math.max(0, size) : 0;
+}
+
+function validateUploadLimits(files: File[]) {
+  for (const file of files.slice(0, MAX_FILES_PER_REQUEST)) {
+    if (declaredFileSize(file) > MAX_FILE_SIZE) {
+      throw Object.assign(new Error(`${file.name || "upload"} exceeds the 50MB intake limit.`), { status: 413 });
+    }
+  }
+  const total = files.reduce((sum, file) => sum + declaredFileSize(file), 0);
+  if (total > MAX_TOTAL_UPLOAD_SIZE) {
+    throw Object.assign(new Error(`Total upload size ${formatMb(total)} exceeds the 150MB intake limit.`), { status: 413 });
+  }
+}
+
 function analyzeRecord(runtime: SalesRuntime, record: IntakeRecord, latestMessage: string): IntakeAnalysis {
   const transcript = record.messages.map((message) => `${message.role}: ${message.content}`).join("\n");
   const uploadNames = record.uploads.map((file) => `${file.name} ${file.type}`).join("\n");
@@ -329,32 +387,82 @@ function localAssistantMessage(analysis: IntakeAnalysis) {
   const matchText = analysis.matches.length > 0
     ? ` Best local match: ${analysis.matches[0].title}.`
     : " I do not have a strong local match yet.";
+  const productDocText = analysis.productDoc
+    ? ` Product doc reader extracted ${analysis.productDoc.productName || "an unnamed product"} (${analysis.productDoc.drawingNo || "no drawing no"}) with ${analysis.productDoc.confidence}% confidence.`
+    : "";
   return [
     `I saved this intake draft and ran local triage. Current read: ${analysis.itemType} with ${confidence} confidence.`,
     `Suggested destination: ${analysis.destination}.${matchText}`,
+    productDocText,
     "I would keep this approval-gated until you confirm the client and placement.",
   ].join(" ");
 }
 
-async function storeUploads(record: IntakeRecord, files: File[]) {
-  if (files.length === 0) return;
+async function storeUploads(runtime: SalesRuntime, record: IntakeRecord, files: File[], message = "", pastedText = ""): Promise<QueuedUploadProcessingTask[]> {
+  if (files.length === 0) return [];
+  validateUploadLimits(files);
   const uploadDir = ensureDir(ssaCompanyDataPath(record.project, "intake", "uploads", record.id));
+  const queuedTasks: QueuedUploadProcessingTask[] = [];
 
   for (const file of files.slice(0, MAX_FILES_PER_REQUEST)) {
     const buffer = Buffer.from(await file.arrayBuffer());
-    if (buffer.length > MAX_FILE_SIZE) {
-      throw Object.assign(new Error(`${file.name} exceeds the 25MB intake limit`), { status: 413 });
+    const effectiveSize = Math.max(buffer.length, declaredFileSize(file));
+    if (effectiveSize > MAX_FILE_SIZE) {
+      throw Object.assign(new Error(`${file.name || "upload"} exceeds the 50MB intake limit.`), { status: 413 });
     }
     const storedName = `${Date.now()}-${sanitizeSegment(file.name || "upload.bin")}`;
     const storedPath = path.join(uploadDir, storedName);
+    const kind = inferProcessingKind(file, message, pastedText);
+    const uploadId = makeId("file");
+    const processing: IntakeUploadProcessing = {
+      status: kind === "product_doc" ? "queued" : "saved",
+      kind,
+      updatedAt: nowIso(),
+    };
     fs.writeFileSync(storedPath, buffer);
     record.uploads.push({
-      id: makeId("file"),
+      id: uploadId,
       name: file.name || storedName,
       type: file.type || "application/octet-stream",
-      size: buffer.length,
+      size: effectiveSize,
       path: storedPath,
       storedAt: nowIso(),
+      processing,
+    });
+
+    runtime.recordEvent("intake.file.saved", record.project, {
+      intakeId: record.id,
+      uploadId,
+      fileName: file.name || storedName,
+      size: effectiveSize,
+      processingKind: kind,
+    });
+
+    if (kind === "product_doc") {
+      queuedTasks.push({
+        intakeId: record.id,
+        uploadId,
+        uploadPath: storedPath,
+        kind,
+      });
+    }
+  }
+
+  return queuedTasks;
+}
+
+function enqueueUploadProcessing(runtime: SalesRuntime, record: IntakeRecord, tasks: QueuedUploadProcessingTask[]) {
+  for (const task of tasks) {
+    const job = runtime.workflows.enqueue(record.project, "intake.product_doc.process", {
+      intakeId: task.intakeId,
+      uploadId: task.uploadId,
+      uploadPath: task.uploadPath,
+    });
+    runtime.recordEvent("intake.file.processing_queued", record.project, {
+      intakeId: task.intakeId,
+      uploadId: task.uploadId,
+      jobId: job.id,
+      kind: task.kind,
     });
   }
 }
@@ -383,9 +491,9 @@ export async function processIntake(runtime: SalesRuntime, input: IntakeInput): 
   const pastedText = input.pastedText || "";
   if (pastedText.trim()) record.pastedText = pastedText.slice(0, 200_000);
 
-  await storeUploads(record, input.files || []);
-
   const userMessage = (input.message || "").trim() || ((input.files || []).length > 0 ? "Uploaded file(s) for SSA intake." : "");
+  const queuedProcessing = await storeUploads(runtime, record, input.files || [], userMessage, pastedText);
+
   if (userMessage) {
     record.messages.push({
       id: makeId("msg"),
@@ -394,6 +502,8 @@ export async function processIntake(runtime: SalesRuntime, input: IntakeInput): 
       createdAt: nowIso(),
     });
   }
+  record.updatedAt = nowIso();
+  writeRecord(record);
 
   const localAnalysis = analyzeRecord(runtime, record, userMessage);
   const llm = await askRuntimeLlm(runtime, record, localAnalysis);
@@ -412,6 +522,7 @@ export async function processIntake(runtime: SalesRuntime, input: IntakeInput): 
   });
   record.updatedAt = nowIso();
   writeRecord(record);
+  enqueueUploadProcessing(runtime, record, queuedProcessing);
   pruneIntakeStorage(record.project);
 
   runtime.recordEvent("intake.processed", record.project, {
@@ -420,6 +531,12 @@ export async function processIntake(runtime: SalesRuntime, input: IntakeInput): 
     destination: record.analysis.destination,
     confidence: record.analysis.confidence,
     uploads: record.uploads.length,
+    productDoc: record.analysis.productDoc ? {
+      drawingNo: record.analysis.productDoc.drawingNo,
+      modelNo: record.analysis.productDoc.modelNo,
+      confidence: record.analysis.productDoc.confidence,
+      needsReview: record.analysis.productDoc.needsReview,
+    } : null,
     sideEffects: "blocked",
   });
 

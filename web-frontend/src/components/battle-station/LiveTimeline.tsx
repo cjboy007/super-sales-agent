@@ -7,9 +7,26 @@ export type TimelineFilter = "all" | "approval" | "ai" | "alert" | "quote" | "in
 
 const FILTERS: TimelineFilter[] = ["all", "approval", "ai", "alert", "quote", "intel", "completed"];
 
+function formatAge(hours: number, language: "en" | "zh") {
+  const safeHours = Math.max(0, Math.floor(hours));
+  const days = Math.floor(safeHours / 24);
+  const restHours = safeHours % 24;
+
+  if (language === "zh") {
+    if (days > 0 && restHours > 0) return `${days}天${restHours}小时`;
+    if (days > 0) return `${days}天`;
+    return `${safeHours}小时`;
+  }
+
+  if (days > 0 && restHours > 0) return `${days}d ${restHours}h`;
+  if (days > 0) return `${days}d`;
+  return `${safeHours}h`;
+}
+
 interface LiveTimelineProps {
   copy: BattleStationCopy["timeline"];
   events: TimelineEvent[];
+  language: "en" | "zh";
   selectedDealId: string;
   filter: TimelineFilter;
   onFilterChange: (filter: TimelineFilter) => void;
@@ -23,6 +40,7 @@ interface LiveTimelineProps {
 export default function LiveTimeline({
   copy,
   events,
+  language,
   selectedDealId,
   filter,
   onFilterChange,
@@ -120,7 +138,7 @@ export default function LiveTimeline({
                   <p className="mt-2 text-xs leading-relaxed text-slate-400">{event.body}</p>
 
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    {event.tags.map((tag) => (
+                    {[event.eventKind, event.account, formatAge(event.ageHours, language)].map((tag) => (
                       <span
                         key={tag}
                         className="rounded border border-slate-800 bg-slate-950/70 px-1.5 py-0.5 font-mono text-[10px] text-slate-500"

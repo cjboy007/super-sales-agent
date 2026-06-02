@@ -43,6 +43,12 @@ function request(url: string, body: Record<string, unknown>): NextRequest {
   });
 }
 
+function pdfFileWithSize(name: string, size: number): File {
+  const bytes = new Uint8Array(size);
+  bytes.set([0x25, 0x50, 0x44, 0x46]);
+  return new File([bytes], name, { type: "application/pdf" });
+}
+
 describe("/api/intake route", () => {
   it("uses the runtime LLM adapter and does not call OpenRouter directly", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
@@ -141,5 +147,104 @@ describe("/api/intake route", () => {
     expect(demoJson.data[0].project).toBe("demo-exporter");
     expect(farreachJson.data[0].project).toBe("farreach");
     expect(fs.existsSync(path.join(tempRoot, "intake"))).toBe(false);
+  });
+
+  it("queues product doc reader processing on product spec intake records", async () => {
+    vi.doMock("@/lib/runtime/product-doc-reader", () => ({
+      maybeAnalyzeProductDocUpload: vi.fn(async () => {
+        throw new Error("product-doc-reader should not run synchronously during intake save");
+      }),
+    }));
+    const { POST } = await import("./route");
+    const file = new File(["%PDF test"], "599-028 technical drawing.pdf", { type: "application/pdf" });
+    const form = new FormData();
+    form.append("message", "Please read this technical drawing.");
+    form.append("files", file);
+
+    const response = await POST(new NextRequest("http://localhost/api/intake?project=demo-exporter", {
+      method: "POST",
+      body: form,
+    }));
+    const json = await response.json();
+
+    expect(json.success).toBe(true);
+    expect(json.data.uploads[0].processing).toMatchObject({
+      status: "queued",
+      kind: "product_doc",
+    });
+    expect(json.data.analysis.productDoc).toBeUndefined();
+  });
+
+  it("accepts product PDFs up to 50MB and records queued processing state", async () => {
+    vi.doMock("@/lib/runtime/product-doc-reader", () => ({
+      maybeAnalyzeProductDocUpload: vi.fn(async () => {
+        throw new Error("product-doc-reader should not run synchronously during intake save");
+      }),
+    }));
+    const { POST } = await import("./route");
+    const file = pdfFileWithSize("599-030 technical drawing.pdf", 50 * 1024 * 1024);
+    const form = new FormData();
+    form.append("message", "Please read this technical drawing.");
+    form.append("files", file);
+
+    const response = await POST(new NextRequest("http://localhost/api/intake?project=demo-exporter", {
+      method: "POST",
+      body: form,
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.data.uploads[0].processing).toMatchObject({
+      status: "queued",
+      kind: "product_doc",
+    });
+    expect(json.data.analysis.productDoc).toBeUndefined();
+
+    const { createRuntimeTaskQueue } = await import("@/lib/runtime/task-queue");
+    expect(createRuntimeTaskQueue().list(10)[0]).toMatchObject({
+      workspaceId: "demo-exporter",
+      workflow: "intake.product_doc.process",
+      status: "queued",
+      input: {
+        intakeId: json.data.id,
+        uploadId: json.data.uploads[0].id,
+      },
+    });
+  });
+
+  it("rejects files over 50MB with a clear file-specific message", async () => {
+    const { POST } = await import("./route");
+    const file = pdfFileWithSize("huge-catalog.pdf", 50 * 1024 * 1024 + 1);
+    const form = new FormData();
+    form.append("files", file);
+
+    const response = await POST(new NextRequest("http://localhost/api/intake?project=demo-exporter", {
+      method: "POST",
+      body: form,
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(413);
+    expect(json.error).toContain("huge-catalog.pdf");
+    expect(json.error).toContain("50MB");
+  });
+
+  it("rejects total upload payloads over 150MB", async () => {
+    const { POST } = await import("./route");
+    const form = new FormData();
+    for (let index = 0; index < 4; index += 1) {
+      form.append("files", pdfFileWithSize(`catalog-${index}.pdf`, 40 * 1024 * 1024));
+    }
+
+    const response = await POST(new NextRequest("http://localhost/api/intake?project=demo-exporter", {
+      method: "POST",
+      body: form,
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(413);
+    expect(json.error).toContain("150MB");
+    expect(json.error).toContain("160MB");
   });
 });

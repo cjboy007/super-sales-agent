@@ -14,6 +14,7 @@ import {
   SelectField,
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
+import { useTheme, type SsaUiSize } from "@/components/ui/ThemeProvider";
 import { useProject } from "@/lib/project";
 
 type TabKey = "api" | "email" | "search";
@@ -50,6 +51,10 @@ interface ConfigState {
     trendTracking: boolean;
     emailVerify: boolean;
   };
+}
+
+interface RuntimeManifestState {
+  dataRoot: string;
 }
 
 const DEFAULT_CONFIG: ConfigState = {
@@ -113,6 +118,7 @@ function ConfigInput({
 
 export default function SettingsPage() {
   const language = useBattleLanguage();
+  const { uiSize, setUiSize } = useTheme();
   const { apiUrl } = useProject();
   const [activeTab, setActiveTab] = useState<TabKey>("api");
   const [config, setConfig] = useState<ConfigState>(DEFAULT_CONFIG);
@@ -121,14 +127,22 @@ export default function SettingsPage() {
   const [testing, setTesting] = useState<"imap" | "smtp" | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [runtimeManifest, setRuntimeManifest] = useState<RuntimeManifestState | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/config")
-      .then((res) => res.json())
-      .then((json) => {
-        if (!cancelled && json.success) {
-          setConfig((prev) => ({ ...prev, ...json.data }));
+    Promise.all([
+      fetch("/api/config").then((res) => res.json()),
+      fetch("/api/runtime?action=manifest").then((res) => res.json()).catch(() => null),
+    ])
+      .then(([configJson, manifestJson]) => {
+        if (cancelled) return;
+        if (configJson.success) {
+          setConfig((prev) => ({ ...prev, ...configJson.data }));
+        }
+        const dataRoot = manifestJson?.data?.runtimeBoundary?.dataRoot;
+        if (typeof dataRoot === "string" && dataRoot.trim()) {
+          setRuntimeManifest({ dataRoot });
         }
       })
       .catch((err) => {
@@ -193,6 +207,23 @@ export default function SettingsPage() {
     { key: "email", label: language === "zh" ? "邮件连接" : "Email Connection" },
     { key: "search", label: language === "zh" ? "搜索" : "Search" },
   ];
+  const uiSizeOptions: Array<{ value: SsaUiSize; label: string; description: string }> = [
+    {
+      value: "small",
+      label: language === "zh" ? "小" : "Small",
+      description: language === "zh" ? "紧凑，适合高密度表格" : "Compact, for dense tables",
+    },
+    {
+      value: "medium",
+      label: language === "zh" ? "中" : "Medium",
+      description: language === "zh" ? "默认，按钮和正文更清楚" : "Default, clearer buttons and text",
+    },
+    {
+      value: "large",
+      label: language === "zh" ? "大" : "Large",
+      description: language === "zh" ? "更大字号，适合长时间操作" : "Larger text for long sessions",
+    },
+  ];
 
   return (
     <BattlePageShell>
@@ -240,6 +271,53 @@ export default function SettingsPage() {
             <p className="self-center text-xs text-slate-500">
               {language === "zh" ? "完整设置仍可在本页修改。" : "Full setup remains editable here."}
             </p>
+          </div>
+        </BattlePanel>
+
+        <BattlePanel
+          title={language === "zh" ? "界面大小" : "UI Size"}
+          meta={language === "zh" ? "控制全局字号、按钮和输入框尺寸" : "controls global text, button, and input sizing"}
+          tone="blue"
+        >
+          <div className="grid gap-3 p-3 md:grid-cols-3">
+            {uiSizeOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setUiSize(option.value)}
+                aria-pressed={uiSize === option.value}
+                className={`rounded-md border px-4 py-3 text-left transition ${
+                  uiSize === option.value
+                    ? "border-emerald-400 bg-emerald-500/15 text-emerald-100"
+                    : "border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-600 hover:text-slate-100"
+                }`}
+              >
+                <span className="block text-sm font-semibold">{option.label}</span>
+                <span className="mt-1 block text-xs text-slate-500">{option.description}</span>
+              </button>
+            ))}
+          </div>
+        </BattlePanel>
+
+        <BattlePanel
+          title={language === "zh" ? "运行数据目录" : "Runtime Data Folder"}
+          meta={language === "zh" ? "客户文件、缓存和 manifest 不进入 SSA 代码仓库" : "customer files, caches, and manifests stay out of the SSA code repo"}
+          tone="amber"
+        >
+          <div className="grid gap-3 p-3 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)]">
+            <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">
+                {language === "zh" ? "当前路径" : "Current path"}
+              </p>
+              <p className="mt-2 break-all font-mono text-xs text-slate-200">
+                {runtimeManifest?.dataRoot || (loading ? (language === "zh" ? "正在读取" : "Loading") : "SSA_DATA_ROOT")}
+              </p>
+            </div>
+            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-3 text-xs leading-5 text-amber-100">
+              {language === "zh"
+                ? ".jadenos、manifest、LLM 缓存、邮件草稿缓存和客户归档属于运行数据。代码 git 不应该包含它们；部署或换机器时需要备份这个目录。"
+                : ".jadenos, manifests, LLM cache, inbox draft cache, and customer archives are runtime data. They should not be committed to the code repo; back up this folder before deploys or machine moves."}
+            </div>
           </div>
         </BattlePanel>
 

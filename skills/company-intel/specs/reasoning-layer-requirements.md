@@ -10,7 +10,7 @@
 
 ## 一、背景
 
-当前 company-intel skill 完成了信息搜集和结构化输出（公司信息 + 联系人 + 邮箱验证 + 写 OKKI），但缺少**推理层**：拿到情报后，帮老板判断"为什么值得跟进"以及"怎么开口"。
+当前 company-intel skill 完成了信息搜集和结构化输出（公司信息 + 联系人 + 邮箱验证 + 可选 CRM 交接），但缺少**推理层**：拿到情报后，帮用户判断"为什么值得跟进"以及"怎么开口"。
 
 参考 ClawHub 上 `afrexai-prospect-researcher` 的痛点推断框架，在现有 4 阶段工作流之后增加 Phase 5。
 
@@ -22,7 +22,7 @@
 Phase 1: 网站背调 → 公司基本信息
 Phase 2: 联系人挖掘 → LinkedIn + 角色识别
 Phase 3: SMTP 邮箱验证 → 邮箱有效性
-Phase 4: 写入 OKKI → CRM 建档 + 本地档案
+Phase 4: 本地建档 + 可选 CRM 交接
 ```
 
 ---
@@ -39,7 +39,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 |------|-----------------|
 | 🔴 Hot | 最近 6 个月内有融资/招聘扩张信号 |
 | | 目标联系人是 CEO/Founder/Head of Purchasing |
-| | 公司产品线与我们高度匹配（HDMI/DP/USB 线材进口商） |
+| | 公司产品线与当前工作区产品画像高度匹配 |
 | 🟡 Warm | 成立时间 > 1 年，有稳定招聘但无融资信号 |
 | | 目标联系人是中层管理者 |
 | | 有相关业务但不确认是否进口线材 |
@@ -61,7 +61,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 
 ### 5.2 痛点分析（Pain Point Analysis）
 
-**目的：** 根据公开信号推断客户当前可能面临什么挑战，我们的线材能解决什么问题。
+**目的：** 根据公开信号推断客户当前可能面临什么挑战，当前工作区的产品/服务能解决什么问题。
 
 **触发信号 → 痛点映射表：**
 
@@ -71,7 +71,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 | 新开分支机构/仓库 | 供应链管理需求增加 | 批量采购 + 物流 |
 | 参加展会（CES 等） | 需要新品支持 | 新品线材适配 |
 | 官网有 HDMI/DP 产品但无品牌 | 可能 OEM/分销 | 提供 OEM 线材 |
-| 公司网站提到 "quality"/"premium" | 对品质要求高 | Your Company 品质背书 |
+| 公司网站提到 "quality"/"premium" | 对品质要求高 | 认证、质检、案例或交付能力背书 |
 | LinkedIn 提到 "supplier change"/"sourcing" | 在换供应商 | 切换成本低，快速响应 |
 
 **输出格式示例：**
@@ -80,7 +80,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 ### 痛点推断
 
 1. **供应链扩张** — 2026-01 新开澳洲分部（官网新闻），需要新的线材供应商配合本地配送
-2. **品质升级** — 官网首页强调 "Premium Quality"，符合我们 HDMI 2.1 认证线定位
+2. **品质升级** — 官网首页强调 "Premium Quality"，符合当前工作区的认证/质检/稳定交付定位
 ```
 
 ⚠️ **约束：** 所有推断必须基于公开证据，不得编造。每条推断后附信息来源 URL。
@@ -114,7 +114,7 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 **要求：**
 - 基于真实情报，不编造
 - 提到客户最近的具体动态（融资、展会、招聘等）
-- 一句话说明 Your Company 能帮到他什么
+- 一句话说明当前工作区的产品/服务能帮到他什么
 - 不出现 "cutting-edge"（USER.md 禁令）
 
 **模板变量：**
@@ -130,13 +130,13 @@ Phase 4: 写入 OKKI → CRM 建档 + 本地档案
 
 Hi [Name],
 
-Congratulations on the $3M Series A! I noticed you're expanding into the Australian market — as you scale, reliable HDMI and USB cable supply is critical. Your Company has been manufacturing certified cables for [similar company in space] since 2010. Would love to share how we helped them reduce supplier lead time by 40%.
+Congratulations on the $3M Series A! I noticed you're expanding into the Australian market. As you scale, reliable supply and shorter lead times become harder to manage. We may be able to support [specific product fit] based on your current product line.
 
 ---
 
 备选 2：
 
-Hi [Name], saw your team at CES — great to see [Company] pushing into premium AV solutions. We manufacture HDMI 2.1 and DP cables with full compliance certification, and I'd love to discuss how we can support your new product line.
+Hi [Name], saw your team at CES — great to see [Company] pushing into premium AV solutions. We work with [specific matching product category] and can support [specific need] if you are reviewing suppliers for the new line.
 ```
 
 每次生成 2 个版本，一个偏商务，一个偏产品。
@@ -235,7 +235,7 @@ Phase 1-4 的输出之后，追加 Phase 5 的完整内容：
 ### P2 — 批量模式 + 话术库
 - **批量输入：** 支持 `companies.json` 数组 → 逐个处理 → 输出 `summary.md`
 - **汇总报告：** 按 Hot/Warm/Cold/Dead 分组，含表格和评分
-- **Your Company 话术库：** 根据 Hot/Warm/Cold 类型选择不同开场角度
+- **工作区产品话术库：** 根据 Hot/Warm/Cold 类型和当前产品画像选择不同开场角度
 
 ### 文件变更
 - ✅ `SKILL.md` → 升级为 v2.0（完整重写）

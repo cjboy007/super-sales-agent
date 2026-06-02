@@ -268,6 +268,18 @@ export class SqliteTaskQueue {
     });
   }
 
+  requeue(id: string, error?: string): RuntimeJob {
+    const existing = this.get(id);
+    if (!existing) throw new Error(`Runtime job not found: ${id}`);
+    return this.save({
+      ...existing,
+      status: "queued",
+      claimedBy: undefined,
+      leaseUntil: undefined,
+      error,
+    });
+  }
+
   private initialize(): void {
     this.exec(`
       PRAGMA journal_mode = WAL;

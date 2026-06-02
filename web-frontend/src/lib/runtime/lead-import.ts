@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { queueCompanyIntelForLeads, type CompanyIntelLeadInput } from "./company-intel";
 import type { SalesRuntime } from "./sales-runtime";
 
 export interface LeadImportInput {
@@ -14,6 +15,11 @@ export interface LeadImportResult {
   path: string;
   count: number;
   format: "csv" | "json";
+  companyIntel: {
+    queued: number;
+    skipped: number;
+    jobs: string[];
+  };
 }
 
 function safeFileName(value: string, fallback: string) {
@@ -22,6 +28,66 @@ function safeFileName(value: string, fallback: string) {
 
 function countCsvRows(csv: string) {
   return Math.max(0, csv.split("\n").filter((line) => line.trim()).length - 1);
+}
+
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const ch = line[index];
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+    } else if (ch === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+
+  result.push(current.trim());
+  return result;
+}
+
+function stringFrom(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return "";
+}
+
+function csvToCompanyIntelLeads(csv: string): CompanyIntelLeadInput[] {
+  const lines = csv.split("\n").filter((line) => line.trim());
+  if (lines.length < 2) return [];
+  const headers = parseCsvLine(lines[0]);
+  return lines.slice(1).map((line) => {
+    const values = parseCsvLine(line);
+    const row: Record<string, string> = {};
+    headers.forEach((header, index) => {
+      row[header.trim()] = (values[index] || "").trim();
+    });
+    return rowToCompanyIntelLead(row);
+  });
+}
+
+function rowToCompanyIntelLead(row: Record<string, unknown>): CompanyIntelLeadInput {
+  const score = stringFrom(row.score);
+  return {
+    companyName: stringFrom(row.companyName, row.company_name, row.company, row.account, row.name),
+    country: stringFrom(row.country, row.market),
+    industry: stringFrom(row.industry, row.vertical),
+    contact: stringFrom(row.contact, row.contact_name, row.contactName, row.person),
+    position: stringFrom(row.position, row.title, row.role),
+    email: stringFrom(row.email, row.email_address, row.mail),
+    homepage: stringFrom(row.homepage, row.website, row.url),
+    category: stringFrom(row.category, row.tier, row.segment),
+    reason: stringFrom(row.reason, row.source, row.notes, row.industry),
+    confidence: stringFrom(row.confidence, row.confidence_score, row.verification_status),
+    score: score === "Hot" || score === "Warm" || score === "Cold" ? score : undefined,
+  };
 }
 
 function rememberImport(runtime: SalesRuntime, input: {
@@ -70,7 +136,10 @@ export function importWorkspaceLeads(runtime: SalesRuntime, input: LeadImportInp
       format: "csv",
       sideEffects: "local-only",
     });
-    return { workspaceId: workspace.id, path: target, count, format: "csv" };
+    const companyIntel = queueCompanyIntelForLeads(runtime, workspace.id, csvToCompanyIntelLeads(input.csv), {
+      source: "lead-import",
+    });
+    return { workspaceId: workspace.id, path: target, count, format: "csv", companyIntel };
   }
 
   if (Array.isArray(input.json)) {
@@ -85,7 +154,10 @@ export function importWorkspaceLeads(runtime: SalesRuntime, input: LeadImportInp
       format: "json",
       sideEffects: "local-only",
     });
-    return { workspaceId: workspace.id, path: target, count: input.json.length, format: "json" };
+    const companyIntel = queueCompanyIntelForLeads(runtime, workspace.id, input.json.map(rowToCompanyIntelLead), {
+      source: "lead-import",
+    });
+    return { workspaceId: workspace.id, path: target, count: input.json.length, format: "json", companyIntel };
   }
 
   throw new Error("Provide csv text or json lead rows to import.");

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useProject, PROJECTS } from "@/lib/project";
@@ -45,9 +46,28 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
       <div className="flex items-center h-16 px-4 border-b border-[var(--border-color)]">
         <button
           onClick={onToggle}
-          className="text-lg font-bold text-white hover:text-[var(--accent)] transition-colors w-full text-left truncate"
+          className="flex min-w-0 flex-1 items-center text-left transition-opacity hover:opacity-90"
+          aria-label="Toggle sidebar"
         >
-          {collapsed ? "JO" : "JadenOS"}
+          {collapsed ? (
+            <Image
+              src="/brand/ssa-icon-192.png"
+              alt="SSA"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-md object-contain"
+              priority
+            />
+          ) : (
+            <Image
+              src="/brand/ssa-logo-horizontal.png"
+              alt="SSA Super Sales Agent"
+              width={168}
+              height={44}
+              className="h-11 w-auto object-contain"
+              priority
+            />
+          )}
         </button>
         <button
           onClick={onCloseMobile}
@@ -117,12 +137,12 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
       {!collapsed && (
         <div className="p-4 border-t border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
-              W
+            <div className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center text-[10px] font-bold text-white">
+              SSA
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-white truncate">JadenOS</p>
-              <p className="text-xs text-gray-500 truncate">OpenClaw for salespeople</p>
+              <p className="text-sm font-medium text-white truncate">SSA</p>
+              <p className="text-xs text-gray-500 truncate">Super Sales Agent</p>
             </div>
           </div>
         </div>

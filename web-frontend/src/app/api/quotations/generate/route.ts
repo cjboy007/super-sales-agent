@@ -5,7 +5,7 @@ import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
 export const dynamic = "force-dynamic";
 
 interface GenerateRequestBody {
-  type: "QT" | "PI" | "PN" | "SPL";
+  type: "QT" | "PI" | "SPL";
   customer: string;
   items?: Array<{
     name: string;

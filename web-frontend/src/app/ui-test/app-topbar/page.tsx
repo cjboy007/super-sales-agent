@@ -6,7 +6,7 @@ const navItems = [
   { label: "Inbox", href: "/inbox" },
   { label: "Emails", href: "/emails" },
   { label: "Quotes", href: "/quotations" },
-  { label: "Docs", href: "/documents" },
+  { label: "Ship Docs", href: "/documents" },
   { label: "Intel", href: "/intelligence" },
   { label: "Settings", href: "/settings" },
 ];

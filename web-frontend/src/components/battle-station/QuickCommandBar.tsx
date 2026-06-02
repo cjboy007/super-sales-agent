@@ -46,12 +46,7 @@ export default function QuickCommandBar({
         <button
           type="button"
           onClick={onSubmit}
-          className={cx(
-            "rounded px-3 py-1.5 text-xs font-semibold transition",
-            command.trim()
-              ? "bg-emerald-600 text-white hover:bg-emerald-500"
-              : "bg-slate-800 text-slate-600"
-          )}
+          className="rounded bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-500"
         >
           {copy.queue}
         </button>

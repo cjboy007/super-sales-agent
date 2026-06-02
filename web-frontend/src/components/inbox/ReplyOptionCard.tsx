@@ -27,12 +27,6 @@ const styleBg = {
   creative: "bg-purple-500/5",
 };
 
-const riskColors = {
-  low: "text-green-400 bg-green-500/10 border-green-500/20",
-  medium: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  high: "text-red-400 bg-red-500/10 border-red-500/20",
-};
-
 export default function ReplyOptionCard({
   option,
   selected,
@@ -57,9 +51,6 @@ export default function ReplyOptionCard({
             <span className={`text-lg font-bold ${styleAccent[option.style]}`}>{option.title}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`text-xs px-2 py-0.5 rounded-full border ${riskColors[option.risk_level]}`}>
-              {option.risk_level} risk
-            </span>
             {selected && (
               <span className={`text-xs px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white font-medium`}>
                 ✓ Selected

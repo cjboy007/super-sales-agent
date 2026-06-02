@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { battleStationI18n, type ActiveAgent } from "@/lib/battle-station-data";
+import { resolveFocusCase } from "@/lib/battle-station-focus";
 import { useProject } from "@/lib/project";
 import { useSSE } from "@/hooks/useSSE";
 import CommandCenter from "@/components/battle-station/CommandCenter";
@@ -45,6 +46,7 @@ function statusToApprovalState(status: string): string {
 }
 
 interface AgentSummary {
+  id?: string;
   name: string;
   role: string;
   tasksCompletedToday: number;
@@ -53,6 +55,109 @@ interface AgentSummary {
   approvalGated: number;
 }
 
+const BACKGROUND_PROGRESS_COPY = {
+  en: {
+    "lead-research": {
+      name: "Lead Research",
+      role: "Prospect research and CRM import",
+      active: (count: number) => `${count} lead task(s) running`,
+      approval: (count: number) => `${count} item(s) waiting for review`,
+      failed: (count: number) => `${count} lead task(s) need attention`,
+      idle: "ready for customer research",
+    },
+    "outreach-drafts": {
+      name: "Outreach Drafts",
+      role: "Inbox triage and cold-email drafts",
+      active: (count: number) => `${count} outreach draft(s) running`,
+      approval: (count: number) => `${count} draft(s) waiting for approval`,
+      failed: (count: number) => `${count} outreach task(s) need attention`,
+      idle: "ready for inbox and outreach work",
+    },
+    "quote-docs": {
+      name: "Quotes and Ship Docs",
+      role: "Quotations, PI export, and CI/PL follow-up files",
+      active: (count: number) => `${count} quote/shipping-file task(s) running`,
+      approval: (count: number) => `${count} file action(s) waiting for review`,
+      failed: (count: number) => `${count} quote/file task(s) need attention`,
+      idle: "ready for quotes and CI/PL files",
+    },
+    "follow-up-plan": {
+      name: "Follow-up Plan",
+      role: "Follow-up cadence and reminders",
+      active: (count: number) => `${count} follow-up task(s) running`,
+      approval: (count: number) => `${count} follow-up item(s) waiting for review`,
+      failed: (count: number) => `${count} follow-up task(s) need attention`,
+      idle: "ready for next-step planning",
+    },
+    "approval-gates": {
+      name: "Approval Gates",
+      role: "Customer-facing action approvals",
+      active: (count: number) => `${count} approval check(s) active`,
+      approval: (count: number) => `${count} item(s) waiting for operator review`,
+      failed: (count: number) => `${count} approval issue(s) need attention`,
+      idle: "no blocked customer-facing actions",
+    },
+    "jaden-runtime": {
+      name: "Jaden Runtime",
+      role: "Local planner and worker queue",
+      active: (count: number) => `${count} queued/running task(s)`,
+      approval: (count: number) => `${count} gate(s) waiting for review`,
+      failed: (count: number) => `${count} runtime task(s) need attention`,
+      idle: "worker queue is clear",
+    },
+  },
+  zh: {
+    "lead-research": {
+      name: "线索搜索",
+      role: "客户资料与 CRM 导入",
+      active: (count: number) => `${count} 项线索任务运行中`,
+      approval: (count: number) => `${count} 项线索结果待复核`,
+      failed: (count: number) => `${count} 项线索任务需要处理`,
+      idle: "可接收客户搜索任务",
+    },
+    "outreach-drafts": {
+      name: "开发信草稿",
+      role: "收件箱分诊与开发信起草",
+      active: (count: number) => `${count} 项开发信任务运行中`,
+      approval: (count: number) => `${count} 封开发信等待审批`,
+      failed: (count: number) => `${count} 项开发信任务需要处理`,
+      idle: "可处理收件箱与开发信",
+    },
+    "quote-docs": {
+      name: "报价与出货文件",
+      role: "报价、PI、CI/PL 后续文件",
+      active: (count: number) => `${count} 项报价/出货文件任务运行中`,
+      approval: (count: number) => `${count} 项文件动作待复核`,
+      failed: (count: number) => `${count} 项报价/文件任务需要处理`,
+      idle: "可处理报价与出货文件",
+    },
+    "follow-up-plan": {
+      name: "跟进安排",
+      role: "跟进节奏与下一步提醒",
+      active: (count: number) => `${count} 项跟进任务运行中`,
+      approval: (count: number) => `${count} 项跟进安排待复核`,
+      failed: (count: number) => `${count} 项跟进任务需要处理`,
+      idle: "可安排下一步跟进",
+    },
+    "approval-gates": {
+      name: "审批闸口",
+      role: "客户可见动作人工审批",
+      active: (count: number) => `${count} 项审批检查运行中`,
+      approval: (count: number) => `${count} 项等待我复核`,
+      failed: (count: number) => `${count} 项审批问题需要处理`,
+      idle: "暂无被拦截的客户可见动作",
+    },
+    "jaden-runtime": {
+      name: "Jaden 后台",
+      role: "本地 planner 与 worker 队列",
+      active: (count: number) => `${count} 项队列任务运行中`,
+      approval: (count: number) => `${count} 个闸口等待复核`,
+      failed: (count: number) => `${count} 项后台任务需要处理`,
+      idle: "后台队列已清空",
+    },
+  },
+} as const;
+
 function statusToAgentTone(summary: AgentSummary): ActiveAgent["tone"] {
   if (summary.approvalGated > 0) return "pending";
   if (summary.tasksFailedToday > 0) return "risk";
@@ -60,30 +165,35 @@ function statusToAgentTone(summary: AgentSummary): ActiveAgent["tone"] {
   return "safe";
 }
 
-function summaryToAgentCard(summary: AgentSummary): ActiveAgent {
+function summaryToAgentCard(summary: AgentSummary, language: keyof typeof BACKGROUND_PROGRESS_COPY): ActiveAgent {
   const tone = statusToAgentTone(summary);
   const queue = summary.activeTasks + summary.approvalGated + summary.tasksFailedToday;
   const load = Math.min(100, summary.activeTasks * 20 + summary.approvalGated * 25 + summary.tasksFailedToday * 30);
+  const key = summary.id || summary.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const localized = BACKGROUND_PROGRESS_COPY[language][key as keyof typeof BACKGROUND_PROGRESS_COPY[typeof language]];
   const status = summary.approvalGated > 0
-    ? "waiting approval"
+    ? (language === "zh" ? "待审批" : "waiting approval")
     : summary.tasksFailedToday > 0
-      ? "error"
+      ? (language === "zh" ? "需处理" : "error")
       : summary.activeTasks > 0
-        ? "running"
-        : "idle";
+        ? (language === "zh" ? "运行中" : "running")
+        : (language === "zh" ? "待命" : "idle");
+  const currentTask = summary.approvalGated > 0
+    ? (localized?.approval(summary.approvalGated) ?? `${summary.role} awaiting approval`)
+    : summary.tasksFailedToday > 0
+      ? (localized?.failed(summary.tasksFailedToday) ?? `${summary.tasksFailedToday} task(s) need attention`)
+      : summary.activeTasks > 0
+        ? (localized?.active(summary.activeTasks) ?? `${summary.activeTasks} active task(s)`)
+        : (localized?.idle ?? (language === "zh" ? "暂无后台任务" : "idle"));
 
   return {
-    id: summary.name,
-    name: summary.name,
-    role: summary.role,
+    id: key,
+    name: localized?.name ?? summary.name,
+    role: localized?.role ?? summary.role,
     status,
     tone,
     load,
-    currentTask: summary.approvalGated > 0
-      ? `${summary.role} awaiting approval`
-      : summary.activeTasks > 0
-        ? `${summary.activeTasks} active task(s)`
-        : "idle",
+    currentTask,
     queue,
   };
 }
@@ -96,7 +206,6 @@ export default function BattleStationPage() {
   const [selectedDealId, setSelectedDealId] = useState("amphenol");
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [focusDealId, setFocusDealId] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState(() => new Date());
   const [stats, setStats] = useState(SAMPLE_STATS);
   const [command, setCommand] = useState("");
   const [lastCommand, setLastCommand] = useState("");
@@ -112,11 +221,6 @@ export default function BattleStationPage() {
   const [liveAgents, setLiveAgents] = useState(station.activeAgents);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [subjects, setSubjects] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -151,7 +255,18 @@ export default function BattleStationPage() {
     [selectedDealId, station.domainAccounts]
   );
 
-  const focusCase = focusDealId ? station.focusCases[focusDealId] : null;
+  const focusCase = useMemo(() => {
+    if (!focusDealId) return null;
+
+    return resolveFocusCase({
+      dealId: focusDealId,
+      language,
+      accounts: station.domainAccounts,
+      approvals: liveApprovals,
+      events: station.timelineEvents,
+      focusCases: station.focusCases,
+    });
+  }, [focusDealId, language, liveApprovals, station.domainAccounts, station.focusCases, station.timelineEvents]);
   const focusApprovalTemplate = useMemo(
     () => (focusCase ? liveApprovals.find((approval) => approval.id === focusCase.approvalId) ?? null : null),
     [focusCase, liveApprovals]
@@ -208,7 +323,7 @@ export default function BattleStationPage() {
         const json = await response.json();
         if (cancelled || !json?.success || !json.data?.agents || !Array.isArray(json.data.agents)) return;
 
-        const live = (json.data.agents as AgentSummary[]).map(summaryToAgentCard);
+        const live = (json.data.agents as AgentSummary[]).map((summary) => summaryToAgentCard(summary, language));
         if (live.length > 0) setLiveAgents(live);
       } catch {
         // Keep sample agent cards if the SSA agent-state API is unavailable.
@@ -219,7 +334,7 @@ export default function BattleStationPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiUrl]);
+  }, [apiUrl, language]);
 
   useEffect(() => {
     if (!focusCase || !focusApprovalTemplate) return;
@@ -268,10 +383,19 @@ export default function BattleStationPage() {
   }, [apiUrl, focusApprovalTemplate, focusCase]);
 
   const openFocus = useCallback((dealId: string) => {
-    if (!station.focusCases[dealId]) return;
+    const nextFocusCase = resolveFocusCase({
+      dealId,
+      language,
+      accounts: station.domainAccounts,
+      approvals: liveApprovals,
+      events: station.timelineEvents,
+      focusCases: station.focusCases,
+    });
+    if (!nextFocusCase) return;
+
     setSelectedDealId(dealId);
     setFocusDealId(dealId);
-  }, [station.focusCases]);
+  }, [language, liveApprovals, station.domainAccounts, station.focusCases, station.timelineEvents]);
 
   const updateApproval = useCallback(
     async (state: string, decisionNote?: string) => {
@@ -366,9 +490,8 @@ export default function BattleStationPage() {
     <div className="flex h-screen flex-col overflow-hidden bg-slate-950 text-slate-200 battle-grid">
       <TopStatusBar
         copy={copy.topBar}
-        activeAgents={station.activeAgents.length}
+        activeAgents={liveAgents.length}
         connected={isConnected}
-        currentTime={currentTime}
         activeEvents={eventCount + recentEvents}
       />
 
@@ -405,6 +528,7 @@ export default function BattleStationPage() {
         <LiveTimeline
           copy={copy.timeline}
           events={station.timelineEvents}
+          language={language}
           selectedDealId={selectedDealId}
           filter={timelineFilter}
           onFilterChange={setTimelineFilter}

@@ -25,6 +25,7 @@ import { getDashboardOverview } from "./dashboard";
 import {
   generateQuotationDocuments,
   generateTradeDocuments,
+  listPiRecords,
   listTradeDocuments,
   requestDocumentGeneration,
   type QuotationGenerationInput,
@@ -32,7 +33,7 @@ import {
 } from "./documents";
 import { testEmailConnection, type EmailConnectionTestInput } from "./email-connection";
 import { sendEmailThroughRuntime, type EmailSendInput } from "./email-send";
-import { previewRuntimeFile, serveRuntimeFile } from "./files";
+import { openRuntimeFile, previewRuntimeFile, serveRuntimeFile } from "./files";
 import {
   draftRuntimeInboxReply,
   getRuntimeInbox,
@@ -42,10 +43,18 @@ import {
   type InboxReplyInput,
   type InboxSendInput,
 } from "./inbox";
+import { refreshIntelligenceFeeds } from "./intelligence-collector";
 import { listIntakeSessions, processIntake, type IntakeInput } from "./intake";
+import {
+  queueCompanyIntel,
+  readCompanyIntel,
+  writeCompanyIntelDossier,
+  type CompanyIntelLeadInput,
+} from "./company-intel";
 import { importWorkspaceLeads, type LeadImportInput } from "./lead-import";
 import { runLlmTask } from "./llm";
 import { getSalesRuntimeManifest } from "./manifest";
+import { rebuildMemoryIndex } from "./memory-index";
 import { createOperatorCommand } from "./operator-commands";
 import { getSentLogSnapshot, runtimeEventsToAgentEvents } from "./activity-stream";
 import { createSalesMemory, type SalesMemory } from "./sales-memory";
@@ -160,6 +169,16 @@ export class SalesRuntime {
   searchMemory(input: MemorySearchInput) {
     const workspace = this.getWorkspace(input.workspaceId);
     return this.memory.searchMemory({ ...input, workspaceId: workspace.id });
+  }
+
+  rebuildMemoryIndex(workspaceId: WorkspaceId) {
+    const workspace = this.getWorkspace(workspaceId);
+    const result = rebuildMemoryIndex(workspace.id);
+    this.recordEvent("memory.index.rebuilt", workspace.id, {
+      recordsIndexed: result.recordsIndexed,
+      updatedAt: result.updatedAt,
+    });
+    return result;
   }
 
   getMemoryTimeline(input: MemorySearchInput) {
@@ -278,6 +297,11 @@ export class SalesRuntime {
     return generateTradeDocuments(this, { ...input, workspaceId: workspace.id });
   }
 
+  listPiRecords(workspaceId = "farreach", query = "") {
+    const workspace = this.getWorkspace(workspaceId);
+    return listPiRecords(workspace.id, query);
+  }
+
   listTradeDocuments(workspaceId = "farreach") {
     const workspace = this.getWorkspace(workspaceId);
     return listTradeDocuments(workspace.id);
@@ -286,6 +310,11 @@ export class SalesRuntime {
   previewFile(input: { path: string | null; workspaceId: string }) {
     const workspace = this.getWorkspace(input.workspaceId);
     return previewRuntimeFile(this, { ...input, workspaceId: workspace.id });
+  }
+
+  openFile(input: { path: string | null; workspaceId?: string }) {
+    const workspaceId = input.workspaceId ? this.getWorkspace(input.workspaceId).id : undefined;
+    return openRuntimeFile(input.path, workspaceId);
   }
 
   serveFile(input: { path: string | null; workspaceId?: string; download?: boolean }) {
@@ -327,9 +356,44 @@ export class SalesRuntime {
     return processIntake(this, { ...input, project: workspace.id });
   }
 
+  async refreshIntelligence(workspaceId = "farreach") {
+    const workspace = this.getWorkspace(workspaceId);
+    const result = await refreshIntelligenceFeeds(workspace.id);
+    this.recordEvent("intelligence.refreshed", workspace.id, {
+      success: result.success,
+      newsCount: result.newsCount,
+      competitorCount: result.competitorCount,
+      sourcesOk: result.sources.filter((source) => source.ok).length,
+      sourcesTotal: result.sources.length,
+      error: result.error || null,
+    });
+    return result;
+  }
+
   importLeads(input: LeadImportInput) {
     const workspace = this.getWorkspace(input.workspaceId);
     return importWorkspaceLeads(this, { ...input, workspaceId: workspace.id });
+  }
+
+  queueCompanyIntel(input: { workspaceId: string; lead: CompanyIntelLeadInput; force?: boolean; source?: string }) {
+    const workspace = this.getWorkspace(input.workspaceId);
+    return queueCompanyIntel(this, workspace.id, input.lead, {
+      force: input.force,
+      source: input.source,
+    });
+  }
+
+  getCompanyIntel(input: { workspaceId: string; lead: CompanyIntelLeadInput }) {
+    const workspace = this.getWorkspace(input.workspaceId);
+    return readCompanyIntel(this, workspace.id, input.lead);
+  }
+
+  completeCompanyIntel(input: { workspaceId: string; lead: CompanyIntelLeadInput; jobId?: string; note?: string }) {
+    const workspace = this.getWorkspace(input.workspaceId);
+    return writeCompanyIntelDossier(this, workspace.id, input.lead, {
+      jobId: input.jobId,
+      note: input.note,
+    });
   }
 
   createOperatorCommand(input: OperatorCommandInput): OperatorCommandRecord {

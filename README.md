@@ -35,6 +35,20 @@ bash hero-pumps/scripts/inbox-monitor-scan.sh
 
 The monitor can run in local-file mode or read-only Himalaya mode. Project wrappers default to Himalaya accounts `farreach` and `heropumps`; set `SSA_INBOX_SOURCE=local` to force local-file mode. The worker writes dedupe state under `~/.ssa/data/companies/<workspace>/inbox/` and records SSA runtime events under `~/.ssa/data/companies/<workspace>/events/`.
 
+### JadenOS Background Worker
+
+SSA owns a lightweight JadenOS scheduler layer. Operator commands are planned into
+bounded runtime jobs by `jaden-planner`, persisted in SSA's SQLite runtime queue,
+and consumed by `jaden-worker`. This does not require OpenClaw, Hermes, or a web
+request lifecycle.
+
+```bash
+node scripts/workers/jaden-worker.mjs --once
+node scripts/workers/jaden-worker.mjs --worker-id jaden-local --max-jobs 5 --max-attempts 3
+```
+
+All customer-visible actions still pass through SSA's side-effect approval gate.
+
 ### SSA Company Data Layout
 
 Runtime files are owned by SSA, but they do not live inside this repo. Each company gets its own folder:
@@ -244,6 +258,11 @@ and uploads live under each company folder and are retained as a bounded recent
 set. Generated previews use temporary folders, and `scripts/check-repo-boundary.sh`
 catches accidental runtime files written into the repo.
 
+JadenOS runtime folders such as `.jadenos/manifest`, `.jadenos/cache`, customer
+quote archives, generated PI/CI/PL files, and price memory are user data, not
+source code. They should be backed up with `SSA_DATA_ROOT`, not committed to the
+SSA application repo.
+
 Keep real email, CRM, Feishu, payment, bank, and document side effects unset or
 `false` unless the exact adapter has been reviewed and approved through the
 side-effect gate.
@@ -273,6 +292,8 @@ See [docs/PUBLIC_BETA_READINESS.md](./docs/PUBLIC_BETA_READINESS.md).
 | `imap-smtp-email` | 邮件收发基础 | ✅ |
 | `okki-email-sync` | OKKI 双向同步 | ✅ |
 | `email-smart-reply` | 邮件智能回复 | ✅ |
+| `back-research` | 批量公司初筛与适配度评分 | 🔄 |
+| `company-intel` | 单客户深度背调、联系人挖掘、邮箱验证 | 🔄 |
 | `quotation-workflow` | 报价单工作流 | ✅ |
 | `follow-up-engine` | 客户跟进引擎 | ✅ |
 | `order-tracker` | 订单追踪 | ✅ |

@@ -444,7 +444,7 @@ describe("SalesRuntime", () => {
       workspaceId: "demo-exporter",
       page: "leads",
       url: "/leads",
-      message: "Review these filtered leads and recommend next steps.",
+      message: "Research these filtered leads, draft outreach, and recommend follow-up next steps.",
       context: {
         filter: "Hot",
         visible: [{ company: "Demo Buyer", email: "buyer@example.com" }],
@@ -459,19 +459,30 @@ describe("SalesRuntime", () => {
       sideEffects: "blocked",
     });
     expect(command.jobId).toBeTruthy();
+    expect(command.jobIds).toHaveLength(3);
+    expect(command.plan?.jobs.map((job) => job.workflow)).toEqual([
+      "email.reply",
+      "lead.import",
+      "follow_up.plan",
+    ]);
 
     const commandPath = path.join(tempRoot, "companies", "demo-exporter", "operator-commands", `${command.id}.json`);
     expect(JSON.parse(fs.readFileSync(commandPath, "utf-8"))).toMatchObject({
       id: command.id,
       jobId: command.jobId,
+      jobIds: command.jobIds,
       context: { filter: "Hot" },
     });
 
     const snapshot = runtime.snapshot();
+    expect(snapshot.jobs.map((job) => job.workflow)).toEqual(expect.arrayContaining([
+      "email.reply",
+      "lead.import",
+      "follow_up.plan",
+    ]));
+    expect(snapshot.jobs.map((job) => job.id)).toEqual(expect.arrayContaining(command.jobIds || []));
     expect(snapshot.jobs[0]).toMatchObject({
-      id: command.jobId,
       workspaceId: "demo-exporter",
-      workflow: "operator.command",
       status: "queued",
     });
     expect(snapshot.events[0]).toMatchObject({
@@ -480,6 +491,8 @@ describe("SalesRuntime", () => {
       payload: {
         commandId: command.id,
         jobId: command.jobId,
+        jobIds: command.jobIds,
+        planSource: "jaden-planner",
         sideEffects: "blocked",
       },
     });
@@ -505,6 +518,7 @@ describe("SalesRuntime", () => {
         workspaceId: "farreach",
         commandId: command.id,
         jobId: command.jobId,
+        jobIds: command.jobIds,
       },
     });
   });
@@ -559,15 +573,22 @@ describe("SalesRuntime", () => {
 
     expect(state.agents).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        name: "Inbox Agent",
+        id: "outreach-drafts",
+        name: "Outreach Drafts",
         activeTasks: 1,
+      }),
+      expect.objectContaining({
+        id: "approval-gates",
+        name: "Approval Gates",
         approvalGated: expect.any(Number),
       }),
       expect.objectContaining({
-        name: "Runtime Agent",
+        id: "jaden-runtime",
+        name: "Jaden Runtime",
         activeTasks: 1,
       }),
     ]));
+    expect(state.agents).toHaveLength(6);
   });
 
   it("stores authoritative SSA memory separately from Hermes/OpenClaw suggestions", () => {

@@ -4,9 +4,11 @@ import { ssaDataRoot } from "../ssa-data-paths";
 
 export const RUNTIME_WORKFLOWS: RuntimeWorkflowType[] = [
   "lead.import",
+  "company_intel.run",
   "email.reply",
   "follow_up.plan",
   "quotation.prepare",
+  "intake.product_doc.process",
   "operator.command",
   "side_effect.request",
 ];
@@ -62,8 +64,8 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
         id: "runtime-workflows",
         openclawEquivalent: "agent tasks / cron jobs",
         ssaPrimitive: "Runtime jobs",
-        status: "partial",
-        notes: "Jobs are persisted in SSA-owned SQLite with worker lease metadata; standalone worker entrypoints and retries remain next.",
+        status: "implemented",
+        notes: "Jobs are persisted in SSA-owned SQLite with worker lease metadata, bounded retries, and a standalone Jaden worker entrypoint.",
       },
       {
         id: "approval-gates",
@@ -106,10 +108,8 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
       "Sales memory lives under companies/<workspace>/memory/records.json.",
     ],
     nextGaps: [
-      "Standalone worker entrypoints and retry policy for SQLite runtime jobs.",
       "Sales tool registry for reusable actions such as quote, draft, classify, import, and approve.",
       "Policy engine for when LLM is required, optional, or forbidden.",
-      "Worker entrypoints that run without Next.js request lifecycle.",
       "Battle Station controls for runtime jobs, tool runs, and scheduled sales playbooks.",
     ],
   };

@@ -165,7 +165,7 @@ export default function EmailsPage() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`h-6 rounded px-2 font-mono text-[10px] uppercase ${
+                    className={`h-8 rounded px-3 font-mono text-[11px] uppercase ${
                       activeTab === tab ? "bg-emerald-600 text-white" : "text-slate-500 hover:text-slate-200"
                     }`}
                   >
@@ -183,38 +183,38 @@ export default function EmailsPage() {
               <EmptyState label={language === "zh" ? (loading ? "正在读取开发信记录" : "没有记录") : (loading ? "loading outreach records" : "no records")} />
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] text-left text-xs">
-                  <thead className="border-b border-slate-800 bg-slate-950/70 text-[10px] uppercase tracking-wide text-slate-500">
+                <table className="w-full min-w-[760px] text-left text-[13px]">
+                  <thead className="border-b border-slate-800 bg-slate-950/70 text-[11px] uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-3 py-2">{language === "zh" ? "收件人" : "Recipient"}</th>
-                      <th className="px-3 py-2">{language === "zh" ? "主题" : "Subject"}</th>
-                      <th className="px-3 py-2">{language === "zh" ? "状态" : "Status"}</th>
-                      <th className="px-3 py-2">{language === "zh" ? "时间" : "Time"}</th>
+                      <th className="px-4 py-3">{language === "zh" ? "收件人" : "Recipient"}</th>
+                      <th className="px-4 py-3">{language === "zh" ? "主题" : "Subject"}</th>
+                      <th className="px-4 py-3">{language === "zh" ? "状态" : "Status"}</th>
+                      <th className="px-4 py-3">{language === "zh" ? "时间" : "Time"}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80">
                     {activeTab === "sent" && sentEmails.map((email) => (
                       <tr key={`${email.email}-${email.sent_at}`} className="hover:bg-slate-800/35">
-                        <td className="px-3 py-2 font-mono text-slate-400">{email.email}</td>
-                        <td className="px-3 py-2 text-slate-200">{email.subject}</td>
-                        <td className="px-3 py-2"><BattleBadge tone="emerald"><BattleText en="saved" zh="已保存" /></BattleBadge></td>
-                        <td className="px-3 py-2 font-mono text-slate-500">{formatDate(email.sent_at)}</td>
+                        <td className="px-4 py-3 font-mono text-slate-400">{email.email}</td>
+                        <td className="px-4 py-3 text-slate-200">{email.subject}</td>
+                        <td className="px-4 py-3"><BattleBadge tone="emerald"><BattleText en="saved" zh="已保存" /></BattleBadge></td>
+                        <td className="px-4 py-3 font-mono text-slate-500">{formatDate(email.sent_at)}</td>
                       </tr>
                     ))}
                     {activeTab === "drafts" && drafts.map((draft) => (
                       <tr key={draft.id} className="hover:bg-slate-800/35">
-                        <td className="px-3 py-2 font-mono text-slate-500">{draft.id}</td>
-                        <td className="px-3 py-2 text-slate-200">{draft.subject}</td>
-                        <td className="px-3 py-2"><BattleBadge tone="amber"><BattleText en="draft" zh="草稿" /></BattleBadge></td>
-                        <td className="px-3 py-2 font-mono text-slate-500">{draft.template}</td>
+                        <td className="px-4 py-3 font-mono text-slate-500">{draft.id}</td>
+                        <td className="px-4 py-3 text-slate-200">{draft.subject}</td>
+                        <td className="px-4 py-3"><BattleBadge tone="amber"><BattleText en="draft" zh="草稿" /></BattleBadge></td>
+                        <td className="px-4 py-3 font-mono text-slate-500">{draft.template}</td>
                       </tr>
                     ))}
                     {activeTab === "pending" && pendingEmails.map((email) => (
                       <tr key={email.id} className="hover:bg-slate-800/35">
-                        <td className="px-3 py-2 font-mono text-slate-400">{email.to}</td>
-                        <td className="px-3 py-2 text-slate-200">{email.subject}</td>
-                        <td className="px-3 py-2"><BattleBadge tone="amber"><BattleText en="review" zh="待审批" /></BattleBadge></td>
-                        <td className="px-3 py-2 font-mono text-slate-500">{formatDate(email.scheduledAt)}</td>
+                        <td className="px-4 py-3 font-mono text-slate-400">{email.to}</td>
+                        <td className="px-4 py-3 text-slate-200">{email.subject}</td>
+                        <td className="px-4 py-3"><BattleBadge tone="amber"><BattleText en="review" zh="待审批" /></BattleBadge></td>
+                        <td className="px-4 py-3 font-mono text-slate-500">{formatDate(email.scheduledAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -228,17 +228,17 @@ export default function EmailsPage() {
             meta={language === "zh" ? "保存草稿，不会直接发给客户" : "saves a draft; does not send to customers"}
           >
             <div className="space-y-3 p-3">
-              <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+              <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] leading-5 text-amber-300">
                 <BattleText
                   en="This page saves the email for review. Customer sends stay locked until an operator explicitly approves."
                   zh="本页只把开发信保存为待审批草稿。操作员明确批准前，不会发给客户。"
                 />
               </div>
-              <InputField value={to} onChange={(event) => setTo(event.target.value)} placeholder="recipient@example.com" mono />
-              <InputField value={subject} onChange={(event) => setSubject(event.target.value)} placeholder={language === "zh" ? "主题" : "Subject"} />
-              <TextAreaField value={body} onChange={(event) => setBody(event.target.value)} placeholder={language === "zh" ? "开发信草稿" : "Draft body"} className="h-52" />
+              <InputField value={to} onChange={(event) => setTo(event.target.value)} placeholder="recipient@example.com" className="w-full" mono />
+              <InputField value={subject} onChange={(event) => setSubject(event.target.value)} placeholder={language === "zh" ? "主题" : "Subject"} className="w-full" />
+              <TextAreaField value={body} onChange={(event) => setBody(event.target.value)} placeholder={language === "zh" ? "开发信草稿" : "Draft body"} className="h-52 w-full" />
               <div className="flex items-center justify-between gap-3">
-                <p className="min-w-0 truncate text-[10px] text-slate-500">
+                <p className="min-w-0 truncate text-[12px] text-slate-500">
                   {saveMessage || (language === "zh" ? "准备保存待审批草稿" : "ready to save for review")}
                 </p>
                 <CommandButton variant="primary" disabled={!to || !subject || !body || saving} onClick={saveRequest}>

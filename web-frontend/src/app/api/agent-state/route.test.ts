@@ -57,16 +57,59 @@ describe("/api/agent-state route", () => {
     expect(json.success).toBe(true);
     expect(json.data.agents).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        name: "Inbox Agent",
-        role: "Email triage and drafts",
+        id: "outreach-drafts",
+        name: "Outreach Drafts",
+        role: "Inbox triage and cold-email drafts",
         activeTasks: 1,
       }),
       expect.objectContaining({
-        name: "Docs Agent",
-        role: "Quotations and trade documents",
+        id: "quote-docs",
+        name: "Quotes and Ship Docs",
+        role: "Quotations, PI export, and CI/PL follow-up files",
+        tasksCompletedToday: 1,
+      }),
+      expect.objectContaining({
+        id: "jaden-runtime",
+        name: "Jaden Runtime",
+        activeTasks: 1,
         tasksCompletedToday: 1,
       }),
     ]));
+    expect(json.data.agents).toHaveLength(6);
     expect(typeof json.data.updatedAt).toBe("string");
+  });
+
+  it("shows Jaden-planned operator command jobs as background progress", async () => {
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    createSalesRuntime().createOperatorCommand({
+      workspaceId: "demo-exporter",
+      page: "quotations",
+      message: "Prepare quotation documents and draft the customer follow-up email.",
+      context: { customer: "Demo Buyer" },
+    });
+    const { GET } = await import("./route");
+
+    const response = await GET(request("http://localhost/api/agent-state?project=demo-exporter&limit=20"));
+    const json = await response.json();
+
+    expect(json.success).toBe(true);
+    expect(json.data.agents).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: "outreach-drafts",
+        name: "Outreach Drafts",
+        activeTasks: 1,
+      }),
+      expect.objectContaining({
+        id: "quote-docs",
+        name: "Quotes and Ship Docs",
+        activeTasks: 1,
+      }),
+      expect.objectContaining({
+        id: "jaden-runtime",
+        name: "Jaden Runtime",
+        activeTasks: 2,
+      }),
+    ]));
+    expect(json.data.agents).toHaveLength(6);
   });
 });

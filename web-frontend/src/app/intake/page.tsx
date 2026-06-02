@@ -92,17 +92,11 @@ const EMPTY_ANALYSIS: IntakeAnalysis = {
   destination: "intake/review",
   confidence: 0,
   relatedParty: "Unknown",
-  summary: "Waiting for files, pasted text, or your notes.",
+  summary: "Waiting for files or your notes.",
   evidence: [],
   matches: [],
   actions: [],
 };
-
-const EXAMPLE_PROMPTS = [
-  "This is a revised PI from the German client. Match it to the right quote and hold for approval.",
-  "This file is a competitor product sheet. Keep it as market intel, not a client record.",
-  "This is a customer RFQ. Find the related lead and tell me whether we need a quotation.",
-];
 
 function formatSize(size: number) {
   if (size < 1024) return `${size} B`;
@@ -148,6 +142,106 @@ function actionLabel(status: IntakeAction["status"]) {
   return "ready";
 }
 
+function localizedItemType(itemType: string, language: "en" | "zh") {
+  if (language !== "zh") return itemType;
+  const labels: Record<string, string> = {
+    "Commercial Invoice": "商业发票",
+    "Packing List": "装箱单",
+    "Proforma Invoice": "形式发票",
+    Quotation: "报价单",
+    "Sample Request": "样品申请",
+    "Payment Proof": "付款凭证",
+    "Product Spec": "产品资料",
+    "Lead List": "线索名单",
+    "Customer Conversation": "客户沟通记录",
+    Unclassified: "未分类",
+  };
+  return labels[itemType] || itemType;
+}
+
+function localizedDestination(destination: string, language: "en" | "zh") {
+  if (language !== "zh") return destination;
+  const labels: Record<string, string> = {
+    "documents/trade-docs": "贸易单证",
+    quotations: "报价",
+    documents: "单证",
+    "documents/payments": "付款单证",
+    "documents/product-specs": "产品资料",
+    "leads/imports": "线索导入",
+    "mail/context": "客户沟通记录",
+    "intake/review": "待人工复核",
+  };
+  return labels[destination] || destination;
+}
+
+function localizedRelatedParty(relatedParty: string, language: "en" | "zh") {
+  if (language !== "zh") return relatedParty;
+  return relatedParty === "Unknown" ? "未识别" : relatedParty;
+}
+
+function localizedSummary(analysis: IntakeAnalysis, language: "en" | "zh") {
+  if (language !== "zh") return analysis.summary;
+  if (
+    analysis.summary === EMPTY_ANALYSIS.summary ||
+    analysis.summary === "Waiting for upload, pasted text, or operator context."
+  ) {
+    return "等待文件或说明。";
+  }
+  if (analysis.itemType === "Unclassified") {
+    return "Jaden 已能保存这条投递，但还需要复核后才能判断归属。";
+  }
+  return `Jaden 判断这是${localizedItemType(analysis.itemType, language)}，复核通过后建议归入${localizedDestination(analysis.destination, language)}。`;
+}
+
+function localizedSource(source: IntakeAnalysis["source"], language: "en" | "zh") {
+  if (language !== "zh") return source;
+  return source === "llm" ? "AI 辅助" : "本地判断";
+}
+
+function localizedEvidence(item: string, language: "en" | "zh") {
+  if (language !== "zh") return item;
+  const uploadMatch = item.match(/^(\d+) uploaded file\(s\)$/);
+  if (uploadMatch) return `${uploadMatch[1]} 个已上传文件`;
+  if (item === "operator context supplied in chat") return "已提供给 Jaden 的说明";
+  if (item.startsWith("type signal: ")) return `内容类型信号：${localizedItemType(item.replace("type signal: ", ""), language)}`;
+  if (item.startsWith("strongest local match: ")) return `最强本地匹配：${item.replace("strongest local match: ", "")}`;
+  return item;
+}
+
+function localizedActionStatus(status: IntakeAction["status"], language: "en" | "zh") {
+  if (language !== "zh") return actionLabel(status);
+  if (status === "approval_required") return "需要审批";
+  if (status === "needs_review") return "需要复核";
+  return "可执行";
+}
+
+function localizedMatchKind(kind: IntakeMatch["kind"], language: "en" | "zh") {
+  if (language !== "zh") return kind;
+  if (kind === "lead") return "线索";
+  if (kind === "quotation") return "报价";
+  return "单证";
+}
+
+function localizedActionLabel(action: IntakeAction, language: "en" | "zh") {
+  if (language !== "zh") return action.label;
+  if (action.id === "archive-original") return "保留原始文件";
+  if (action.id === "link-context") {
+    return action.label === "Hold for client matching"
+      ? "等待客户匹配"
+      : `关联到 ${action.label.replace(/^Link context to /, "")}`;
+  }
+  if (action.id === "place-file") return `建议归入 ${localizedDestination(action.target.replace(/^~\/.ssa\/data\//, ""), language)}`;
+  return action.label;
+}
+
+function localizedActionTarget(action: IntakeAction, language: "en" | "zh") {
+  if (language !== "zh") return action.target;
+  if (action.target === "manual review queue") return "人工复核队列";
+  if (action.target === "local client context") return "本地客户资料";
+  if (action.target.startsWith("~/.ssa/data/")) return action.target.replace("~/.ssa/data/", "SSA 数据区 / ");
+  return action.target;
+}
+
 function pickFiles(fileList: FileList | null) {
   return Array.from(fileList || []).slice(0, 8);
 }
@@ -160,7 +254,6 @@ export default function IntakePage() {
   const [record, setRecord] = useState<IntakeRecord | null>(null);
   const [sessions, setSessions] = useState<IntakeSessionSummary[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [pastedText, setPastedText] = useState("");
   const [message, setMessage] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [sending, setSending] = useState(false);
@@ -197,8 +290,7 @@ export default function IntakePage() {
 
   async function submitIntake(nextMessage = message) {
     const trimmedMessage = nextMessage.trim();
-    const trimmedText = pastedText.trim();
-    if (sending || (!trimmedMessage && !trimmedText && files.length === 0)) return;
+    if (sending || (!trimmedMessage && files.length === 0)) return;
 
     setSending(true);
     setError(null);
@@ -208,7 +300,6 @@ export default function IntakePage() {
       const form = new FormData();
       if (record?.id) form.append("sessionId", record.id);
       if (trimmedMessage) form.append("message", trimmedMessage);
-      if (trimmedText) form.append("pastedText", trimmedText);
       files.forEach((file) => form.append("files", file));
 
       const res = await fetch(apiUrl("/api/intake"), {
@@ -221,7 +312,6 @@ export default function IntakePage() {
       setRecord(json.data);
       setFiles([]);
       setMessage("");
-      setPastedText("");
       await loadSessions();
     } catch (err) {
       setError(err instanceof Error ? err.message : "SSA intake rejected the item");
@@ -264,7 +354,6 @@ export default function IntakePage() {
   function startNew() {
     setRecord(null);
     setFiles([]);
-    setPastedText("");
     setMessage("");
     setError(null);
     setQueuedReceipt("");
@@ -280,8 +369,9 @@ export default function IntakePage() {
   const contextSummary = [
     `${language === "zh" ? "项目" : "Project"} ${project.name}`,
     `${language === "zh" ? "文件" : "Files"} ${uploads.length + files.length}`,
-    `${language === "zh" ? "把握度" : "Confidence"} ${analysis.confidence || 0}%`,
   ].join(" / ");
+  const displayItemType = localizedItemType(analysis.itemType, language);
+  const displayDestination = localizedDestination(analysis.destination, language);
 
   return (
     <BattlePageShell>
@@ -299,13 +389,6 @@ export default function IntakePage() {
       </BattlePageHeader>
 
       <BattlePageBody className="space-y-3">
-        <div className="grid gap-3 md:grid-cols-4">
-          <StatCell label={language === "zh" ? "内容类型" : "Item Type"} value={analysis.itemType} tone={confidenceTone(analysis.confidence)} />
-          <StatCell label={language === "zh" ? "把握度" : "Confidence"} value={`${analysis.confidence || 0}%`} tone={confidenceTone(analysis.confidence)} />
-          <StatCell label={language === "zh" ? "匹配结果" : "Matches"} value={analysis.matches.length} tone="purple" />
-          <StatCell label={language === "zh" ? "文件" : "Files"} value={uploads.length + files.length} tone="blue" />
-        </div>
-
         {error && (
           <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
             {error}
@@ -313,222 +396,189 @@ export default function IntakePage() {
         )}
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_430px]">
-          <div className="space-y-3">
-            <BattlePanel
-              title={language === "zh" ? "投递区" : "Drop Zone"}
-              meta={contextSummary}
-              action={<BattleBadge tone={record ? "emerald" : "neutral"}>{record ? <BattleText en="saved" zh="已保存" /> : <BattleText en="new" zh="新建" />}</BattleBadge>}
-            >
-              <div className="grid gap-3 p-3 lg:grid-cols-[minmax(280px,0.8fr)_minmax(0,1fr)]">
-                <div
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    setDragActive(true);
+          <BattlePanel
+            title={language === "zh" ? "投递区" : "Drop Zone"}
+            meta={contextSummary}
+            action={<BattleBadge tone={record ? "emerald" : "neutral"}>{record ? <BattleText en="saved" zh="已保存" /> : <BattleText en="new" zh="新建" />}</BattleBadge>}
+          >
+            <div className="p-3">
+              <div
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={handleDrop}
+                className={cx(
+                  "flex min-h-[304px] flex-col justify-between rounded-md border border-dashed bg-slate-950/55 p-4 transition",
+                  dragActive ? "border-emerald-400 bg-emerald-500/10" : "border-slate-700"
+                )}
+              >
+                <input
+                  ref={inputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(event) => {
+                    const selected = pickFiles(event.target.files);
+                    if (selected.length) setFiles((current) => [...current, ...selected].slice(0, 8));
+                    event.target.value = "";
                   }}
-                  onDragLeave={() => setDragActive(false)}
-                  onDrop={handleDrop}
-                  className={cx(
-                    "flex min-h-56 flex-col justify-between rounded-md border border-dashed bg-slate-950/55 p-4 transition",
-                    dragActive ? "border-emerald-400 bg-emerald-500/10" : "border-slate-700"
-                  )}
-                >
-                  <input
-                    ref={inputRef}
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={(event) => {
-                      const selected = pickFiles(event.target.files);
-                      if (selected.length) setFiles((current) => [...current, ...selected].slice(0, 8));
-                      event.target.value = "";
-                    }}
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-100">
-                      <BattleText en="Drop files here" zh="把文件拖到这里" />
-                    </p>
-                    <p className="mt-2 text-xs leading-5 text-slate-400">
-                      <BattleText
-                        en="SSA keeps the originals safe, reads your notes, and suggests where each item belongs."
-                        zh="SSA 会安全保留原件，结合你的说明，建议它们应该归到哪里。"
-                      />
-                    </p>
-                  </div>
-
-                  <div className="mt-4 space-y-2">
-                    {files.length === 0 && uploads.length === 0 ? (
-                      <div className="rounded-md border border-slate-800 bg-slate-900/45 px-3 py-3 font-mono text-[10px] uppercase tracking-wide text-slate-600">
-                        <BattleText en="no files selected" zh="还没有选择文件" />
-                      </div>
-                    ) : (
-                      <div className="max-h-40 space-y-2 overflow-y-auto">
-                        {uploads.map((file) => (
-                          <div key={file.id} className="rounded-md border border-slate-800 bg-slate-900/60 px-3 py-2">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="truncate text-xs font-semibold text-slate-200">{file.name}</p>
-                              <BattleBadge tone="emerald">saved</BattleBadge>
-                            </div>
-                            <p className="mt-1 font-mono text-[10px] text-slate-500">{formatSize(file.size)} / {file.type || "file"}</p>
-                          </div>
-                        ))}
-                        {files.map((file, index) => (
-                          <div key={`${file.name}-${file.size}-${index}`} className="rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="truncate text-xs font-semibold text-slate-200">{file.name}</p>
-                              <button
-                                type="button"
-                                onClick={() => setFiles((current) => current.filter((_, i) => i !== index))}
-                                className="font-mono text-[10px] uppercase text-amber-300 hover:text-amber-100"
-                              >
-                                remove
-                              </button>
-                            </div>
-                            <p className="mt-1 font-mono text-[10px] text-slate-500">{formatSize(file.size)} / pending</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="font-mono text-[10px] text-slate-500">
-                        <BattleText en="waiting" zh="待保存" /> {files.length} / {formatSize(pendingSize)}
-                      </p>
-                      <CommandButton variant="secondary" onClick={() => inputRef.current?.click()}>
-                        <BattleText en="Choose Files" zh="选择文件" />
-                      </CommandButton>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex min-h-56 flex-col gap-3">
-                  <div>
-                    <div className="mb-1 flex items-center justify-between">
-                      <label className="text-[10px] uppercase tracking-wide text-slate-500">
-                        <BattleText en="Paste Text Or Notes" zh="粘贴文字或备注" />
-                      </label>
-                      <span className="font-mono text-[10px] text-slate-600">{pastedText.length} <BattleText en="chars" zh="字" /></span>
-                    </div>
-                    <TextAreaField
-                      value={pastedText}
-                      onChange={(event) => setPastedText(event.target.value)}
-                      placeholder={language === "zh" ? "粘贴邮件正文、询盘、产品备注，或任何帮助 SSA 判断归属的信息" : "Paste an email body, RFQ text, product note, or anything that helps SSA classify the item"}
-                      className="min-h-32 w-full resize-none"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-slate-100">
+                    <BattleText en="Drop files here" zh="把文件拖到这里" />
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-slate-400">
+                    <BattleText
+                      en="SSA keeps the originals safe, reads your notes, and suggests where each item belongs."
+                      zh="SSA 会安全保留原件，结合你的说明，建议它们应该归到哪里。"
                     />
-                  </div>
-
-                  <div className="grid gap-2 md:grid-cols-3">
-                    {EXAMPLE_PROMPTS.map((prompt) => (
-                      <button
-                        key={prompt}
-                        type="button"
-                        onClick={() => setMessage(prompt)}
-                        className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-left text-[11px] leading-4 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
-                      >
-                        {prompt}
-                      </button>
-                    ))}
-                  </div>
+                  </p>
                 </div>
-              </div>
-            </BattlePanel>
 
-            <BattlePanel
-              title={language === "zh" ? "说明给 Jaden" : "Notes for Jaden"}
-              meta={language === "zh" ? "告诉 Jaden 这是什么、该怎么处理" : "tell Jaden what this is and what to check"}
-              action={<BattleBadge tone={messages.length ? "emerald" : "neutral"}>{messages.length} <BattleText en="notes" zh="条" /></BattleBadge>}
-            >
-              <div className="flex h-[460px] flex-col">
-                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
-                  {messages.length === 0 ? (
-                    <EmptyState label={language === "zh" ? "描述这是什么，然后交给 Jaden 分析" : "describe what this is, then ask Jaden to review it"} />
+                <div className="mt-4 space-y-2">
+                  {files.length === 0 && uploads.length === 0 ? (
+                    <div className="rounded-md border border-slate-800 bg-slate-900/45 px-3 py-3 font-mono text-[10px] uppercase tracking-wide text-slate-600">
+                      <BattleText en="no files selected" zh="还没有选择文件" />
+                    </div>
                   ) : (
-                    messages.map((chat) => (
-                      <div
-                        key={chat.id}
-                        className={cx(
-                          "max-w-[88%] rounded-md border px-3 py-2",
-                          chat.role === "user"
-                            ? "ml-auto border-emerald-500/30 bg-emerald-500/10"
-                            : "border-slate-800 bg-slate-950/75"
-                        )}
-                      >
-                        <div className="mb-1 flex items-center justify-between gap-3">
-                          <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
-                            {chat.role === "user" ? "Operator" : "Jaden"}
-                          </p>
-                          <p className="font-mono text-[10px] text-slate-600">{formatTime(chat.createdAt)}</p>
+                    <div className="max-h-40 space-y-2 overflow-y-auto">
+                      {uploads.map((file) => (
+                        <div key={file.id} className="rounded-md border border-slate-800 bg-slate-900/60 px-3 py-2">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="truncate text-xs font-semibold text-slate-200">{file.name}</p>
+                            <BattleBadge tone="emerald"><BattleText en="saved" zh="已保存" /></BattleBadge>
+                          </div>
+                          <p className="mt-1 font-mono text-[10px] text-slate-500">{formatSize(file.size)} / {file.type || "file"}</p>
                         </div>
-                        <p className="whitespace-pre-wrap text-xs leading-5 text-slate-300">{chat.content}</p>
-                      </div>
-                    ))
-                  )}
-                  {sending && (
-                    <div className="max-w-[88%] rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2">
-                      <p className="font-mono text-[10px] uppercase tracking-wide text-blue-300">Jaden</p>
-                      <p className="mt-1 text-xs text-slate-300">
-                        <BattleText en="Reviewing your notes and saving the item..." zh="正在阅读你的说明并保存这条投递..." />
-                      </p>
+                      ))}
+                      {files.map((file, index) => (
+                        <div key={`${file.name}-${file.size}-${index}`} className="rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="truncate text-xs font-semibold text-slate-200">{file.name}</p>
+                            <button
+                              type="button"
+                              onClick={() => setFiles((current) => current.filter((_, i) => i !== index))}
+                              className="font-mono text-[10px] uppercase text-amber-300 hover:text-amber-100"
+                            >
+                              <BattleText en="remove" zh="移除" />
+                            </button>
+                          </div>
+                          <p className="mt-1 font-mono text-[10px] text-slate-500">{formatSize(file.size)} / <BattleText en="pending" zh="待保存" /></p>
+                        </div>
+                      ))}
                     </div>
                   )}
-                  <div ref={chatEndRef} />
-                </div>
-
-                <div className="border-t border-slate-800 bg-slate-900/75 p-3">
-                  <TextAreaField
-                    value={message}
-                    onChange={(event) => setMessage(event.target.value)}
-                    onKeyDown={(event) => {
-                      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-                        event.preventDefault();
-                        submitIntake();
-                      }
-                    }}
-                    placeholder={language === "zh" ? "告诉 Jaden 这是什么、你认为它属于哪里、或要核对哪个客户关系" : "Tell Jaden what this is, where you think it belongs, or what relationship to check"}
-                    className="min-h-20 w-full resize-none"
-                  />
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    <p className="truncate font-mono text-[10px] text-slate-500">
-                      <BattleText en="Files and changes stay inside SSA until you approve an action." zh="你批准动作前，文件和变更只保存在 SSA 内。" />
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-mono text-[10px] text-slate-500">
+                      <BattleText en="waiting" zh="待保存" /> {files.length} / {formatSize(pendingSize)}
                     </p>
-                    <CommandButton
-                      variant="primary"
-                      disabled={sending || (!message.trim() && !pastedText.trim() && files.length === 0)}
-                      onClick={() => submitIntake()}
-                    >
-                      {sending ? <BattleText en="Analyzing" zh="分析中" /> : <BattleText en="Ask Jaden" zh="交给 Jaden" />}
+                    <CommandButton variant="secondary" onClick={() => inputRef.current?.click()}>
+                      <BattleText en="Choose Files" zh="选择文件" />
                     </CommandButton>
                   </div>
                 </div>
               </div>
-            </BattlePanel>
-          </div>
+            </div>
+          </BattlePanel>
 
-          <div className="space-y-3">
-            <BattlePanel
-              title={language === "zh" ? "判断结果" : "Decision Panel"}
-              meta={record ? (language === "zh" ? "已保存的投递" : "saved intake") : (language === "zh" ? "暂无投递" : "no active intake")}
-              action={<BattleBadge tone={confidenceTone(analysis.confidence)}>{analysis.confidence || 0}%</BattleBadge>}
-            >
+          <BattlePanel
+            title={language === "zh" ? "说明给 Jaden" : "Notes for Jaden"}
+            meta={language === "zh" ? "告诉 Jaden 这是什么、该怎么处理" : "tell Jaden what this is and what to check"}
+            action={<BattleBadge tone={messages.length ? "emerald" : "neutral"}>{messages.length} <BattleText en="notes" zh="条" /></BattleBadge>}
+          >
+            <div className="flex min-h-[352px] flex-col">
+              <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
+                {messages.length === 0 ? (
+                  <EmptyState label={language === "zh" ? "写一句说明，然后交给 Jaden 分析" : "write one instruction, then ask Jaden to review it"} />
+                ) : (
+                  messages.map((chat) => (
+                    <div
+                      key={chat.id}
+                      className={cx(
+                        "max-w-[88%] rounded-md border px-3 py-2",
+                        chat.role === "user"
+                          ? "ml-auto border-emerald-500/30 bg-emerald-500/10"
+                          : "border-slate-800 bg-slate-950/75"
+                      )}
+                    >
+                      <div className="mb-1 flex items-center justify-between gap-3">
+                        <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
+                          {chat.role === "user" ? <BattleText en="Operator" zh="操作员" /> : "Jaden"}
+                        </p>
+                        <p className="font-mono text-[10px] text-slate-600">{formatTime(chat.createdAt)}</p>
+                      </div>
+                      <p className="whitespace-pre-wrap text-xs leading-5 text-slate-300">{chat.content}</p>
+                    </div>
+                  ))
+                )}
+                {sending && (
+                  <div className="max-w-[88%] rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2">
+                    <p className="font-mono text-[10px] uppercase tracking-wide text-blue-300">Jaden</p>
+                    <p className="mt-1 text-xs text-slate-300">
+                      <BattleText en="Reviewing your instruction and saving the item..." zh="正在阅读你的说明并保存这条投递..." />
+                    </p>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              <div className="border-t border-slate-800 bg-slate-900/75 p-3">
+                <TextAreaField
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  onKeyDown={(event) => {
+                    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                      event.preventDefault();
+                      submitIntake();
+                    }
+                  }}
+                  placeholder={language === "zh" ? "例如：这是德国客户的新 PI，匹配到正确报价，先不要移动文件。" : "Example: This is a revised PI from the German client. Match it to the right quote and hold for approval."}
+                  className="min-h-24 w-full resize-none"
+                />
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <p className="truncate font-mono text-[10px] text-slate-500">
+                    <BattleText en="Files and changes stay inside SSA until you approve an action." zh="你批准动作前，文件和变更只保存在 SSA 内。" />
+                  </p>
+                  <CommandButton
+                    variant="primary"
+                    disabled={sending || (!message.trim() && files.length === 0)}
+                    onClick={() => submitIntake()}
+                  >
+                    {sending ? <BattleText en="Analyzing" zh="分析中" /> : <BattleText en="Ask Jaden" zh="交给 Jaden" />}
+                  </CommandButton>
+                </div>
+              </div>
+            </div>
+          </BattlePanel>
+        </div>
+
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_430px]">
+          <BattlePanel
+            title={language === "zh" ? "判断结果" : "Decision Panel"}
+            meta={record ? (language === "zh" ? "已保存的投递" : "saved intake") : (language === "zh" ? "暂无投递" : "no active intake")}
+            action={<BattleBadge tone={confidenceTone(analysis.confidence)}>{analysis.confidence || 0}%</BattleBadge>}
+          >
               <div className="space-y-3 p-3">
                 <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-100">{analysis.itemType}</p>
-                      <p className="mt-1 font-mono text-[10px] text-slate-500">{analysis.destination}</p>
+                      <p className="text-sm font-semibold text-slate-100">{displayItemType}</p>
+                      <p className="mt-1 font-mono text-[10px] text-slate-500">{displayDestination}</p>
                     </div>
-                    <BattleBadge tone={analysis.source === "llm" ? "purple" : "blue"}>{analysis.source}</BattleBadge>
+                    <BattleBadge tone={analysis.source === "llm" ? "purple" : "blue"}>{localizedSource(analysis.source, language)}</BattleBadge>
                   </div>
-                  <p className="mt-3 text-xs leading-5 text-slate-400">{analysis.summary}</p>
+                  <p className="mt-3 text-xs leading-5 text-slate-400">{localizedSummary(analysis, language)}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-slate-500"><BattleText en="Related Company" zh="相关公司" /></p>
-                    <p className="mt-1 truncate text-xs font-semibold text-slate-200">{analysis.relatedParty}</p>
-                  </div>
-                  <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-slate-500"><BattleText en="Updated" zh="更新时间" /></p>
-                    <p className="mt-1 font-mono text-xs text-slate-300">{formatTime(record?.updatedAt)}</p>
-                  </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <StatCell label={language === "zh" ? "内容类型" : "Item Type"} value={displayItemType} tone={confidenceTone(analysis.confidence)} />
+                  <StatCell label={language === "zh" ? "把握度" : "Confidence"} value={`${analysis.confidence || 0}%`} tone={confidenceTone(analysis.confidence)} />
+                  <StatCell label={language === "zh" ? "匹配结果" : "Matches"} value={analysis.matches.length} tone="purple" />
+                  <StatCell label={language === "zh" ? "文件" : "Files"} value={uploads.length + files.length} tone="blue" />
+                  <StatCell label={language === "zh" ? "相关公司" : "Related Company"} value={localizedRelatedParty(analysis.relatedParty, language)} tone="neutral" />
+                  <StatCell label={language === "zh" ? "更新时间" : "Updated"} value={formatTime(record?.updatedAt)} tone="neutral" />
                 </div>
 
                 <div>
@@ -541,7 +591,7 @@ export default function IntakePage() {
                     <div className="space-y-1">
                       {analysis.evidence.map((item) => (
                         <div key={item} className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-400">
-                          {item}
+                          {localizedEvidence(item, language)}
                         </div>
                       ))}
                     </div>
@@ -564,10 +614,10 @@ export default function IntakePage() {
                       {analysis.actions.map((action) => (
                         <div key={action.id} className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
                           <div className="flex items-center justify-between gap-3">
-                            <p className="text-xs font-semibold text-slate-200">{action.label}</p>
-                            <BattleBadge tone={statusTone(action.status)}>{actionLabel(action.status)}</BattleBadge>
+                            <p className="text-xs font-semibold text-slate-200">{localizedActionLabel(action, language)}</p>
+                            <BattleBadge tone={statusTone(action.status)}>{localizedActionStatus(action.status, language)}</BattleBadge>
                           </div>
-                          <p className="mt-1 truncate font-mono text-[10px] text-slate-500">{action.target}</p>
+                          <p className="mt-1 truncate font-mono text-[10px] text-slate-500">{localizedActionTarget(action, language)}</p>
                         </div>
                       ))}
                     </div>
@@ -577,8 +627,9 @@ export default function IntakePage() {
                   </p>
                 </div>
               </div>
-            </BattlePanel>
+          </BattlePanel>
 
+          <div className="space-y-3">
             <BattlePanel title={language === "zh" ? "匹配结果" : "Matches Found"} meta={language === "zh" ? "客户、报价、单证" : "clients, quotes, documents"}>
               {analysis.matches.length === 0 ? (
                 <EmptyState label={language === "zh" ? "还没有找到匹配结果" : "no match found yet"} />
@@ -592,7 +643,7 @@ export default function IntakePage() {
                           <p className="mt-1 line-clamp-2 text-xs text-slate-400">{match.detail}</p>
                         </div>
                         <div className="flex shrink-0 items-center gap-1.5">
-                          <BattleBadge tone={kindTone(match.kind)}>{match.kind}</BattleBadge>
+                          <BattleBadge tone={kindTone(match.kind)}>{localizedMatchKind(match.kind, language)}</BattleBadge>
                           <span className="font-mono text-[10px] text-slate-500">{match.confidence}%</span>
                         </div>
                       </div>
@@ -615,11 +666,11 @@ export default function IntakePage() {
                       className="block w-full px-3 py-2 text-left transition hover:bg-slate-800/35"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <p className="truncate text-xs font-semibold text-slate-200">{item.itemType}</p>
+                        <p className="truncate text-xs font-semibold text-slate-200">{localizedItemType(item.itemType, language)}</p>
                         <BattleBadge tone={confidenceTone(item.confidence)}>{item.confidence}%</BattleBadge>
                       </div>
                       <p className="mt-1 truncate font-mono text-[10px] text-slate-500">
-                        {item.id} / {item.destination} / {formatTime(item.updatedAt)}
+                        {item.id} / {localizedDestination(item.destination, language)} / {formatTime(item.updatedAt)}
                       </p>
                     </button>
                   ))}

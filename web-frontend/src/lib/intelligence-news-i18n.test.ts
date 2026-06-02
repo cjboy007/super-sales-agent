@@ -57,8 +57,28 @@ describe("intelligence news localization", () => {
     );
 
     expect(localized.title).toBe("供应链市场信号");
-    expect(localized.summary).toBe("来自 Supply Chain Dive 的英文新闻源，当前暂无中文摘要；已记录为供应链相关外部信号。");
+    expect(localized.summary).toBe("供应链相关动态可能影响交付周期、库存安排或采购成本。");
     expect(localized.title).not.toContain("Target");
     expect(localized.summary).not.toContain("retailer");
+  });
+
+  it("does not display internal source and review instructions from cached Chinese summaries", () => {
+    const localized = localizeNewsItem(
+      {
+        title: "HDMI FORUM RELEASES VERSION 2.2 OF THE HDMI SPECIFICATION",
+        titleZh: "标准认证动态",
+        summary: "HDMI Forum releases a new specification with higher bandwidth.",
+        summaryZh: "来自 HDMI Forum News 的外部英文新闻源，已归入标准认证信号；建议结合客户、报价和交期影响复核。",
+        tag: "standards",
+        source: "HDMI Forum News",
+      },
+      "zh"
+    );
+
+    expect(localized.title).toBe("HDMI FORUM RELEASES VERSION 2.2 OF THE HDMI SPECIFICATION");
+    expect(localized.summary).toBe("标准认证相关动态可能影响高速线材的规格说明、认证要求或产品卖点。");
+    expect(localized.summary).not.toContain("来自");
+    expect(localized.summary).not.toContain("建议");
+    expect(localized.summary).not.toContain("复核");
   });
 });

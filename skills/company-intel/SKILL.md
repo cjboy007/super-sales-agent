@@ -1,402 +1,374 @@
-# SKILL.md - 公司情报侦察
-
-> **名称：** 公司情报侦察 v2.0
-> **触发：** 用户提供公司 URL、公司名、或批量 JSON，要求建档/背调/找联系人/查邮箱
-> **执行：** SHADOW Agent 直接调用工具完成全流程
-> **输出：** 本地档案 + OKKI 建档 + 有效邮箱列表 + 推理分析
-
+---
+name: company-intel
+description: Use when a sales workflow needs single-company customer background research, buyer/contact discovery, email verification, lead-fit scoring, source-backed outreach angles, or company dossier generation.
 ---
 
-## 📋 完整工作流（SHADOW 亲自执行）
+# Company Intel
 
-```
-Phase 1: 网站背调 → Phase 2: 联系人挖掘 → Phase 3: 邮箱验证 → Phase 4: 写入 OKKI → Phase 5: 推理层
-```
+Company Intel is the deep customer background research skill for SSA/JadenOS. It turns one target company into a clean, source-backed sales dossier: who they are, what they sell, whether they are worth pursuing, who to contact, which emails are verified, and how to open the conversation.
 
-**批量模式：** 用户提供 `companies.json` 数组 → 逐个处理 → 输出汇总报告 `summary.md`
+It is complementary to `back-research`: use `back-research` for a large company list, then run `company-intel` only on the high-fit companies.
 
----
+## When To Use
 
-## Phase 0: 红线检测（新增 · P0）
+Use this skill when the user provides any of the following:
 
-**在开始任何工作前，先运行红线检测。触发任一项 → 立即跳过。**
+- A company name, website, email domain, LinkedIn/company page, Alibaba lead, or inquiry sender.
+- A short list of companies that already passed a first screening.
+- A request like "客户背调", "查这个客户", "找联系人", "验证邮箱", "生成客户档案", "判断值不值得跟", or "给开发信切入点".
 
-| 红线 | 检测方法 | 动作 |
-|------|---------|------|
-| 制裁国家/实体 | 检查公司所在国家是否在 OFAC/EU 制裁名单 | 🚫 直接跳过，记录原因 |
-| 公司破产/注销 | 搜索 "{公司名} bankrupt" / "注销" / "liquidation" | 💀 标记为 Dead，不建档 |
-| 大量差评/诉讼 | 搜索 "{公司名} scam" / "lawsuit" / "fraud" | ⚠️ 标记为 Risk，输出警告 |
-| 邮箱域名不匹配 | 官网域名 vs 邮箱域名交叉验证 | ⚠️ 标记为 Suspicious |
-| 色情/赌博/军火 | Phase 1 网站内容检测 | 🚫 直接跳过 |
+Do not use this as the market-news skill. Industry news and competitor monitoring belong to `ssa-intelligence`; this skill is for a named company or account.
 
-**输出格式：**
-```
-### Phase 0 红线检测
-- [✅ 通过] 无红线
-- 或 [🚫 触发] 具体红线 + 原因
+## Runtime Boundary
+
+All generated runtime files must stay outside the repo.
+
+Default data root:
+
+```bash
+SSA_DATA_ROOT="${SSA_DATA_ROOT:-$HOME/.ssa/data}"
 ```
 
----
+Default output layout:
 
-## Phase 1: 网站背调
-
-**工具：** `web_fetch` + `web_search`
-
-```
-1. web_fetch 目标 URL（contact-us / about / 首页）
-2. web_fetch 补充页面（/about/, /career/, /team/, /products/）
-3. web_search 公司名（获取 LinkedIn / ZoomInfo / Moneyhouse / Glassdoor 等外部来源）
-4. 交叉验证：至少 2 个独立来源确认同一信息
+```text
+$SSA_DATA_ROOT/companies/<workspace>/intelligence/clients/<client-slug>/
+  client-intel.json
+  client-intel.md
+  sources.json
+  email-candidates.json
 ```
 
-**提取字段：**
-- 公司全称、简称、国家、地址
-- 电话、邮箱、网站
-- 成立时间、营业额、员工规模
-- 业务类型、产品线、代理品牌
-- 核心团队（官网 + LinkedIn 列出的）
-- **Your Company 相关性信号：** 是否卖 HDMI/DP/USB/Ethernet 线材、是否有 OEM 需求
+Rules:
 
----
+- Never write customer dossiers, downloaded pages, temporary HTML, generated Excel, or API responses into the git repo.
+- If the user provides an export folder, write an extra copy there only after confirming the folder is outside the repo.
+- Do not use project-specific paths such as old Google Drive aliases unless the current workspace settings explicitly define them.
+- Keep raw search/cache artifacts bounded. The final dossier should contain source URLs and short evidence notes, not full copied pages.
 
-## Phase 2: 联系人挖掘（增强 · P1）
+## External Connectors
 
-**工具：** `web_search`
+Company Intel can run in degraded mode with only web search. Optional connectors improve coverage:
 
-### Step 1: 找 LinkedIn 员工
-```
-1. site:linkedin.com/in "{公司名}" — 找员工 LinkedIn
-2. "{公司名}" "CEO" OR "Founder" OR "Director"
-3. "{公司名}" "buyer" OR "purchasing" OR "category manager"
-4. "{公司名}" "sales director" OR "head of sales" — 卖电子产品的人很可能也卖线
-```
+| Connector | Purpose | Required |
+|-----------|---------|----------|
+| SearXNG / Tavily / Brave | Web search and source discovery | Recommended |
+| Hunter / Apollo | Contact discovery and email verification | Optional |
+| NeverBounce / ZeroBounce | Email verification fallback | Optional |
+| OKKI / HubSpot / Salesforce | CRM handoff after review | Optional |
+| Company GOAT | Public registry, funding, DNS, GitHub and Companies House enrichment | Optional |
+| Contact GOAT | Email permutation and verification waterfall | Optional |
 
-### Step 2: 推导邮箱格式
-```
-1. 从 RocketReach / Hunter.io / Apollo.io snippet 找已知邮箱
-2. "{公司名}" "{人名}" email — 验证已知人名
-3. 分析已确认的邮箱，推导格式：
-   - first@domain.com（最常见）
-   - first.last@domain.com
-   - f.last@domain.com
-   - first@domain.com（小公司常见）
-4. 基于推导的格式，为每个目标联系人生成邮箱候选
+Environment/path conventions:
+
+```bash
+COMPANY_GOAT_PATH=/path/to/g6-company-goat
+CONTACT_GOAT_PATH=/path/to/g6-contact-goat
+HUNTER_API_KEY=...
+APOLLO_API_KEY=...
 ```
 
-### Step 3: 关键角色优先级
-| 优先级 | 角色 | 原因 |
-|--------|------|------|
-| 1 | CEO/Founder/Owner | 最高决策人 |
-| 2 | Head of Distribution/Purchasing/Procurement | 采购负责人 |
-| 3 | Category Manager / Product Manager | 品类/产品采购 |
-| 4 | Sales Director / Head of Sales | 卖电子产品的，需要线材配套 |
-| 5 | Key Account Manager | 可反向利用获取情报 |
-| 6 | Finance Head / CFO | 价格谈判时重要 |
+Real side effects are gated:
 
----
+- Do not create CRM records unless the matching connector is configured, the workspace has enabled it, and the user explicitly requested handoff.
+- Do not send emails from this skill.
+- Do not perform SMTP RCPT verification unless email verification is enabled for the workspace or the user explicitly approved it for the current run.
+- SMTP verification must stop before `DATA`; it is verification only, never delivery.
 
-## Phase 3: SMTP 邮箱验证（零风险）
+## Workflow
 
-**工具：** `exec` 运行 Python 脚本
-
-```python
-import socket
-import time
-
-emails = ['artur@domain.com', 'info@domain.com', ...]
-mx = 'mail.domain.com'  # 从 dig MX 获取
-
-for email in emails:
-    s = socket.create_connection((mx, 25), timeout=15)
-    s.settimeout(15)
-    s.recv(1024)
-    s.send(b"EHLO gmail.com\r\n")
-    time.sleep(2)
-    s.recv(4096)
-    s.send(b"MAIL FROM:<test@gmail.com>\r\n")
-    time.sleep(2)
-    s.recv(512)
-    s.send(f"RCPT TO:<{email}>\r\n".encode())
-    time.sleep(2)
-    resp = s.recv(512).decode()
-    code = resp[:3]  # 250 = 有效，550 = 不存在
-    s.send(b"QUIT\r\n")
-    s.close()
-    time.sleep(3)  # 每个邮箱间隔 3 秒
+```text
+Phase 0: Normalize input and set workspace
+Phase 1: Red-line screening
+Phase 2: Company research
+Phase 3: Product fit and sales angle
+Phase 4: Contact discovery
+Phase 5: Email verification
+Phase 6: Scoring and reasoning
+Phase 7: Dossier, handoff, and next actions
 ```
 
-**⚠️ 关键：**
-- 必须 `time.sleep(2~3)`，否则超时
-- 只到 RCPT TO，绝不发 DATA
-- 每个邮箱之间间隔 3 秒
+## Phase 0: Normalize Input
 
----
+Normalize incoming data before searching.
 
-## Phase 4: 写入 OKKI
+Minimum normalized record:
 
-**工具：** `exec` 调 OKKI CLI
-
-**4a. 本地存档：**
-```
-intelligence/clients/{Company_Name}.md
-```
-
-**4b. OKKI 新建客户：**
-```python
-data = {
-    'name': '公司全称',
-    'short_name': '简称',
-    'country': 'ISO两位码',
-    'address': '详细地址',
-    'homepage': 'https://...',
-    'user_id': 56785529,  # Jordan
-    'group_id': 0,
-    'pool_id': 0,
-    'is_public': 0,
-    'remark': '关键信息摘要',
-    'customers': [
-        {'first_name': '名', 'last_name': '姓', 'position': '职位', 'email': '已验证邮箱'}
-    ]
+```json
+{
+  "company_name": "Example GmbH",
+  "website": "https://example.com",
+  "domain": "example.com",
+  "country": "DE",
+  "source": "inquiry/email/manual/import",
+  "workspace": "default"
 }
 ```
 
-注意：`group_id` 和 `pool_id` 必填，不能省略。
+If only an email is given, derive the domain and search for the company behind that domain. If only a company name is given, search for the official website and mark confidence.
 
----
+## Phase 1: Red-Line Screening
 
-## Phase 5: 推理层（增强 · P0+P1+P2）
+Run red-line checks before spending time on deep research.
 
-**目的：** 基于 Phase 0-4 已采集的情报，帮老板判断"为什么值得跟进"以及"怎么开口"。
+| Red line | Method | Action |
+|----------|--------|--------|
+| Sanctioned country/entity | Check public sanctions indicators and source country | Skip, record reason |
+| Bankrupt/dissolved company | Search legal status, liquidation, bankruptcy, registry status | Mark `dead_or_inactive` |
+| Fraud/scam/lawsuit cluster | Search company name plus scam, fraud, lawsuit, complaint | Mark `risk` |
+| Domain/email mismatch | Compare official domain, email domain, MX records, website identity | Mark `suspicious` |
+| Prohibited industry | Detect pornography, gambling, weapons, illegal goods | Skip, record reason |
 
-**不需要额外 API，完全基于已有数据推理。**
+Output must include the evidence URL or explicitly state that no public signal was found.
 
-### 5.1 量化线索评分（Lead Score）
+## Phase 2: Company Research
 
-**基础分 50 分，按以下规则加减：**
+Gather facts from the official site plus independent sources.
 
-| 信号 | 分值 | 说明 |
-|------|------|------|
-| 有 CEO/Founder/Owner 已验证邮箱 | +15 | 最高决策人可直达 |
-| 产品线匹配 HDMI/DP/USB/Ethernet | +15 | 直接采购需求 |
-| 公司成立 > 3 年 | +10 | 稳定性 |
-| 有招聘/融资/扩张信号 | +10 | 业务在增长 |
-| 官网提到 quality/certification/premium | +5 | 品质意识 |
-| 有 OEM/白牌产品 | +5 | 可能需要代工 |
-| Sales Director 邮箱已验证 | +5 | 销售端入口 |
-| 所有邮箱全部 bounce（550） | -20 | 无法触达 |
-| 明显不相关（纯服务/零售/个人博客） | -15 | 非目标客户 |
-| 官网不可访问/信息极少 | -10 | 数据不足 |
-| Phase 0 触发红线（非制裁类） | -10 | 风险提示 |
+Required checks:
 
-**评级阈值：**
-| 分数 | 评级 | 动作 |
-|------|------|------|
-| ≥ 75 | 🔴 Hot | 立即跟进，优先处理 |
-| 50-74 | 🟡 Warm | 正常跟进，排入计划 |
-| < 50 | 🟢 Cold | 暂存，定期回顾 |
+1. Fetch or inspect the homepage, contact page, about page, product page, and team/career pages when available.
+2. Search the company name plus country, domain, product terms, registry terms, news, acquisition, expansion, funding, exhibition, and hiring.
+3. Cross-check important facts against at least two sources when possible.
+4. Extract recent developments from the last 12 months. If none are found, write `未找到公开近况` and include which searches were checked.
+5. Extract product portfolio with concrete categories. Do not reduce this to vague keywords.
+6. Check public company registries for financial data before saying revenue is unavailable.
 
-**输出格式：**
-```
-### 🔴 Hot — 评分 85/100
+Financial data requirements:
 
-| 信号 | 分值 |
-|------|------|
-| 有 CEO 已验证邮箱 | +15 |
-| 产品线匹配 HDMI/USB | +15 |
-| 公司成立 8 年 | +10 |
-| 正招聘产品经理 | +10 |
-| 官网提到 "premium quality" | +5 |
-| **总计** | **85** |
-```
+- Recent revenue or turnover, if public.
+- Profit/loss, if public.
+- Employee count, if public.
+- Three-year trend when available.
+- Registry/source used and confidence.
 
-### 5.2 痛点分析（Pain Point Analysis）
+Important: do not stop after the first general web search. Many countries expose financial data through public registries. Use the country-specific reference file before deciding that data is unavailable.
 
-根据公开信号推断客户当前面临的挑战，Your Company 线材能解决什么。
+See `references/financial-data-extraction.md`.
 
-**触发信号 → 痛点映射：**
+## Phase 3: Product Fit And Sales Angle
 
-| 信号 | 推断痛点 | 切入角度 |
-|------|---------|----------|
-| 大量招聘 tech/engineering | 产品线扩张，需稳定供应商 | 定制化线材方案 |
-| 新开分支机构/仓库 | 供应链需求增加 | 批量采购 + 物流 |
-| 参加展会（CES/IFA 等） | 需要新品支持 | 新品线材适配 |
-| 官网有 HDMI/DP 产品但无品牌 | 可能 OEM/分销 | 提供 OEM 线材 |
-| 官网提到 "quality"/"premium"/"certified" | 对品质要求高 | Your Company 认证背书 |
-| LinkedIn 提到 "supplier change"/"sourcing" | 在换供应商 | 切换成本低，快速响应 |
-| 有自有品牌但产品线不全 | 缺品类，需要补齐 | 补充产品线 |
+Use the current workspace product profile, uploaded catalogs, onboarding answers, or user-provided product list. Do not hardcode one supplier's product line.
 
-⚠️ **约束：** 所有推断必须基于公开证据，不得编造。每条推断附信息来源 URL。
+Output three parts:
 
-### 5.3 时机判断（Timing Signal）
+1. Customer product portfolio: concrete categories, brands, OEM/private-label signals, price tier.
+2. Fit map: `our_product_line -> customer_need`, with confidence and evidence.
+3. Sales angle: price, certification, lead time, customization, factory capacity, compliance, regional supply chain, or another angle supported by the evidence.
 
-| 时机信号 | 权重 | 说明 |
-|---------|------|------|
-| 最近 30 天内有新动态 | 🔴 高 | 融资/展会/新品发布 |
-| 最近 90 天内有新动态 | 🟡 中 | 招聘/合作/官网改版 |
-| 超过 90 天无动态 | 🟢 低 | 常规跟进，时机一般 |
+Bad output:
 
-**输出格式：**
-```
-### 时机：🟢 好 — 2026-04 刚参加完 CES，新品线正在选型
+```text
+客户可能需要我们的产品，建议联系。
 ```
 
-### 5.4 个性化开场白（Personalized Opener）
+Good output:
 
-生成 2 个版本：一个偏商务，一个偏产品。
-
-**Your Company 特色话术库（根据线索类型选角度）：**
-
-| 线索类型 | 商务版角度 | 产品版角度 |
-|----------|-----------|-----------|
-| 🔴 Hot（有明确采购需求） | "我们刚帮 [类似公司] 解决了 [具体问题]" | "HDMI 2.1 认证线缆 + 你的产品线 = 完美匹配" |
-| 🟡 Warm（可能相关） | "注意到你们在做 [具体业务]，我们有相关经验" | "我们的 HDMI/USB 产品线能帮你补齐 [具体品类]" |
-| 🟢 Cold（常规接触） | "简单介绍 Your Company，看是否有合作可能" | "18 年制造经验 + HDMI 认证会员，越南工厂" |
-
-**要求：**
-- 基于真实情报，不编造
-- 提到客户最近的具体动态
-- 一句话说明 Your Company 能帮到什么
-- ⛔ 禁止出现 "cutting-edge"、"innovative"、"leading"
-
-**输出格式：**
-```
-### 推荐开场白
-
-**版本 1（偏商务）：**
-Hi [Name], [个性化开场，基于真实情报]. Your Company 可以 [具体帮助]. 
-
-**版本 2（偏产品）：**
-Hi [Name], [产品角度切入]. We manufacture [具体产品线] with [认证/优势].
+```text
+Fit: Cat6A patch cable and PoE cable -> customer sells CCTV and network installation kits.
+Evidence: product page lists IP camera kits and network accessories.
+Angle: reduce sourcing complexity by bundling certified network cable with camera accessories.
 ```
 
----
+## Phase 4: Contact Discovery
 
-## 📝 交付模板
+Prioritize contacts by sales usefulness:
 
-### 单家公司档案
-```markdown
-# {Company Name}
+| Priority | Role |
+|----------|------|
+| 1 | Owner, Founder, CEO, Managing Director |
+| 2 | Purchasing, Procurement, Sourcing, Supply Chain |
+| 3 | Product Manager, Category Manager, Merchandising |
+| 4 | Sales Director, Business Development, Channel Manager |
+| 5 | Operations, Logistics, Finance when relevant |
 
-> 建档日期：YYYY-MM-DD | 跟进人：XXX | 线索评分：🔴 Hot / 🟡 Warm / 🟢 Cold
+Allowed sources:
 
-## 基本信息
-| 项目 | 内容 |
-|------|------|
-| 公司全称 | |
-| 简称 | |
-| 国家 | |
-| 地址 | |
-| 电话 | |
-| 邮箱 | |
-| 网站 | |
-| 成立时间 | |
-| 员工规模 | |
-| 业务类型 | |
-| 产品线 | |
-| Your Company 相关性 | |
+- Official website team/contact pages.
+- Public search snippets.
+- Public LinkedIn search snippets, not authenticated scraping.
+- Hunter/Apollo or similar connector if configured.
+- Company emails already present in inbound mail or documents.
 
-## 核心联系人（已验证邮箱）
-| 姓名 | 职位 | 邮箱 | 状态 |
-|------|------|------|------|
+Separate `contacts` from `email_candidates`.
 
-## 关键点
-- ...
+- `contacts` may contain only confirmed people and emails that are verified or directly sourced.
+- `email_candidates` stores generated guesses and unverified addresses for review.
+- Every contact must include `source_url` or `source_note`.
 
-## Phase 0 红线检测
-- [✅ 通过] 无红线
+## Phase 5: Email Verification
 
----
+Verification order:
 
-## 情报分析
+1. Provider verification through Hunter/Apollo/NeverBounce/ZeroBounce when configured.
+2. MX/DNS check for the domain.
+3. SMTP RCPT check only when explicitly enabled.
+4. Manual review state if verification cannot be performed.
 
-### 线索评分：🔴 Hot — 85/100
-| 信号 | 分值 |
-|------|------|
-| ... | +X |
+SMTP rules:
 
-### 痛点推断
-1. [痛点] — [证据] ([来源](URL))
+- Stop at `RCPT TO`.
+- Never send `DATA`.
+- Wait between attempts.
+- Record status as `verified`, `invalid`, `catch_all`, `unknown`, or `not_checked`.
 
-### 时机判断
-[时机评级] — [理由]
+Only `verified` emails can be used for automated scoring boosts or CRM handoff. Guessed or unknown emails stay in `email_candidates`.
 
-### 推荐开场白
+## Phase 6: Scoring And Reasoning
 
-**版本 1（偏商务）：**
-[内容]
+Start from 50 points and adjust with evidence-backed signals.
 
-**版本 2（偏产品）：**
-[内容]
-```
+| Signal | Score |
+|--------|-------|
+| Decision-maker email verified | +15 |
+| Purchasing/sourcing contact verified | +12 |
+| Strong product fit | +15 |
+| Recent growth, hiring, funding, expansion, or exhibition | +10 |
+| Company active for more than 3 years | +8 |
+| Clear certification/quality/compliance concern | +5 |
+| OEM/private-label or supplier-switch signal | +5 |
+| All emails invalid | -20 |
+| Website unavailable or very thin evidence | -10 |
+| Product mismatch | -15 |
+| Red-line risk without hard skip | -10 |
 
-### 批量汇总报告（summary.md）
-```markdown
-# Your Company 线索背调汇总
+Ratings:
 
-> 生成日期：YYYY-MM-DD | 总计：X 家
+| Score | Rating | Action |
+|-------|--------|--------|
+| 75+ | Hot | Review now and draft outreach |
+| 50-74 | Warm | Add to follow-up queue |
+| Below 50 | Cold | Archive or monitor |
 
-## 概览
-| 评级 | 数量 | 占比 |
-|------|------|------|
-| 🔴 Hot | X | X% |
-| 🟡 Warm | X | X% |
-| 🟢 Cold | X | X% |
-| 🚫 Dead/Skip | X | X% |
+Every score adjustment must cite a source or a computed verification result.
 
-## 🔴 Hot（立即跟进）
-| 公司 | 国家 | 评分 | CEO/联系人 | 邮箱 | 关键信号 |
-|------|------|------|-----------|------|---------|
+## Phase 7: Dossier And Handoff
 
-## 🟡 Warm（正常跟进）
-| 公司 | 国家 | 评分 | 联系人 | 邮箱 | 关键信号 |
-|------|------|------|--------|------|---------|
+Generate both JSON and Markdown.
 
-## 🟢 Cold（暂存）
-| 公司 | 国家 | 评分 | 原因 |
-|------|------|------|------|
+Required JSON shape:
 
-## 🚫 跳过/排除
-| 公司 | 原因 |
-|------|------|
-```
-
----
-
-## 🔧 批量模式使用说明
-
-**输入：** `companies.json` 数组
 ```json
-[
-  {"name": "Company A", "url": "https://...", "country": "US"},
-  {"name": "Company B", "url": "https://...", "country": "DE"}
-]
+{
+  "company": {
+    "name": "Example GmbH",
+    "country": "DE",
+    "website": "https://example.com",
+    "domain": "example.com",
+    "status": "active",
+    "confidence": "high"
+  },
+  "red_lines": [],
+  "financial_data": {
+    "revenue": null,
+    "currency": null,
+    "employees": null,
+    "source": "Checked Handelsregister/North Data; revenue not public for small GmbH",
+    "confidence": "medium"
+  },
+  "recent_developments": [
+    {"date": "N/A", "event": "未找到公开近况", "source_url": ""}
+  ],
+  "product_portfolio": {
+    "main_products": [],
+    "brands": [],
+    "oem_or_private_label": "unknown",
+    "price_positioning": "unknown"
+  },
+  "sales_entry": {
+    "product_match": "",
+    "angle": "",
+    "opener_business": "",
+    "opener_product": "",
+    "evidence": []
+  },
+  "contacts": [],
+  "email_candidates": [],
+  "lead_score": 0,
+  "rating": "Hot/Warm/Cold",
+  "recommended_next_actions": []
+}
 ```
 
-**执行：**
-1. 逐个处理，每家公司生成独立档案
-2. 每处理完 5 家，更新一次进度报告
-3. 全部完成后，生成 `summary.md` 汇总
+Required Markdown sections:
 
-**输出位置：**
-- 单家档案：`intelligence/clients/{Company_Name}.md`
-- 汇总报告：`intelligence/batch-{YYYY-MM-DD}-summary.md`
+- Basic company information.
+- Financial and registry findings.
+- Recent developments.
+- Product portfolio.
+- Product fit and sales angle.
+- Verified contacts.
+- Email candidates requiring review.
+- Score table.
+- Recommended next actions.
+- Source list.
 
----
+CRM handoff is optional and must be reviewed. If enabled, send only verified contacts and source-backed fields.
 
-## ⚠️ 安全红线
+## Batch Mode
 
-1. **邮箱验证绝不发 DATA** — 只到 RCPT TO 阶段
-2. **Phase 0 红线检测优先** — 触发制裁类直接跳过
-3. **公司背调三步法则** — 域名可访问 → 内容匹配 → 交叉验证
-4. **不捏造信息** — 不确定时说"不确定"，推断标注不确定性
-5. **OKKI 建档必填 group_id/pool_id**
-6. **所有推断附来源 URL** — 不得无依据猜测
+For 50+ companies:
 
----
+```text
+back-research -> filter High/Warm fit -> company-intel deep dive -> outreach/review queue
+```
 
-## 📊 版本历史
+Company Intel can process a small list, but it should not be the first pass for raw scraped lists. Deep research on unfiltered lists wastes time and creates noisy workspaces.
 
-| 版本 | 日期 | 变更 |
-|------|------|------|
-| v2.0 | 2026-04-30 | 新增 Phase 0 红线检测、量化评分（P1）、批量模式（P2）、话术库 |
-| v1.0 | 2026-04-30 | 初始版本：4 阶段工作流 + Phase 5 推理层 |
+Batch output goes under:
+
+```text
+$SSA_DATA_ROOT/companies/<workspace>/intelligence/clients/
+$SSA_DATA_ROOT/companies/<workspace>/intelligence/reports/company-intel-summary-YYYY-MM-DD.md
+```
+
+## Onboarding And Settings
+
+SSA onboarding should encourage users to connect or define:
+
+- Search provider: SearXNG, Tavily, or Brave.
+- Email/contact provider: Hunter or Apollo.
+- Optional verifier: NeverBounce, ZeroBounce, or provider verification.
+- CRM connector: OKKI, HubSpot, Salesforce, or none.
+- Product profile: main products, certifications, target industries, regions, minimum order rules, lead time advantages.
+- Data root/export preference.
+
+Users must be able to change these in Settings later.
+
+## Relationship To Other SSA Skills
+
+| Skill | Relationship |
+|-------|--------------|
+| `back-research` | Batch fast scan and fit scoring before deep research |
+| `ssa-intelligence` | Market/news/competitor monitoring, not named-account dossiers |
+| `email-smart-reply` | Uses company-intel facts to draft replies |
+| `campaign-tracker` | Uses ratings and next actions for outreach planning |
+| `okki-email-sync` | Optional CRM/email sync after review |
+| `quotation-workflow` | Uses customer facts and requirements after inquiry qualification |
+
+## Safety Rules
+
+1. Do not fabricate facts, contacts, financials, or recent developments.
+2. Every important claim needs a source URL or a clear `not_found` note.
+3. Keep guessed emails out of `contacts`.
+4. Do not send emails from this skill.
+5. Do not create CRM records without explicit handoff approval.
+6. Do not write runtime artifacts into the repo.
+7. Do not scrape authenticated social pages.
+8. Record uncertainty instead of hiding it.
+
+## References
+
+- `references/financial-data-extraction.md` — country registry and financial data extraction notes.
+- `references/competitor-analysis-framework.md` — competitor/company analysis dimensions.
+- `references/alibaba-openapi-limits.md` — Alibaba International OpenAPI boundaries.
+- `references/excel-requirements-template.md` — optional inquiry requirements workbook template.
+
+## Version History
+
+| Version | Date | Change |
+|---------|------|--------|
+| v3.6-ssa | 2026-05-31 | Migrated Hermes company-intel into SSA/JadenOS, removed project-specific Farreach paths and hardcoded product claims, added SSA runtime boundary and connector gates. |
+| v3.5 | 2026-05-31 | Hermes cleanup of non-background-research content. |
+| v3.0 | 2026-05-28 | Added financial data extraction requirements and registry lookup guidance. |
+| v2.0 | 2026-04-30 | Added red-line screening, scoring, batch mode, and reasoning layer. |

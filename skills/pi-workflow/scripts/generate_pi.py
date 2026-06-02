@@ -7,6 +7,9 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from pi_generator import generate_pi_excel
+
 def generate_pi_html(output_path, data):
     """生成传统风格 PI HTML"""
     
@@ -468,6 +471,13 @@ def main():
         
         output = generate_pi_html(args.output, data)
         print(f"✅ PI 已生成：{output}")
+
+        excel_output = str(Path(output).with_suffix('.xlsx'))
+        excel_result = generate_pi_excel(data, excel_output)
+        if excel_result.success:
+            print(f"✅ Excel 源文件已生成：{excel_result.output_path}")
+        else:
+            print(f"⚠️  Excel 源文件生成失败：{excel_result.error}")
         
         # 如果输出是 HTML，自动生成 PDF（去掉页眉页脚）
         if str(output).endswith('.html'):

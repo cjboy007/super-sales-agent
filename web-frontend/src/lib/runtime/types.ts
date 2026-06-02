@@ -70,7 +70,7 @@ export interface LlmRequest {
 
 export interface LlmResult {
   provider: string;
-  source: "mock" | "provider";
+  source: "mock" | "provider" | "cache";
   text: string;
   confidence: number;
   structured?: Record<string, unknown>;
@@ -131,9 +131,11 @@ export interface RuntimeEvent {
 
 export type RuntimeWorkflowType =
   | "lead.import"
+  | "company_intel.run"
   | "email.reply"
   | "follow_up.plan"
   | "quotation.prepare"
+  | "intake.product_doc.process"
   | "operator.command"
   | "side_effect.request";
 
@@ -321,6 +323,14 @@ export interface OperatorCommandRecord {
   status: "queued_for_local_runtime";
   sideEffects: "blocked";
   jobId?: string;
+  jobIds?: string[];
+  plan?: {
+    source: "jaden-planner";
+    jobs: Array<{
+      id: string;
+      workflow: RuntimeWorkflowType;
+    }>;
+  };
   createdAt: string;
 }
 
@@ -375,6 +385,7 @@ export interface ApprovalPatchInput {
 }
 
 export interface AgentStateSummary {
+  id: string;
   name: string;
   role: string;
   tasksCompletedToday: number;
