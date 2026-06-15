@@ -25,5 +25,6 @@ export * from "./jaden-planner";
 export * from "./jaden-worker";
 export * from "./operator-commands";
 export * from "./activity-stream";
+export * from "./assistant-router";
 export * from "./product-doc-reader";
 export * from "./sales-runtime";
