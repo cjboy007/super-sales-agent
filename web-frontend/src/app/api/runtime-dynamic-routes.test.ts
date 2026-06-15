@@ -3,6 +3,7 @@ import path from "path";
 import { describe, expect, it } from "vitest";
 
 const API_ROUTES_THAT_TOUCH_RUNTIME_STATE = [
+  "assistant/query/route.ts",
   "config/route.ts",
   "documents/generate/route.ts",
   "documents/pi-records/route.ts",

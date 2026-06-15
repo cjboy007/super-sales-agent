@@ -15,6 +15,12 @@ import type {
   OperatorCommandInput,
   OperatorCommandRecord,
 } from "./types";
+import {
+  runAssistantQuery,
+  type AssistantQueryInput,
+  type AssistantQueryResult,
+  type AssistantRouterOptions,
+} from "./assistant-router";
 import type { SettingsInput } from "./configuration";
 import {
   getMaskedSettings,
@@ -217,6 +223,25 @@ export class SalesRuntime {
       provider: result.provider,
       source: result.source,
       confidence: result.confidence,
+    });
+    return result;
+  }
+
+  async runAssistantQuery(
+    input: AssistantQueryInput,
+    options: AssistantRouterOptions = {}
+  ): Promise<AssistantQueryResult> {
+    const workspace = this.getWorkspace(input.workspaceId);
+    const result = await runAssistantQuery(this, { ...input, workspaceId: workspace.id }, options);
+    this.recordEvent("assistant.query.completed", workspace.id, {
+      taskType: result.intent.taskType,
+      localEvidence: result.evidence.local.length,
+      webEvidence: result.evidence.web.length,
+      usedWeb: result.routing.usedWeb,
+      webSearchStatus: result.routing.webSearchStatus,
+      blockedSideEffect: result.safety.blockedSideEffect,
+      confidence: result.confidence,
+      sideEffects: "blocked-by-default",
     });
     return result;
   }
