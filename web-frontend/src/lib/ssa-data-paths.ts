@@ -2,8 +2,28 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-const REPO_ROOT = path.resolve(process.cwd(), "..");
 const DEFAULT_DATA_ROOT = path.join(os.homedir(), ".ssa", "data");
+
+function looksLikeAppRoot(candidate: string): boolean {
+  return (
+    fs.existsSync(path.join(candidate, "skills")) &&
+    fs.existsSync(path.join(candidate, "scripts"))
+  );
+}
+
+function discoverAppRoot(): string {
+  const cwd = process.cwd();
+  const candidates = [
+    cwd,
+    path.resolve(cwd, ".."),
+    path.resolve(cwd, "../.."),
+  ];
+  return candidates.find(looksLikeAppRoot) || path.resolve(cwd, "..");
+}
+
+export function ssaAppRoot(): string {
+  return path.resolve(process.env.SSA_APP_ROOT || discoverAppRoot());
+}
 
 export function ssaDataRoot(): string {
   return path.resolve(process.env.SSA_DATA_ROOT || DEFAULT_DATA_ROOT);
@@ -43,7 +63,7 @@ export function ensureSsaCompanyDataPath(workspaceId: string | null | undefined,
 export const ensureSsaWorkspaceDataPath = ensureSsaCompanyDataPath;
 
 export function repoPath(...segments: string[]): string {
-  return path.join(REPO_ROOT, ...segments);
+  return path.join(ssaAppRoot(), ...segments);
 }
 
 export function readJsonFile<T>(filePath: string, fallback: T): T {

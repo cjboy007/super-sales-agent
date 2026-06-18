@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   BattleBadge,
   BattleText,
+  AccessRequiredState,
+  AccessBanner,
   BattlePageBody,
   BattlePageHeader,
   BattlePageShell,
@@ -12,11 +14,13 @@ import {
   CommandButton,
   EmptyState,
   InputField,
+  LoadFailedState,
   SelectField,
   StatCell,
   type BattleTone,
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
+import { useProject } from "@/lib/project";
 
 interface Quotation {
   id: string;
@@ -25,7 +29,6 @@ interface Quotation {
   amount: string;
   status: "Draft" | "Sent" | "Confirmed" | "Expired";
   date: string;
-  filePath: string;
   fileName?: string;
   fileType: string;
   mainProducts?: string;
@@ -34,9 +37,9 @@ interface Quotation {
 
 interface QuotationFileLink {
   format: "pdf" | "excel";
-  path: string;
   fileName: string;
   fileType: string;
+  downloadUrl: string;
 }
 
 interface QuotationStats {
@@ -49,6 +52,7 @@ interface QuotationStats {
 type TypeFilter = "All" | Quotation["type"];
 type StatusFilter = "All" | "Draft" | "Sent" | "Confirmed" | "Expired";
 type OpenState = "idle" | "opening" | "opened" | "error";
+type AccessIssue = "none" | "beta_required" | "workspace_denied";
 
 const PAGE_SIZE = 20;
 
@@ -81,8 +85,8 @@ function typeLabel(type: TypeFilter | Quotation["type"], language: "en" | "zh") 
   return labels[type]?.[language] || type;
 }
 
-function fileLabel(file: Pick<QuotationFileLink, "fileName" | "path" | "fileType">): string {
-  return file.fileName || file.path.split(/[\\/]/).pop() || file.fileType || "-";
+function fileLabel(file: Pick<QuotationFileLink, "fileName" | "fileType">): string {
+  return file.fileName || file.fileType || "-";
 }
 
 function fileFormatLabel(format: QuotationFileLink["format"], language: "en" | "zh") {
@@ -92,6 +96,7 @@ function fileFormatLabel(format: QuotationFileLink["format"], language: "en" | "
 
 export default function QuotationsPage() {
   const language = useBattleLanguage();
+  const { apiFetch } = useProject();
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [stats, setStats] = useState<QuotationStats>({ total: 0, byType: {}, byStatus: {}, totalAmount: "—" });
   const [search, setSearch] = useState("");
@@ -101,12 +106,14 @@ export default function QuotationsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accessIssue, setAccessIssue] = useState<AccessIssue>("none");
   const [message, setMessage] = useState("");
-  const [openStateByPath, setOpenStateByPath] = useState<Record<string, OpenState>>({});
+  const [openStateByFile, setOpenStateByFile] = useState<Record<string, OpenState>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setAccessIssue("none");
     try {
       const params = new URLSearchParams({
         search,
@@ -116,10 +123,17 @@ export default function QuotationsPage() {
         pageSize: String(PAGE_SIZE),
       });
       const [listRes, statsRes] = await Promise.all([
-        fetch(`/api/quotations?${params.toString()}`),
-        fetch("/api/quotations?action=stats"),
+        apiFetch(`/api/quotations?${params.toString()}`),
+        apiFetch("/api/quotations?action=stats"),
       ]);
       const [listJson, statsJson] = await Promise.all([listRes.json(), statsRes.json()]);
+      if (listRes.status === 401 || statsRes.status === 401 || listRes.status === 403 || statsRes.status === 403) {
+        setAccessIssue(listRes.status === 403 || statsRes.status === 403 ? "workspace_denied" : "beta_required");
+        setQuotations([]);
+        setStats({ total: 0, byType: {}, byStatus: {}, totalAmount: "—" });
+        setTotalPages(1);
+        return;
+      }
       if (!listRes.ok || listJson.error) throw new Error(listJson.error || "Failed to load quotations");
       const quoteRows = Array.isArray(listJson.data) ? listJson.data : listJson.quotations;
       setQuotations(quoteRows || []);
@@ -130,28 +144,25 @@ export default function QuotationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, type]);
+  }, [apiFetch, page, search, status, type]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  async function openQuoteFile(path: string) {
-    setOpenStateByPath((current) => ({ ...current, [path]: "opening" }));
+  const metricValue = (value: string | number) => accessIssue !== "none" ? "--" : value;
+
+  async function openQuoteFile(file: QuotationFileLink) {
+    const key = file.downloadUrl || file.fileName;
+    setOpenStateByFile((current) => ({ ...current, [key]: "opening" }));
     try {
-      const res = await fetch("/api/files/open?project=farreach", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path }),
-      });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || "Open failed");
-      setOpenStateByPath((current) => ({ ...current, [path]: "opened" }));
+      window.open(file.downloadUrl, "_blank", "noopener,noreferrer");
+      setOpenStateByFile((current) => ({ ...current, [key]: "opened" }));
       window.setTimeout(() => {
-        setOpenStateByPath((current) => ({ ...current, [path]: "idle" }));
+        setOpenStateByFile((current) => ({ ...current, [key]: "idle" }));
       }, 1800);
     } catch (err) {
-      setOpenStateByPath((current) => ({ ...current, [path]: "error" }));
+      setOpenStateByFile((current) => ({ ...current, [key]: "error" }));
       setMessage(err instanceof Error ? err.message : "Open failed");
     }
   }
@@ -172,11 +183,12 @@ export default function QuotationsPage() {
       </BattlePageHeader>
 
       <BattlePageBody className="space-y-3">
+        {accessIssue !== "none" && <AccessBanner issue={accessIssue} next="/quotations" />}
         <div className="grid gap-3 md:grid-cols-4">
-          <StatCell label={language === "zh" ? "全部报价" : "Total Quotes"} value={stats.total} tone="emerald" />
-          <StatCell label={language === "zh" ? "草稿" : "Drafts"} value={stats.byStatus?.Draft || 0} tone="amber" />
-          <StatCell label={language === "zh" ? "已发送" : "Sent"} value={stats.byStatus?.Sent || 0} tone="blue" />
-          <StatCell label={language === "zh" ? "已确认" : "Confirmed"} value={stats.byStatus?.Confirmed || 0} tone="purple" />
+          <StatCell label={language === "zh" ? "全部报价" : "Total Quotes"} value={metricValue(stats.total)} tone="emerald" />
+          <StatCell label={language === "zh" ? "草稿" : "Drafts"} value={metricValue(stats.byStatus?.Draft || 0)} tone="amber" />
+          <StatCell label={language === "zh" ? "已发送" : "Sent"} value={metricValue(stats.byStatus?.Sent || 0)} tone="blue" />
+          <StatCell label={language === "zh" ? "已确认" : "Confirmed"} value={metricValue(stats.byStatus?.Confirmed || 0)} tone="purple" />
         </div>
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -199,8 +211,10 @@ export default function QuotationsPage() {
               </div>
             }
           >
-            {error ? (
-              <EmptyState label={error} />
+            {accessIssue !== "none" ? (
+              <EmptyState label={language === "zh" ? "解锁访问后可查看" : "unlock access to view quotes"} />
+            ) : error ? (
+              <LoadFailedState title="quotation records" zhTitle="报价记录" onRetry={load} />
             ) : quotations.length === 0 ? (
               <EmptyState label={language === "zh" ? (loading ? "正在读取报价" : "没有匹配报价") : (loading ? "loading quotes" : "no matching quotes")} />
             ) : (
@@ -220,14 +234,16 @@ export default function QuotationsPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-800/80">
                     {quotations.map((quote) => (
-                      <tr key={`${quote.id}-${quote.filePath}`} className="hover:bg-slate-800/35">
+                      <tr key={`${quote.id}-${quote.fileName || quote.customer}`} className="hover:bg-slate-800/35">
                         <td className="px-3 py-2 font-mono text-slate-300">{quote.id}</td>
                         <td className="min-w-[240px] max-w-[320px] px-3 py-2">
                           <div className="space-y-1.5">
-                            {(quote.files || []).length > 0 ? quote.files!.map((file) => (
-                              <div key={file.path} className="flex items-center justify-between gap-2 rounded border border-slate-800 bg-slate-950/55 px-2 py-1.5">
+                            {(quote.files || []).length > 0 ? quote.files!.map((file) => {
+                              const openKey = file.downloadUrl || file.fileName;
+                              return (
+                              <div key={`${file.format}:${file.fileName}`} className="flex items-center justify-between gap-2 rounded border border-slate-800 bg-slate-950/55 px-2 py-1.5">
                                 <div className="min-w-0">
-                                  <p className="truncate font-mono text-[11px] text-slate-200" title={file.path}>
+                                  <p className="truncate font-mono text-[11px] text-slate-200" title={file.fileName}>
                                     {fileLabel(file)}
                                   </p>
                                   <p className="font-mono text-[10px] uppercase text-slate-500">
@@ -236,18 +252,18 @@ export default function QuotationsPage() {
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() => openQuoteFile(file.path)}
-                                  disabled={openStateByPath[file.path] === "opening"}
+                                  onClick={() => openQuoteFile(file)}
+                                  disabled={openStateByFile[openKey] === "opening"}
                                   className="shrink-0 rounded border border-slate-700 px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-slate-300 hover:border-emerald-400 hover:text-emerald-300"
                                 >
-                                  {openStateByPath[file.path] === "opening"
+                                  {openStateByFile[openKey] === "opening"
                                     ? language === "zh" ? "打开中" : "Opening"
-                                    : openStateByPath[file.path] === "opened"
+                                    : openStateByFile[openKey] === "opened"
                                       ? language === "zh" ? "已打开" : "Opened"
                                       : language === "zh" ? "打开" : "Open"}
                                 </button>
                               </div>
-                            )) : (
+                            ); }) : (
                               <p className="font-mono text-[10px] uppercase text-slate-500">
                                 {language === "zh" ? "没有 PDF / Excel" : "No PDF / Excel"}
                               </p>

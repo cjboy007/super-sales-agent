@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { consumeTrialQuota, type TrialAccessSession } from "@/lib/runtime/trial-auth";
+import { withPublicAction } from "../../public-action";
 
 export const dynamic = "force-dynamic";
 
@@ -16,14 +18,30 @@ interface GenerateRequestBody {
   }>;
   terms?: string;
   notes?: string;
+  decisionId?: string;
+}
+
+function trialQuotaResponse(trial: TrialAccessSession | undefined) {
+  if (!trial) return null;
+  const quota = consumeTrialQuota(trial, "document");
+  if (quota.ok) return null;
+  return NextResponse.json(
+    {
+      success: false,
+      error: quota.message,
+      reason: quota.reason,
+      contactPhone: quota.contactPhone,
+    },
+    { status: quota.reason === "quota_exceeded" ? 429 : 403 }
+  );
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateRequestBody = await request.json();
-    const project = new URL(request.url).searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
+    const auth = requireResolvedWorkspaceAccess(request, body as unknown as Record<string, unknown>);
     if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
 
     if (!body.type || !body.customer) {
       return NextResponse.json(
@@ -31,6 +49,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    const quotaResponse = trialQuotaResponse(auth.session.trial);
+    if (quotaResponse) return quotaResponse;
 
     const runtime = createSalesRuntime();
     const result = await runtime.generateQuotationDocuments({
@@ -40,9 +60,10 @@ export async function POST(request: NextRequest) {
       items: body.items,
       terms: body.terms,
       notes: body.notes,
+      decisionId: body.decisionId,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json(withPublicAction(result));
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(

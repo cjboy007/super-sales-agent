@@ -199,7 +199,7 @@ function summaryToAgentCard(summary: AgentSummary, language: keyof typeof BACKGR
 }
 
 export default function BattleStationPage() {
-  const { apiUrl } = useProject();
+  const { apiUrl, apiFetch } = useProject();
   const { language } = useTheme();
   const { eventHistory, isConnected, eventCount } = useSSE(apiUrl("/api/events"));
 
@@ -227,7 +227,7 @@ export default function BattleStationPage() {
 
     async function fetchOverview() {
       try {
-        const response = await fetch(apiUrl("/api/dashboard/overview"));
+        const response = await apiFetch("/api/dashboard/overview");
         if (!response.ok) return;
         const json = await response.json();
         const data = json?.data as DashboardOverview | undefined;
@@ -248,7 +248,7 @@ export default function BattleStationPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiUrl]);
+  }, [apiFetch]);
 
   const selectedDeal = useMemo(
     () => station.domainAccounts.find((account) => account.id === selectedDealId) ?? station.domainAccounts[0],
@@ -277,7 +277,7 @@ export default function BattleStationPage() {
 
     async function fetchApprovals() {
       try {
-        const response = await fetch(apiUrl("/api/approvals"));
+        const response = await apiFetch("/api/approvals");
         const json = await response.json();
         if (cancelled || !json?.success || !Array.isArray(json.data) || json.data.length === 0) return;
 
@@ -312,14 +312,14 @@ export default function BattleStationPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiUrl]);
+  }, [apiFetch]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchAgents() {
       try {
-        const response = await fetch(apiUrl("/api/agent-state?limit=20"));
+        const response = await apiFetch("/api/agent-state?limit=20");
         const json = await response.json();
         if (cancelled || !json?.success || !json.data?.agents || !Array.isArray(json.data.agents)) return;
 
@@ -334,7 +334,7 @@ export default function BattleStationPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, language]);
+  }, [apiFetch, language]);
 
   useEffect(() => {
     if (!focusCase || !focusApprovalTemplate) return;
@@ -344,13 +344,13 @@ export default function BattleStationPage() {
 
     async function syncApprovalRecord() {
       try {
-        const lookup = await fetch(apiUrl(`/api/approvals?id=${encodeURIComponent(approvalTemplate.id)}`));
+        const lookup = await apiFetch(`/api/approvals?id=${encodeURIComponent(approvalTemplate.id)}`);
         const lookupJson = await lookup.json();
         if (cancelled) return;
 
         if (lookupJson?.success && Array.isArray(lookupJson.data) && lookupJson.data.length > 0) return;
 
-        await fetch(apiUrl("/api/approvals"), {
+        await apiFetch("/api/approvals", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -380,7 +380,7 @@ export default function BattleStationPage() {
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, focusApprovalTemplate, focusCase]);
+  }, [apiFetch, focusApprovalTemplate, focusCase]);
 
   const openFocus = useCallback((dealId: string) => {
     const nextFocusCase = resolveFocusCase({
@@ -412,7 +412,7 @@ export default function BattleStationPage() {
           : "pending";
 
       try {
-        await fetch(apiUrl("/api/approvals"), {
+        await apiFetch("/api/approvals", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -426,7 +426,7 @@ export default function BattleStationPage() {
         // Local approval state already updated.
       }
     },
-    [apiUrl, focusCase]
+    [apiFetch, focusCase]
   );
 
   const submitCommand = useCallback(() => {

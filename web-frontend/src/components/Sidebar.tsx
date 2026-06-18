@@ -3,13 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useProject, PROJECTS } from "@/lib/project";
-import type { ProjectId } from "@/lib/project";
+import { useProject } from "@/lib/project";
 
 const ALL_MENU_ITEMS = [
   { name: "Dashboard", icon: "📊", href: "/" },
   { name: "Throw Anything", icon: "🧲", href: "/intake" },
-  { name: "线索库", icon: "👥", href: "/leads" },
+  { name: "客户", icon: "👥", href: "/leads" },
   { name: "邮件", icon: "📧", href: "/emails" },
   { name: "收件箱", icon: "📥", href: "/inbox", badge: true },
   { name: "报价单", icon: "📋", href: "/quotations" },
@@ -27,7 +26,7 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
-  const { project, setProjectId } = useProject();
+  const { project, setProjectId, allowedWorkspaces, canSwitchWorkspace } = useProject();
 
   // Filter menu items based on project capabilities
   const menuItems = ALL_MENU_ITEMS.filter((item) => {
@@ -46,8 +45,9 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
       <div className="flex items-center h-16 px-4 border-b border-[var(--border-color)]">
         <button
           onClick={onToggle}
-          className="flex min-w-0 flex-1 items-center text-left transition-opacity hover:opacity-90"
+          className="flex min-w-0 flex-1 items-center rounded-md border border-transparent text-left transition hover:border-white/10 hover:bg-white/5 hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/70"
           aria-label="Toggle sidebar"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
             <Image
@@ -71,30 +71,41 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
         </button>
         <button
           onClick={onCloseMobile}
-          className="md:hidden text-white text-xl ml-2"
+          className="ml-2 rounded-md border border-transparent px-2 py-1 text-xl text-white transition hover:border-white/15 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/70 md:hidden"
+          aria-label="Close menu"
+          title="Close menu"
         >
           ✕
         </button>
       </div>
 
       {/* Project Switcher */}
-      <div className="px-3 pt-3 pb-1">
-        <div className="flex gap-1 bg-[var(--sidebar-hover)]/50 rounded-lg p-1">
-          {(Object.values(PROJECTS) as Array<{ id: ProjectId; name: string; emoji: string }>).map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setProjectId(p.id)}
-              className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all ${
-                project.id === p.id
-                  ? "bg-[var(--accent)] text-white shadow"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              {collapsed ? p.emoji : `${p.emoji} ${p.name}`}
-            </button>
-          ))}
+      {allowedWorkspaces.length > 0 && (
+        <div className="px-3 pt-3 pb-1">
+          <div className="flex gap-1 bg-[var(--sidebar-hover)]/50 rounded-lg p-1">
+            {canSwitchWorkspace ? (
+              allowedWorkspaces.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setProjectId(p.id)}
+                  title={p.name}
+                  className={`flex-1 rounded-md border border-transparent px-2 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/70 ${
+                    project.id === p.id
+                      ? "bg-[var(--accent)] text-white shadow"
+                      : "text-gray-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  {collapsed ? p.emoji : `${p.emoji} ${p.name}`}
+                </button>
+              ))
+            ) : (
+              <div className="min-w-0 flex-1 px-2 py-1.5 text-xs font-medium text-gray-300">
+                {collapsed ? project.emoji : `${project.emoji} ${project.name}`}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 py-4 overflow-y-auto">
@@ -106,10 +117,12 @@ export default function Sidebar({ collapsed, onToggle, onCloseMobile }: SidebarP
                 <Link
                   href={item.href}
                   onClick={() => onCloseMobile?.()}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                  aria-current={isActive ? "page" : undefined}
+                  title={item.name}
+                  className={`group flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/70 ${
                     isActive
-                      ? "bg-[var(--accent)] text-white shadow-lg shadow-blue-500/20"
-                      : "text-gray-400 hover:bg-[var(--sidebar-hover)] hover:text-white"
+                      ? "border-blue-400/30 bg-[var(--accent)] text-white shadow-lg shadow-blue-500/20"
+                      : "border-transparent text-gray-400 hover:border-white/10 hover:bg-[var(--sidebar-hover)] hover:text-white"
                   }`}
                 >
                   <span className="text-xl flex-shrink-0">{item.icon}</span>

@@ -45,7 +45,7 @@ function stateLabel(value: string, language: "en" | "zh") {
     "waiting-human": { en: "Needs review", zh: "需要复核" },
     "ai-generating": { en: "Drafting", zh: "起草中" },
     "human-review": { en: "Review draft", zh: "复核草稿" },
-    "approval-sending": { en: "Saving decision", zh: "保存决策" },
+    "approval-sending": { en: "Submitting request", zh: "提交申请中" },
     "captured-local": { en: "Saved for review", zh: "已保存待审批" },
     "approved-sent": { en: "Approved", zh: "已批准" },
     "draft-saved": { en: "Draft saved", zh: "草稿已保存" },
@@ -59,7 +59,7 @@ export default function InboxFocusPage({ params }: PageProps) {
   const { emailId } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { apiUrl } = useProject();
+  const { apiFetch } = useProject();
   const language = useBattleLanguage();
   const requestedStyle = searchParams.get("style");
   const [email, setEmail] = useState<InboundEmail | null>(null);
@@ -77,7 +77,7 @@ export default function InboxFocusPage({ params }: PageProps) {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(apiUrl(`/api/inbox/${emailId}`));
+        const res = await apiFetch(`/api/inbox/${emailId}`);
         const json = await res.json();
         if (!json.success) throw new Error(json.error || "Email not found");
         setEmail(json.data);
@@ -89,7 +89,7 @@ export default function InboxFocusPage({ params }: PageProps) {
       }
     }
     load();
-  }, [apiUrl, emailId]);
+  }, [apiFetch, emailId]);
 
   const fullEmail = selectedOption ? draftsByOptionId[selectedOption.id] || null : null;
   const draftOptions = useMemo(() => email?.options || [], [email?.options]);
@@ -104,7 +104,7 @@ export default function InboxFocusPage({ params }: PageProps) {
       try {
         const prepared = await Promise.all(
           draftOptions.map(async (option) => {
-            const res = await fetch(apiUrl(`/api/inbox/${emailIdForDrafts}/select`), {
+            const res = await apiFetch(`/api/inbox/${emailIdForDrafts}/select`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ style: option.style }),
@@ -136,7 +136,7 @@ export default function InboxFocusPage({ params }: PageProps) {
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, draftOptions, email?.id, requestedStyle]);
+  }, [apiFetch, draftOptions, email?.id, requestedStyle]);
 
   const selectOption = useCallback((option: ReplyOption) => {
     setSelectedOption(option);
@@ -150,7 +150,7 @@ export default function InboxFocusPage({ params }: PageProps) {
     setGenerating(true);
     setState("ai-generating");
     try {
-      const res = await fetch(apiUrl(`/api/inbox/${emailId}/select`), {
+      const res = await apiFetch(`/api/inbox/${emailId}/select`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ style: selectedOption.style }),
@@ -166,7 +166,7 @@ export default function InboxFocusPage({ params }: PageProps) {
     } finally {
       setGenerating(false);
     }
-  }, [apiUrl, emailId, selectedOption]);
+  }, [apiFetch, emailId, selectedOption]);
 
   const optionOutlines = useMemo(
     () => selectedOption ? localizedReplyOutline(selectedOption, language) : [],
@@ -178,7 +178,7 @@ export default function InboxFocusPage({ params }: PageProps) {
     setSending(true);
     setState("approval-sending");
     try {
-      const res = await fetch(apiUrl(`/api/inbox/${emailId}/send`), {
+      const res = await apiFetch(`/api/inbox/${emailId}/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -186,12 +186,6 @@ export default function InboxFocusPage({ params }: PageProps) {
           subject: fullEmail.subject,
           body: editedBody || fullEmail.body,
           style: selectedOption.style,
-          humanApproval: {
-            approved: true,
-            approvedBy: "local-operator",
-            approvedAt: new Date().toISOString(),
-            note: `Approved ${selectedOption.style} reply from inbox review.`,
-          },
         }),
       });
       const json = await res.json();
@@ -336,13 +330,13 @@ export default function InboxFocusPage({ params }: PageProps) {
                 />
                 <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
                   <BattleText
-                    en="An operator must approve before this draft can reach a customer. In safe mode, approval is recorded but no real email is sent."
-                    zh="这封草稿必须由操作员批准后才可发给客户。安全模式下只记录审批，不会真正外发邮件。"
+                    en="This draft will only reach a customer after a server-side approval decision and the real-send switch are both present."
+                    zh="这封草稿只有同时具备服务端审批记录和真实发送开关时，才会外发给客户。"
                   />
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <CommandButton variant="primary" disabled={sending} onClick={approveSend}>
-                    {sending ? <BattleText en="Processing" zh="处理中" /> : <BattleText en="Approve & Send" zh="批准并发送" />}
+                    {sending ? <BattleText en="Submitting" zh="提交中" /> : <BattleText en="Submit Request" zh="提交申请" />}
                   </CommandButton>
                   <CommandButton variant="secondary" onClick={() => setState("draft-saved")}><BattleText en="Save Draft" zh="保存草稿" /></CommandButton>
                   <CommandButton variant="ghost" onClick={regenerateSelected}><BattleText en="Regenerate" zh="重新生成" /></CommandButton>

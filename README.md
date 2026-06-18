@@ -43,11 +43,38 @@ and consumed by `jaden-worker`. This does not require OpenClaw, Hermes, or a web
 request lifecycle.
 
 ```bash
-node scripts/workers/jaden-worker.mjs --once
-node scripts/workers/jaden-worker.mjs --worker-id jaden-local --max-jobs 5 --max-attempts 3
+node scripts/workers/jaden-worker.mjs --workspace farreach --once
+node scripts/workers/jaden-worker.mjs --workspace farreach --worker-id jaden-local --max-jobs 5 --max-attempts 3 --interval-ms 5000
+node scripts/workers/jaden-worker.mjs --status --worker-id jaden-local
+
+cd web-frontend
+npm run worker
+npm run worker:status
+npm run worker:supervisor
 ```
 
-All customer-visible actions still pass through SSA's side-effect approval gate.
+For a resident worker, generate a supervisor config instead of hand-copying the
+long command:
+
+```bash
+node scripts/workers/jaden-worker-supervisor.mjs generate \
+  --platform launchd \
+  --workspace farreach \
+  --worker-id jaden-farreach-1
+
+node scripts/workers/jaden-worker-supervisor.mjs generate --platform systemd --workspace farreach --worker-id jaden-farreach-1
+node scripts/workers/jaden-worker-supervisor.mjs generate --platform pm2 --workspace farreach --worker-id jaden-farreach-1
+```
+
+The generator writes both the supervisor config and a small command manifest with
+start, stop, restart, status, and health-check commands. By default those files
+go to `SSA_DATA_ROOT/runtime/supervisors` so generated configs do not capture
+local machine paths inside the repo. The configs use an always-restart policy and
+the same persistent `SSA_DATA_ROOT` queue as the web runtime. Every worker tick
+syncs the inbox into the customer CRM, creates/updates customer records, queues
+`company-intel` for new inbound customers, and then consumes queued runtime jobs.
+Use `--no-inbox-sync` only for isolated queue tests. All customer-visible actions
+still pass through SSA's side-effect approval gate.
 
 ### SSA Company Data Layout
 
@@ -64,6 +91,7 @@ Common company subfolders:
 inbox/              # mailbox scan input and monitor state
 mail/               # sent logs, drafts, captured send requests
 leads/              # imported lead CSV/JSON files
+customers/          # canonical customer accounts and CRM activity timeline
 documents/          # generated trade documents
 quotations/         # generated quotes
 intelligence/       # news, market, and competitor signals
@@ -349,7 +377,7 @@ export SSA_ENABLE_REAL_PAYMENT=true
 export SSA_ENABLE_REAL_BANK=true
 ```
 
-只有在明确需要真实外部调用时才设置这些变量。真实客户邮件发送还必须带有人工审批标记。
+只有在明确需要真实外部调用时才设置这些变量。真实客户邮件发送还必须带有已批准的服务端 side-effect 决策记录 ID；浏览器请求体里的人工审批标记不能作为放行依据。
 真实冷邮件发送还需要 Hunter 邮箱核验通过；`SSA_ALLOW_UNVERIFIED_EMAIL_SEND=true`
 仅作为人工明确接受风险时的紧急覆盖，不应作为 public beta 默认配置。
 

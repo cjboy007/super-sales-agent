@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe("/api/leads route", () => {
-  it("does not use legacy beta tokens as a workspace sign-in gate", async () => {
+  it("blocks scoped beta tokens from reading another workspace", async () => {
     process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
       { token: "farreach-token", workspaces: ["farreach"] },
     ]);
@@ -40,8 +40,8 @@ describe("/api/leads route", () => {
     const response = await GET(makeRequest("http://localhost/api/leads?project=hero-pumps&action=stats", "farreach-token"));
     const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json).toEqual({ success: true, data: { total: 0, hot: 0, warm: 0, cold: 0, countries: 0 } });
+    expect(response.status).toBe(403);
+    expect(json.success).toBe(false);
   });
 
   it("treats a missing default Farreach lead export as empty local data", async () => {

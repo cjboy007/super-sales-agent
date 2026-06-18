@@ -10,6 +10,7 @@ export type SettingsInput = Partial<AppSettings>;
 
 const SENSITIVE_SETTINGS_KEYS = [
   "deepseekApiKey",
+  "llmApiKey",
   "openrouterApiKey",
   "openaiApiKey",
   "geminiApiKey",
@@ -41,7 +42,7 @@ function mergeSettings(input: SettingsInput, base: AppSettings): AppSettings {
 
   for (const key of SENSITIVE_SETTINGS_KEYS) {
     if (isMaskedSecret(input[key])) {
-      merged[key] = base[key];
+      (merged as unknown as Record<string, unknown>)[key] = base[key] ?? "";
     }
   }
 
@@ -58,7 +59,7 @@ function auditPayload(before: AppSettings, after: AppSettings): Record<string, u
   return {
     changedKeys: changed,
     sensitiveKeysChanged: changed.filter((key) => SENSITIVE_SETTINGS_KEYS.includes(key as (typeof SENSITIVE_SETTINGS_KEYS)[number])),
-    llmConfigured: Boolean(after.deepseekApiKey || after.openaiApiKey || after.openrouterApiKey),
+    llmConfigured: Boolean(after.llmProvider || after.llmBaseUrl || after.llmApiKey || after.deepseekApiKey || after.openaiApiKey || after.openrouterApiKey),
     mailboxConfigured: Boolean(after.email && after.imapHost && after.smtpHost),
     emailVerificationConfigured: Boolean(after.hunterApiKey),
     leadSourceConfigured: Boolean(after.apolloApiKey),
@@ -66,6 +67,9 @@ function auditPayload(before: AppSettings, after: AppSettings): Record<string, u
     notificationsConfigured: Boolean(after.notificationProvider && after.notificationProvider !== "none" && after.notificationWebhookUrl),
     searchEngine: after.searchEngine,
     defaultModel: after.defaultModel,
+    llmProvider: after.llmProvider || "auto",
+    gatewayAccessMode: after.gatewayAccessMode,
+    intakeRetentionMode: after.intakeRetentionMode,
     autoCapture: after.autoCapture,
   };
 }

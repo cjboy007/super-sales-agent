@@ -353,6 +353,52 @@ describe("SalesRuntime", () => {
     });
   });
 
+  it("does not save PI records before document generation is approved", async () => {
+    const runtime = createSalesRuntime();
+    const data = {
+      company: { name: "Seller", address: "A", phone: "", email: "" },
+      customer: { company_name: "Buyer Co", contact: "Ada", email: "ada@example.com", phone: "", address: "B", country: "Germany" },
+      shipment: {
+        date: "2026-06-18",
+        vessel: "",
+        departure_port: "Shenzhen",
+        destination_port: "Hamburg",
+        incoterms: "FOB",
+        country_of_origin: "China",
+        marks: "N/M",
+      },
+      currency: "USD",
+      freight: 0,
+      insurance: 0,
+      products: [{
+        description: "Pump",
+        specification: "P-1",
+        hs_code: "8413",
+        quantity: 2,
+        unit_price: 10,
+        net_weight_kg: 1,
+        gross_weight_kg: 1.2,
+        dimensions_cm: "10x10x10",
+        package_type: "Carton",
+        packages: 1,
+      }],
+      pi_info: { pi_no: "PI-20260618-001", valid_until: "2026-07-18" },
+      ci_info: { ci_no: "CI-20260618-001", ci_date: "2026-06-18", payment_terms: "T/T" },
+      pl_info: { pl_no: "PL-20260618-001" },
+    };
+
+    const result = await runtime.generateTradeDocuments({
+      workspaceId: "farreach",
+      data,
+      docTypes: ["PI"],
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.blocked).toBe(true);
+    expect(fs.existsSync(path.join(tempRoot, "companies", "farreach", "documents", "pi-records", "PI-20260618-001.json"))).toBe(false);
+    expect(fs.existsSync(path.join(tempRoot, "companies", "farreach", "pricing", "price-memory.json"))).toBe(false);
+  });
+
   it("allows email side effects only when explicitly enabled", () => {
     process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
     const runtime = createSalesRuntime();
@@ -366,6 +412,44 @@ describe("SalesRuntime", () => {
 
     expect(decision.status).toBe("allowed");
     expect(decision.realExecutionEnabled).toBe(true);
+  });
+
+  it("creates a separate retry review record for idempotent side-effect requests", () => {
+    const runtime = createSalesRuntime();
+    const original = runtime.requestSideEffect({
+      kind: "email.send",
+      workspaceId: "farreach",
+      summary: "Send quote follow-up",
+      payload: { to: "buyer@example.com", subject: "Quote follow-up" },
+      idempotencyKey: "farreach:email:buyer@example.com:Quote follow-up",
+    });
+
+    const retried = runtime.retrySideEffect(original.id);
+
+    expect(retried.id).not.toBe(original.id);
+    expect(retried).toMatchObject({
+      status: "retry_requested",
+      retryOf: original.id,
+      retryCount: 1,
+      payload: expect.objectContaining({
+        to: "buyer@example.com",
+        subject: "Quote follow-up",
+        retryOf: original.id,
+      }),
+    });
+
+    const decisions = runtime.listSideEffects(10);
+    expect(decisions.map((decision) => decision.id)).toEqual(expect.arrayContaining([
+      original.id,
+      retried.id,
+    ]));
+    expect(decisions.find((decision) => decision.id === original.id)).toMatchObject({
+      status: "blocked",
+    });
+    expect(decisions.find((decision) => decision.id === retried.id)).toMatchObject({
+      status: "retry_requested",
+      retryOf: original.id,
+    });
   });
 
   it("returns empty lead memory for a new local workspace", () => {

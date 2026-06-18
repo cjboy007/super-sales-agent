@@ -10,6 +10,7 @@ import { promisify } from "node:util";
 const DEFAULT_WORKSPACE = "farreach";
 const DEFAULT_DATA_ROOT = path.join(os.homedir(), ".ssa", "data");
 const MAX_EVENTS = 1000;
+const MAX_SEEN_MESSAGES = Number.parseInt(process.env.SSA_INBOX_MONITOR_MAX_SEEN || "5000", 10);
 const DEFAULT_SOURCE_MODE = "local";
 const DEFAULT_INBOX_FOLDER = "INBOX";
 const DEFAULT_PAGE_SIZE = 20;
@@ -31,7 +32,9 @@ function readJson(filePath, fallback) {
 
 function writeJson(filePath, value) {
   ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(value, null, 2), "utf-8");
+  const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tempPath, JSON.stringify(value, null, 2), "utf-8");
+  fs.renameSync(tempPath, filePath);
 }
 
 function dataRootFromOptions(options = {}) {
@@ -56,6 +59,14 @@ function statePath(dataRoot, workspace) {
 
 function eventsPath(dataRoot, workspace) {
   return path.join(companyDir(dataRoot, workspace), "events", "events.json");
+}
+
+function customersPath(dataRoot, workspace) {
+  return path.join(companyDir(dataRoot, workspace), "customers", "accounts.json");
+}
+
+function customerActivityPath(dataRoot, workspace) {
+  return path.join(companyDir(dataRoot, workspace), "customers", "activity.json");
 }
 
 function sourcePath(dataRoot, workspace) {
@@ -169,6 +180,259 @@ function stringValue(...values) {
   return "";
 }
 
+function normalizeEmail(value) {
+  const match = String(value || "").match(/<([^>]+)>/);
+  const email = (match ? match[1] : String(value || "")).trim().toLowerCase();
+  return email.includes("@") ? email : "";
+}
+
+function emailDomain(value) {
+  const email = normalizeEmail(value);
+  return email.includes("@") ? (email.split("@").pop() || "").replace(/^www\./i, "") : "";
+}
+
+function domainCompanyName(domain) {
+  const root = domain.replace(/^www\./i, "").split(".").filter(Boolean)[0] || domain;
+  return root
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ") || domain || "Unknown Customer";
+}
+
+function customerSlug(message) {
+  const domain = emailDomain(message.fromEmail);
+  if (domain) return domain.replace(/\.[a-z]{2,}$/i, "").replace(/[^a-z0-9._-]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase();
+  return normalizeEmail(message.fromEmail).replace(/[^a-z0-9._-]+/gi, "-") || "unknown-customer";
+}
+
+function customerVisibleText(value, fallback = "") {
+  return stringValue(value, fallback)
+    .replace(/\bPO\s*#\s*[A-Z0-9][A-Z0-9-]*\b/gi, "the purchase order")
+    .replace(/\bPO-[A-Z0-9][A-Z0-9-]*\b/gi, "the purchase order")
+    .replace(/\bPI-[A-Z0-9][A-Z0-9-]*\b/gi, "the PI")
+    .replace(/\bQT-[A-Z0-9][A-Z0-9-]*\b/gi, "the quote")
+    .replace(/\bRFQ-[A-Z0-9][A-Z0-9-]*\b/gi, "the RFQ")
+    .replace(/\bworkflows?\b/gi, "process")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function orderNumberFromMessage(message) {
+  const text = `${message.subject || ""}\n${message.body || ""}`;
+  const match = text.match(/\b(?:PI|QT|RFQ|PO)[-\s#]*[A-Z0-9][A-Z0-9-]*\b/i);
+  return match ? match[0].replace(/\s*#\s*/g, "-").replace(/\s+/g, "-").toUpperCase() : "";
+}
+
+function amountFromMessage(message) {
+  const text = `${message.subject || ""}\n${message.body || ""}`;
+  const match = text.match(/\b(USD|EUR|GBP|CNY|RMB)\s*[$€£¥]?\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)\b/i)
+    || text.match(/[$€£¥]\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/);
+  if (!match) return "";
+  if (match.length >= 3) return `${match[1].toUpperCase()} ${match[2].replace(/,/g, "")}`;
+  return `USD ${match[1].replace(/,/g, "")}`;
+}
+
+function productTypeFromMessage(message) {
+  const text = `${message.subject || ""}\n${message.body || ""}`;
+  const candidates = [
+    /\b([A-Z0-9+.-]+(?:\s+to\s+[A-Z0-9+.-]+)?\s+cable(?:\s+program|\s+order|\s+replacement)?)\b/i,
+    /\b(HDMI\s*[0-9.]*\s*cables?)\b/i,
+    /\b(DisplayPort\s*cables?)\b/i,
+    /\b(USB-C\s*cables?)\b/i,
+  ];
+  for (const pattern of candidates) {
+    const match = text.match(pattern);
+    if (match?.[1]) return customerVisibleText(match[1]);
+  }
+  return "Order";
+}
+
+function paymentStatusFromMessage(message) {
+  const lower = `${message.subject || ""}\n${message.body || ""}`.toLowerCase();
+  if (/refund(ed)?|credit note/.test(lower)) return "refunded";
+  if (/overdue|payment delay|unpaid|past due/.test(lower)) return "overdue";
+  if (/partial payment|deposit received|balance pending/.test(lower)) return "partial";
+  if (/payment received|paid|wire received|tt received|deposit paid/.test(lower)) return "paid";
+  if (/payment pending|awaiting payment|invoice issued/.test(lower)) return "pending";
+  return "pending";
+}
+
+function fulfillmentStatusFromMessage(message) {
+  const lower = `${message.subject || ""}\n${message.body || ""}`.toLowerCase();
+  if (/exception|customs hold|quality issue|claim|dispute|delay/.test(lower)) return "exception";
+  if (/delivered|received by customer|signed for/.test(lower)) return "delivered";
+  if (/shipped|shipment booked|tracking|air waybill|awb|bl issued/.test(lower)) return "shipped";
+  if (/production|preparing|packing|ready to ship/.test(lower)) return "preparing";
+  return "not_started";
+}
+
+function lifecycleStageFromMessage(message, paymentStatus, fulfillmentStatus) {
+  const lower = `${message.subject || ""}\n${message.body || ""}`.toLowerCase();
+  if (/exception|customs hold|quality issue|claim|dispute|overdue|delay/.test(lower) || fulfillmentStatus === "exception" || paymentStatus === "overdue") return "exception";
+  if (/refund|credit note/.test(lower) || paymentStatus === "refunded") return "refund";
+  if (/after-sales|after sales|warranty|replacement|complaint/.test(lower)) return "after_sales";
+  if (fulfillmentStatus === "shipped" || fulfillmentStatus === "delivered") return "shipment";
+  if (fulfillmentStatus === "preparing") return "production";
+  return "payment";
+}
+
+function orderTypeFromNumber(orderNumber) {
+  if (/^PI\b|^PI-/i.test(orderNumber)) return "PI";
+  if (/^QT\b|^QT-/i.test(orderNumber)) return "QT";
+  return "Order";
+}
+
+function orderSummary({ productType, amount, lifecycleStage, paymentStatus, fulfillmentStatus }) {
+  const amountText = amount ? ` for ${amount}` : "";
+  if (lifecycleStage === "exception" || fulfillmentStatus === "exception" || paymentStatus === "overdue") {
+    return `${productType} shipment exception requires review: payment ${paymentStatus}, shipment ${fulfillmentStatus}${amountText}.`;
+  }
+  if (lifecycleStage === "refund" || paymentStatus === "refunded") return `${productType} refund follow-up is active${amountText}.`;
+  if (lifecycleStage === "after_sales") return `${productType} after-sales follow-up is active${amountText}.`;
+  if (lifecycleStage === "shipment" || fulfillmentStatus === "shipped" || fulfillmentStatus === "delivered") {
+    return `${productType} shipment ${fulfillmentStatus}${amountText}.`;
+  }
+  return `${productType} payment ${paymentStatus}${amountText}.`;
+}
+
+function orderActivityFromMessage(workspace, message, customer) {
+  const text = `${message.subject || ""}\n${message.body || ""}`;
+  if (!/\b(pi|po|order|payment|paid|shipment|shipped|delivered|refund|after-sales|after sales|exception|customs hold|quality issue)\b/i.test(text)) return null;
+  const orderNumber = orderNumberFromMessage(message);
+  const paymentStatus = paymentStatusFromMessage(message);
+  const fulfillmentStatus = fulfillmentStatusFromMessage(message);
+  const lifecycleStage = lifecycleStageFromMessage(message, paymentStatus, fulfillmentStatus);
+  if (!orderNumber && lifecycleStage === "payment" && paymentStatus === "pending" && fulfillmentStatus === "not_started" && !/order confirmation|new order|purchase order/i.test(text)) return null;
+  const productType = productTypeFromMessage(message);
+  const amount = amountFromMessage(message);
+  return {
+    id: `order:${customer.id}:${orderNumber || productType}:${lifecycleStage}:${paymentStatus}:${fulfillmentStatus}:${message.receivedAt || ""}`.toLowerCase(),
+    workspaceId: workspace,
+    customerId: customer.id,
+    customerName: customer.companyName,
+    kind: "order_status",
+    occurredAt: message.receivedAt || "",
+    createdAt: "",
+    contactName: message.fromName || "",
+    contactEmail: normalizeEmail(message.fromEmail),
+    subject: "Order lifecycle update",
+    summary: orderSummary({ productType, amount, lifecycleStage, paymentStatus, fulfillmentStatus }),
+    status: lifecycleStage,
+    source: customer.source,
+    metadata: {
+      orderNumber: orderNumber || null,
+      orderType: orderTypeFromNumber(orderNumber),
+      productType,
+      amount,
+      lifecycleStage,
+      paymentStatus,
+      fulfillmentStatus,
+      status: lifecycleStage,
+    },
+  };
+}
+
+function syncMessagesToCustomerCrm(dataRoot, workspace, messages, now, source) {
+  if (messages.length === 0) return { customersUpserted: 0, activitiesWritten: 0, orderActivitiesWritten: 0 };
+  const activitySource = String(source || "").startsWith("himalaya:") ? "mailbox-readonly" : "mailbox-sync";
+  const accountsFile = customersPath(dataRoot, workspace);
+  const activitiesFile = customerActivityPath(dataRoot, workspace);
+  const accounts = readJson(accountsFile, []);
+  const activities = readJson(activitiesFile, []);
+  const byId = new Map(Array.isArray(accounts) ? accounts.map((account) => [account.id, account]) : []);
+  const seenActivities = new Set(Array.isArray(activities) ? activities.map((activity) => activity.id) : []);
+  const nextActivities = [];
+  const nextOrderActivities = [];
+  let customersUpserted = 0;
+  let orderActivitiesWritten = 0;
+
+  for (const message of messages) {
+    const fromEmail = normalizeEmail(message.fromEmail);
+    if (!fromEmail) continue;
+    const domain = emailDomain(fromEmail);
+    const id = domain || customerSlug(message);
+    const companyName = domain ? domainCompanyName(domain) : message.fromName || fromEmail;
+    const existing = byId.get(id);
+    const sourceRecord = {
+      type: "email",
+      companyName,
+      contact: message.fromName || "",
+      role: "",
+      email: fromEmail,
+      website: domain ? `https://${domain}` : "",
+      country: "",
+      industry: "",
+      category: "Inbound Email",
+      reason: `Inbound email: ${message.subject || "(no subject)"}`,
+      confidence: message.important ? "82%" : "68%",
+      importedAt: now,
+    };
+    const existingSources = existing?.sources || [];
+    const sourceKey = `${sourceRecord.companyName}|${sourceRecord.email}|${sourceRecord.website}`.toLowerCase();
+    const sources = [
+      sourceRecord,
+      ...existingSources.filter((item) => `${item.companyName}|${item.email}|${item.website}`.toLowerCase() !== sourceKey),
+    ].slice(0, 20);
+    byId.set(id, {
+      id,
+      companyName: existing?.companyName || companyName,
+      country: existing?.country || "",
+      website: existing?.website || sourceRecord.website,
+      domain,
+      industry: existing?.industry || "",
+      status: existing?.status || "Prospect",
+      sources,
+      intelligence: {
+        ...(existing?.intelligence || {}),
+        status: existing?.intelligence?.status === "ready" ? "ready" : "queued",
+        queuedAt: existing?.intelligence?.queuedAt || now,
+      },
+      createdAt: existing?.createdAt || now,
+      updatedAt: now,
+    });
+    customersUpserted += existing ? 0 : 1;
+
+    const activityId = `email:${message.id || fromEmail}:${message.subject || ""}:${message.receivedAt || now}`.toLowerCase();
+    const customerRef = { id, companyName, source: activitySource };
+    if (!seenActivities.has(activityId)) {
+      seenActivities.add(activityId);
+      nextActivities.push({
+        id: activityId,
+        workspaceId: workspace,
+        customerId: id,
+        customerName: companyName,
+        kind: "email_received",
+        occurredAt: message.receivedAt || now,
+        createdAt: now,
+        contactName: message.fromName || "",
+        contactEmail: fromEmail,
+        subject: message.subject || "(no subject)",
+        summary: message.body ? `${message.subject || "(no subject)"} - ${message.body.replace(/\s+/g, " ").slice(0, 220)}` : message.subject || "(no subject)",
+        status: "received",
+        source: activitySource,
+        metadata: {
+          important: message.important,
+        },
+      });
+    }
+    const orderActivity = orderActivityFromMessage(workspace, message, customerRef);
+    if (orderActivity && !seenActivities.has(orderActivity.id)) {
+      seenActivities.add(orderActivity.id);
+      nextOrderActivities.push({
+        ...orderActivity,
+        createdAt: now,
+        occurredAt: orderActivity.occurredAt || message.receivedAt || now,
+      });
+      orderActivitiesWritten += 1;
+    }
+  }
+
+  writeJson(accountsFile, Array.from(byId.values()).sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""))));
+  writeJson(activitiesFile, [...nextOrderActivities, ...nextActivities, ...(Array.isArray(activities) ? activities : [])].sort((a, b) => String(b.occurredAt || "").localeCompare(String(a.occurredAt || ""))).slice(0, 2000));
+  return { customersUpserted, activitiesWritten: nextActivities.length, orderActivitiesWritten };
+}
+
 function stableMessageId(raw) {
   return stringValue(
     raw.id,
@@ -217,6 +481,24 @@ function loadState(filePath, now) {
     lastCheck: stringValue(state.lastCheck) || now,
     seen: state.seen && typeof state.seen === "object" && !Array.isArray(state.seen) ? state.seen : {},
   };
+}
+
+function pruneSeenState(state, maxSeen = MAX_SEEN_MESSAGES) {
+  const limit = Number.isFinite(maxSeen) && maxSeen > 0 ? Math.floor(maxSeen) : 5000;
+  const entries = Object.entries(state.seen || {});
+  if (entries.length <= limit) return state;
+  const seen = Object.fromEntries(
+    entries
+      .sort(([, a], [, b]) => String(b?.firstSeenAt || b?.receivedAt || "").localeCompare(String(a?.firstSeenAt || a?.receivedAt || "")))
+      .slice(0, limit)
+  );
+  return { ...state, seen };
+}
+
+function pageLimit(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return DEFAULT_PAGE_SIZE;
+  return Math.max(1, Math.floor(number));
 }
 
 function recordRuntimeEvent(dataRoot, workspace, event) {
@@ -296,7 +578,9 @@ export async function runInboxMonitor(options = {}) {
     };
   }
 
-  const newMessages = messages.filter((message) => !state.seen[message.id]);
+  const newMessages = messages
+    .filter((message) => !state.seen[message.id])
+    .slice(0, pageLimit(options.pageSize));
 
   for (const message of newMessages) {
     state.seen[message.id] = {
@@ -309,10 +593,12 @@ export async function runInboxMonitor(options = {}) {
   }
 
   state.lastCheck = now;
-  writeJson(stateFile, state);
+  writeJson(stateFile, pruneSeenState(state, options.maxSeen));
 
   const importantCount = newMessages.filter((message) => message.important).length;
+  let crm = { customersUpserted: 0, activitiesWritten: 0, orderActivitiesWritten: 0 };
   if (newMessages.length > 0) {
+    crm = syncMessagesToCustomerCrm(dataRoot, workspace, newMessages, now, source);
     recordRuntimeEvent(dataRoot, workspace, {
       id: `inbox-monitor-${workspace}-${Date.now()}`,
       type: "inbox.monitor.new_mail",
@@ -323,6 +609,9 @@ export async function runInboxMonitor(options = {}) {
         newCount: newMessages.length,
         importantCount,
         messageIds: newMessages.map((message) => message.id),
+        customersUpserted: crm.customersUpserted,
+        activitiesWritten: crm.activitiesWritten,
+        orderActivitiesWritten: crm.orderActivitiesWritten,
         sideEffects: sourceMode === "himalaya" ? "himalaya-read-only" : "local-only",
       },
     });
@@ -336,6 +625,9 @@ export async function runInboxMonitor(options = {}) {
     source,
     newCount: newMessages.length,
     importantCount,
+    activitiesWritten: crm.activitiesWritten,
+    orderActivitiesWritten: crm.orderActivitiesWritten,
+    customersUpserted: crm.customersUpserted,
     newMessages,
     output: reportForMessages(workspace, newMessages),
   };

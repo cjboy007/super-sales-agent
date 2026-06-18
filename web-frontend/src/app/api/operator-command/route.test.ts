@@ -46,33 +46,37 @@ describe("/api/operator-command route", () => {
     expect(json.data).toMatchObject({
       status: "queued_for_local_runtime",
       sideEffects: "blocked",
+      queuedTasks: 2,
     });
-    expect(json.data.id).toMatch(/^cmd-/);
-    expect(json.data.jobId).toMatch(/^quotation.prepare-/);
-    expect(json.data.jobIds).toHaveLength(2);
     expect(json.data.plan).toMatchObject({
       source: "jaden-planner",
       jobs: [
-        { workflow: "quotation.prepare" },
-        { workflow: "email.reply" },
+        { title: "Quote or PI preparation" },
+        { title: "Email follow-up" },
       ],
     });
+    expect(json.data).not.toHaveProperty("id");
+    expect(json.data).not.toHaveProperty("jobId");
+    expect(json.data).not.toHaveProperty("jobIds");
+    expect(JSON.stringify(json.data)).not.toContain("cmd-");
+    expect(JSON.stringify(json.data)).not.toContain("workflow");
 
-    const command = JSON.parse(
-      fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "operator-commands", `${json.data.id}.json`), "utf-8")
-    );
+    const commandDir = path.join(tempRoot, "companies", "demo-exporter", "operator-commands");
+    const commandFiles = fs.readdirSync(commandDir).filter((name) => name.endsWith(".json"));
+    expect(commandFiles).toHaveLength(1);
+    const command = JSON.parse(fs.readFileSync(path.join(commandDir, commandFiles[0]), "utf-8"));
     expect(command).toMatchObject({
-      id: json.data.id,
-      jobId: json.data.jobId,
-      jobIds: json.data.jobIds,
+      id: expect.stringMatching(/^cmd-/),
       workspaceId: "demo-exporter",
       sideEffects: "blocked",
     });
+    expect(command.jobId).toMatch(/^quotation.prepare-/);
+    expect(command.jobIds).toHaveLength(2);
 
     const { createRuntimeTaskQueue } = await import("@/lib/runtime");
     const jobs = createRuntimeTaskQueue().list(10);
-    expect(jobs.map((job) => job.id)).toEqual(expect.arrayContaining(json.data.jobIds));
-    expect(jobs.find((job) => job.id === json.data.jobId)).toMatchObject({
+    expect(jobs.map((job) => job.id)).toEqual(expect.arrayContaining(command.jobIds));
+    expect(jobs.find((job) => job.id === command.jobId)).toMatchObject({
       workspaceId: "demo-exporter",
       workflow: "quotation.prepare",
       status: "queued",
@@ -84,9 +88,9 @@ describe("/api/operator-command route", () => {
       type: "operator.command.queued",
       workspaceId: "demo-exporter",
       payload: {
-        commandId: json.data.id,
-        jobId: json.data.jobId,
-        jobIds: json.data.jobIds,
+        commandId: command.id,
+        jobId: command.jobId,
+        jobIds: command.jobIds,
         planSource: "jaden-planner",
         sideEffects: "blocked",
       },

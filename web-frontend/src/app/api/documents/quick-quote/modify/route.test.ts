@@ -1,17 +1,29 @@
 import { NextRequest } from "next/server";
+import fs from "fs";
+import os from "os";
+import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createQuickQuoteDefaults } from "@/lib/quick-quote";
 
 const originalLlmProvider = process.env.SSA_LLM_PROVIDER;
+const originalDataRoot = process.env.SSA_DATA_ROOT;
+let tempRoot = "";
 
 beforeEach(() => {
   vi.resetModules();
+  tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-quick-quote-modify-test-"));
+  process.env.SSA_DATA_ROOT = tempRoot;
   process.env.SSA_LLM_PROVIDER = "mock";
 });
 
 afterEach(() => {
   if (originalLlmProvider === undefined) delete process.env.SSA_LLM_PROVIDER;
   else process.env.SSA_LLM_PROVIDER = originalLlmProvider;
+
+  if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
+  else process.env.SSA_DATA_ROOT = originalDataRoot;
+
+  fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
 function request(body: Record<string, unknown>): NextRequest {
@@ -48,6 +60,8 @@ describe("/api/documents/quick-quote/modify route", () => {
       },
     });
     expect(json.reply).toContain("35");
+    expect(JSON.stringify(json)).not.toContain("provider");
+    expect(json).not.toHaveProperty("provider");
   });
 
   it("rejects missing quick quote data", async () => {

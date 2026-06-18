@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #050916;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Sans";
+        src: url("assets/fonts/ibm-plex-sans-300.ttf") format("truetype");
+        font-weight: 300;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Sans";
+        src: url("assets/fonts/ibm-plex-sans-400.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Sans";
+        src: url("assets/fonts/ibm-plex-sans-700.ttf") format("truetype");
+        font-weight: 700 950;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("assets/fonts/ibm-plex-mono-400.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("assets/fonts/ibm-plex-mono-700.ttf") format("truetype");
+        font-weight: 700 950;
+        font-style: normal;
+      }
+
+      body {
+        font-family: "IBM Plex Sans", sans-serif;
+        color: #e5edf8;
+      }
+
+      .mono,
+      .eyebrow,
+      .badge,
+      .metric,
+      .step-code,
+      .data-line {
+        font-family: "IBM Plex Mono", monospace;
+        font-variant-numeric: tabular-nums;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #050916;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background-color: #050916;
+      }
+
+      #scene1 {
+        z-index: 1;
+      }
+
+      #scene2 {
+        z-index: 2;
+        opacity: 0;
+      }
+
+      #scene3 {
+        z-index: 3;
+        opacity: 0;
+      }
+
+      #scene4 {
+        z-index: 4;
+        opacity: 0;
+      }
+
+      #scene5 {
+        z-index: 5;
+        opacity: 0;
+      }
+
+      .scene-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        padding: 84px 96px;
+        gap: 46px;
+      }
+
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background:
+          linear-gradient(rgba(96, 165, 250, 0.06) 1px, rgba(5, 9, 22, 0) 1px),
+          linear-gradient(90deg, rgba(96, 165, 250, 0.05) 1px, rgba(5, 9, 22, 0) 1px);
+        background-size: 64px 64px;
+        opacity: 0.42;
+      }
+
+      .glow {
+        position: absolute;
+        z-index: 0;
+        width: 720px;
+        height: 720px;
+        border-radius: 50%;
+        filter: blur(74px);
+        opacity: 0.26;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.5), rgba(16, 185, 129, 0));
+      }
+
+      .glow.blue {
+        background: radial-gradient(circle, rgba(96, 165, 250, 0.38), rgba(96, 165, 250, 0));
+      }
+
+      .glow.amber {
+        background: radial-gradient(circle, rgba(251, 191, 36, 0.28), rgba(251, 191, 36, 0));
+      }
+
+      .topline {
+        position: absolute;
+        left: 96px;
+        right: 96px;
+        top: 38px;
+        z-index: 8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .mark {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        place-items: center;
+        border: 1px solid #475569;
+        border-radius: 10px;
+        background: #0f172a;
+        color: #e5edf8;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-title {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+
+      .brand-sub {
+        margin-top: 2px;
+        color: #8ea0ba;
+        font-size: 16px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        gap: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.38);
+        border-radius: 8px;
+        background: rgba(16, 185, 129, 0.12);
+        padding: 10px 14px;
+        color: #6ee7b7;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 18px rgba(16, 185, 129, 0.8);
+      }
+
+      h1 {
+        max-width: 820px;
+        font-size: 96px;
+        line-height: 0.98;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+      }
+
+      h2 {
+        max-width: 780px;
+        font-size: 76px;
+        line-height: 1.02;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+      }
+
+      .lead {
+        max-width: 730px;
+        color: #b9c6d8;
+        font-size: 31px;
+        font-weight: 350;
+        line-height: 1.36;
+      }
+
+      .small-copy {
+        color: #9dadc4;
+        font-size: 22px;
+        line-height: 1.45;
+        font-weight: 350;
+      }
+
+      .accent {
+        color: #10b981;
+      }
+
+      .amber {
+        color: #fbbf24;
+      }
+
+      .blue-text {
+        color: #60a5fa;
+      }
+
+      .purple {
+        color: #a78bfa;
+      }
+
+      .split {
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .copy-stack {
+        display: flex;
+        max-width: 780px;
+        flex-direction: column;
+        justify-content: center;
+        gap: 34px;
+      }
+
+      .device {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 16px;
+        background: #0f172a;
+        box-shadow: 0 36px 90px rgba(0, 0, 0, 0.52);
+      }
+
+      .device::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.07), inset 0 -90px 120px rgba(5, 9, 22, 0.3);
+      }
+
+      .device img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-device {
+        width: 940px;
+        height: 530px;
+        transform: rotate(-1.2deg);
+      }
+
+      .wide-device {
+        width: 1180px;
+        height: 664px;
+      }
+
+      .focus-device {
+        width: 1185px;
+        height: 667px;
+      }
+
+      .quote-device {
+        width: 1080px;
+        height: 608px;
+      }
+
+      .screen-wrap {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .screen-label {
+        position: absolute;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(39, 52, 73, 0.95);
+        border-radius: 9px;
+        background: rgba(15, 23, 42, 0.92);
+        padding: 12px 16px;
+        color: #e5edf8;
+        font-size: 20px;
+        font-weight: 800;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+      }
+
+      .screen-label .badge {
+        border-radius: 6px;
+        padding: 4px 8px;
+        background: rgba(16, 185, 129, 0.14);
+        color: #6ee7b7;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+      }
+
+      .callout {
+        position: absolute;
+        z-index: 7;
+        width: 330px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.93);
+        padding: 18px 20px;
+        box-shadow: 0 18px 55px rgba(0, 0, 0, 0.42);
+      }
+
+      .callout-title {
+        margin-bottom: 8px;
+        color: #f8fafc;
+        font-size: 22px;
+        font-weight: 850;
+      }
+
+      .callout-body {
+        color: #aebbd0;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 7px;
+        padding: 8px 10px;
+        font-size: 17px;
+        font-weight: 850;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .badge.green {
+        border: 1px solid rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.14);
+        color: #6ee7b7;
+      }
+
+      .badge.amber-bg {
+        border: 1px solid rgba(251, 191, 36, 0.46);
+        background: rgba(251, 191, 36, 0.12);
+        color: #fbbf24;
+      }
+
+      .badge.blue {
+        border: 1px solid rgba(96, 165, 250, 0.42);
+        background: rgba(96, 165, 250, 0.12);
+        color: #93c5fd;
+      }
+
+      .badge.red {
+        border: 1px solid rgba(248, 113, 113, 0.42);
+        background: rgba(248, 113, 113, 0.11);
+        color: #fca5a5;
+      }
+
+      .problem-stack {
+        display: grid;
+        gap: 16px;
+        width: 640px;
+      }
+
+      .problem-card {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.84);
+        padding: 20px 22px;
+        box-shadow: 0 16px 55px rgba(0, 0, 0, 0.32);
+      }
+
+      .problem-card strong {
+        display: block;
+        color: #e5edf8;
+        font-size: 23px;
+        line-height: 1.3;
+      }
+
+      .problem-card span {
+        display: block;
+        margin-top: 8px;
+        color: #8ea0ba;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .pipeline {
+        display: grid;
+        max-width: 720px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        min-height: 146px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 13px;
+        background: rgba(15, 23, 42, 0.85);
+        padding: 18px 18px 16px;
+      }
+
+      .step-code {
+        color: #6ee7b7;
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .step-title {
+        margin-top: 16px;
+        color: #f8fafc;
+        font-size: 22px;
+        font-weight: 850;
+        line-height: 1.18;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        width: 740px;
+      }
+
+      .metric-card {
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.9);
+        padding: 18px 20px;
+      }
+
+      .metric {
+        color: #6ee7b7;
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .metric-label {
+        margin-top: 12px;
+        color: #9dadc4;
+        font-size: 18px;
+      }
+
+      .quote-layout {
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .quote-side {
+        display: flex;
+        width: 565px;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .check-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .check {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.72);
+        padding: 15px 16px;
+        color: #c4cfdd;
+        font-size: 21px;
+        line-height: 1.32;
+      }
+
+      .check::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 10px;
+        height: 10px;
+        margin-top: 9px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.72);
+      }
+
+      .approval-grid {
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .approval-copy {
+        display: flex;
+        width: 540px;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .approval-card {
+        border: 1px solid rgba(251, 191, 36, 0.45);
+        border-radius: 14px;
+        background: rgba(26, 20, 13, 0.86);
+        padding: 24px 26px;
+      }
+
+      .approval-card .title {
+        color: #fbbf24;
+        font-size: 28px;
+        font-weight: 900;
+      }
+
+      .approval-card .body {
+        margin-top: 10px;
+        color: #c4cfdd;
+        font-size: 21px;
+        line-height: 1.35;
+      }
+
+      .final-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 90px 112px;
+        gap: 36px;
+      }
+
+      .final-backdrop {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0.14;
+      }
+
+      .final-backdrop img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.8) contrast(1.2);
+      }
+
+      .final-main {
+        position: relative;
+        z-index: 3;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) 620px;
+        align-items: center;
+        gap: 80px;
+      }
+
+      .cta-panel {
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.88);
+        padding: 34px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+      }
+
+      .pilot-list {
+        display: grid;
+        gap: 13px;
+        margin-top: 22px;
+      }
+
+      .pilot-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 22px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        padding-bottom: 13px;
+        color: #c4cfdd;
+        font-size: 22px;
+      }
+
+      .pilot-item:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .pilot-item span:last-child {
+        color: #6ee7b7;
+        font-weight: 850;
+      }
+
+      .caption-strip {
+        position: absolute;
+        right: 96px;
+        bottom: 48px;
+        left: 96px;
+        z-index: 8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid rgba(39, 52, 73, 0.92);
+        border-radius: 13px;
+        background: rgba(5, 9, 22, 0.8);
+        padding: 16px 20px;
+      }
+
+      .caption-strip .mono {
+        color: #8ea0ba;
+        font-size: 18px;
+      }
+
+      .caption-strip strong {
+        color: #e5edf8;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="42"
+      data-width="1920"
+      data-height="1080"
+    >
+      <section id="scene1" class="scene">
+        <div class="bg-grid"></div>
+        <div class="glow blue" data-layout-allow-overflow style="left: -220px; top: 120px"></div>
+        <div class="glow amber" data-layout-allow-overflow style="right: -280px; bottom: -120px"></div>
+        <div class="topline">
+          <div class="brand">
+            <div class="mark">SSA</div>
+            <div>
+              <div class="brand-title">Super Sales Agent</div>
+              <div class="brand-sub mono">Export sales cockpit</div>
+            </div>
+          </div>
+          <div class="badge amber-bg">No auto-send</div>
+        </div>
+        <div class="scene-content split">
+          <div class="copy-stack">
+            <div class="eyebrow"><span class="dot"></span>Foreign trade sales</div>
+            <h1>Every inquiry hides a deadline.</h1>
+            <p class="lead">
+              Quotes, PI, samples, payment nudges, shipping status and CRM notes scatter across the same inbox.
+            </p>
+            <div class="problem-stack">
+              <div class="problem-card">
+                <strong>Customer asks for price changes</strong>
+                <span>Margin, copper movement and prior orders need review before anyone replies.</span>
+              </div>
+              <div class="problem-card">
+                <strong>The next action gets buried</strong>
+                <span>Follow-up timing becomes memory work instead of a repeatable operating rhythm.</span>
+              </div>
+            </div>
+          </div>
+          <div class="screen-wrap">
+            <div class="device hero-device" data-layout-allow-overflow>
+              <img src="assets/cockpit-hero.png" alt="SSA cockpit screenshot" />
+            </div>
+            <div class="screen-label" style="right: -10px; top: 150px">
+              <span class="badge amber-bg">3 open</span>
+              Needs review
+            </div>
+            <div class="screen-label" style="left: 32px; bottom: 128px">
+              <span class="badge red">Risk</span>
+              Competitor quote detected
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene2" class="scene">
+        <div class="bg-grid"></div>
+        <div class="glow" data-layout-allow-overflow style="left: 180px; bottom: -260px"></div>
+        <div class="scene-content split">
+          <div class="copy-stack">
+            <div class="eyebrow"><span class="dot"></span>SSA workflow</div>
+            <h2>Turn the inbox into a sales operating system.</h2>
+            <p class="lead">
+              SSA watches the work, ranks urgency, prepares the next move, and keeps each customer visible.
+            </p>
+            <div class="pipeline">
+              <div class="step">
+                <div class="step-code">01</div>
+                <div class="step-title">Read inquiry</div>
+              </div>
+              <div class="step">
+                <div class="step-code">02</div>
+                <div class="step-title">Pull context</div>
+              </div>
+              <div class="step">
+                <div class="step-code">03</div>
+                <div class="step-title">Draft action</div>
+              </div>
+              <div class="step">
+                <div class="step-code">04</div>
+                <div class="step-title">Ask approval</div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-wrap">
+            <div class="device wide-device" data-layout-allow-overflow>
+              <img src="assets/cockpit-workflow.png" alt="SSA battle station screenshot" />
+            </div>
+            <div class="callout" style="right: 42px; top: 132px">
+              <div class="callout-title">Deal radar</div>
+              <div class="callout-body">Accounts, values, risk, confidence and next action in one view.</div>
+            </div>
+            <div class="callout" style="left: 18px; bottom: 112px">
+              <div class="callout-title">Live activity</div>
+              <div class="callout-body">RFQs, alerts, quotes and AI work stay in the same timeline.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene3" class="scene">
+        <div class="bg-grid"></div>
+        <div class="glow blue" data-layout-allow-overflow style="right: -220px; top: 110px"></div>
+        <div class="scene-content quote-layout">
+          <div class="screen-wrap">
+            <div class="device quote-device" data-layout-allow-overflow>
+              <img src="assets/quick-quote.png" alt="SSA quick quote screenshot" />
+            </div>
+            <div class="screen-label" style="right: 42px; bottom: 116px">
+              <span class="badge green">Preview</span>
+              Quote and PI ready to review
+            </div>
+          </div>
+          <div class="quote-side">
+            <div class="eyebrow"><span class="dot"></span>Quote engine</div>
+            <h2>From inquiry to quote package in minutes.</h2>
+            <p class="lead">
+              Customer terms, product lines, margins, internal references and final export documents stay connected.
+            </p>
+            <div class="check-list">
+              <div class="check">Build a professional quotation preview while costs and margins stay internal.</div>
+              <div class="check">Prepare PI and shipping-doc follow-up from the same customer context.</div>
+              <div class="check">Keep price history and references available before customer send.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene4" class="scene">
+        <div class="bg-grid"></div>
+        <div class="glow amber" data-layout-allow-overflow style="left: -260px; bottom: -200px"></div>
+        <div class="scene-content approval-grid">
+          <div class="approval-copy">
+            <div class="eyebrow"><span class="dot"></span>Trust gate</div>
+            <h2>AI drafts. Human approves.</h2>
+            <p class="lead">
+              SSA can analyze pricing, competitor pressure and margin impact, but customer-facing actions stay locked.
+            </p>
+            <div class="approval-card">
+              <div class="title">External send is blocked until approved.</div>
+              <div class="body">The salesperson reviews the draft, saves it, regenerates it, approves it, or rejects it.</div>
+            </div>
+            <div class="badge-row">
+              <div class="badge amber-bg">Approval gate</div>
+              <div class="badge green">Operator control</div>
+              <div class="badge blue">CRM memory</div>
+            </div>
+          </div>
+          <div class="screen-wrap">
+            <div class="device focus-device" data-layout-allow-overflow>
+              <img src="assets/approval-focus.png" alt="SSA approval focus screenshot" />
+            </div>
+            <div class="callout" style="right: 50px; bottom: 132px">
+              <div class="callout-title">Counter-offer draft</div>
+              <div class="callout-body">Discount, free shipping and LME clause are prepared for review.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene5" class="scene">
+        <div class="final-backdrop">
+          <img src="assets/cockpit-final.png" alt="SSA cockpit background" />
+        </div>
+        <div class="bg-grid"></div>
+        <div class="glow" data-layout-allow-overflow style="right: 120px; top: 120px"></div>
+        <div class="glow blue" data-layout-allow-overflow style="left: -180px; bottom: -220px"></div>
+        <div class="topline">
+          <div class="brand">
+            <div class="mark">SSA</div>
+            <div>
+              <div class="brand-title">Super Sales Agent</div>
+              <div class="brand-sub mono">AI sales cockpit for export teams</div>
+            </div>
+          </div>
+          <div class="badge green">7-day pilot</div>
+        </div>
+        <div class="final-content">
+          <div class="final-main">
+            <div class="copy-stack">
+              <div class="eyebrow"><span class="dot"></span>First pilot offer</div>
+              <h1>One mailbox. One catalog. One week.</h1>
+              <p class="lead">
+                See how many replies, quotes, follow-ups and customer records SSA can prepare before anything is sent.
+              </p>
+            </div>
+            <div class="cta-panel">
+              <div class="badge-row">
+                <div class="badge green">Mailbox</div>
+                <div class="badge blue">Product docs</div>
+                <div class="badge amber-bg">20 inquiries</div>
+              </div>
+              <div class="pilot-list">
+                <div class="pilot-item"><span>Reply drafts</span><span>reviewed</span></div>
+                <div class="pilot-item"><span>Quote and PI prep</span><span>measured</span></div>
+                <div class="pilot-item"><span>Missed follow-ups</span><span>found</span></div>
+                <div class="pilot-item"><span>Customer memory</span><span>built</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="caption-strip">
+          <strong>From customer inquiry to approved quote workflow</strong>
+          <span class="mono">super-sales-agent / controlled export sales automation</span>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.from("#scene1 .brand", { y: -24, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.2);
+      tl.from("#scene1 .badge", { scale: 0.82, opacity: 0, duration: 0.45, ease: "back.out(1.4)" }, 0.38);
+      tl.from("#scene1 .eyebrow", { x: -34, opacity: 0, duration: 0.55, ease: "expo.out" }, 0.55);
+      tl.from("#scene1 h1", { y: 56, opacity: 0, duration: 0.72, ease: "power4.out" }, 0.82);
+      tl.from("#scene1 .lead", { y: 34, opacity: 0, duration: 0.58, ease: "sine.out" }, 1.18);
+      tl.from("#scene1 .problem-card", { x: -38, opacity: 0, duration: 0.48, stagger: 0.12, ease: "power2.out" }, 1.55);
+      tl.from("#scene1 .hero-device", { x: 78, y: 24, scale: 0.94, opacity: 0, duration: 0.78, ease: "expo.out" }, 1.0);
+      tl.from("#scene1 .screen-label", { y: 20, scale: 0.9, opacity: 0, duration: 0.42, stagger: 0.16, ease: "back.out(1.5)" }, 1.78);
+      tl.to("#scene1 .glow", { scale: 1.08, opacity: 0.34, duration: 4.8, repeat: 1, yoyo: true, ease: "sine.inOut" }, 0.8);
+
+      tl.to("#scene2", { opacity: 1, duration: 0.58, ease: "power2.inOut" }, 6.7);
+      tl.set("#scene1", { opacity: 0 }, 7.32);
+      tl.set("#scene1", { visibility: "hidden" }, 7.34);
+      tl.from("#scene2 .eyebrow", { x: -38, opacity: 0, duration: 0.52, ease: "power3.out" }, 7.1);
+      tl.from("#scene2 h2", { y: 60, opacity: 0, duration: 0.72, ease: "expo.out" }, 7.32);
+      tl.from("#scene2 .lead", { y: 36, opacity: 0, duration: 0.55, ease: "sine.out" }, 7.72);
+      tl.from("#scene2 .step", { y: 30, scale: 0.94, opacity: 0, duration: 0.45, stagger: 0.11, ease: "back.out(1.35)" }, 8.08);
+      tl.from("#scene2 .wide-device", { x: 70, scale: 0.95, opacity: 0, duration: 0.72, ease: "power4.out" }, 7.48);
+      tl.from("#scene2 .callout", { y: 30, opacity: 0, duration: 0.45, stagger: 0.16, ease: "power2.out" }, 8.62);
+      tl.to("#scene2 .wide-device img", { scale: 1.035, x: -18, duration: 7.4, ease: "sine.inOut" }, 7.6);
+
+      tl.to("#scene3", { opacity: 1, duration: 0.58, ease: "power2.inOut" }, 15.2);
+      tl.set("#scene2", { opacity: 0 }, 15.84);
+      tl.set("#scene2", { visibility: "hidden" }, 15.86);
+      tl.from("#scene3 .quote-device", { x: -74, scale: 0.95, opacity: 0, duration: 0.78, ease: "expo.out" }, 15.65);
+      tl.from("#scene3 .screen-label", { y: 28, scale: 0.9, opacity: 0, duration: 0.44, ease: "back.out(1.5)" }, 16.26);
+      tl.from("#scene3 .eyebrow", { x: 40, opacity: 0, duration: 0.5, ease: "power3.out" }, 16.05);
+      tl.from("#scene3 h2", { y: 54, opacity: 0, duration: 0.68, ease: "expo.out" }, 16.3);
+      tl.from("#scene3 .lead", { y: 32, opacity: 0, duration: 0.52, ease: "sine.out" }, 16.68);
+      tl.from("#scene3 .check", { x: 34, opacity: 0, duration: 0.42, stagger: 0.12, ease: "power2.out" }, 17.05);
+      tl.to("#scene3 .quote-device img", { scale: 1.04, x: 18, duration: 7.5, ease: "sine.inOut" }, 15.78);
+
+      tl.to("#scene4", { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 24.2);
+      tl.set("#scene3", { opacity: 0 }, 24.86);
+      tl.set("#scene3", { visibility: "hidden" }, 24.88);
+      tl.from("#scene4 .eyebrow", { x: -36, opacity: 0, duration: 0.5, ease: "power3.out" }, 24.62);
+      tl.from("#scene4 h2", { y: 58, opacity: 0, duration: 0.7, ease: "expo.out" }, 24.86);
+      tl.from("#scene4 .lead", { y: 32, opacity: 0, duration: 0.52, ease: "sine.out" }, 25.25);
+      tl.from("#scene4 .approval-card", { y: 38, scale: 0.96, opacity: 0, duration: 0.52, ease: "back.out(1.2)" }, 25.65);
+      tl.from("#scene4 .badge-row .badge", { y: 22, opacity: 0, duration: 0.34, stagger: 0.1, ease: "power2.out" }, 26.05);
+      tl.from("#scene4 .focus-device", { x: 72, scale: 0.95, opacity: 0, duration: 0.76, ease: "power4.out" }, 24.82);
+      tl.from("#scene4 .callout", { y: 34, scale: 0.94, opacity: 0, duration: 0.48, ease: "back.out(1.4)" }, 26.12);
+      tl.to("#scene4 .focus-device img", { scale: 1.035, x: -16, duration: 8.3, ease: "sine.inOut" }, 24.98);
+
+      tl.to("#scene5", { opacity: 1, duration: 0.68, ease: "sine.inOut" }, 33.6);
+      tl.set("#scene4", { opacity: 0 }, 34.34);
+      tl.set("#scene4", { visibility: "hidden" }, 34.36);
+      tl.from("#scene5 .brand", { y: -26, opacity: 0, duration: 0.52, ease: "power3.out" }, 34.08);
+      tl.from("#scene5 .topline > .badge", { scale: 0.84, opacity: 0, duration: 0.42, ease: "back.out(1.5)" }, 34.26);
+      tl.from("#scene5 .eyebrow", { x: -38, opacity: 0, duration: 0.5, ease: "power3.out" }, 34.58);
+      tl.from("#scene5 h1", { y: 62, opacity: 0, duration: 0.76, ease: "expo.out" }, 34.82);
+      tl.from("#scene5 .lead", { y: 34, opacity: 0, duration: 0.56, ease: "sine.out" }, 35.26);
+      tl.from("#scene5 .cta-panel", { x: 56, scale: 0.96, opacity: 0, duration: 0.66, ease: "power4.out" }, 35.0);
+      tl.from("#scene5 .cta-panel .badge", { y: 22, opacity: 0, duration: 0.34, stagger: 0.08, ease: "power2.out" }, 35.56);
+      tl.from("#scene5 .pilot-item", { y: 18, opacity: 0, duration: 0.34, stagger: 0.09, ease: "power2.out" }, 35.92);
+      tl.from("#scene5 .caption-strip", { y: 28, opacity: 0, duration: 0.48, ease: "power3.out" }, 36.42);
+      tl.to("#scene5 .final-backdrop img", { scale: 1.04, duration: 7.0, ease: "sine.inOut" }, 34.0);
+      tl.to("#root", { opacity: 0, duration: 0.55, ease: "sine.inOut" }, 41.35);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

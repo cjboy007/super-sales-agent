@@ -48,17 +48,20 @@ afterEach(() => {
 });
 
 describe("/api/config route", () => {
-  it("does not require an in-app sign-in even if legacy beta env vars are present", async () => {
+  it("requires an admin beta token for settings when beta auth is configured", async () => {
     process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
       { token: "settings-token", workspaces: ["farreach"] },
+      { token: "admin-token", workspaces: ["*"] },
     ]);
     const route = await import("./route");
 
     const getResponse = await route.GET(getRequest());
-    const postResponse = await route.POST(jsonRequest("POST", { defaultModel: "mock" }));
+    const scopedResponse = await route.GET(getRequest("settings-token"));
+    const postResponse = await route.POST(jsonRequest("POST", { defaultModel: "mock" }, "admin-token"));
     const postJson = await postResponse.json();
 
-    expect(getResponse.status).toBe(200);
+    expect(getResponse.status).toBe(401);
+    expect(scopedResponse.status).toBe(403);
     expect(postResponse.status).toBe(200);
     expect(postJson.success).toBe(true);
     expect(postJson.data.defaultModel).toBe("mock");

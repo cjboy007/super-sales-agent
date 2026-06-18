@@ -1,10 +1,23 @@
 {
   "primary": {
-    "beneficiary": "FARREACH ELECTRONIC CO LIMITED",
-    "bank_name": "HSBC Hong Kong",
-    "account_no": "YOUR-ACCOUNT-NUMBER",
-    "swift_code": "YOUR-SWIFT-CODE",
-    "bank_address": "No.1 Queen's Road Central,Central, Hong Kong",
+    "id": "primary-usd-account",
+    "beneficiary": "YOUR COMPANY NAME",
+    "beneficiary_address": "YOUR COMPANY ADDRESS",
+    "bank_name": "YOUR ACTIVE BANK NAME",
+    "account_no": "YOUR_ACCOUNT_NUMBER",
+    "swift_code": "YOUR_SWIFT_CODE",
+    "bank_address": "YOUR BANK ADDRESS",
+    "currency": "USD",
     "active": true
+  },
+  "legacy": {
+    "id": "legacy-account",
+    "beneficiary": "LEGACY COMPANY NAME",
+    "bank_name": "LEGACY BANK NAME",
+    "account_no": "LEGACY_ACCOUNT_NUMBER",
+    "swift_code": "LEGACY_SWIFT_CODE",
+    "bank_address": "LEGACY BANK ADDRESS",
+    "currency": "USD",
+    "active": false
   }
 }

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   createSalesRuntime,
+  type CustomerMemoryContext,
   type MemoryAuthority,
+  type MemoryHit,
+  type MemoryRecord,
   type MemoryRecordKind,
   type MemorySource,
+  type MemoryTimelineSummary,
 } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +30,17 @@ const SOURCE_TYPES = new Set<MemorySource["type"]>([
   "hermes",
   "external-memory",
 ]);
+
+type PublicMemoryRecord = Omit<MemoryRecord, "workspaceId" | "customerId" | "source" | "metadata" | "idempotencyKey">;
+type PublicMemoryHit = PublicMemoryRecord & Pick<MemoryHit, "score" | "matchedTerms" | "reason">;
+type PublicMemoryTimeline = Omit<MemoryTimelineSummary, "workspaceId" | "customerId" | "recentRecords"> & {
+  recentRecords: PublicMemoryRecord[];
+};
+type PublicCustomerMemoryContext = Omit<CustomerMemoryContext, "workspaceId" | "customerId" | "facts" | "episodes" | "timeline" | "retrieval"> & {
+  facts: PublicMemoryHit[];
+  episodes: PublicMemoryHit[];
+  timeline: PublicMemoryTimeline;
+};
 
 function stringValue(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
@@ -72,11 +87,90 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+function cleanPublicText(value: string): string {
+  return value
+    .replace(/\/Users\/[^\s"'`]+/g, "the local runtime")
+    .replace(/\.ssa\/[^\s"'`]+/g, "the local runtime");
+}
+
+function cleanPublicList(values: string[]): string[] {
+  return values.map(cleanPublicText);
+}
+
+function publicMemoryRecord(record: MemoryRecord): PublicMemoryRecord {
+  const {
+    workspaceId: _workspaceId,
+    customerId: _customerId,
+    source: _source,
+    metadata: _metadata,
+    idempotencyKey: _idempotencyKey,
+    ...rest
+  } = record;
+
+  return {
+    ...rest,
+    customerName: rest.customerName ? cleanPublicText(rest.customerName) : undefined,
+    subject: rest.subject ? cleanPublicText(rest.subject) : undefined,
+    title: cleanPublicText(rest.title),
+    body: cleanPublicText(rest.body),
+    tags: cleanPublicList(rest.tags),
+  };
+}
+
+function publicMemoryHit(hit: MemoryHit): PublicMemoryHit {
+  return {
+    ...publicMemoryRecord(hit),
+    score: hit.score,
+    matchedTerms: cleanPublicList(hit.matchedTerms),
+    reason: cleanPublicText(hit.reason),
+  };
+}
+
+function publicMemoryTimeline(timeline: MemoryTimelineSummary): PublicMemoryTimeline {
+  const {
+    workspaceId: _workspaceId,
+    customerId: _customerId,
+    recentRecords,
+    ...rest
+  } = timeline;
+
+  return {
+    ...rest,
+    query: cleanPublicText(rest.query),
+    customerName: rest.customerName ? cleanPublicText(rest.customerName) : undefined,
+    summary: cleanPublicText(rest.summary),
+    openRisks: cleanPublicList(rest.openRisks),
+    recommendedNextSteps: cleanPublicList(rest.recommendedNextSteps),
+    recentRecords: recentRecords.map(publicMemoryRecord),
+  };
+}
+
+function publicCustomerMemoryContext(context: CustomerMemoryContext): PublicCustomerMemoryContext {
+  const {
+    workspaceId: _workspaceId,
+    customerId: _customerId,
+    facts,
+    episodes,
+    timeline,
+    retrieval: _retrieval,
+    ...rest
+  } = context;
+
+  return {
+    ...rest,
+    query: cleanPublicText(rest.query),
+    customerName: rest.customerName ? cleanPublicText(rest.customerName) : undefined,
+    facts: facts.map(publicMemoryHit),
+    episodes: episodes.map(publicMemoryHit),
+    timeline: publicMemoryTimeline(timeline),
+  };
+}
+
 export async function GET(request: NextRequest) {
   const runtime = createSalesRuntime();
-  const project = request.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(request, project);
+  const auth = requireResolvedWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
   const query = request.nextUrl.searchParams.get("query") || "";
   const limit = Math.min(50, Math.max(1, Number(request.nextUrl.searchParams.get("limit") || "10")));
   const mode = request.nextUrl.searchParams.get("mode") || "search";
@@ -91,22 +185,22 @@ export async function GET(request: NextRequest) {
   };
 
   if (mode === "timeline") {
-    return NextResponse.json({ success: true, data: runtime.getMemoryTimeline(input) });
+    return NextResponse.json({ success: true, data: publicMemoryTimeline(runtime.getMemoryTimeline(input)) });
   }
 
   if (mode === "customer-context") {
-    return NextResponse.json({ success: true, data: runtime.getCustomerMemoryContext(input) });
+    return NextResponse.json({ success: true, data: publicCustomerMemoryContext(runtime.getCustomerMemoryContext(input)) });
   }
 
-  return NextResponse.json({ success: true, data: runtime.searchMemory(input) });
+  return NextResponse.json({ success: true, data: runtime.searchMemory(input).map(publicMemoryHit) });
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({})) as Record<string, unknown>;
-    const project = stringValue(body.workspaceId) || request.nextUrl.searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
+    const auth = requireResolvedWorkspaceAccess(request, body);
     if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
     const title = stringValue(body.title);
     const bodyText = stringValue(body.body);
     if (!title || !bodyText) {
@@ -132,7 +226,7 @@ export async function POST(request: NextRequest) {
       idempotencyKey: stringValue(body.idempotencyKey),
     });
 
-    return NextResponse.json({ success: true, data: record });
+    return NextResponse.json({ success: true, data: publicMemoryRecord(record) });
   } catch (error) {
     return NextResponse.json({ success: false, error: errorMessage(error) }, { status: 500 });
   }

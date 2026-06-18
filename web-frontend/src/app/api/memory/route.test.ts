@@ -45,13 +45,15 @@ describe("/api/memory route", () => {
     expect(written).toMatchObject({
       success: true,
       data: {
-        workspaceId: "demo-exporter",
         kind: "episode",
         customerName: "Beta Buyer",
         authority: "suggested",
-        source: { type: "hermes", id: "h-1" },
       },
     });
+    expect(JSON.stringify(written.data)).not.toContain("workspaceId");
+    expect(JSON.stringify(written.data)).not.toContain("source");
+    expect(JSON.stringify(written.data)).not.toContain("metadata");
+    expect(JSON.stringify(written.data)).not.toContain("provider");
 
     const searchResponse = await GET(request("http://localhost/api/memory?project=demo-exporter&query=Beta%20rush&authorities=suggested"));
     const search = await searchResponse.json();
@@ -63,6 +65,13 @@ describe("/api/memory route", () => {
       authority: "suggested",
       reason: expect.stringContaining("Matched"),
     });
+    const serialized = JSON.stringify(search.data);
+    expect(serialized).not.toContain("workspaceId");
+    expect(serialized).not.toContain("source");
+    expect(serialized).not.toContain("metadata");
+    expect(serialized).not.toContain("provider");
+    expect(serialized).not.toContain("/Users/");
+    expect(serialized).not.toContain(".ssa");
   });
 
   it("returns a memory timeline for customer context", async () => {
@@ -87,11 +96,51 @@ describe("/api/memory route", () => {
     expect(timeline).toMatchObject({
       success: true,
       data: {
-        workspaceId: "demo-exporter",
         customerName: "Gamma Buyer",
         openRisks: ["Margin risk guardrail"],
       },
     });
     expect(timeline.data.summary).toContain("fact: Margin risk guardrail");
+    const serialized = JSON.stringify(timeline.data);
+    expect(serialized).not.toContain("workspaceId");
+    expect(serialized).not.toContain("source");
+    expect(serialized).not.toContain("metadata");
+    expect(serialized).not.toContain("provider");
+    expect(serialized).not.toContain("/Users/");
+    expect(serialized).not.toContain(".ssa");
+  });
+
+  it("returns customer memory context without retrieval internals or source paths", async () => {
+    const { GET, POST } = await import("./route");
+
+    await POST(request("http://localhost/api/memory?project=demo-exporter", {
+      method: "POST",
+      body: JSON.stringify({
+        kind: "fact",
+        customerName: "Path Buyer",
+        title: "Local file note",
+        body: "Path Buyer quote was imported from /Users/wilson/.ssa/data/companies/demo-exporter/quotes/local.pdf.",
+        source: {
+          type: "document",
+          id: "doc-1",
+          path: "/Users/wilson/.ssa/data/companies/demo-exporter/quotes/local.pdf",
+        },
+      }),
+    }));
+
+    const contextResponse = await GET(request("http://localhost/api/memory?project=demo-exporter&mode=customer-context&query=Path%20Buyer&customerName=Path%20Buyer"));
+    const context = await contextResponse.json();
+
+    expect(context.success).toBe(true);
+    expect(context.data.facts).toHaveLength(1);
+    const serialized = JSON.stringify(context.data);
+    expect(serialized).not.toContain("workspaceId");
+    expect(serialized).not.toContain("customerId");
+    expect(serialized).not.toContain("retrieval");
+    expect(serialized).not.toContain("source");
+    expect(serialized).not.toContain("metadata");
+    expect(serialized).not.toContain("provider");
+    expect(serialized).not.toContain("/Users/");
+    expect(serialized).not.toContain(".ssa");
   });
 });

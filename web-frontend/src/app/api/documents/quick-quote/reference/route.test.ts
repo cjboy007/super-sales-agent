@@ -12,6 +12,13 @@ function request(url: string): NextRequest {
   return new NextRequest(url);
 }
 
+function expectNoInternalReferenceFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("provider");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 function tradeData(customer: string, product: string, unitPrice: number): TradeDocumentData {
   return {
     company: { name: "Seller", address: "", phone: "", email: "" },
@@ -154,14 +161,15 @@ describe("/api/documents/quick-quote/reference route", () => {
       base: "USD",
       quoteCurrency: "EUR",
       rates: { CNY: 7.2, EUR: 0.92, GBP: 0.78 },
-      provider: "Frankfurter",
     });
+    expect(json.data.exchangeRate).not.toHaveProperty("provider");
+    expectNoInternalReferenceFields(json);
   });
 
-  it("keeps reference data available when the exchange rate provider fails", async () => {
+  it("keeps reference data available without exposing service failures when exchange rates fail", async () => {
     await recordPrice("demo-exporter", tradeData("Local Buyer", "USB-C cable", 1.25));
     vi.stubGlobal("fetch", vi.fn(async () => {
-      throw new Error("network down");
+      throw new Error("provider network down at /Users/wilson/.ssa/data/rates.log");
     }));
 
     const { GET } = await import("./route");
@@ -176,6 +184,9 @@ describe("/api/documents/quick-quote/reference route", () => {
       base: "USD",
       quoteCurrency: "USD",
     });
+    expect(json.data.exchangeRate).not.toHaveProperty("provider");
+    expect(json.data.exchangeRate).not.toHaveProperty("error");
+    expectNoInternalReferenceFields(json);
   });
 
   it("reuses exchange rates for repeated reference requests inside the cache window", async () => {

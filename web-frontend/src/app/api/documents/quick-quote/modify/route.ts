@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { QuickQuoteData, QuickQuoteLine } from "@/lib/quick-quote";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -193,9 +193,9 @@ function patchSummary(patch: QuickQuotePatch, source: "llm" | "local") {
 
 export async function POST(request: NextRequest) {
   try {
-    const project = request.nextUrl.searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
+    const auth = requireResolvedWorkspaceAccess(request);
     if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
 
     const body: ModifyQuickQuoteBody = await request.json();
     const message = stringValue(body.message);
@@ -225,7 +225,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       source,
-      provider: llm.provider,
       reply: llmPatch?.reply || patchSummary(patch, source),
       updatedQuote: applyPatch(body.quote, patch),
     });

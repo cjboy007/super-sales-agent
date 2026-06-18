@@ -14,8 +14,9 @@ const path = require('path');
 
 class BankConfig {
   constructor() {
-    this.configPath = path.join(__dirname, '..', 'config', 'bank-accounts.json');
+    this.configPath = process.env.SSA_BANK_ACCOUNTS_PATH || path.join(__dirname, '..', 'config', 'bank-accounts.json');
     this.config = null;
+    this.configMtimeMs = null;
   }
 
   /**
@@ -23,13 +24,29 @@ class BankConfig {
    * @param {boolean} throwError - 是否抛出错误（默认 false，返回 null）
    */
   load(throwError = false) {
-    if (this.config) {
+    const configuredPath = process.env.SSA_BANK_ACCOUNTS_PATH || path.join(__dirname, '..', 'config', 'bank-accounts.json');
+    if (configuredPath !== this.configPath) {
+      this.configPath = configuredPath;
+      this.config = null;
+      this.configMtimeMs = null;
+    }
+
+    if (this.config && this.configMtimeMs !== null) {
+      try {
+        const stat = fs.statSync(this.configPath);
+        if (stat.mtimeMs === this.configMtimeMs) return this.config;
+      } catch {
+        // Fall through to normal read/error handling below.
+      }
+    } else if (this.config) {
       return this.config;
     }
 
     try {
+      const stat = fs.statSync(this.configPath);
       const content = fs.readFileSync(this.configPath, 'utf-8');
       this.config = JSON.parse(content);
+      this.configMtimeMs = stat.mtimeMs;
       return this.config;
     } catch (error) {
       const errorMsg = [
@@ -54,6 +71,7 @@ class BankConfig {
    */
   reload() {
     this.config = null;
+    this.configMtimeMs = null;
     return this.load(true);
   }
 
@@ -140,5 +158,6 @@ module.exports = {
   getBank: (type) => instance.getBank(type),
   getAllBanks: () => instance.getAllBanks(),
   validateBankInfo: (bankInfo) => instance.validateBankInfo(bankInfo),
-  load: () => instance.load()
+  load: () => instance.load(),
+  reload: () => instance.reload()
 };

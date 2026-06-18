@@ -15,8 +15,8 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const DB_DIR = path.join(process.env.HOME, '.ssa', 'data', 'runtime', 'legacy-shared-state');
-const DB_PATH = path.join(DB_DIR, 'sales-state.db');
+const DB_PATH = process.env.SALES_STATE_DB_PATH || path.join(process.env.HOME, '.ssa', 'data', 'runtime', 'legacy-shared-state', 'sales-state.db');
+const DB_DIR = path.dirname(DB_PATH);
 
 if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
 
@@ -58,7 +58,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS customer_stages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     project TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL,
     company TEXT,
     contact_name TEXT,
     country TEXT,
@@ -72,7 +72,8 @@ db.exec(`
     last_reply_at TEXT,
     intent TEXT,
     created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
+    updated_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(project, email)
   );
 
   CREATE TABLE IF NOT EXISTS replies (
@@ -96,6 +97,72 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_leads_project ON leads(project);
 `);
 
+function uniqueIndexesFor(tableName) {
+  return db.pragma(`index_list(${tableName})`).filter(index => index.unique);
+}
+
+function indexColumns(indexName) {
+  return db.pragma(`index_info(${indexName})`).map(column => column.name);
+}
+
+function hasLegacyCustomerStageEmailUnique() {
+  return uniqueIndexesFor('customer_stages').some((index) => {
+    const columns = indexColumns(index.name);
+    return columns.length === 1 && columns[0] === 'email';
+  });
+}
+
+function migrateCustomerStagesProjectScopedUnique() {
+  if (!hasLegacyCustomerStageEmailUnique()) {
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_stages_project_email_unique ON customer_stages(project, email);');
+    return;
+  }
+
+  db.exec(`
+    BEGIN;
+    ALTER TABLE customer_stages RENAME TO customer_stages_legacy_email_unique;
+    CREATE TABLE customer_stages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project TEXT NOT NULL,
+      email TEXT NOT NULL,
+      company TEXT,
+      contact_name TEXT,
+      country TEXT,
+      current_stage TEXT DEFAULT 'cold_email_sent',
+      follow_up_count INTEGER DEFAULT 0,
+      last_contact_at TEXT,
+      next_follow_up_at TEXT,
+      is_cold INTEGER DEFAULT 0,
+      cold_until TEXT,
+      reply_status TEXT DEFAULT 'no_reply',
+      last_reply_at TEXT,
+      intent TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(project, email)
+    );
+    INSERT INTO customer_stages (
+      id, project, email, company, contact_name, country, current_stage,
+      follow_up_count, last_contact_at, next_follow_up_at, is_cold, cold_until,
+      reply_status, last_reply_at, intent, created_at, updated_at
+    )
+    SELECT
+      id, project, email, company, contact_name, country, current_stage,
+      follow_up_count, last_contact_at, next_follow_up_at, is_cold, cold_until,
+      reply_status, last_reply_at, intent, created_at, updated_at
+    FROM customer_stages_legacy_email_unique;
+    DROP TABLE customer_stages_legacy_email_unique;
+    COMMIT;
+  `);
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_stages_project ON customer_stages(project);
+    CREATE INDEX IF NOT EXISTS idx_stages_next_followup ON customer_stages(next_follow_up_at);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_stages_project_email_unique ON customer_stages(project, email);
+  `);
+}
+
+migrateCustomerStagesProjectScopedUnique();
+
 const stmts = {
   // Prepared statements for performance
   insertLead: db.prepare(`
@@ -109,7 +176,10 @@ const stmts = {
   upsertStage: db.prepare(`
     INSERT INTO customer_stages (project, email, company, contact_name, country, current_stage, follow_up_count, last_contact_at, next_follow_up_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(email) DO UPDATE SET
+    ON CONFLICT(project, email) DO UPDATE SET
+      company = COALESCE(excluded.company, company),
+      contact_name = COALESCE(excluded.contact_name, contact_name),
+      country = COALESCE(excluded.country, country),
       current_stage = COALESCE(excluded.current_stage, current_stage),
       follow_up_count = COALESCE(excluded.follow_up_count, follow_up_count),
       last_contact_at = COALESCE(excluded.last_contact_at, last_contact_at),

@@ -99,7 +99,7 @@ export interface SideEffectDecision {
   id: string;
   kind: SideEffectKind;
   workspaceId: WorkspaceId;
-  status: "blocked" | "allowed" | "approved" | "rejected" | "retry_requested";
+  status: "blocked" | "allowed" | "approved" | "rejected" | "retry_requested" | "executed" | "execution_failed";
   reason: string;
   realExecutionEnabled: boolean;
   createdAt: string;
@@ -110,6 +110,14 @@ export interface SideEffectDecision {
   rejectionNote?: string;
   retryOf?: string;
   retryCount?: number;
+  execution?: {
+    status: "executed" | "failed";
+    executedAt?: string;
+    failedAt?: string;
+    error?: string;
+    canRetry?: boolean;
+    result?: Record<string, unknown>;
+  };
   payload: Record<string, unknown>;
 }
 

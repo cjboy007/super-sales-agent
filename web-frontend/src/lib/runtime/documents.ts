@@ -7,6 +7,7 @@ import { requestSideEffect } from "./side-effect-gate";
 import type { SalesRuntime } from "./sales-runtime";
 import { upsertFileManifestRecords, type FileManifestRecord } from "./file-manifest";
 import { recordPiPrices } from "./price-memory";
+import { ingestCustomerInteraction } from "./customer-memory-ingestor";
 
 const QUOTATION_GENERATE_SCRIPT = repoPath("skills", "quotation-workflow", "scripts", "generate-all.sh");
 function quotationOutputDir(workspaceId: string) {
@@ -57,6 +58,7 @@ export interface TradeDocumentGenerationInput {
   workspaceId: string;
   data: TradeDocumentData;
   docTypes: TradeDocumentType[];
+  decisionId?: string;
 }
 
 export interface GeneratedTradeDocument {
@@ -111,6 +113,7 @@ export interface QuotationGenerationInput {
   }>;
   terms?: string;
   notes?: string;
+  decisionId?: string;
 }
 
 export interface QuotationGenerationResult {
@@ -153,6 +156,178 @@ function makeQuotationNo(type: string) {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
   const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
   return `${type}-${dateStr}-${randomNum}`;
+}
+
+function isDocumentGenerationEnabled() {
+  return process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION === "true";
+}
+
+const DOCUMENT_APPROVAL_REQUIRED_DETAIL = "Document generation blocked: approved action record is required before files are generated.";
+
+function cleanText(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeForComparison(value: unknown): string {
+  return JSON.stringify(value ?? null);
+}
+
+function samePayloadValue(a: unknown, b: unknown) {
+  return normalizeForComparison(a) === normalizeForComparison(b);
+}
+
+function disabledDocumentDecision(sideEffect: SideEffectDecision): SideEffectDecision {
+  if (sideEffect.status === "blocked") return sideEffect;
+  return {
+    ...sideEffect,
+    status: "blocked",
+    reason: "Document generation request captured locally. Real document generation is disabled.",
+    execution: undefined,
+  };
+}
+
+function missingDocumentApprovalDecision(sideEffect: SideEffectDecision): SideEffectDecision {
+  return {
+    ...sideEffect,
+    status: sideEffect.status === "allowed" ? "allowed" : "blocked",
+    reason: DOCUMENT_APPROVAL_REQUIRED_DETAIL,
+    execution: undefined,
+  };
+}
+
+function quotationApprovalPayload(input: QuotationGenerationInput) {
+  return {
+    items: input.items || [],
+    terms: input.terms || "",
+    notes: input.notes || "",
+  };
+}
+
+function quotationApprovalIdempotencyKey(input: QuotationGenerationInput) {
+  return `${input.workspaceId}:document:${input.type}:${input.customer}`;
+}
+
+function tradeDocumentCustomerName(data: TradeDocumentData) {
+  return data.customer.company_name || data.customer.email || "Unknown customer";
+}
+
+function tradeDocumentTypeLabel(docTypes: TradeDocumentType[]) {
+  return docTypes.includes("ALL") ? "ALL" : docTypes.join("+");
+}
+
+function approvedQuotationDecision(runtime: SalesRuntime, input: QuotationGenerationInput): SideEffectDecision | null {
+  const decisionId = cleanText(input.decisionId);
+  if (!decisionId) return null;
+  const decision = runtime.getSideEffect(decisionId);
+  if (!decision || decision.kind !== "document.generate") return null;
+  if (decision.workspaceId !== input.workspaceId) return null;
+  if (decision.status !== "approved") return null;
+  if (cleanText(decision.payload.documentType) !== input.type) return null;
+  if (cleanText(decision.payload.customer) !== input.customer) return null;
+  const expectedPayload = quotationApprovalPayload(input);
+  if (!samePayloadValue(decision.payload.items, expectedPayload.items)) return null;
+  if (cleanText(decision.payload.terms) !== expectedPayload.terms) return null;
+  if (cleanText(decision.payload.notes) !== expectedPayload.notes) return null;
+  return decision;
+}
+
+function approvedTradeDocumentDecision(runtime: SalesRuntime, input: TradeDocumentGenerationInput): SideEffectDecision | null {
+  const decisionId = cleanText(input.decisionId);
+  if (!decisionId) return null;
+  const decision = runtime.getSideEffect(decisionId);
+  if (!decision || decision.kind !== "document.generate") return null;
+  if (decision.workspaceId !== input.workspaceId) return null;
+  if (decision.status !== "approved") return null;
+  if (cleanText(decision.payload.documentType) !== tradeDocumentTypeLabel(input.docTypes)) return null;
+  if (!samePayloadValue(decision.payload.docTypes, input.docTypes)) return null;
+  if (cleanText(decision.payload.piNo) !== input.data.pi_info.pi_no) return null;
+  if (cleanText(decision.payload.ciNo) !== input.data.ci_info.ci_no) return null;
+  if (cleanText(decision.payload.plNo) !== input.data.pl_info.pl_no) return null;
+  if (!samePayloadValue(decision.payload.customer, input.data.customer)) return null;
+  return decision;
+}
+
+function rememberQuotationDocument(
+  runtime: SalesRuntime,
+  input: QuotationGenerationInput,
+  quotationNo: string,
+  status: "requested" | "generated",
+  sideEffect: SideEffectDecision,
+  files: Array<{ format: string; path: string }> = []
+) {
+  const products = (input.items || []).map((item) => item.name || item.description).filter(Boolean).join(", ");
+  return ingestCustomerInteraction(runtime, {
+    workspaceId: input.workspaceId,
+    direction: status === "generated" ? "document_generated" : "document_requested",
+    customerName: input.customer,
+    subject: `${input.type} ${quotationNo} ${status}`,
+    body: [
+      `${input.type} ${quotationNo} ${status} for ${input.customer}.`,
+      products ? `Products: ${products}.` : "",
+      input.terms ? `Terms: ${input.terms}.` : "",
+      input.notes ? `Notes: ${input.notes}.` : "",
+      files.length ? `Files: ${files.map((file) => `${file.format}:${file.path}`).join(", ")}` : "",
+    ].filter(Boolean).join(" "),
+    documentNo: quotationNo,
+    filePath: files[0]?.path,
+    occurredAt: new Date().toISOString(),
+    source: {
+      type: "document",
+      id: sideEffect.id,
+      path: files[0]?.path,
+    },
+    metadata: {
+      documentType: input.type,
+      status,
+      products,
+      files,
+      sideEffectDecisionId: sideEffect.id,
+    },
+    idempotencyKey: `${input.workspaceId}:quotation-document:${quotationNo}:${status}:${sideEffect.id}`,
+  });
+}
+
+function rememberTradeDocument(
+  runtime: SalesRuntime,
+  input: TradeDocumentGenerationInput,
+  status: "requested" | "generated",
+  sideEffect: SideEffectDecision,
+  documents: GeneratedTradeDocument[] = []
+) {
+  const customer = tradeDocumentCustomerName(input.data);
+  const piNo = input.data.pi_info.pi_no;
+  return ingestCustomerInteraction(runtime, {
+    workspaceId: input.workspaceId,
+    direction: status === "generated" ? "document_generated" : "document_requested",
+    customerName: customer,
+    email: input.data.customer.email,
+    contactName: input.data.customer.contact,
+    subject: `${tradeDocumentTypeLabel(input.docTypes)} documents ${status}`,
+    body: [
+      `${tradeDocumentTypeLabel(input.docTypes)} documents ${status} for ${customer}.`,
+      piNo ? `PI: ${piNo}.` : "",
+      `Amount: ${formatAmount(input.data)}.`,
+      `Products: ${productSummary(input.data)}.`,
+      documents.length ? `Files: ${documents.map((document) => document.path).join(", ")}` : "",
+    ].filter(Boolean).join(" "),
+    documentNo: piNo,
+    filePath: documents[0]?.path,
+    occurredAt: new Date().toISOString(),
+    source: {
+      type: "document",
+      id: sideEffect.id,
+      path: documents[0]?.path,
+    },
+    metadata: {
+      docTypes: input.docTypes,
+      status,
+      amount: formatAmount(input.data),
+      productType: productSummary(input.data),
+      files: documents,
+      sideEffectDecisionId: sideEffect.id,
+    },
+    idempotencyKey: `${input.workspaceId}:trade-document:${piNo}:${tradeDocumentTypeLabel(input.docTypes)}:${status}:${sideEffect.id}`,
+  });
 }
 
 function findGeneratedQuotationFiles(workspaceId: string, quotationNo: string): Array<{ format: string; path: string }> {
@@ -220,27 +395,36 @@ export async function generateQuotationDocuments(
   ensureDir(quotationOutputDir(input.workspaceId));
 
   const quotationNo = makeQuotationNo(input.type);
+  const approvalPayload = quotationApprovalPayload(input);
   const sideEffect = runtime.requestDocumentGeneration({
     workspaceId: input.workspaceId,
     documentType: input.type,
     customer: input.customer,
-    payload: {
-      quotationNo,
-      items: input.items || [],
-      terms: input.terms || "",
-      notes: input.notes || "",
-    },
-    idempotencyKey: `${input.workspaceId}:document:${quotationNo}`,
+    payload: approvalPayload,
+    idempotencyKey: quotationApprovalIdempotencyKey(input),
   });
+  rememberQuotationDocument(runtime, input, quotationNo, "requested", sideEffect);
 
-  if (sideEffect.status !== "allowed") {
+  if (!isDocumentGenerationEnabled()) {
     return {
       success: true,
       blocked: true,
       quotationNo,
       files: [],
-      sideEffect,
+      sideEffect: disabledDocumentDecision(sideEffect),
       detail: "Quotation generation request captured locally. Real document generation is disabled.",
+    };
+  }
+
+  const approval = approvedQuotationDecision(runtime, input);
+  if (!approval) {
+    return {
+      success: true,
+      blocked: true,
+      quotationNo,
+      files: [],
+      sideEffect: missingDocumentApprovalDecision(sideEffect),
+      detail: DOCUMENT_APPROVAL_REQUIRED_DETAIL,
     };
   }
 
@@ -270,11 +454,18 @@ export async function generateQuotationDocuments(
 
     const files = findGeneratedQuotationFiles(input.workspaceId, quotationNo);
     upsertGeneratedQuotationManifest(input.workspaceId, input, quotationNo, files);
+    const executedSideEffect = runtime.recordSideEffectExecuted(approval.id, {
+      result: {
+        quotationNo,
+        files: files.map((file) => ({ format: file.format, path: file.path })),
+      },
+    });
+    rememberQuotationDocument(runtime, input, quotationNo, "generated", executedSideEffect, files);
     return {
       success: true,
       quotationNo,
       files,
-      sideEffect,
+      sideEffect: executedSideEffect,
       detail: "Document generated successfully",
       log: stdout.slice(-500),
     };
@@ -284,6 +475,10 @@ export async function generateQuotationDocuments(
     } catch {
       // Temp cleanup is best-effort.
     }
+    runtime.recordSideEffectFailed(approval.id, {
+      error: scriptError instanceof Error ? scriptError.message : String(scriptError),
+      canRetry: true,
+    });
     throw scriptError;
   }
 }
@@ -422,14 +617,11 @@ export async function generateTradeDocuments(
 ): Promise<TradeDocumentGenerationResult> {
   const outputDir = tradeDocsOutputDir(input.workspaceId);
   ensureDir(outputDir);
-  if (input.data.pi_info.pi_no.trim() && input.docTypes.includes("PI")) {
-    savePiRecord(input.workspaceId, input.data);
-  }
 
   const sideEffect = runtime.requestDocumentGeneration({
     workspaceId: input.workspaceId,
-    documentType: input.docTypes.includes("ALL") ? "ALL" : input.docTypes.join("+"),
-    customer: input.data.customer.company_name || input.data.customer.email || "Unknown customer",
+    documentType: tradeDocumentTypeLabel(input.docTypes),
+    customer: tradeDocumentCustomerName(input.data),
     payload: {
       docTypes: input.docTypes,
       piNo: input.data.pi_info.pi_no,
@@ -439,14 +631,26 @@ export async function generateTradeDocuments(
     },
     idempotencyKey: `${input.workspaceId}:trade-docs:${input.data.pi_info.pi_no}:${input.docTypes.join("+")}`,
   });
+  rememberTradeDocument(runtime, input, "requested", sideEffect);
 
-  if (sideEffect.status !== "allowed") {
+  if (!isDocumentGenerationEnabled()) {
     return {
       success: true,
       blocked: true,
       documents: [],
-      sideEffect,
+      sideEffect: disabledDocumentDecision(sideEffect),
       message: "Trade document generation request captured locally. Real document generation is disabled.",
+    };
+  }
+
+  const approval = approvedTradeDocumentDecision(runtime, input);
+  if (!approval) {
+    return {
+      success: true,
+      blocked: true,
+      documents: [],
+      sideEffect: missingDocumentApprovalDecision(sideEffect),
+      message: DOCUMENT_APPROVAL_REQUIRED_DETAIL,
     };
   }
 
@@ -463,9 +667,13 @@ export async function generateTradeDocuments(
 
       if (!script || !fs.existsSync(script)) {
         if (docType === "PI") continue;
+        const failedSideEffect = runtime.recordSideEffectFailed(approval.id, {
+          error: `Script not found for ${docType}: ${script}`,
+          canRetry: true,
+        });
         return {
           success: false,
-          sideEffect,
+          sideEffect: failedSideEffect,
           error: `Script not found for ${docType}: ${script}`,
         };
       }
@@ -497,19 +705,36 @@ export async function generateTradeDocuments(
   }
 
   if (documents.length === 0) {
+    const failedSideEffect = runtime.recordSideEffectFailed(approval.id, {
+      error: "No documents were generated. Check Python dependencies.",
+      canRetry: true,
+    });
     return {
       success: false,
-      sideEffect,
+      sideEffect: failedSideEffect,
       error: "No documents were generated. Check Python dependencies.",
     };
   }
 
+  if (documents.some((document) => document.type === "PI")) {
+    savePiRecord(input.workspaceId, input.data);
+  }
   upsertTradeDocumentManifest(input.workspaceId, input.data, documents);
+  const executedSideEffect = runtime.recordSideEffectExecuted(approval.id, {
+    result: {
+      documents: documents.map((document) => ({
+        type: document.type,
+        filename: document.filename,
+        size: document.size,
+      })),
+    },
+  });
+  rememberTradeDocument(runtime, input, "generated", executedSideEffect, documents);
 
   return {
     success: true,
     documents,
-    sideEffect,
+    sideEffect: executedSideEffect,
     message: `成功生成 ${documents.length} 份单证`,
   };
 }

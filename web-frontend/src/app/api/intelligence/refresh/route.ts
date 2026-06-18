@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,14 +8,48 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+type IntelligenceRefreshResult = Awaited<ReturnType<ReturnType<typeof createSalesRuntime>["refreshIntelligence"]>>;
+
+function publicRefreshResult(result: IntelligenceRefreshResult) {
+  const cached = Boolean(result.cache?.hit);
+  return {
+    success: result.success,
+    data: {
+      status: result.success ? (cached ? "cached" : "updated") : "needs_retry",
+      updatedAt: result.updatedAt,
+      newsCount: result.newsCount,
+      competitorCount: result.competitorCount,
+      cached,
+      message: result.success
+        ? cached
+          ? "Saved market intelligence is already current."
+          : "Market intelligence was refreshed."
+        : "Market intelligence could not be refreshed. Existing saved intelligence was kept.",
+    },
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const project = request.nextUrl.searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
+    const auth = requireResolvedWorkspaceAccess(request);
     if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
     const result = await createSalesRuntime().refreshIntelligence(project);
-    return NextResponse.json(result, { status: result.success ? 200 : 502 });
+    return NextResponse.json(publicRefreshResult(result), { status: result.success ? 200 : 502 });
   } catch (error) {
-    return NextResponse.json({ success: false, error: errorMessage(error) }, { status: 500 });
+    const message = errorMessage(error);
+    return NextResponse.json({
+      success: false,
+      data: {
+        status: "needs_retry",
+        updatedAt: new Date().toISOString(),
+        newsCount: 0,
+        competitorCount: 0,
+        cached: false,
+        message: message.includes("Beta access")
+          ? "Market intelligence could not be refreshed because access is not available."
+          : "Market intelligence could not be refreshed. Existing saved intelligence was kept.",
+      },
+    }, { status: 500 });
   }
 }

@@ -53,9 +53,35 @@ describe("/api/documents/quick-quote/export-pi route", () => {
         piNo: "PI-20260601-001",
         customer: "Local Buyer",
         git: { committed: true },
+        archive: {
+          status: "archived",
+          fileCount: 3,
+        },
       },
     });
-    expect(fs.existsSync(path.join(json.data.packageDir, "PI-20260601-001.html"))).toBe(true);
-    expect(fs.existsSync(path.join(json.data.packageDir, "price-cost.json"))).toBe(true);
+    const packageDir = path.join(
+      tempRoot,
+      "companies",
+      "demo-exporter",
+      "customers",
+      "Local_Buyer",
+      "quotes",
+      "PI-20260601-001"
+    );
+    expect(fs.existsSync(path.join(packageDir, "PI-20260601-001.html"))).toBe(true);
+    expect(fs.existsSync(path.join(packageDir, "price-cost.json"))).toBe(true);
+
+    const serialized = JSON.stringify(json.data);
+    expect(json.data).not.toHaveProperty("workspaceId");
+    expect(json.data).not.toHaveProperty("customerDir");
+    expect(json.data).not.toHaveProperty("packageDir");
+    expect(serialized).not.toContain("path");
+    expect(serialized).not.toContain(tempRoot);
+    expect(serialized).not.toContain("/Users/");
+    expect(serialized).not.toContain(".ssa");
+    expect(serialized).not.toContain("workspaceId");
+    expect(serialized).not.toContain("provider");
+    expect(serialized).not.toContain("jobId");
+    expect(serialized).not.toContain("workflow");
   });
 });

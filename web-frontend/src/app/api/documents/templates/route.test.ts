@@ -52,4 +52,27 @@ describe("/api/documents/templates route", () => {
     const savedDir = path.join(tempRoot, "companies", "demo-exporter", "documents", "template-samples");
     expect(fs.readdirSync(savedDir).filter((file) => file.endsWith(".pdf"))).toHaveLength(3);
   });
+
+  it("does not expose saved file paths in the upload response", async () => {
+    const files = [
+      new File(["pi"], "PI-approved.pdf", { type: "application/pdf" }),
+      new File(["ci"], "CI-approved.pdf", { type: "application/pdf" }),
+      new File(["pl"], "PL-approved.pdf", { type: "application/pdf" }),
+    ];
+    const { POST } = await import("./route");
+
+    const response = await POST(uploadRequest(files));
+    const json = await response.json();
+    const payload = JSON.stringify(json);
+
+    expect(response.status).toBe(200);
+    expect(json.savedFiles).toEqual([
+      { filename: "PI-approved.pdf", size: 2 },
+      { filename: "CI-approved.pdf", size: 2 },
+      { filename: "PL-approved.pdf", size: 2 },
+    ]);
+    expect(payload).not.toContain(tempRoot);
+    expect(payload).not.toContain("/template-samples/");
+    expect(payload).not.toContain("path");
+  });
 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { withPublicAction } from "../../public-action";
 
 export const dynamic = "force-dynamic";
 
@@ -11,13 +12,13 @@ export async function GET(
 ) {
   const { emailId } = await params;
   const runtime = createSalesRuntime();
-  const project = req.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(req, project);
+  const auth = requireResolvedWorkspaceAccess(req);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
   const email = await runtime.getInboxEmail(project, emailId);
 
   if (!email.success) {
-    return NextResponse.json(email, { status: 404 });
+    return NextResponse.json(withPublicAction(email), { status: 404 });
   }
-  return NextResponse.json(email);
+  return NextResponse.json(withPublicAction(email));
 }

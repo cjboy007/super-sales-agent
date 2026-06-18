@@ -58,6 +58,15 @@ function readAllDecisions(): SideEffectDecision[] {
 }
 
 export function requestSideEffect(request: SideEffectRequest): SideEffectDecision {
+  const idempotencyKey = request.idempotencyKey || "";
+  if (idempotencyKey) {
+    const existing = readDecisions(request.workspaceId).find((decision) =>
+      decision.kind === request.kind &&
+      decision.payload.idempotencyKey === idempotencyKey
+    );
+    if (existing) return existing;
+  }
+
   const realExecutionEnabled = isRealExecutionEnabled(request.kind);
   const decision: SideEffectDecision = {
     id: makeDecisionId(request.kind),
@@ -71,7 +80,7 @@ export function requestSideEffect(request: SideEffectRequest): SideEffectDecisio
     createdAt: new Date().toISOString(),
     payload: {
       summary: request.summary,
-      idempotencyKey: request.idempotencyKey || null,
+      idempotencyKey: idempotencyKey || null,
       ...request.payload,
     },
   };
@@ -127,6 +136,10 @@ export function rejectSideEffectDecision(id: string, input: { by?: string; note?
 export function retrySideEffectDecision(id: string): SideEffectDecision {
   const existing = getSideEffectDecision(id);
   if (!existing) throw new Error(`Side effect decision not found: ${id}`);
+  const retryCount = (existing.retryCount || 0) + 1;
+  const originalIdempotencyKey = typeof existing.payload.idempotencyKey === "string"
+    ? existing.payload.idempotencyKey
+    : "";
 
   const retry = requestSideEffect({
     kind: existing.kind,
@@ -135,15 +148,16 @@ export function retrySideEffectDecision(id: string): SideEffectDecision {
     payload: {
       ...existing.payload,
       retryOf: existing.id,
+      originalIdempotencyKey: originalIdempotencyKey || null,
     },
-    idempotencyKey: String(existing.payload.idempotencyKey || `${existing.id}:retry`),
+    idempotencyKey: `${existing.workspaceId}:${existing.kind}:${existing.id}:retry:${retryCount}`,
   });
 
   const retried = {
     ...retry,
     status: "retry_requested" as const,
     retryOf: existing.id,
-    retryCount: (existing.retryCount || 0) + 1,
+    retryCount,
     updatedAt: new Date().toISOString(),
     reason: retry.realExecutionEnabled
       ? "Retry requested and real execution flag is enabled; caller must still execute through an adapter."
@@ -156,4 +170,39 @@ export function retrySideEffectDecision(id: string): SideEffectDecision {
   else decisions.unshift(retried);
   writeDecisions(retried.workspaceId, decisions.slice(0, 500));
   return retried;
+}
+
+export function recordSideEffectExecutionSuccess(
+  id: string,
+  input: { result?: Record<string, unknown> } = {}
+): SideEffectDecision {
+  return updateDecision(id, (decision) => ({
+    ...decision,
+    status: "executed",
+    updatedAt: new Date().toISOString(),
+    reason: "Execution completed through an approved adapter.",
+    execution: {
+      status: "executed",
+      executedAt: new Date().toISOString(),
+      result: input.result || {},
+    },
+  }));
+}
+
+export function recordSideEffectExecutionFailure(
+  id: string,
+  input: { error: string; canRetry?: boolean }
+): SideEffectDecision {
+  return updateDecision(id, (decision) => ({
+    ...decision,
+    status: "execution_failed",
+    updatedAt: new Date().toISOString(),
+    reason: input.error,
+    execution: {
+      status: "failed",
+      failedAt: new Date().toISOString(),
+      error: input.error,
+      canRetry: input.canRetry !== false,
+    },
+  }));
 }

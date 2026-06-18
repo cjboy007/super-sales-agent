@@ -18,9 +18,10 @@ const { promisify } = require('util');
 const { SalesState } = require('../shared/sales-state-db');
 
 const execAsync = promisify(exec);
+const REPO_ROOT = path.resolve(__dirname, '..');
 
 // ==================== 配置 ====================
-const IMAP_CLI = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/scripts/imap.js';
+const IMAP_CLI = path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'scripts', 'imap.js');
 const LOG_DIR = path.join(process.env.HOME, '.ssa', 'logs', 'reply-processor');
 const CHECK_LIMIT = 20;
 

@@ -1,6 +1,9 @@
 import fs from "fs";
 import type { InboundEmail, ReplyStyle } from "../../types/inbox";
 import { ensureSsaCompanyDataPath, readJsonFile } from "../ssa-data-paths";
+import { syncInboxEmailsToCustomers } from "./customer-activity";
+import type { CustomerActivitySyncResult } from "./customer-activity";
+import { ingestCustomerInteraction, resolveCustomerAffiliation } from "./customer-memory-ingestor";
 import { verifyEmailAddress } from "./email-verification";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision } from "./types";
@@ -13,6 +16,7 @@ export interface InboxListRuntimeResult {
   total: number;
   stats: unknown;
   sideEffect?: SideEffectDecision;
+  crm?: CustomerActivitySyncResult;
 }
 
 export interface InboxDetailRuntimeResult {
@@ -40,12 +44,7 @@ export interface InboxSendInput {
   body?: unknown;
   content?: unknown;
   html?: unknown;
-  humanApproval?: {
-    approved?: boolean;
-    approvedBy?: string;
-    approvedAt?: string;
-    note?: string;
-  };
+  decisionId?: unknown;
 }
 
 export interface InboxStyleSelectionInput {
@@ -62,6 +61,10 @@ function isFarreachBridgeEnabled() {
   return process.env.SSA_ENABLE_FARREACH_BRIDGE === "true";
 }
 
+function isRealEmailSendEnabled() {
+  return process.env.SSA_ENABLE_REAL_EMAIL_SEND === "true";
+}
+
 function canSendWithoutVerification() {
   return process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND === "true";
 }
@@ -70,8 +73,14 @@ function verificationBlockDetail(status: string) {
   return `Email blocked: recipient verification is ${status}. Configure Hunter verification or approve an explicit unverified-send override.`;
 }
 
-function hasHumanApproval(input: InboxSendInput) {
-  return input.humanApproval?.approved === true;
+function approvalBlockDetail() {
+  return "Email blocked: approved side-effect decision is required before real customer send.";
+}
+
+function bridgeStatusFailureMessage(response: Response) {
+  const status = response.status || "unknown";
+  const statusText = response.statusText ? ` ${response.statusText}` : "";
+  return `Email bridge returned ${status}${statusText}. Retry after checking the send service.`;
 }
 
 function sendRequestLogPath(workspaceId: string) {
@@ -147,6 +156,21 @@ function stringValue(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
 
+function approvedInboxSendDecision(runtime: SalesRuntime, input: InboxSendInput, to: string, subject: string): SideEffectDecision | null {
+  const decisionId = stringValue(input.decisionId).trim();
+  if (!decisionId) return null;
+  const decision = runtime.getSideEffect(decisionId);
+  if (!decision || decision.kind !== "email.send") return null;
+  if (decision.workspaceId !== input.workspaceId) return null;
+  const isApprovedForExecution = decision.status === "approved" ||
+    (decision.status === "execution_failed" && Boolean(decision.approvedBy) && decision.execution?.canRetry !== false);
+  if (!isApprovedForExecution) return null;
+  if (stringValue(decision.payload.to).trim() !== to) return null;
+  if (stringValue(decision.payload.subject).trim() !== subject) return null;
+  if (stringValue(decision.payload.emailId).trim() !== input.emailId) return null;
+  return decision;
+}
+
 function requestInboxFetch(runtime: SalesRuntime, workspaceId: string, payload: {
   summary: string;
   idempotencyKey: string;
@@ -182,12 +206,16 @@ export async function getRuntimeInbox(runtime: SalesRuntime, workspaceId: string
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.emails && data.emails.length > 0) {
+          const crm = syncInboxEmailsToCustomers(runtime, workspace.id, data.emails, {
+            source: "inbox-bridge",
+          });
           return {
             success: true,
             data: data.emails,
             total: data.count,
             stats: runtime.memory.getInbox(workspace.id, { limit: normalizedLimit }).stats,
             sideEffect,
+            crm,
           };
         }
       }
@@ -197,12 +225,16 @@ export async function getRuntimeInbox(runtime: SalesRuntime, workspaceId: string
   }
 
   const localInbox = runtime.memory.getInbox(workspace.id, { limit: normalizedLimit });
+  const crm = syncInboxEmailsToCustomers(runtime, workspace.id, localInbox.data || [], {
+    source: "local-inbox",
+  });
   return {
     success: true,
     data: localInbox.data || [],
     total: localInbox.total,
     stats: localInbox.stats,
     sideEffect,
+    crm,
   };
 }
 
@@ -227,6 +259,9 @@ export async function getRuntimeInboxEmail(
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.email) {
+          syncInboxEmailsToCustomers(runtime, workspace.id, [data.email], {
+            source: "inbox-bridge",
+          });
           return { success: true, data: data.email, sideEffect };
         }
       }
@@ -236,6 +271,11 @@ export async function getRuntimeInboxEmail(
   }
 
   const email = runtime.memory.getInboxEmail(workspace.id, emailId);
+  if (email.success && email.data) {
+    syncInboxEmailsToCustomers(runtime, workspace.id, [email.data], {
+      source: "local-inbox",
+    });
+  }
   return { ...email, sideEffect };
 }
 
@@ -270,6 +310,26 @@ export async function draftRuntimeInboxReply(runtime: SalesRuntime, input: Inbox
   const subject = stringValue(input.subject, sourceEmail?.subject || "Your inquiry");
   const content = stringValue(input.body, stringValue(input.content, sourceEmail?.body_text || ""));
   const language = stringValue(input.language, "en");
+  const sourceAddress = sourceEmail?.from_email || from;
+  const customerResolution = resolveCustomerAffiliation(runtime, {
+    workspaceId: workspace.id,
+    email: sourceAddress,
+    contactName: sourceEmail?.from_name || from,
+    subject,
+    body: content,
+  });
+  const customerMemory = runtime.getCustomerMemoryContext({
+    workspaceId: workspace.id,
+    query: [
+      customerResolution.customerName,
+      customerResolution.contactEmail,
+      sourceAddress,
+      subject,
+    ].filter(Boolean).join(" "),
+    customerId: customerResolution.customerId,
+    customerName: customerResolution.customerName,
+    limit: 8,
+  });
   const llm = await runtime.runLlm({
     task: "draft",
     workspaceId: workspace.id,
@@ -284,6 +344,8 @@ export async function draftRuntimeInboxReply(runtime: SalesRuntime, input: Inbox
       emailId: input.emailId,
       language,
       source: "inbox.reply",
+      customerMemory,
+      customerResolution,
     },
   });
 
@@ -324,14 +386,34 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
       subject,
       html: Boolean(input.html),
       source: "inbox.send",
-      humanApproval: input.humanApproval || null,
     },
     idempotencyKey: `${workspace.id}:inbox:${input.emailId}:send`,
   });
 
-  if (isFarreachBridgeEnabled() && sideEffect.status === "allowed") {
-    if (!hasHumanApproval(input)) {
-      appendToSendRequestLog(workspace.id, to, subject, "blocked_missing_approval");
+  const rememberReply = (status: string, decision: SideEffectDecision) => ingestCustomerInteraction(runtime, {
+    workspaceId: workspace.id,
+    direction: "inbox_reply_sent",
+    email: to,
+    subject,
+    body: stringValue(input.body, stringValue(input.content)),
+    occurredAt: new Date().toISOString(),
+    source: {
+      type: "email",
+      id: decision.id,
+    },
+    metadata: {
+      emailId: input.emailId,
+      status,
+      sideEffectDecisionId: decision.id,
+    },
+    idempotencyKey: `${workspace.id}:inbox-reply:${input.emailId}:${decision.id}:${status}`,
+  });
+
+  if (isRealEmailSendEnabled()) {
+    const approval = approvedInboxSendDecision(runtime, { ...input, workspaceId: workspace.id }, to, subject);
+    if (!approval) {
+      appendToSendRequestLog(workspace.id, to, subject, "blocked_missing_approval_record");
+      rememberReply("blocked_missing_approval_record", sideEffect);
       return {
         success: true,
         email_id: input.emailId,
@@ -340,7 +422,7 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
         subject,
         blocked: true,
         sideEffect,
-        message: "Email blocked: human approval is required before real customer send.",
+        message: approvalBlockDetail(),
       };
     }
 
@@ -350,6 +432,11 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
     });
     if (verification.status !== "valid" && !canSendWithoutVerification()) {
       appendToSendRequestLog(workspace.id, to, subject, `blocked_verification_${verification.status}`);
+      rememberReply(`blocked_verification_${verification.status}`, approval);
+      runtime.recordSideEffectFailed(approval.id, {
+        error: verificationBlockDetail(verification.status),
+        canRetry: true,
+      });
       return {
         success: true,
         email_id: input.emailId,
@@ -363,31 +450,59 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
       };
     }
 
-    try {
-      const res = await fetch(`${farreachUrl()}/api/v1/email/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to,
-          subject,
-          body: stringValue(input.body, stringValue(input.content)),
-          html: input.html || false,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return {
-          success: true,
-          email_id: input.emailId,
-          sent_at: data.sentAt || new Date().toISOString(),
-          to,
-          subject,
-          sideEffect,
-          message: data.detail || "Email sent successfully",
-        };
+    if (isFarreachBridgeEnabled()) {
+      let res: Response | null = null;
+      try {
+        res = await fetch(`${farreachUrl()}/api/v1/email/send`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to,
+            subject,
+            body: stringValue(input.body, stringValue(input.content)),
+            html: input.html || false,
+          }),
+        });
+      } catch (error) {
+        runtime.recordSideEffectFailed(approval.id, {
+          error: error instanceof Error ? error.message : String(error),
+          canRetry: true,
+        });
       }
-    } catch {
-      // Fall through to local capture response.
+
+      if (res?.ok) {
+        const data = await res.json();
+        try {
+          const executedSideEffect = runtime.recordSideEffectExecuted(approval.id, {
+            result: {
+              to,
+              subject,
+              sentAt: data.sentAt || null,
+            },
+          });
+          rememberReply("sent", executedSideEffect);
+          return {
+            success: true,
+            email_id: input.emailId,
+            sent_at: data.sentAt || new Date().toISOString(),
+            to,
+            subject,
+            sideEffect: executedSideEffect,
+            message: data.detail || "Email sent successfully",
+          };
+        } catch (error) {
+          runtime.recordSideEffectFailed(approval.id, {
+            error: error instanceof Error ? error.message : String(error),
+            canRetry: true,
+          });
+          throw error;
+        }
+      } else if (res) {
+        runtime.recordSideEffectFailed(approval.id, {
+          error: bridgeStatusFailureMessage(res),
+          canRetry: true,
+        });
+      }
     }
   }
 
@@ -396,8 +511,9 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
     workspace.id,
     to,
     subject,
-    sideEffect.status === "allowed" ? "blocked_bridge_unavailable" : "blocked_local_preview"
+    isRealEmailSendEnabled() ? "blocked_bridge_unavailable" : "blocked_local_preview"
   );
+  rememberReply(isRealEmailSendEnabled() ? "blocked_bridge_unavailable" : "blocked_local_preview", sideEffect);
   return {
     success: true,
     email_id: input.emailId,
@@ -407,7 +523,7 @@ export async function sendRuntimeInboxReply(runtime: SalesRuntime, input: InboxS
     blocked: true,
     sideEffect,
     message:
-      sideEffect.status === "allowed"
+      isRealEmailSendEnabled()
         ? "Email captured locally. Real send bridge is unavailable."
         : sideEffect.reason,
   };

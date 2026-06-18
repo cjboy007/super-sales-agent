@@ -92,3 +92,4 @@ mail/
 .env.*
 !.env.example
 !**/.env.example
+config/bank-accounts.local.json

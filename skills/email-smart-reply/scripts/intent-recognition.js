@@ -8,7 +8,9 @@
 
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+const { loadSsaProfileEnv } = require('../../../shared/ssa-secrets');
+
+loadSsaProfileEnv({ profile: 'email-smart-reply' });
 
 // 加载 intent schema
 const SCHEMA_PATH = path.join(__dirname, '..', 'config', 'intent-schema.json');

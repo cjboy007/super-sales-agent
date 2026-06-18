@@ -26,6 +26,7 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const { SalesState } = require('../../shared/sales-state-db');
 const { verifyLegacyOutboundSafety } = require('../../skills/imap-smtp-email/lib/outbound-safety');
+const { loadSsaEmailEnv, requireSmtpEnv } = require('../../shared/ssa-secrets');
 
 const execAsync = promisify(exec);
 const PROJECT = 'hero-pumps';
@@ -33,7 +34,7 @@ const HERO_DATA_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', '
 
 // ==================== 配置 ====================
 const CONFIG = {
-  SMTP_CLI: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js',
+  SMTP_CLI: path.join(__dirname, '..', '..', 'skills', 'imap-smtp-email', 'scripts', 'smtp.js'),
   LEADS_DIR: path.join(HERO_DATA_DIR, 'leads'),
   SIGNATURE: 'hero-jordan',
   TEMPLATES_DIR: path.join(__dirname, '../config/templates'),
@@ -156,25 +157,33 @@ class TemplateManager {
 }
 
 // ==================== 邮件发送（已修复：nodemailer 直发） ====================
-const nodemailer = require('/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/node_modules/nodemailer');
-const dotenv = require('/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/node_modules/dotenv');
-
-// 读取项目 .env 配置
-const heroEnvPath = path.join(__dirname, '../.env');
-if (fs.existsSync(heroEnvPath)) {
-  dotenv.config({ path: heroEnvPath });
+function requireSkillDependency(name) {
+  try {
+    return require(name);
+  } catch {
+    return require(path.join(__dirname, '..', '..', 'skills', 'imap-smtp-email', 'node_modules', name));
+  }
 }
 
-function createHeroTransporter() {
-  return nodemailer.createTransport({
+const nodemailer = requireSkillDependency('nodemailer');
+loadSsaEmailEnv({ profile: PROJECT });
+
+let heroTransporter = null;
+
+function getHeroTransporter() {
+  if (heroTransporter) return heroTransporter;
+  requireSmtpEnv();
+  heroTransporter = nodemailer.createTransport({
+    pool: true,
     host: process.env.SMTP_HOST || 'smtp.qiye.aliyun.com',
     port: parseInt(process.env.SMTP_PORT || '465', 10),
-    secure: process.env.SMTP_SECURE === 'true' || true,
+    secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
   });
+  return heroTransporter;
 }
 
 class EmailSender {
@@ -188,7 +197,7 @@ class EmailSender {
         workspaceId: PROJECT,
         to,
         subject,
-        humanApproval: true,
+        approvalId: process.env.SSA_RUNTIME_APPROVAL_ID,
       });
 
       // ⭐ 修复：用 nodemailer 直发，不再调用 Farreach smtp.js CLI
@@ -198,14 +207,13 @@ class EmailSender {
         .replace(/>/g, '&gt;')
         .replace(/\n/g, '<br>');
 
-      const transporter = createHeroTransporter();
+      const transporter = getHeroTransporter();
       await transporter.sendMail({
         from: '"Hero Pump" <' + (process.env.SMTP_FROM || 'sales@heropumps.com') + '>',
         to: to,
         subject: subject,
         html: htmlBody,
       });
-      transporter.close();
 
       logger.success(`已发送: ${to}`);
       return { success: true };

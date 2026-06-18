@@ -1,0 +1,271 @@
+[
+  {
+    "name": "01-cockpit",
+    "url": "http://localhost:3001/",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/01-cockpit.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [
+        "Molex Shanghai",
+        "AT RISK",
+        "$1.1M",
+        "Competitor quote detected",
+        "34%"
+      ],
+      "buttons": 23,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "OpenClaw for salespeople",
+      "hasHorizontalOverflow": false,
+      "inputs": 1,
+      "links": 18,
+      "mainTextStart": "Activity Details6 events visibleAllApprovalsAI ActionsAlertsQuotesIntelDoneAI Agent completed RFQ analysisaiTE Connectivity09:1247 SKUs matched to Farreach catalog. Recommended pricing at Tier 2 for >=500K unit lots. Forecast margin: 23.4%.RFQTE Connectivity10hApproval required: Amphenol counter-offerapprovalneeds reviewAmphenol Asia09:09Customer requested 12% discount. AI generated counter-offer: 8% discount + free shipping on >=100K meter batches. Net margin impact: -3.9pts.Pricing issueAmphenol Asia10hReviewCompetitor alert: JST quote detectedalertMolex Shanghai08:54JST appears 18% below standing price for XH connector cables. Suggested response: bundle pricing with 3139 custom lengths and continuity terms.Competitor priceMolex Shanghai10hBOM scrape completeaiFoxconn Precision08:30Extracted 23 cable and connector line items from project Aurora-7. 18 match Farreach SKUs. Outreach draft",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"OpenClaw for salespeople\" [level=1]\n  - paragraph: OpenClaw for salespeople\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: event feed reconnecting\n  - generic: 0 session events\n- complementary:\n  - heading \"Business Activity\" [level=2]\n  - paragraph: 6 monitored domains\n  - generic: LIVE\n  - 'button \"TE Connectivity Suzhou / Munich ACTIVE Deal RFQ-2026-0517 Value $2.4M 47 SKUs matched to Farreach catalog. Margin forecast is above target with volume-tier pricing. Agent: Negotiating pricing tier 12m ago Confidence 72%\"':\n    - heading \"TE Connectivity\" [level=3]\n    - paragraph: Suzhou / Munich\n    - generic: ACTIVE\n    - paragraph: Deal\n    - paragraph: RFQ-2026-0517\n    - paragraph: Value\n    - paragraph: $2.4M\n    - paragraph: 47 SKUs matched to Farreach catalog. Margin forecast is above target with volume-tier pricing.\n    - generic: \"Agent:\"\n    - generic: Negotiating pricing tier\n    - generic: 12m ago\n    - generic: Confidence\n    - generic: 72%\n  - 'button \"Amphenol Asia Shenzhen PENDING Deal PO-88392 Value $847K AI recommends 8% discount plus free shipping on >=100K meter batches with LME review clause. Agent: Drafted counter-offer 3m ago Confidence 87% Review Edit Reject\"':\n    - heading \"Amphenol Asia\" [level=3]\n    "
+  },
+  {
+    "name": "02-intake",
+    "url": "http://localhost:3001/intake",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/02-intake.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [],
+      "buttons": 10,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Throw Me Anything",
+      "hasHorizontalOverflow": false,
+      "inputs": 2,
+      "links": 11,
+      "mainTextStart": "Drop ZoneProject Farreach / Files 0newDrop files hereSSA keeps the originals safe, reads your notes, and suggests where each item belongs.no files selectedwaiting 0 / 0 BChoose FilesNotes for Jadentell Jaden what this is and what to check0 noteswrite one instruction, then ask Jaden to review itFiles and changes stay inside SSA until you approve an action.Ask JadenDecision Panelno active intake0%Unclassifiedintake/reviewlocalWaiting for files or your notes.Item TypeUnclassifiedConfidence0%Matches0Files0Related CompanyUnknownUpdated-Why SSA Thinks Thiswaiting for more informationSuggested ActionsSend for Reviewno action proposedNo files are moved. This only saves a review request.Matches Foundclients, quotes, documentsno match found yetRecent Itemsrecent saved itemsno recent items",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Throw Me Anything\" [level=1]\n  - paragraph: DROP FILES, NOTES, RFQS / SSA SORTS FOR REVIEW / FARREACH\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: READY\n  - button \"New Intake\"\n- main:\n  - heading \"Drop Zone\" [level=2]\n  - paragraph: Project Farreach / Files 0\n  - generic: new\n  - paragraph: Drop files here\n  - paragraph: SSA keeps the originals safe, reads your notes, and suggests where each item belongs.\n  - generic: no files selected\n  - paragraph: waiting 0 / 0 B\n  - button \"Choose Files\"\n  - heading \"Notes for Jaden\" [level=2]\n  - paragraph: tell Jaden what this is and what to check\n  - generic: 0 notes\n  - generic: write one instruction, then ask Jaden to review it\n  - 'textbox \"Example: This is a revised PI from the German client. Match it to the right quote and hold for approval.\"'\n  - paragraph: Files and changes stay inside SSA until you approve an action.\n  - button \"Ask Jaden\" [disabled]\n  - heading \"Decision Panel\" [level=2]\n  - paragraph: no active intake\n  - generic: 0%\n  - paragraph: Unclassified\n  - paragraph: intake/review\n  - generic: local\n  - paragraph: Waiting for files or your notes.\n  - paragraph: Item Type\n  - paragraph: Unclassified\n  - paragraph: Confidence\n  - paragraph: 0%\n  - paragraph: Matches"
+  },
+  {
+    "name": "03-customers",
+    "url": "http://localhost:3001/leads",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/03-customers.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [
+        "--"
+      ],
+      "buttons": 10,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Customers",
+      "hasHorizontalOverflow": false,
+      "inputs": 4,
+      "links": 13,
+      "mainTextStart": "Total Customers--Active Customers--Risk Customers--Countries--Customer List / Customer Detail0 visible customers / 20 per pageAllProspectActive CustomerDormantRiskArchivedAllBeta Access RequiredSave your beta access pass before viewing customers, orders, and timelines.The page keeps customer data, order milestones, and operations status separated from system setup details.Open Beta AccessUser guidePAGE 1 / 1PrevNextAsk Jaden About This Pageuses the current filters and visible data; no external sendreadyWhat Jaden can seeYour note is saved with this page's current filters, visible records, and totals so Jaden knows what you are looking at.Customers / Filter All / All / Visible 0 / Active 0 / Search noneNothing is sent to customers. This is saved inside JadenOS for review.Ask Jaden",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Customers\" [level=1]\n  - paragraph: FARREACH / CUSTOMER LIST / PAGE 1\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: LIVE\n  - button \"Refresh\"\n- main:\n  - paragraph: Total Customers\n  - paragraph: \"--\"\n  - paragraph: Active Customers\n  - paragraph: \"--\"\n  - paragraph: Risk Customers\n  - paragraph: \"--\"\n  - paragraph: Countries\n  - paragraph: \"--\"\n  - heading \"Customer List / Customer Detail\" [level=2]\n  - paragraph: 0 visible customers / 20 per page\n  - textbox \"Search company, contact, email, country, industry\"\n  - combobox:\n    - option \"All\" [selected]\n    - option \"Prospect\"\n    - option \"Active Customer\"\n    - option \"Dormant\"\n    - option \"Risk\"\n    - option \"Archived\"\n  - combobox:\n    - option \"All\" [selected]\n  - generic: Beta Access Required\n  - paragraph: Save your beta access pass before viewing customers, orders, and timelines.\n  - paragraph: The page keeps customer data, order milestones, and operations status separated from system setup details.\n  - link \"Open Beta Access\":\n    - /url: /beta-access?next=/leads\n  - link \"User guide\":\n    - /url: /docs/BETA_USER_GUIDE.md\n  - generic: PAGE 1 / 1\n  - button \"Prev\" [disabled]\n  - button \"Next\" [disabled]\n  - heading \"Ask Jaden About This Page\" [level=2]\n  - paragrap"
+  },
+  {
+    "name": "04-inbox",
+    "url": "http://localhost:3001/inbox",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/04-inbox.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [],
+      "buttons": 5,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Inbox Triage",
+      "hasHorizontalOverflow": false,
+      "inputs": 0,
+      "links": 15,
+      "mainTextStart": "Pending--Handled Today--Pending Analysis--Pending Review--Email Review Listcustomer emails that need operator decisionBeta Access RequiredSave your beta access pass before opening customer inbox.Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines.Open Beta AccessUser guideMessage Previewno selectionBeta Access RequiredSave your beta access pass before opening message preview.Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines.Open Beta AccessUser guide",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Inbox Triage\" [level=1]\n  - paragraph: AI ASSISTED / HUMAN DECISION REQUIRED / CUSTOMER SENDS LOCKED\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: 0 OPEN\n- main:\n  - paragraph: Pending\n  - paragraph: \"--\"\n  - paragraph: Handled Today\n  - paragraph: \"--\"\n  - paragraph: Pending Analysis\n  - paragraph: \"--\"\n  - paragraph: Pending Review\n  - paragraph: \"--\"\n  - heading \"Email Review List\" [level=2]\n  - paragraph: customer emails that need operator decision\n  - generic: Beta Access Required\n  - paragraph: Save your beta access pass before opening customer inbox.\n  - paragraph: Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines.\n  - link \"Open Beta Access\":\n    - /url: /beta-access?next=%2Finbox\n  - link \"User guide\":\n    - /url: /docs/BETA_USER_GUIDE.md\n  - heading \"Message Preview\" [level=2]\n  - paragraph: no selection\n  - generic: Beta Access Required\n  - paragraph: Save your beta access pass before opening message preview.\n  - paragraph: Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines.\n  - link \"Open Beta Access\":\n    - /url: /beta-access?next=%2Fin"
+  },
+  {
+    "name": "05-outreach",
+    "url": "http://localhost:3001/emails",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/05-outreach.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [],
+      "buttons": 11,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Outreach Operations",
+      "hasHorizontalOverflow": false,
+      "inputs": 3,
+      "links": 11,
+      "mainTextStart": "Saved Outreach0Received0Replied0Reply Rate0%Outreach Records0 recordssaveddraftspendingno recordsNew Review Draftsaves a draft; does not send to customersThis page saves the email for review. Customer sends stay locked until an operator explicitly approves.ready to save for reviewSave for Review",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Outreach Operations\" [level=1]\n  - paragraph: FARREACH / SAFE MODE / CUSTOMER SENDS NEED APPROVAL\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: READY\n  - button \"Refresh\"\n- main:\n  - paragraph: Saved Outreach\n  - paragraph: \"0\"\n  - paragraph: Received\n  - paragraph: \"0\"\n  - paragraph: Replied\n  - paragraph: \"0\"\n  - paragraph: Reply Rate\n  - paragraph: 0%\n  - heading \"Outreach Records\" [level=2]\n  - paragraph: 0 records\n  - button \"saved\"\n  - button \"drafts\"\n  - button \"pending\"\n  - generic: no records\n  - heading \"New Review Draft\" [level=2]\n  - paragraph: saves a draft; does not send to customers\n  - generic: This page saves the email for review. Customer sends stay locked until an operator explicitly approves.\n  - textbox \"recipient@example.com\"\n  - textbox \"Subject\"\n  - textbox \"Draft body\"\n  - paragraph: ready to save for review\n  - button \"Save for Review\" [disabled]\n- button \"Open Next.js Dev Tools\":\n- alert"
+  },
+  {
+    "name": "06-quotes",
+    "url": "http://localhost:3001/quotations",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/06-quotes.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [],
+      "buttons": 9,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Quotation Control",
+      "hasHorizontalOverflow": false,
+      "inputs": 3,
+      "links": 14,
+      "mainTextStart": "Total Quotes--Drafts--Sent--Confirmed--Quote ListPAGE 1 / 1AllQuotationSample OrderBulk PIAllDraftSentConfirmedExpiredBeta Access RequiredSave your beta access pass before opening quotation records.Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines.Open Beta AccessUser guideQuick Quotecustomer / cost / references / PIQuote InputCustomer / Products / TermsInternal ReferenceCost / Supplier / Price HistoryOutputEnglish Preview / Export PIQuotes now start from the full quick quote workflow, then export PI and archive files from there.Open Quick QuoteTOTAL AMOUNT —PrevNext",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Quotation Control\" [level=1]\n  - paragraph: QUOTE FILES / STATUS REVIEW / FILES ONLY\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: READY\n  - button \"Refresh\"\n- main:\n  - paragraph: Total Quotes\n  - paragraph: \"--\"\n  - paragraph: Drafts\n  - paragraph: \"--\"\n  - paragraph: Sent\n  - paragraph: \"--\"\n  - paragraph: Confirmed\n  - paragraph: \"--\"\n  - heading \"Quote List\" [level=2]\n  - paragraph: PAGE 1 / 1\n  - textbox \"Search customer or number\"\n  - combobox:\n    - option \"All\" [selected]\n    - option \"Quotation\"\n    - option \"Sample Order\"\n    - option \"Bulk PI\"\n  - combobox:\n    - option \"All\" [selected]\n    - option \"Draft\"\n    - option \"Sent\"\n    - option \"Confirmed\"\n    - option \"Expired\"\n  - generic: Beta Access Required\n  - paragraph: Save your beta access pass before opening quotation records.\n  - paragraph: Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines.\n  - link \"Open Beta Access\":\n    - /url: /beta-access?next=%2Fquotations\n  - link \"User guide\":\n    - /url: /docs/BETA_USER_GUIDE.md\n  - heading \"Quick Quote\" [level=2]\n  - paragraph: customer / cost / references / PI\n  - paragraph: Quote Input\n  - paragraph: Customer / Products / T"
+  },
+  {
+    "name": "07-ship-docs",
+    "url": "http://localhost:3001/documents",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/07-ship-docs.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [],
+      "buttons": 11,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Shipment Documents",
+      "hasHorizontalOverflow": false,
+      "inputs": 24,
+      "links": 11,
+      "mainTextStart": "PI SourceNot selectedAmountUSD 0.00Net Weight0.0kgTo CreateCI+PLPI Follow-Up FilesPI-20260610-001 / FOB ShenzhenCIPLSearch PI NumberChoose a saved PI firstNo saved PI yet. Create one from Quick Quote first.PI No.CustomerContactEmailAddressShip DateDepartureDestinationCurrencyUSDEURCNYGBPFreightInsurancePacking And Shipmentderived from PI productsDescriptionHS CodeSpecificationQtyUnit PriceNet kgGross kgPackagesCarton / Package TypeDimensionsMarks0 ready this sessionCreate CI / PLAsk Jaden About This Pageuses the current filters and visible data; no external sendreadyWhat Jaden can seeYour note is saved with this page's current filters, visible records, and totals so Jaden knows what you are looking at.Shipment Documents / Files CI+PL / Customer not set / Amount USD 0.00 / Generated 0Nothing is sent to customers. This is saved inside JadenOS for review.Ask JadenNew Documentsthis sessionno",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Shipment Documents\" [level=1]\n  - paragraph: CI / PL FROM SAVED PI / FILES ONLY\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: READY\n  - button \"Refresh\"\n- main:\n  - paragraph: PI Source\n  - paragraph: Not selected\n  - paragraph: Amount\n  - paragraph: USD 0.00\n  - paragraph: Net Weight\n  - paragraph: 0.0kg\n  - paragraph: To Create\n  - paragraph: CI+PL\n  - heading \"PI Follow-Up Files\" [level=2]\n  - paragraph: PI-20260610-001 / FOB Shenzhen\n  - button \"CI\"\n  - button \"PL\"\n  - text: Search PI Number\n  - textbox \"Search PI Number\":\n    - /placeholder: Type PI number or customer\n  - paragraph: Choose a saved PI first\n  - generic: No saved PI yet. Create one from Quick Quote first.\n  - text: PI No.\n  - textbox \"PI No.\": PI-20260610-001\n  - text: Customer\n  - textbox \"Customer\"\n  - text: Contact\n  - textbox \"Contact\"\n  - text: Email\n  - textbox \"Email\"\n  - text: Address\n  - textbox \"Address\"\n  - text: Ship Date\n  - textbox \"Ship Date\": 2026-06-10\n  - text: Departure\n  - textbox \"Departure\": Shenzhen, China\n  - text: Destination\n  - textbox \"Destination\"\n  - text: Currency\n  - combobox \"Currency\" [disabled]:\n    - option \"USD\" [selected]\n    - option \"EUR\"\n    - option \"CNY\"\n    - option \"GBP\"\n  - text: Freight\n  - spinbutton \"Freigh"
+  },
+  {
+    "name": "08-intel",
+    "url": "http://localhost:3001/intelligence",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/08-intel.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [
+        "0"
+      ],
+      "buttons": 9,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Intelligence Board",
+      "hasHorizontalOverflow": false,
+      "inputs": 0,
+      "links": 11,
+      "mainTextStart": "Insights0News Signals0Competitor Events0Alerts0AI Insightsmarket impact summariesno insights foundAlertscost, FX, and source statusno active alertsMarket Newsfiltered external signal cacheno market newsCompetitor Watchproduct, factory, price mentionsno competitor mentions",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Intelligence Board\" [level=1]\n  - paragraph: AI SUMMARY / MARKET SIGNALS / -\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: INTEL\n  - button \"Reload\"\n  - button \"Refresh News\"\n- main:\n  - paragraph: Insights\n  - paragraph: \"0\"\n  - paragraph: News Signals\n  - paragraph: \"0\"\n  - paragraph: Competitor Events\n  - paragraph: \"0\"\n  - paragraph: Alerts\n  - paragraph: \"0\"\n  - heading \"AI Insights\" [level=2]\n  - paragraph: market impact summaries\n  - generic: no insights found\n  - heading \"Alerts\" [level=2]\n  - paragraph: cost, FX, and source status\n  - generic: no active alerts\n  - heading \"Market News\" [level=2]\n  - paragraph: filtered external signal cache\n  - generic: no market news\n  - heading \"Competitor Watch\" [level=2]\n  - paragraph: product, factory, price mentions\n  - generic: no competitor mentions\n- button \"Open Next.js Dev Tools\":\n- alert"
+  },
+  {
+    "name": "09-ops",
+    "url": "http://localhost:3001/agent-status",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/09-ops.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [
+        "No heartbeat",
+        "Real actions gated"
+      ],
+      "buttons": 9,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Operations",
+      "hasHorizontalOverflow": false,
+      "inputs": 0,
+      "links": 15,
+      "mainTextStart": "Beta access token is invalid.Beta Readiness-CheckingReadiness checks will appear after the health check returns.First-Run Path-First-run guidance will appear after the health check returns.Mail to CRMWaiting for syncCheckingMailbox sync status will appear after health check returns.Connect email and start the resident worker so new mail enters customer timelines.Needs connectionCapture offNo recent syncRun demo emailWorker RecoveryPrepareCheckingWorker recovery status will appear after the health check returns.Prepare recovery so Operations can show start, stop, restart, and health-check capability.Restart missingStart/stop missingHealth missingRecent control requestsNo worker control request has been recorded yet.Background Worker-checkingWaiting for health checkNo heartbeatReal actions gatedLocal open modeAccess page openPrepare recoveryLast Activity-No worker activity has been recorde",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"Operations\" [level=1]\n  - paragraph: Beta readiness / worker health / safety gates\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - link \"Health page\":\n    - /url: /health\n  - link \"User guide\":\n    - /url: /docs/BETA_USER_GUIDE.md\n  - button \"Refresh\"\n- main:\n  - generic: Beta access token is invalid.\n  - heading \"Beta Readiness\" [level=2]\n  - paragraph: \"-\"\n  - generic: Checking\n  - paragraph: Readiness checks will appear after the health check returns.\n  - heading \"First-Run Path\" [level=2]\n  - paragraph: \"-\"\n  - paragraph: First-run guidance will appear after the health check returns.\n  - heading \"Mail to CRM\" [level=2]\n  - paragraph: Waiting for sync\n  - generic: Checking\n  - paragraph: Mailbox sync status will appear after health check returns.\n  - paragraph: Connect email and start the resident worker so new mail enters customer timelines.\n  - generic: Needs connection\n  - generic: Capture off\n  - generic: No recent sync\n  - button \"Run demo email\"\n  - heading \"Worker Recovery\" [level=2]\n  - paragraph: Prepare\n  - generic: Checking\n  - paragraph: Worker recovery status will appear after the health check returns.\n  - paragraph: Prepare recovery so Operations can show start, stop, restart, and health-check capability.\n  - generic: "
+  },
+  {
+    "name": "10-settings",
+    "url": "http://localhost:3001/settings",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/10-settings.png",
+    "title": "SSA",
+    "meta": {
+      "alerts": [
+        "Setup"
+      ],
+      "buttons": 15,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "System Settings",
+      "hasHorizontalOverflow": false,
+      "inputs": 6,
+      "links": 12,
+      "mainTextStart": "JadenOS Onboarding Terminalrun /jadenos onboarding for guided setupOpen$ /jadenos onboardingstep through DeepSeek, email, Hunter, Tavily, and optional connectors.Full setup remains editable here.Beta Accessaccess pass for external beta usersNeededAccess PassSave AccessClearAfter saving, customers, orders, timelines, and settings use this access automatically. The page keeps setup details hidden.UI Sizecontrols global text, button, and input sizingSmallCompact, for dense tablesMediumDefault, clearer buttons and textLargeLarger text for long sessionsData Protection Statuscustomer data is stored separately from product codeCurrent statusOperator review neededRuntime files, caches, and customer archives stay hidden from customer pages.For production or beta use, ask an operator to verify data isolation.Mailbox Readinessconfirms new mail can enter customer timelinesSetupMailbox setup needs at",
+      "scrollHeight": 720,
+      "scrollWidth": 1280
+    },
+    "snapshotPreview": "- banner:\n  - link \"SSA home\":\n    - /url: /\n    - img \"SSA\"\n  - heading \"System Settings\" [level=1]\n  - paragraph: SAFE SETTINGS / KEYS HIDDEN / CUSTOMER SENDS LOCKED\n  - navigation:\n    - link \"Cockpit\":\n      - /url: /\n    - link \"Intake\":\n      - /url: /intake\n    - link \"Customers\":\n      - /url: /leads\n    - link \"Inbox\":\n      - /url: /inbox\n    - link \"Outreach\":\n      - /url: /emails\n    - link \"Quotes\":\n      - /url: /quotations\n    - link \"Ship Docs\":\n      - /url: /documents\n    - link \"Intel\":\n      - /url: /intelligence\n    - link \"Ops\":\n      - /url: /agent-status\n    - link \"Settings\":\n      - /url: /settings\n  - button \"EN\"\n  - button \"中文\"\n  - button \"Dark\"\n  - generic: READY\n  - button \"Save\"\n- main:\n  - heading \"JadenOS Onboarding Terminal\" [level=2]\n  - paragraph: run /jadenos onboarding for guided setup\n  - link \"Open\":\n    - /url: /jadenos/onboarding\n  - generic: $ /jadenos onboardingstep through DeepSeek, email, Hunter, Tavily, and optional connectors.\n  - paragraph: Full setup remains editable here.\n  - heading \"Beta Access\" [level=2]\n  - paragraph: access pass for external beta users\n  - generic: Needed\n  - text: Access Pass\n  - textbox \"Access Pass\":\n    - /placeholder: Enter the beta pass your team provided\n  - button \"Save Access\" [disabled]\n  - button \"Clear\" [disabled]\n  - paragraph: After saving, customers, orders, timelines, and settings use this access automatically. The page keeps setup details hidden.\n  - heading \"UI Size\" [level=2]\n  - paragraph: controls global text, button, and input sizing\n  - button \"Small Compact, for dense tables\":\n    - generic: Small\n    - generic: Compact, for dense tables\n  - button \"Medium Default, clearer buttons and text\" [pressed]:\n    - generic: Medium\n    - generic: Default, clearer buttons and text\n  "
+  },
+  {
+    "name": "16-beta-access",
+    "url": "http://localhost:3001/beta-access",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/16-beta-access.png",
+    "meta": {
+      "buttons": 1,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "内测访问",
+      "hasHorizontalOverflow": false,
+      "inputs": 1,
+      "links": 1,
+      "scrollHeight": 720,
+      "scrollWidth": 1280,
+      "textStart": "SSASuper Sales Agent内测访问输入团队提供的访问口令后，就可以进入客户、订单和运维页面。Start with Customers, Mailbox, or Demo data.第一次进入后，可以先看客户页，也可以连接邮箱或创建演示数据熟悉订单和时间线。User guide / 使用指南访问口令进入 Super Sales AgentrequestAnimationFrame(function(){$RT=performance.now()});$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0}; $RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:1\",\"S:1\")SSAdocument.querySelectorAll('body link[rel=\"icon\"], body link[rel=\"apple-touch-icon\"]').forEach(el => document.head.appen",
+      "url": "http://localhost:3001/beta-access"
+    }
+  },
+  {
+    "name": "17-jadenos-onboarding",
+    "url": "http://localhost:3001/onboarding",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/17-jadenos-onboarding.png",
+    "meta": {
+      "buttons": 21,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "JadenOS Onboarding",
+      "hasHorizontalOverflow": false,
+      "inputs": 1,
+      "links": 20,
+      "scrollHeight": 720,
+      "scrollWidth": 1280,
+      "textStart": "JadenOS OnboardingGuided setup for the sales workspaceCockpitIntakeCustomersInboxOutreachQuotesShip DocsIntelOpsSettingsSETUPBeta guideUser guideSavePreferencesEN中文LightSETUPBeta guideUser guideSaveModulesCockpitCore launch0/5SetupStepsjump around; core items remain requiredName the workspaceStart guided setupDoneConnect AI assistantAdd an AI assistant keyNeededEnable document image readingAdd image-reading accessNeededConnect work emailAdd mailbox settingsNeededEnable email verificationTurn on address checksNeededConnect company researchAdd research accessNeededTrain document templatesUpload approved examplesLaterAdd optional connectorsAdd CRM sync and alertsLaterFinish setupReview launch readinessNeededCore checklistoptional connectors excludedAI assistantNeededDocument image readingNeededWork emailNeededEmail verificationNeededCompany researchNeededSetup progresscomplete the sales workspace step by stepStart guided setupDoneStart with a sales workspace for customers, approvals, drafts, documents, and account history. You can change these choices later in Settings.ready for the next step1. Name the workspaceStart guided setupDoneWorkspaceJadenOS runs as a local sales cockpit for ",
+      "url": "http://localhost:3001/jadenos/onboarding"
+    }
+  },
+  {
+    "name": "18-quick-quote",
+    "url": "http://localhost:3001/quotations/quick-quote",
+    "filePath": "/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/design-audits/ui-ux-2026-06-10/screenshots/18-quick-quote.png",
+    "meta": {
+      "buttons": 9,
+      "clientHeight": 720,
+      "clientWidth": 1280,
+      "h1": "Quick Quote",
+      "hasHorizontalOverflow": false,
+      "inputs": 22,
+      "links": 13,
+      "scrollHeight": 720,
+      "scrollWidth": 1280,
+      "textStart": "Quick QuoteQUOTATIONS / QUOTE PREVIEW / NOT SENTCockpitIntakeCustomersInboxOutreachQuotesShip DocsIntelOpsSettingsPREVIEWBackPreferencesEN中文LightPREVIEWBackModulesQuotesQuote No.QT-20260610-001CustomerNot setProfit EstimateUSD 0.00Grand TotalUSD 0.00Customer And TermsQT-20260610-001Quote No.DateValid UntilCurrencyUSDEURCNYGBPCustomerContactEmailCountryIncotermsFOB ShenzhenEXWCIFDAPDDPLead TimePayment TermsProducts And Pricingcost plus margin, preview updates liveAdd LineItem 1SpecQtyCostSupplierMargin %Price0.00DelInternal Referencessales-only; not included in customer previewExchange ReferenceLoading exchange rateswaiting for dataCustomer Price HistoryNo same-customer price yetSimilar Shipment PricesEnter product names to matchBeta access token is invalid.Charges And NotesFOB ShenzhenFreightPackingDiscountNotesQuote PreviewCustomer not setQuotationFARREACH ELECTRONIC CO LIMITEDQT-20260610-0012026-06-10Bill ToCustomer not set---TermsFOB ShenzhenT/T 30% deposit, 70% before shipment15-25 days after deposit and sample approvalItemSpecificationQtyUnit PriceAmount--00.000.00Product AmountUSD 0.00ChargesUSD 0.00Grand TotalUSD 0.00Export PIJaden Quote Editnatural-language quote editsWaiti",
+      "url": "http://localhost:3001/quotations/quick-quote"
+    }
+  }
+]

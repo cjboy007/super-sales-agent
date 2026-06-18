@@ -6,6 +6,16 @@ const CONFIG_PATH = ensureSsaDataPath("config.json");
 // ─── Config schema matching settings page ────────────────────────────────────
 
 export interface AppSettings {
+  // Local gateway
+  gatewayAccessMode?: "local" | "lan";
+  gatewayBindHost?: string;
+  gatewayPublicHost?: string;
+  intakeRetentionMode?: "keep" | "archive";
+  intakeMaxActiveSessions?: number;
+  // LLM provider
+  llmProvider?: string;
+  llmBaseUrl?: string;
+  llmApiKey?: string;
   // API keys
   deepseekApiKey: string;
   openaiApiKey: string;
@@ -43,6 +53,14 @@ export interface AppSettings {
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
+  gatewayAccessMode: "local",
+  gatewayBindHost: "127.0.0.1",
+  gatewayPublicHost: "",
+  intakeRetentionMode: "keep",
+  intakeMaxActiveSessions: 100,
+  llmProvider: "",
+  llmBaseUrl: "",
+  llmApiKey: "",
   deepseekApiKey: "",
   openaiApiKey: "",
   openrouterApiKey: "",
@@ -54,7 +72,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   crmApiKey: "",
   notificationProvider: "none",
   notificationWebhookUrl: "",
-  defaultModel: "deepseek-v4-pro",
+  defaultModel: "",
   smtpHost: "smtp.qiye.aliyun.com",
   smtpPort: "465",
   smtpEncryption: "ssl",
@@ -79,6 +97,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 // Fields that should be Base64-encoded on disk
 const SENSITIVE_FIELDS: (keyof AppSettings)[] = [
   "deepseekApiKey",
+  "llmApiKey",
   "openaiApiKey",
   "openrouterApiKey",
   "geminiApiKey",

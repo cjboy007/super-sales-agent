@@ -47,6 +47,17 @@ function request(url: string): NextRequest {
   return new NextRequest(url);
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 describe("/api/dashboard/overview route", () => {
   it("uses local Hero memory and blocks external data API reads by default", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
@@ -61,13 +72,14 @@ describe("/api/dashboard/overview route", () => {
       name: "Acme Pumps",
       email: "ada@example.com",
     });
-    expect(json.data.sideEffect).toMatchObject({
-      kind: "data.read",
-      workspaceId: "hero-pumps",
+    expect(json.data.action).toMatchObject({
+      title: "Data access",
       status: "blocked",
-      realExecutionEnabled: false,
+      blocked: true,
     });
-    expect(json.data.sideEffect.reason).toContain("SSA_ENABLE_REAL_DATA_READ=true");
+    expect(json.data.action.reason).toContain("explicit approval");
+    expect(json.data.action.reason).not.toContain("SSA_ENABLE_REAL_DATA_READ");
+    expectNoInternalActionFields(json.data);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -120,11 +132,11 @@ describe("/api/dashboard/overview route", () => {
       name: "Remote Pumps",
       email: "remote@example.com",
     });
-    expect(json.data.sideEffect).toMatchObject({
-      kind: "data.read",
-      workspaceId: "hero-pumps",
+    expect(json.data.action).toMatchObject({
+      title: "Data access",
       status: "allowed",
-      realExecutionEnabled: true,
+      blocked: false,
     });
+    expectNoInternalActionFields(json.data);
   });
 });

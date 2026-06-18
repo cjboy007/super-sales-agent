@@ -1,6 +1,13 @@
 import type { LlmRequest, LlmResult } from "./types";
 import { readSettings } from "../config-store";
 import { getLlmCacheEntry, setLlmCacheEntry } from "./llm-cache";
+import { annotateLlmResultWithPolicy } from "./llm-policy";
+import {
+  defaultBaseUrlForProvider,
+  isLocalLlmProvider,
+  normalizeLlmProviderId,
+  type LlmProviderId,
+} from "../llm-provider-options";
 
 function summarize(input: string, max = 260): string {
   const compact = input.replace(/\s+/g, " ").trim();
@@ -106,18 +113,19 @@ function systemPrompt(task: LlmRequest["task"]) {
   ].join(" ");
 }
 
-type ProviderName = "mock" | "deepseek" | "openai" | "openrouter";
+type ProviderName = LlmProviderId;
+type ProviderMode = "local" | "cloud" | "mock";
 
 interface ProviderConfig {
   provider: ProviderName;
   apiKey: string;
   model: string;
   endpoint: string;
+  mode: ProviderMode;
+  requiresApiKey: boolean;
 }
 
 const DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-pro";
-const OPENAI_DEFAULT_MODEL = "gpt-4o-mini";
-const OPENROUTER_DEFAULT_MODEL = "deepseek/deepseek-v4-pro";
 const LLM_PROMPT_VERSION = "jadenos.llm.v1";
 
 function directDeepSeekModel(model: string | undefined): string {
@@ -134,27 +142,75 @@ function directDeepSeekModel(model: string | undefined): string {
 }
 
 function directOpenAiModel(model: string | undefined): string {
-  if (!model || model.includes("/") || model === "mock") return OPENAI_DEFAULT_MODEL;
-  if (!model.startsWith("gpt-") && !model.startsWith("o")) return OPENAI_DEFAULT_MODEL;
-  return model;
+  const trimmed = model?.trim();
+  if (!trimmed || trimmed === "mock") return "";
+  return trimmed.startsWith("openai/") ? trimmed.slice("openai/".length) : trimmed;
 }
 
 function openRouterModel(model: string | undefined): string {
-  if (!model || model === "mock") return OPENROUTER_DEFAULT_MODEL;
+  const trimmed = model?.trim();
+  if (!trimmed || trimmed === "mock") return "";
   const deepSeekModel = directDeepSeekModel(model);
-  if (deepSeekModel !== DEEPSEEK_DEFAULT_MODEL || /deepseek/i.test(model)) {
+  if (/^deepseek(\/|-)/i.test(trimmed)) {
     return `deepseek/${deepSeekModel}`;
   }
-  return model;
+  return trimmed;
 }
 
-function providerEndpoint(provider: Exclude<ProviderName, "mock">): string {
-  if (provider === "deepseek") {
-    const baseUrl = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
-    return `${baseUrl.replace(/\/+$/, "")}/chat/completions`;
-  }
-  if (provider === "openai") return "https://api.openai.com/v1/chat/completions";
-  return "https://openrouter.ai/api/v1/chat/completions";
+function normalizeProvider(value: string | undefined): ProviderName | "" {
+  return normalizeLlmProviderId(value);
+}
+
+function chatCompletionsEndpoint(baseUrl: string) {
+  const trimmed = baseUrl.replace(/\/+$/, "");
+  if (trimmed.endsWith("/chat/completions")) return trimmed;
+  return `${trimmed}/chat/completions`;
+}
+
+function providerMode(provider: ProviderName): ProviderMode {
+  if (provider === "mock") return "mock";
+  if (isLocalLlmProvider(provider)) return "local";
+  return "cloud";
+}
+
+function providerDefaultBaseUrl(provider: Exclude<ProviderName, "mock">): string {
+  if (provider === "deepseek" && process.env.DEEPSEEK_BASE_URL) return process.env.DEEPSEEK_BASE_URL;
+  return defaultBaseUrlForProvider(provider);
+}
+
+function providerEndpoint(provider: Exclude<ProviderName, "mock">, baseUrl?: string): string {
+  return chatCompletionsEndpoint(baseUrl?.trim() || providerDefaultBaseUrl(provider));
+}
+
+function providerApiKey(provider: ProviderName, settings: ReturnType<typeof readSettings>): string {
+  const generic = process.env.SSA_LLM_API_KEY || settings.llmApiKey;
+  if (generic) return generic;
+  if (provider === "deepseek") return process.env.DEEPSEEK_API_KEY || settings.deepseekApiKey;
+  if (provider === "openai") return process.env.OPENAI_API_KEY || settings.openaiApiKey;
+  if (provider === "openrouter") return process.env.OPENROUTER_API_KEY || settings.openrouterApiKey;
+  if (provider === "dashscope") return process.env.DASHSCOPE_API_KEY || process.env.QWEN_API_KEY || "";
+  if (provider === "dashscope-coding-plan") return process.env.DASHSCOPE_CODING_PLAN_API_KEY || process.env.QWEN_CODING_PLAN_API_KEY || "";
+  if (provider === "zhipu") return process.env.ZHIPU_API_KEY || process.env.GLM_API_KEY || "";
+  if (provider === "zhipu-coding-plan") return process.env.ZHIPU_CODING_PLAN_API_KEY || process.env.GLM_CODING_PLAN_API_KEY || process.env.ZHIPU_API_KEY || process.env.GLM_API_KEY || "";
+  if (provider === "moonshot") return process.env.MOONSHOT_API_KEY || process.env.KIMI_API_KEY || "";
+  if (provider === "kimi-code") return process.env.KIMI_CODE_API_KEY || process.env.KIMI_CODING_PLAN_API_KEY || "";
+  if (provider === "doubao") return process.env.DOUBAO_API_KEY || process.env.VOLCENGINE_API_KEY || process.env.ARK_API_KEY || "";
+  if (provider === "doubao-coding-plan") return process.env.DOUBAO_CODING_PLAN_API_KEY || process.env.VOLCENGINE_CODING_PLAN_API_KEY || process.env.ARK_CODING_PLAN_API_KEY || "";
+  if (provider === "qianfan") return process.env.QIANFAN_API_KEY || process.env.BAIDU_API_KEY || "";
+  if (provider === "hunyuan") return process.env.HUNYUAN_API_KEY || process.env.TENCENT_HUNYUAN_API_KEY || "";
+  return "";
+}
+
+function providerRequiresApiKey(provider: ProviderName): boolean {
+  return providerMode(provider) === "cloud";
+}
+
+function providerDefaultModel(provider: ProviderName, requested: string | undefined): string {
+  if (provider === "deepseek") return directDeepSeekModel(requested);
+  if (provider === "openai") return directOpenAiModel(requested);
+  if (provider === "openrouter") return openRouterModel(requested);
+  const trimmed = requested?.trim();
+  return trimmed && trimmed !== "mock" ? trimmed : "";
 }
 
 function llmTimeoutMs(): number {
@@ -165,70 +221,119 @@ function llmTimeoutMs(): number {
 
 function resolveProvider(): ProviderConfig | null {
   const settings = readSettings();
-  const requestedProvider = process.env.SSA_LLM_PROVIDER?.toLowerCase();
+  const requestedProvider = normalizeProvider(process.env.SSA_LLM_PROVIDER) || normalizeProvider(settings.llmProvider);
+  const configuredModel = process.env.SSA_LLM_MODEL || settings.defaultModel;
+  const configuredBaseUrl = process.env.SSA_LLM_BASE_URL || settings.llmBaseUrl;
+
+  if (requestedProvider === "mock") return null;
+  if (requestedProvider) {
+    const apiKey = providerApiKey(requestedProvider, settings);
+    const requiresApiKey = providerRequiresApiKey(requestedProvider);
+    const model = providerDefaultModel(requestedProvider, configuredModel);
+    if (!model) return null;
+    if (requiresApiKey && !apiKey) return null;
+    return {
+      provider: requestedProvider,
+      apiKey,
+      model,
+      endpoint: providerEndpoint(requestedProvider, configuredBaseUrl),
+      mode: providerMode(requestedProvider),
+      requiresApiKey,
+    };
+  }
+
+  if (configuredBaseUrl) {
+    const model = providerDefaultModel("local-openai", configuredModel);
+    if (!model) return null;
+    return {
+      provider: "local-openai",
+      apiKey: providerApiKey("local-openai", settings),
+      model,
+      endpoint: providerEndpoint("local-openai", configuredBaseUrl),
+      mode: "local",
+      requiresApiKey: false,
+    };
+  }
+
   const deepSeekApiKey = process.env.DEEPSEEK_API_KEY || settings.deepseekApiKey;
   const openAiApiKey = process.env.OPENAI_API_KEY || settings.openaiApiKey;
   const openRouterApiKey = process.env.OPENROUTER_API_KEY || settings.openrouterApiKey;
-  const configuredModel = process.env.SSA_LLM_MODEL || settings.defaultModel;
-
-  if (requestedProvider === "mock") return null;
-  if (requestedProvider === "deepseek") {
-    return deepSeekApiKey
-      ? {
-        provider: "deepseek",
-        apiKey: deepSeekApiKey,
-        model: directDeepSeekModel(configuredModel),
-        endpoint: providerEndpoint("deepseek"),
-      }
-      : null;
-  }
-  if (requestedProvider === "openai") {
-    return openAiApiKey
-      ? {
-        provider: "openai",
-        apiKey: openAiApiKey,
-        model: directOpenAiModel(configuredModel),
-        endpoint: providerEndpoint("openai"),
-      }
-      : null;
-  }
-  if (requestedProvider === "openrouter") {
-    return openRouterApiKey
-      ? {
-        provider: "openrouter",
-        apiKey: openRouterApiKey,
-        model: openRouterModel(configuredModel),
-        endpoint: providerEndpoint("openrouter"),
-      }
-      : null;
-  }
 
   if (deepSeekApiKey) {
+    const model = directDeepSeekModel(configuredModel);
+    if (!model) return null;
     return {
       provider: "deepseek",
       apiKey: deepSeekApiKey,
-      model: directDeepSeekModel(configuredModel),
+      model,
       endpoint: providerEndpoint("deepseek"),
+      mode: "cloud",
+      requiresApiKey: true,
     };
   }
   if (openAiApiKey) {
+    const model = directOpenAiModel(configuredModel);
+    if (!model) return null;
     return {
       provider: "openai",
       apiKey: openAiApiKey,
-      model: directOpenAiModel(configuredModel),
+      model,
       endpoint: providerEndpoint("openai"),
+      mode: "cloud",
+      requiresApiKey: true,
     };
   }
   if (openRouterApiKey) {
+    const model = openRouterModel(configuredModel);
+    if (!model) return null;
     return {
       provider: "openrouter",
       apiKey: openRouterApiKey,
-      model: openRouterModel(configuredModel),
+      model,
       endpoint: providerEndpoint("openrouter"),
+      mode: "cloud",
+      requiresApiKey: true,
     };
   }
 
   return null;
+}
+
+export interface LlmRuntimeStatus {
+  provider: ProviderName;
+  mode: ProviderMode;
+  readiness: "local_model_ready" | "cloud_model_ready" | "mock_fallback";
+  configured: boolean;
+  source: "provider" | "mock";
+  model: string;
+  endpoint: string | null;
+  requiresApiKey: boolean;
+}
+
+export function getLlmRuntimeStatus(): LlmRuntimeStatus {
+  const provider = resolveProvider();
+  if (!provider) {
+    return {
+      provider: "mock",
+      mode: "mock",
+      readiness: "mock_fallback",
+      configured: false,
+      source: "mock",
+      model: "mock",
+      endpoint: null,
+      requiresApiKey: false,
+    };
+  }
+  return {
+    provider: provider.provider,
+    mode: provider.mode,
+    readiness: provider.mode === "local" ? "local_model_ready" : "cloud_model_ready",
+    configured: true,
+    source: "provider",
+    model: provider.model,
+    endpoint: provider.endpoint,
+    requiresApiKey: provider.requiresApiKey,
+  };
 }
 
 async function runChatCompletionTask(
@@ -241,7 +346,7 @@ async function runChatCompletionTask(
       signal: AbortSignal.timeout(llmTimeoutMs()),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${config.apiKey}`,
+        ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
       },
       body: JSON.stringify({
         model: config.model,
@@ -300,17 +405,18 @@ export async function runLlmTask(request: LlmRequest): Promise<LlmResult> {
     }),
   };
   const cached = getLlmCacheEntry(cacheInput);
-  if (cached) return cached;
+  if (cached) return annotateLlmResultWithPolicy(request.task, cached);
 
   if (provider) {
     const result = await runChatCompletionTask(request, provider);
     if (result) {
-      setLlmCacheEntry(cacheInput, result);
-      return result;
+      const annotated = annotateLlmResultWithPolicy(request.task, result);
+      setLlmCacheEntry(cacheInput, annotated);
+      return annotated;
     }
   }
 
-  const fallback = fallbackForTask(request);
+  const fallback = annotateLlmResultWithPolicy(request.task, fallbackForTask(request));
   setLlmCacheEntry(cacheInput, fallback);
   return fallback;
 }

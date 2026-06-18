@@ -20,7 +20,9 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const { verifyLegacyOutboundSafety } = require('../../imap-smtp-email/lib/outbound-safety');
-require('dotenv').config({ path: path.resolve(__dirname, '../../imap-smtp-email/.env') });
+const { loadSsaEmailEnv, requireSmtpEnv } = require('../../../shared/ssa-secrets');
+
+loadSsaEmailEnv();
 
 // Parse command line arguments
 function parseArgs(args) {
@@ -348,6 +350,7 @@ function log(message, level = 'INFO') {
 
 // Create SMTP transporter
 function createTransporter() {
+  requireSmtpEnv();
   const config = {
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT) || 587,
@@ -362,7 +365,7 @@ function createTransporter() {
   };
 
   if (!config.host || !config.auth.user || !config.auth.pass) {
-    throw new Error('Missing SMTP configuration. Please check imap-smtp-email/.env');
+    throw new Error('Missing SMTP configuration. Set platform env vars or an external SSA profile.');
   }
 
   return nodemailer.createTransport(config);
@@ -374,7 +377,7 @@ async function sendEmail(to, subject, text) {
     workspaceId: process.env.SSA_WORKSPACE_ID || 'farreach',
     to,
     subject,
-    humanApproval: true,
+    approvalId: process.env.SSA_RUNTIME_APPROVAL_ID,
   });
 
   const transporter = createTransporter();

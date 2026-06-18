@@ -41,6 +41,17 @@ function request(url: string): NextRequest {
   return new NextRequest(url);
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 describe("/api/inbox/[emailId] route", () => {
   it("serves local inbox detail from Sales Memory", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
@@ -59,6 +70,7 @@ describe("/api/inbox/[emailId] route", () => {
       },
     });
     expect(json.sideEffect).toBeUndefined();
+    expect(json.action).toBeUndefined();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -73,12 +85,12 @@ describe("/api/inbox/[emailId] route", () => {
     const json = await response.json();
 
     expect(json.success).toBe(true);
-    expect(json.sideEffect).toMatchObject({
-      kind: "imap.fetch",
-      workspaceId: "farreach",
+    expect(json.action).toMatchObject({
+      title: "Mailbox sync",
       status: "blocked",
-      realExecutionEnabled: false,
+      blocked: true,
     });
+    expectNoInternalActionFields(json);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -116,12 +128,12 @@ describe("/api/inbox/[emailId] route", () => {
     expect(json).toMatchObject({
       success: true,
       data: { id: "bridge-email-1" },
-      sideEffect: {
-        kind: "imap.fetch",
-        workspaceId: "farreach",
+      action: {
+        title: "Mailbox sync",
         status: "allowed",
-        realExecutionEnabled: true,
+        blocked: false,
       },
     });
+    expectNoInternalActionFields(json);
   });
 });

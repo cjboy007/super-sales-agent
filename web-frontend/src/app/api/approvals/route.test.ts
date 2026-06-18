@@ -34,9 +34,15 @@ describe("/api/approvals route", () => {
     expect(json.success).toBe(true);
     expect(json.data.map((approval: { id: string }) => approval.id)).toContain("amphenol-counter");
     expect(json.data[0]).toMatchObject({
-      workspaceId: "farreach",
       status: "pending",
+      dealId: expect.any(String),
     });
+    const serialized = JSON.stringify(json.data);
+    expect(serialized).not.toContain("workspaceId");
+    expect(serialized).not.toContain("deal_id");
+    expect(serialized).not.toContain("metadata");
+    expect(serialized).not.toContain("/Users/");
+    expect(serialized).not.toContain(".ssa");
   });
 
   it("upserts and updates approvals through Sales Memory with audit events", async () => {
@@ -61,10 +67,12 @@ describe("/api/approvals route", () => {
     expect(created.success).toBe(true);
     expect(created.data).toMatchObject({
       id: "demo-approval",
-      workspaceId: "demo-exporter",
-      deal_id: "demo-deal",
+      dealId: "demo-deal",
       status: "pending",
     });
+    expect(JSON.stringify(created.data)).not.toContain("workspaceId");
+    expect(JSON.stringify(created.data)).not.toContain("deal_id");
+    expect(JSON.stringify(created.data)).not.toContain("metadata");
 
     const patchedResponse = await PATCH(request("http://localhost/api/approvals?project=demo-exporter", {
       method: "PATCH",

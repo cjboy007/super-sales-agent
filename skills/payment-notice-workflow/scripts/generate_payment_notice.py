@@ -4,8 +4,38 @@
 import sys
 import json
 import argparse
+import html
 from pathlib import Path
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+try:
+    from bank_config import get_primary_bank
+except Exception:
+    get_primary_bank = None
+
+
+def escape_html(value):
+    return html.escape(str(value or ""), quote=True)
+
+
+def money(value):
+    try:
+        return Decimal(str(value or 0))
+    except InvalidOperation as exc:
+        raise ValueError(f"Invalid money amount: {value}") from exc
+
+
+def load_primary_bank_info():
+    if get_primary_bank:
+        bank = get_primary_bank(throw_error=False)
+        if bank:
+            return bank
+    raise RuntimeError("Primary bank configuration is required for payment notices")
 
 def generate_payment_notice_html(output_path, data):
     """生成收款通知 HTML"""
@@ -60,16 +90,19 @@ def generate_payment_notice_html(output_path, data):
     currency = payment.get('currency', 'USD')
     deposit_amount = payment.get('deposit_amount', 0)
     deposit_date = payment.get('deposit_date', '').replace('-', '.')
-    balance_due = payment.get('balance_due', total_amount)
+    expected_balance_due = money(total_amount) - money(deposit_amount)
+    if 'balance_due' in payment:
+        provided_balance_due = money(payment.get('balance_due'))
+        if provided_balance_due != expected_balance_due:
+            raise ValueError(
+                f"balance_due mismatch: expected {expected_balance_due} from total_amount - deposit_amount, got {provided_balance_due}"
+            )
+        balance_due = float(provided_balance_due)
+    else:
+        balance_due = float(expected_balance_due)
     
     # 银行信息
-    bank_info = data.get('bank_info', {
-        'beneficiary': 'FARREACH ELECTRONIC CO LIMITED',
-        'bank_name': 'HSBC Hong Kong',
-        'account_no': '411-758097-838',
-        'swift_code': 'HSBCHKHHHKH',
-        'bank_address': 'No.1 Queen\'s Road Central,Central, Hong Kong'
-    })
+    bank_info = data.get('bank_info') or load_primary_bank_info()
     
     # 条款
     terms = data.get('terms', {})
@@ -81,7 +114,7 @@ def generate_payment_notice_html(output_path, data):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Notice - {notice_no}</title>
+    <title>Payment Notice - {escape_html(notice_no)}</title>
     <style>
         body {{
             font-family: 'Times New Roman', Times, serif;
@@ -187,14 +220,14 @@ def generate_payment_notice_html(output_path, data):
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="flex: 1;">
                     <div class="title" style="text-align: left; font-size: 16pt;">
-                        {company_name}
+                        {escape_html(company_name)}
                     </div>
                     <div style="margin-top: 10px; font-size: 10pt;">
-                        <strong>Address:</strong> {company_address}<br>
-                        <strong>Tel:</strong> {company_phone} &nbsp;|&nbsp; 
-                        <strong>Fax:</strong> {company_fax}<br>
-                        <strong>Email:</strong> {company_email}<br>
-                        <strong>Website:</strong> {company_website}
+                        <strong>Address:</strong> {escape_html(company_address)}<br>
+                        <strong>Tel:</strong> {escape_html(company_phone)} &nbsp;|&nbsp; 
+                        <strong>Fax:</strong> {escape_html(company_fax)}<br>
+                        <strong>Email:</strong> {escape_html(company_email)}<br>
+                        <strong>Website:</strong> {escape_html(company_website)}
                     </div>
                 </div>
                 <div style="text-align: right; border: 2px solid #000; padding: 10px; margin-left: 20px;">
@@ -208,13 +241,13 @@ def generate_payment_notice_html(output_path, data):
             <table style="width: 100%; margin-bottom: 15px;">
                 <tr>
                     <td style="width: 20%;" class="bold">Notice No:</td>
-                    <td style="width: 30%;">{notice_no}</td>
+                    <td style="width: 30%;">{escape_html(notice_no)}</td>
                     <td style="width: 20%;" class="bold">Date:</td>
-                    <td style="width: 30%;">{notice_date}</td>
+                    <td style="width: 30%;">{escape_html(notice_date)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Due Date:</td>
-                    <td colspan="3" class="urgent">{due_date}</td>
+                    <td colspan="3" class="urgent">{escape_html(due_date)}</td>
                 </tr>
             </table>
         </div>
@@ -225,19 +258,19 @@ def generate_payment_notice_html(output_path, data):
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 20%;" class="bold">Company:</td>
-                    <td>{customer_name}</td>
+                    <td>{escape_html(customer_name)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Attn:</td>
-                    <td>{customer_contact}</td>
+                    <td>{escape_html(customer_contact)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Email:</td>
-                    <td>{customer_email}</td>
+                    <td>{escape_html(customer_email)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Phone:</td>
-                    <td>{customer_phone}</td>
+                    <td>{escape_html(customer_phone)}</td>
                 </tr>
             </table>
         </div>
@@ -246,9 +279,9 @@ def generate_payment_notice_html(output_path, data):
         <div class="section">
             <div class="section-title">REFERENCE:</div>
             <table style="width: 100%;">
-                {f'<tr><td style="width: 20%;" class="bold">PI No:</td><td>{pi_no}</td></tr>' if pi_no else ''}
-                {f'<tr><td class="bold">Quotation No:</td><td>{quotation_no}</td></tr>' if quotation_no else ''}
-                {f'<tr><td class="bold">Order No:</td><td>{order_no}</td></tr>' if order_no else ''}
+                {f'<tr><td style="width: 20%;" class="bold">PI No:</td><td>{escape_html(pi_no)}</td></tr>' if pi_no else ''}
+                {f'<tr><td class="bold">Quotation No:</td><td>{escape_html(quotation_no)}</td></tr>' if quotation_no else ''}
+                {f'<tr><td class="bold">Order No:</td><td>{escape_html(order_no)}</td></tr>' if order_no else ''}
             </table>
         </div>
 
@@ -259,17 +292,17 @@ def generate_payment_notice_html(output_path, data):
                 <table style="width: 100%;">
                     <tr>
                         <td style="width: 60%;" class="bold">Total Amount:</td>
-                        <td class="right bold">{currency} {total_amount:,.2f}</td>
+                        <td class="right bold">{escape_html(currency)} {total_amount:,.2f}</td>
                     </tr>
                     {f'''
                     <tr>
                         <td class="bold">Deposit Received ({deposit_date}):</td>
-                        <td class="right">{currency} {deposit_amount:,.2f}</td>
+                        <td class="right">{escape_html(currency)} {deposit_amount:,.2f}</td>
                     </tr>
                     ''' if deposit_amount > 0 else ''}
                     <tr>
                         <td class="bold" style="border-top: 2px solid #000; padding-top: 10px; font-size: 14pt;">Balance Due:</td>
-                        <td class="right highlight" style="border-top: 2px solid #000; padding-top: 10px; font-size: 14pt;">{currency} {balance_due:,.2f}</td>
+                        <td class="right highlight" style="border-top: 2px solid #000; padding-top: 10px; font-size: 14pt;">{escape_html(currency)} {balance_due:,.2f}</td>
                     </tr>
                 </table>
             </div>
@@ -282,23 +315,23 @@ def generate_payment_notice_html(output_path, data):
                 <table style="width: 100%; border: none;">
                     <tr>
                         <td style="width: 25%; border: none;" class="bold">Beneficiary:</td>
-                        <td style="border: none;">{bank_info.get('beneficiary', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('beneficiary', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">Bank Name:</td>
-                        <td style="border: none;">{bank_info.get('bank_name', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('bank_name', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">Account No:</td>
-                        <td style="border: none;">{bank_info.get('account_no', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('account_no', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">SWIFT Code:</td>
-                        <td style="border: none;">{bank_info.get('swift_code', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('swift_code', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">Bank Address:</td>
-                        <td style="border: none;">{bank_info.get('bank_address', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('bank_address', ''))}</td>
                     </tr>
                 </table>
             </div>
@@ -310,11 +343,11 @@ def generate_payment_notice_html(output_path, data):
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 30%;" class="bold">Payment Terms:</td>
-                    <td>{payment_terms}</td>
+                    <td>{escape_html(payment_terms)}</td>
                 </tr>
             </table>
             {f'''
-            <div style="margin-top: 15px; font-size: 10pt; white-space: pre-line;">{remarks}</div>
+            <div style="margin-top: 15px; font-size: 10pt; white-space: pre-line;">{escape_html(remarks)}</div>
             ''' if remarks else ''}
         </div>
 
@@ -322,7 +355,7 @@ def generate_payment_notice_html(output_path, data):
         <div class="section" style="margin-top: 30px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
             <p style="margin: 0;"><strong>For any questions regarding this payment notice, please contact:</strong></p>
             <p style="margin: 5px 0 0 0; font-size: 10pt;">
-                Email: {company_email} | Tel: {company_phone}
+                Email: {escape_html(company_email)} | Tel: {escape_html(company_phone)}
             </p>
         </div>
 

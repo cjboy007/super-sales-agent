@@ -1,3 +1,6 @@
+import fs from "fs";
+import { ssaCompanyDataPath } from "./ssa-data-paths";
+
 /**
  * In-memory event bus for real-time SSE push.
  * Server-side only — safe for Edge/Node runtime.
@@ -69,17 +72,19 @@ export function getRecentEvents(limit = 20): AgentEvent[] {
  * Seed recent sent-log entries as "email-sent" events on first call.
  * This ensures new SSE clients see historical context.
  */
-let seeded = false;
+const seededWorkspaces = new Set<string>();
 
-export function seedSentLogEvents(): AgentEvent[] {
-  if (seeded) return getRecentEvents();
-  seeded = true;
+function publicSeedId(workspaceId: string, sentAt: string, index: number): string {
+  const compactTime = sentAt.replace(/[^0-9]/g, "").slice(0, 14) || "sent";
+  return `seed-${workspaceId}-${compactTime}-${index}`;
+}
+
+export function seedSentLogEvents(workspaceId = "farreach"): AgentEvent[] {
+  if (seededWorkspaces.has(workspaceId)) return getRecentEvents();
+  seededWorkspaces.add(workspaceId);
 
   try {
-    // Dynamic import for server-side only
-    const fs = require("fs");
-    const { ssaCompanyDataPath } = require("./ssa-data-paths");
-    const logPath = ssaCompanyDataPath("farreach", "mail", "sent-log.json");
+    const logPath = ssaCompanyDataPath(workspaceId, "mail", "sent-log.json");
     if (!fs.existsSync(logPath)) return getRecentEvents();
 
     const entries = JSON.parse(fs.readFileSync(logPath, "utf-8")) as Array<{
@@ -93,12 +98,13 @@ export function seedSentLogEvents(): AgentEvent[] {
     // Seed the most recent 20 entries as events (oldest first for chronological order)
     entries
       .slice(-20)
-      .forEach((e) => {
+      .forEach((e, index) => {
         const evt: AgentEvent = {
-          id: `seed-${e.tracking_id || e.email}-${Date.now()}`,
+          id: publicSeedId(workspaceId, e.sent_at, index),
           type: "email-sent",
           timestamp: e.sent_at,
           data: {
+            workspaceId,
             company: e.company,
             email: e.email,
             subject: e.subject,

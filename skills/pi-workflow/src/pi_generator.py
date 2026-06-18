@@ -9,10 +9,20 @@ scripts/generate_pi.py 生成的 HTML/PDF 保持一致。
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+import sys
 from typing import Optional
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+try:
+    from bank_config import get_primary_bank
+except Exception:
+    get_primary_bank = None
 
 
 @dataclass
@@ -53,6 +63,14 @@ def as_date(value):
 def money_format(currency: str):
     symbol = "$" if currency == "USD" else f'"{currency} "'
     return f'{symbol}#,##0.00'
+
+
+def load_primary_bank_info():
+    if get_primary_bank:
+        bank = get_primary_bank(throw_error=False)
+        if bank:
+            return bank
+    raise RuntimeError("Primary bank configuration is required for PI generation")
 
 
 def write_label_value(ws, row, label, value, label_col=1, value_col=2, width=5):
@@ -148,13 +166,7 @@ def generate_pi_excel(data: dict, output_path: str) -> GenerationResult:
         subtotal = sum(as_money(p.get("quantity")) * as_money(p.get("unit_price", p.get("unitPrice", 0))) for p in products)
         total = subtotal + freight + tax
 
-        bank_info = data.get("bank_info", {
-            "beneficiary": "FARREACH ELECTRONIC CO LIMITED",
-            "bank_name": "HSBC Hong Kong",
-            "account_no": "411-758097-838",
-            "swift_code": "HSBCHKHHHKH",
-            "bank_address": "No.1 Queen's Road Central,Central, Hong Kong",
-        })
+        bank_info = data.get("bank_info") or load_primary_bank_info()
 
         payment_terms = terms.get("payment", "T/T 30% deposit, 70% before shipment")
         packaging = terms.get("packaging", "Standard export packaging")

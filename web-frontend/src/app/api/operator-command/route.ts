@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,12 +11,39 @@ interface OperatorCommandBody {
   url?: string;
 }
 
+function titleForWorkflow(workflow: unknown): string {
+  if (workflow === "email.reply") return "Email follow-up";
+  if (workflow === "quotation.prepare") return "Quote or PI preparation";
+  if (workflow === "lead.import") return "Customer import";
+  if (workflow === "company_intel.run") return "Customer background check";
+  if (workflow === "intake.product_doc.process") return "Product document intake";
+  if (workflow === "operator.command") return "Operator request";
+  if (workflow === "side_effect.request") return "External action approval";
+  return "Background task";
+}
+
+function publicPlan(plan: unknown) {
+  const rawPlan = plan && typeof plan === "object" && !Array.isArray(plan)
+    ? plan as { source?: unknown; jobs?: unknown }
+    : {};
+  const jobs = Array.isArray(rawPlan.jobs) ? rawPlan.jobs : [];
+  return {
+    source: typeof rawPlan.source === "string" ? rawPlan.source : "local-planner",
+    jobs: jobs.map((job) => {
+      const rawJob = job && typeof job === "object" && !Array.isArray(job)
+        ? job as { workflow?: unknown }
+        : {};
+      return { title: titleForWorkflow(rawJob.workflow) };
+    }),
+  };
+}
+
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as OperatorCommandBody;
   const runtime = createSalesRuntime();
-  const workspaceId = request.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(request, workspaceId);
+  const auth = requireResolvedWorkspaceAccess(request, body as Record<string, unknown>);
   if (!auth.ok) return auth.response;
+  const workspaceId = auth.workspaceId;
 
   try {
     const record = runtime.createOperatorCommand({
@@ -30,12 +57,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        id: record.id,
         status: record.status,
         sideEffects: record.sideEffects,
-        jobId: record.jobId,
-        jobIds: record.jobIds || (record.jobId ? [record.jobId] : []),
-        plan: record.plan,
+        queuedTasks: record.jobIds?.length || (record.jobId ? 1 : 0),
+        plan: publicPlan(record.plan),
       },
     });
   } catch (error) {

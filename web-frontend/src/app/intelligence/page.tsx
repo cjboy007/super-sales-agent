@@ -15,6 +15,7 @@ import {
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
 import { localizeMarketNewsText, localizeNewsItem, localizeNewsTag } from "@/lib/intelligence-news-i18n";
+import { useProject } from "@/lib/project";
 
 interface Insight {
   title: string;
@@ -146,6 +147,7 @@ function alertSourceUrl(alert: Alert) {
 
 export default function IntelligencePage() {
   const language = useBattleLanguage();
+  const { apiFetch } = useProject();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [competitors, setCompetitors] = useState<CompetitorEvent[]>([]);
@@ -160,10 +162,10 @@ export default function IntelligencePage() {
     setError(null);
     try {
       const [insightsRes, newsRes, competitorRes, alertsRes] = await Promise.all([
-        fetch("/api/intelligence/insights"),
-        fetch("/api/intelligence/news"),
-        fetch("/api/intelligence/competitors"),
-        fetch("/api/intelligence/alerts"),
+        apiFetch("/api/intelligence/insights"),
+        apiFetch("/api/intelligence/news"),
+        apiFetch("/api/intelligence/competitors"),
+        apiFetch("/api/intelligence/alerts"),
       ]);
       const [insightsJson, newsJson, competitorJson, alertsJson] = await Promise.all([
         insightsRes.json(),
@@ -183,17 +185,17 @@ export default function IntelligencePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [apiFetch, load]);
 
   const refreshExternalIntel = useCallback(async () => {
     setRefreshing(true);
     setError(null);
     try {
-      const response = await fetch("/api/intelligence/refresh", { method: "POST" });
+      const response = await apiFetch("/api/intelligence/refresh", { method: "POST" });
       const result = await response.json();
       if (!result.success) throw new Error(result.error || "Failed to refresh intelligence");
       await load();
@@ -202,7 +204,7 @@ export default function IntelligencePage() {
     } finally {
       setRefreshing(false);
     }
-  }, [load]);
+  }, [apiFetch, load]);
 
   return (
     <BattlePageShell>
@@ -238,7 +240,11 @@ export default function IntelligencePage() {
             meta={language === "zh" ? "市场影响摘要" : "market impact summaries"}
           >
             {insights.length === 0 ? (
-              <EmptyState label={language === "zh" ? (loading ? "正在读取情报摘要" : "没有情报摘要") : (loading ? "loading insight feed" : "no insights found")} />
+              <EmptyState
+                label={language === "zh" ? (loading ? "正在读取情报摘要" : "尚无市场信号。连接数据源或重新加载。") : (loading ? "loading insight feed" : "No market signals yet. Connect sources or reload.")}
+                action={loading ? undefined : (language === "zh" ? "前往设置连接数据源" : "Connect sources in Settings")}
+                actionHref={loading ? undefined : "/settings"}
+              />
             ) : (
               <div className="grid gap-2 p-3 md:grid-cols-2">
                 {insights.map((item) => (
@@ -288,7 +294,11 @@ export default function IntelligencePage() {
             meta={language === "zh" ? "筛选后的市场信号" : "filtered external signal cache"}
           >
             {news.length === 0 ? (
-              <EmptyState label={language === "zh" ? (loading ? "正在读取市场新闻" : "没有市场新闻") : (loading ? "loading news feed" : "no market news")} />
+              <EmptyState
+                label={language === "zh" ? (loading ? "正在读取市场新闻" : "暂无市场新闻。连接搜索或重新加载缓存。") : (loading ? "loading news feed" : "No market news yet. Connect research sources or reload cached news.")}
+                action={loading ? undefined : (language === "zh" ? "刷新情报" : "Refresh intelligence")}
+                actionHref={loading ? undefined : "/intelligence"}
+              />
             ) : (
               <div className="max-h-[520px] divide-y divide-slate-800 overflow-y-auto">
                 {news.slice(0, 30).map((item) => {
@@ -316,7 +326,9 @@ export default function IntelligencePage() {
             meta={language === "zh" ? "产品、工厂、价格提及" : "product, factory, price mentions"}
           >
             {competitors.length === 0 ? (
-              <EmptyState label={language === "zh" ? (loading ? "正在读取竞品动态" : "没有竞品动态") : (loading ? "loading competitor feed" : "no competitor mentions")} />
+              <EmptyState
+                label={language === "zh" ? (loading ? "正在读取竞品动态" : "暂无竞品动态。竞品信号将在检测到后出现。") : (loading ? "loading competitor feed" : "No competitor mentions yet. Signals appear when detected.")}
+              />
             ) : (
               <div className="max-h-[520px] divide-y divide-slate-800 overflow-y-auto">
                 {competitors.slice(0, 30).map((item) => {

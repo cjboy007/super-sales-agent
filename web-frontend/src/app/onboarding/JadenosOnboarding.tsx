@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { cx } from "@/components/battle-station/theme";
 import {
@@ -16,15 +17,87 @@ import {
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
 import { useProject } from "@/lib/project";
+import { LLM_PROVIDER_OPTIONS, defaultBaseUrlForProvider } from "@/lib/llm-provider-options";
 import {
   DEFAULT_CONFIG,
   JADENOS_ONBOARDING_ROUTE,
   type ConfigState,
   type JadenosOnboardingStep,
+  type OnboardingRuntimeState,
   getJadenosOnboardingSteps,
   getOnboardingReadiness,
-  isConfiguredSecret,
 } from "./onboarding-flow";
+
+const LOCAL_GATEWAY_API = "/api/local-gateway";
+const LOCAL_STORAGE_API = "/api/local-storage";
+const LLM_TEST_API = "/api/llm/test";
+
+interface GatewayStatus {
+  accessMode: "local" | "lan";
+  bindHost: string;
+  publicHost: string;
+  port: string;
+  tokenRequired: boolean;
+  localUrl: string;
+  lanUrl: string | null;
+  warning: string;
+  firewallHint: string;
+}
+
+interface LocalOnboardingStatus {
+  completed: boolean;
+  completedAt: string | null;
+  accessMode: "local" | "lan" | null;
+  modelProvider: string | null;
+  testUploadCompleted: boolean;
+  synthesisTestCompleted: boolean;
+}
+
+interface LocalStorageState {
+  summary: {
+    dataRoot: string;
+    totalBytes: number;
+    totalFiles: number;
+    retention: {
+      mode: "keep" | "archive";
+      maxActiveSessions: number | null;
+      deletesOriginals: false;
+    };
+    directories: Array<{
+      id: string;
+      label: string;
+      relativePath: string;
+      bytes: number;
+      files: number;
+    }>;
+  };
+}
+
+interface ModelHealth {
+  readiness: "local_model_ready" | "cloud_model_ready" | "mock_fallback";
+  mode: "local" | "cloud" | "mock";
+  configured: boolean;
+  model: string;
+  endpointConfigured: boolean;
+  mockFallbackActive: boolean;
+}
+
+interface IntakeUploadReceipt {
+  id: string;
+  uploads?: Array<{ name: string; size: number }>;
+  analysis?: { summary?: string };
+}
+
+interface SynthesisReceipt {
+  synthesisId: string;
+  title: string;
+  fileName: string;
+  downloadUrl?: string;
+  filesRead: number;
+  filesSkipped: number;
+  source: "provider" | "mock" | "local";
+  summary: string;
+}
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="block text-[10px] uppercase tracking-wide text-slate-500">{children}</label>;
@@ -70,6 +143,18 @@ function StatusBadge({ status }: { status: JadenosOnboardingStep["status"] }) {
   return <BattleBadge tone="amber"><BattleText en="Needed" zh="需要" /></BattleBadge>;
 }
 
+function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let index = 0;
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024;
+    index += 1;
+  }
+  return `${value >= 10 || index === 0 ? Math.round(value) : value.toFixed(1)} ${units[index]}`;
+}
+
 function ReadinessMeter({ completed, total }: { completed: number; total: number }) {
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   return (
@@ -77,7 +162,7 @@ function ReadinessMeter({ completed, total }: { completed: number; total: number
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-[10px] uppercase tracking-wide text-slate-500">
-            <BattleText en="Core launch" zh="核心上线" />
+            <BattleText en="First run" zh="首次启动" />
           </p>
           <p className="mt-1 font-mono text-xl font-semibold text-slate-100">{completed}/{total}</p>
         </div>
@@ -89,70 +174,6 @@ function ReadinessMeter({ completed, total }: { completed: number; total: number
         <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
       </div>
     </div>
-  );
-}
-
-function SwitchRow({
-  checked,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  label: React.ReactNode;
-}) {
-  return (
-    <label className="flex min-h-8 items-center gap-2 rounded-md border border-slate-800 bg-slate-950 px-3 text-xs text-slate-300">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      <span>{label}</span>
-    </label>
-  );
-}
-
-function TerminalPanel({
-  steps,
-  activeIndex,
-  language,
-}: {
-  steps: JadenosOnboardingStep[];
-  activeIndex: number;
-  language: "en" | "zh";
-}) {
-  const visibleSteps = steps.slice(0, activeIndex + 1);
-
-  return (
-    <BattlePanel
-      title={language === "zh" ? "JadenOS 设置终端" : "JadenOS Setup Terminal"}
-      meta={language === "zh" ? "一步一步连接销售工作台" : "step-by-step sales workspace setup"}
-    >
-      <div className="bg-slate-950 p-3 font-mono text-xs leading-6">
-        <div className="max-h-[330px] min-h-[260px] overflow-y-auto rounded-md border border-slate-800 bg-black/35 px-3 py-2">
-          {visibleSteps.map((step) => (
-            <div key={step.id} className="py-1">
-              <div className="text-emerald-300">{step.command}</div>
-              <div className="text-slate-300">
-                <span className="text-slate-500">JadenOS: </span>
-                {language === "zh" ? step.zhPrompt : step.prompt}
-              </div>
-              <div className={cx(
-                "text-[11px]",
-                step.status === "done" ? "text-emerald-400" : step.status === "optional" ? "text-slate-500" : "text-amber-300"
-              )}>
-                status: {step.status}
-              </div>
-            </div>
-          ))}
-          <div className="mt-1 inline-flex items-center gap-2 text-emerald-300">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-            <span>{language === "zh" ? "等待下一步" : "waiting for next step"}</span>
-          </div>
-        </div>
-      </div>
-    </BattlePanel>
   );
 }
 
@@ -170,7 +191,7 @@ function StepList({
   return (
     <BattlePanel
       title={language === "zh" ? "步骤" : "Steps"}
-      meta={language === "zh" ? "可跳转；核心项仍需补齐" : "jump around; core items remain required"}
+      meta={language === "zh" ? "首次启动清单" : "first-run checklist"}
     >
       <div className="divide-y divide-slate-800">
         {steps.map((step, index) => (
@@ -179,13 +200,15 @@ function StepList({
             type="button"
             onClick={() => onSelect(index)}
             className={cx(
-              "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs transition",
-              index === activeIndex ? "bg-emerald-500/10 text-slate-100" : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+              "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:bg-slate-950",
+              index === activeIndex
+                ? "bg-emerald-500/10 text-slate-100"
+                : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
             )}
           >
             <span className="min-w-0">
               <span className="block truncate font-semibold">{language === "zh" ? step.zhTitle : step.title}</span>
-              <span className="block truncate font-mono text-[10px] text-slate-600">{step.command.replace("$ ", "")}</span>
+              <span className="block truncate text-[10px] text-slate-600">{step.command}</span>
             </span>
             <StatusBadge status={step.status} />
           </button>
@@ -195,326 +218,313 @@ function StepList({
   );
 }
 
+function modelReadinessLabel(model: ModelHealth | null, language: "en" | "zh") {
+  if (model?.readiness === "local_model_ready") return language === "zh" ? "本地模型已连接" : "Local model ready";
+  if (model?.readiness === "cloud_model_ready") return language === "zh" ? "云模型已连接" : "Cloud model ready";
+  return language === "zh" ? "Mock fallback 生效" : "Mock fallback active";
+}
+
 function StepBody({
   step,
   config,
   updateConfig,
-  testConnection,
-  uploadDocumentTemplates,
-  testing,
-  templateUploading,
-  templateSummary,
+  accessTokenInput,
+  setAccessTokenInput,
+  saveAccess,
+  clearAccess,
+  betaToken,
+  gateway,
+  storage,
+  model,
+  testModel,
+  testingModel,
+  uploadTestFile,
+  uploadSampleTestFile,
+  uploading,
+  uploadReceipt,
+  runSynthesis,
+  synthesizing,
+  synthesisReceipt,
+  markOnboardingComplete,
+  finishing,
   loading,
   language,
 }: {
   step: JadenosOnboardingStep;
   config: ConfigState;
   updateConfig: (partial: Partial<ConfigState>) => void;
-  testConnection: (kind: "imap" | "smtp") => void;
-  uploadDocumentTemplates: (files: FileList | null) => void;
-  testing: "imap" | "smtp" | null;
-  templateUploading: boolean;
-  templateSummary: string;
+  accessTokenInput: string;
+  setAccessTokenInput: (value: string) => void;
+  saveAccess: () => void;
+  clearAccess: () => void;
+  betaToken: string;
+  gateway: GatewayStatus | null;
+  storage: LocalStorageState | null;
+  model: ModelHealth | null;
+  testModel: () => void;
+  testingModel: boolean;
+  uploadTestFile: (files: FileList | null) => void;
+  uploadSampleTestFile: () => void;
+  uploading: boolean;
+  uploadReceipt: IntakeUploadReceipt | null;
+  runSynthesis: () => void;
+  synthesizing: boolean;
+  synthesisReceipt: SynthesisReceipt | null;
+  markOnboardingComplete: () => void;
+  finishing: boolean;
   loading: boolean;
   language: "en" | "zh";
 }) {
-  if (step.id === "identity") {
+  if (step.id === "token") {
     return (
-      <div className="grid gap-3 p-3 lg:grid-cols-3">
-        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <BattleBadge tone="emerald"><BattleText en="Workspace" zh="工作台" /></BattleBadge>
-          <p className="mt-2 text-xs leading-5 text-slate-300">
-            <BattleText
-              en="JadenOS runs as a local sales cockpit for leads, approvals, drafts, documents, and account memory."
-              zh="JadenOS 是本地销售驾驶舱，用于线索、审批、草稿、单证和客户记忆。"
-            />
-          </p>
-        </div>
-        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <BattleBadge tone="blue"><BattleText en="Files" zh="文件" /></BattleBadge>
-          <p className="mt-2 text-xs leading-5 text-slate-300">
-            <BattleText
-              en="Catalogs, price sheets, templates, and customer files go through Intake so the workspace stays organized."
-              zh="产品册、价格表、模板和客户文件走投递台，工作区不会乱成一团。"
-            />
-          </p>
-        </div>
-        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <BattleBadge tone="amber"><BattleText en="Editable" zh="可修改" /></BattleBadge>
-          <p className="mt-2 text-xs leading-5 text-slate-300">
-            <BattleText
-              en="Every setup choice here can be changed later in Settings."
-              zh="这里的每个设置之后都可以在设置里修改。"
-            />
-          </p>
-        </div>
-        <SwitchRow
-          checked={config.autoCapture}
-          onChange={(checked) => updateConfig({ autoCapture: checked })}
-          label={<BattleText en="Save outbound drafts for review" zh="保存外发草稿供审批" />}
-        />
-        <Link
-          href="/intake"
-          className="inline-flex h-8 items-center justify-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-600"
-        >
-          <BattleText en="Open Intake" zh="打开投递台" />
-        </Link>
-        <Link
-          href="/settings"
-          className="inline-flex h-8 items-center justify-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-600"
-        >
-          <BattleText en="Open Settings" zh="打开设置" />
-        </Link>
-      </div>
-    );
-  }
-
-  if (step.id === "llm") {
-    return (
-      <div className="grid gap-3 p-3 md:grid-cols-2 xl:grid-cols-3">
-        <ConfigInput label={language === "zh" ? "DeepSeek 密钥" : "DeepSeek Key"} value={config.deepseekApiKey} onChange={(v) => updateConfig({ deepseekApiKey: v })} mono placeholder="sk-..." />
+      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
         <FieldLabel>
-          {language === "zh" ? "默认模型" : "Default Model"}
-          <SelectField value={config.defaultModel} onChange={(event) => updateConfig({ defaultModel: event.target.value })} className="mt-1 w-full">
-            <option value="deepseek-v4-pro">deepseek-v4-pro</option>
-            <option value="deepseekv4pro">deepseekv4pro</option>
-            <option value="deepseek/deepseek-v4-pro">deepseek/deepseek-v4-pro</option>
-            <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
-            <option value="gpt-4o-mini">gpt-4o-mini</option>
-            <option value="gpt-4.1">gpt-4.1</option>
-            <option value="google/gemini-2.5-flash">google/gemini-2.5-flash</option>
-            <option value="anthropic/claude-sonnet-4">anthropic/claude-sonnet-4</option>
-            <option value="mock">mock</option>
-          </SelectField>
+          {language === "zh" ? "访问口令" : "Access Pass"}
+          <InputField
+            value={accessTokenInput}
+            type="password"
+            autoComplete="off"
+            onChange={(event) => setAccessTokenInput(event.target.value)}
+            className="mt-1 w-full"
+          />
         </FieldLabel>
-        <ConfigInput label={language === "zh" ? "OpenRouter 备用密钥" : "OpenRouter fallback key"} value={config.openrouterApiKey} onChange={(v) => updateConfig({ openrouterApiKey: v })} mono placeholder="sk-or-..." />
-        <ConfigInput label={language === "zh" ? "OpenAI 备用密钥" : "OpenAI fallback key"} value={config.openaiApiKey} onChange={(v) => updateConfig({ openaiApiKey: v })} mono placeholder="sk-..." />
-      </div>
-    );
-  }
-
-  if (step.id === "vision") {
-    return (
-      <div className="grid gap-3 p-3 md:grid-cols-2 xl:grid-cols-3">
-        <ConfigInput label={language === "zh" ? "OpenRouter 识图密钥" : "OpenRouter vision key"} value={config.openrouterApiKey} onChange={(v) => updateConfig({ openrouterApiKey: v })} mono placeholder="sk-or-..." />
-        <ConfigInput label={language === "zh" ? "OpenAI 识图密钥" : "OpenAI vision key"} value={config.openaiApiKey} onChange={(v) => updateConfig({ openaiApiKey: v })} mono placeholder="sk-..." />
-        <ConfigInput label={language === "zh" ? "Gemini 识图密钥" : "Gemini vision key"} value={config.geminiApiKey} onChange={(v) => updateConfig({ geminiApiKey: v })} mono placeholder="AIza..." />
-        <FieldLabel>
-          {language === "zh" ? "推荐识图模型" : "Recommended vision model"}
-          <SelectField value={config.defaultModel} onChange={(event) => updateConfig({ defaultModel: event.target.value })} className="mt-1 w-full">
-            <option value="google/gemini-2.5-flash">google/gemini-2.5-flash</option>
-            <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
-            <option value="gpt-4o-mini">gpt-4o-mini</option>
-            <option value="gpt-4.1">gpt-4.1</option>
-            <option value="anthropic/claude-sonnet-4">anthropic/claude-sonnet-4</option>
-          </SelectField>
-        </FieldLabel>
-        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3 text-xs leading-5 text-slate-300 md:col-span-2">
+        <CommandButton type="button" variant="primary" onClick={saveAccess} disabled={!accessTokenInput.trim()}>
+          <BattleText en="Save Access" zh="保存访问" />
+        </CommandButton>
+        <CommandButton type="button" variant="ghost" onClick={clearAccess} disabled={!betaToken && !accessTokenInput}>
+          <BattleText en="Clear" zh="清除" />
+        </CommandButton>
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs leading-5 text-slate-300 lg:col-span-3">
           <BattleText
-            en="This powers Intake image reading for product drawings, catalogs, datasheets, and screenshots. SSA will still keep files approval-gated."
-            zh="这项用于投递台读取产品图纸、产品目录、规格书和截图。SSA 仍会保持文件审批边界。"
+            en="The browser stores the access pass and sends it to SSA with each protected request. LAN mode keeps the same protection."
+            zh="浏览器会保存访问口令，并在访问受保护页面/API 时交给 SSA。LAN 模式也继续使用同一套保护。"
           />
         </div>
       </div>
     );
   }
 
-  if (step.id === "email") {
+  if (step.id === "access") {
     return (
-      <div className="grid gap-3 p-3 md:grid-cols-2 xl:grid-cols-4">
-        <ConfigInput label={language === "zh" ? "邮箱账号" : "Email Account"} value={config.email} onChange={(v) => updateConfig({ email: v })} mono placeholder="sales@example.com" />
-        <ConfigInput label={language === "zh" ? "邮箱密码 / 应用密码" : "Email Password / App Password"} value={config.emailPassword} onChange={(v) => updateConfig({ emailPassword: v })} mono />
-        <ConfigInput label={language === "zh" ? "收信服务器" : "Incoming Mail Server"} value={config.imapHost} onChange={(v) => updateConfig({ imapHost: v })} mono placeholder="imap.example.com" />
-        <ConfigInput label={language === "zh" ? "收信端口" : "Incoming Port"} value={config.imapPort} onChange={(v) => updateConfig({ imapPort: v })} mono />
-        <ConfigInput label={language === "zh" ? "收信加密" : "Incoming Security"} value={config.imapEncryption} onChange={(v) => updateConfig({ imapEncryption: v })} mono />
-        <ConfigInput label={language === "zh" ? "发信服务器" : "Outgoing Mail Server"} value={config.smtpHost} onChange={(v) => updateConfig({ smtpHost: v })} mono placeholder="smtp.example.com" />
-        <ConfigInput label={language === "zh" ? "发信端口" : "Outgoing Port"} value={config.smtpPort} onChange={(v) => updateConfig({ smtpPort: v })} mono />
-        <ConfigInput label={language === "zh" ? "发信加密" : "Outgoing Security"} value={config.smtpEncryption} onChange={(v) => updateConfig({ smtpEncryption: v })} mono />
-        <CommandButton type="button" variant="secondary" onClick={() => testConnection("imap")} disabled={Boolean(testing) || loading}>
-          {testing === "imap" ? <BattleText en="Testing inbox" zh="测试收件中" /> : <BattleText en="Test inbox" zh="测试收件" />}
-        </CommandButton>
-        <CommandButton type="button" variant="secondary" onClick={() => testConnection("smtp")} disabled={Boolean(testing) || loading}>
-          {testing === "smtp" ? <BattleText en="Testing sending" zh="测试发信中" /> : <BattleText en="Test sending" zh="测试发信" />}
-        </CommandButton>
-      </div>
-    );
-  }
-
-  if (step.id === "verification") {
-    return (
-      <div className="grid gap-3 p-3 md:grid-cols-2">
-        <ConfigInput label={language === "zh" ? "Hunter API 密钥" : "Hunter API Key"} value={config.hunterApiKey} onChange={(v) => updateConfig({ hunterApiKey: v })} mono />
-        <SwitchRow
-          checked={config.autoResearch.emailVerify}
-          onChange={(checked) => updateConfig({ autoResearch: { ...config.autoResearch, emailVerify: checked } })}
-          label={<BattleText en="Require checks before cold send" zh="冷邮件发送前要求核验" />}
+      <div className="grid gap-3 p-3 lg:grid-cols-2">
+        <FieldLabel>
+          {language === "zh" ? "访问模式" : "Access Mode"}
+          <SelectField
+            value={config.gatewayAccessMode || "local"}
+            onChange={(event) => {
+              const mode = event.target.value === "lan" ? "lan" : "local";
+              updateConfig({
+                gatewayAccessMode: mode,
+                gatewayBindHost: mode === "lan" ? "0.0.0.0" : "127.0.0.1",
+              });
+            }}
+            className="mt-1 w-full"
+          >
+            <option value="local">{language === "zh" ? "仅本机" : "Local only"}</option>
+            <option value="lan">{language === "zh" ? "LAN 局域网" : "LAN"}</option>
+          </SelectField>
+        </FieldLabel>
+        <ConfigInput
+          label={language === "zh" ? "本机局域网 IP" : "LAN Host IP"}
+          value={config.gatewayPublicHost || ""}
+          onChange={(value) => updateConfig({ gatewayPublicHost: value })}
+          mono
+          placeholder={language === "zh" ? "留空自动检测" : "Auto-detect when empty"}
         />
-      </div>
-    );
-  }
-
-  if (step.id === "research") {
-    return (
-      <div className="grid gap-3 p-3 md:grid-cols-2 xl:grid-cols-4">
-        <ConfigInput label={language === "zh" ? "Tavily API 密钥" : "Tavily API Key"} value={config.tavilyApiKey} onChange={(v) => updateConfig({ tavilyApiKey: v })} mono />
-        <ConfigInput label={language === "zh" ? "搜索服务" : "Search Service"} value={config.searchEngine} onChange={(v) => updateConfig({ searchEngine: v })} mono />
-        <ConfigInput label={language === "zh" ? "地区" : "Region"} value={config.searchRegion} onChange={(v) => updateConfig({ searchRegion: v })} mono />
-        <ConfigInput label={language === "zh" ? "最多结果数" : "Max Results"} value={config.maxResults} type="number" onChange={(v) => updateConfig({ maxResults: Math.max(1, Number(v) || 1) })} mono />
-        <ConfigInput label={language === "zh" ? "搜索深度" : "Search Depth"} value={config.searchDepth} onChange={(v) => updateConfig({ searchDepth: v })} mono />
-        <SwitchRow
-          checked={config.autoResearch.leadResearch}
-          onChange={(checked) => updateConfig({ autoResearch: { ...config.autoResearch, leadResearch: checked } })}
-          label={<BattleText en="Lead research" zh="线索调研" />}
-        />
-        <SwitchRow
-          checked={config.autoResearch.priceMonitor}
-          onChange={(checked) => updateConfig({ autoResearch: { ...config.autoResearch, priceMonitor: checked } })}
-          label={<BattleText en="Price watch" zh="价格监控" />}
-        />
-        <SwitchRow
-          checked={config.autoResearch.trendTracking}
-          onChange={(checked) => updateConfig({ autoResearch: { ...config.autoResearch, trendTracking: checked } })}
-          label={<BattleText en="Trend tracking" zh="趋势跟踪" />}
-        />
-      </div>
-    );
-  }
-
-  if (step.id === "optional") {
-    return (
-      <div className="grid gap-3 p-3 md:grid-cols-2">
-        <div className="grid gap-3 rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">Apollo</h3>
-              <p className="mt-1 text-xs text-slate-500">
-                <BattleText en="Lead source and enrichment after core mail works." zh="核心邮件跑通后，用于线索来源和信息补全。" />
-              </p>
-            </div>
-            <StatusBadge status={isConfiguredSecret(config.apolloApiKey) ? "done" : "optional"} />
-          </div>
-          <ConfigInput label={language === "zh" ? "Apollo API 密钥" : "Apollo API Key"} value={config.apolloApiKey} onChange={(v) => updateConfig({ apolloApiKey: v })} mono />
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-slate-500">{language === "zh" ? "本机地址" : "Local URL"}</p>
+          <p className="mt-2 break-all font-mono text-sm text-slate-100">{gateway?.localUrl || "http://127.0.0.1:3001"}</p>
         </div>
-
-        <div className="grid gap-3 rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">CRM</h3>
-              <p className="mt-1 text-xs text-slate-500">
-                <BattleText en="Local workspace first, CRM sync later if needed." zh="先用本地工作台，需要时再接 CRM 同步。" />
-              </p>
-            </div>
-            <StatusBadge status={config.crmProvider !== "none" && isConfiguredSecret(config.crmApiKey) ? "done" : "optional"} />
-          </div>
-          <FieldLabel>
-            CRM
-            <SelectField value={config.crmProvider} onChange={(event) => updateConfig({ crmProvider: event.target.value })} className="mt-1 w-full">
-              <option value="none">None / Local Workspace</option>
-              <option value="hubspot">HubSpot</option>
-              <option value="salesforce">Salesforce</option>
-              <option value="pipedrive">Pipedrive</option>
-              <option value="close">Close</option>
-              <option value="okki">OKKI</option>
-            </SelectField>
-          </FieldLabel>
-          <ConfigInput label={language === "zh" ? "CRM API 密钥" : "CRM API Key"} value={config.crmApiKey} onChange={(v) => updateConfig({ crmApiKey: v })} mono />
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-slate-500">{language === "zh" ? "局域网地址" : "LAN URL"}</p>
+          <p className="mt-2 break-all font-mono text-sm text-slate-100">{gateway?.lanUrl || (language === "zh" ? "未开启" : "Not enabled")}</p>
         </div>
-
-        <div className="grid gap-3 rounded-md border border-slate-800 bg-slate-950 px-3 py-3 md:col-span-2">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
-                <BattleText en="Team notifications" zh="团队通知" />
-              </h3>
-              <p className="mt-1 text-xs text-slate-500">
-                <BattleText en="Approval alerts can go to Slack, Teams, Feishu, or Lark." zh="审批提醒可以发到 Slack、Teams、飞书或 Lark。" />
-              </p>
-            </div>
-            <StatusBadge status={config.notificationProvider !== "none" && isConfiguredSecret(config.notificationWebhookUrl) ? "done" : "optional"} />
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <FieldLabel>
-              {language === "zh" ? "通知渠道" : "Notification Channel"}
-              <SelectField value={config.notificationProvider} onChange={(event) => updateConfig({ notificationProvider: event.target.value })} className="mt-1 w-full">
-                <option value="none">None</option>
-                <option value="slack">Slack</option>
-                <option value="teams">Microsoft Teams</option>
-                <option value="feishu">Feishu / Lark</option>
-              </SelectField>
-            </FieldLabel>
-            <ConfigInput label={language === "zh" ? "Webhook 地址" : "Webhook URL"} value={config.notificationWebhookUrl} onChange={(v) => updateConfig({ notificationWebhookUrl: v })} mono />
-          </div>
+        <div className="rounded-md border border-amber-500/25 bg-amber-500/10 p-3 text-xs leading-5 text-amber-100 lg:col-span-2">
+          <p>{gateway?.warning || (language === "zh" ? "LAN 访问开启后，请只在可信局域网使用，不要暴露到公网。" : "Use LAN access only on trusted private networks. Do not expose it to the public internet.")}</p>
+          <p className="mt-1">{gateway?.firewallHint || (language === "zh" ? "如果同一局域网设备打不开，请检查系统防火墙是否允许该端口。" : "If another LAN device cannot connect, check whether the host firewall allows the selected port.")}</p>
         </div>
       </div>
     );
   }
 
-  if (step.id === "documentTemplates") {
+  if (step.id === "model") {
     return (
-      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <BattleBadge tone="purple"><BattleText en="PI / CI / PL templates" zh="PI / CI / PL 模板" /></BattleBadge>
-          <p className="mt-2 text-xs leading-5 text-slate-300">
-            <BattleText
-              en="Upload 3-5 approved PI, CI, and PL examples. JadenOS saves them as template references and produces a confirmation draft."
-              zh="上传 3-5 份客户已确认的 PI、CI、PL 样本。JadenOS 会保存为模板参考，并生成待确认的模板草案。"
-            />
-          </p>
-          <label className="mt-3 block rounded-md border border-dashed border-slate-700 bg-slate-900/70 px-3 py-4 text-center text-xs text-slate-300 transition hover:border-emerald-500">
-            <input
-              type="file"
-              multiple
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.html,.htm,.csv"
-              className="hidden"
-              onChange={(event) => uploadDocumentTemplates(event.target.files)}
-              disabled={templateUploading || loading}
-            />
-            {templateUploading
-              ? <BattleText en="Uploading samples..." zh="正在上传样本..." />
-              : <BattleText en="Choose 3-5 template sample files" zh="选择 3-5 份模板样本文件" />}
-          </label>
-        </div>
-        <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-          <BattleBadge tone={templateSummary ? "emerald" : "amber"}>
-            {templateSummary ? <BattleText en="Draft ready" zh="草案已生成" /> : <BattleText en="Waiting" zh="等待样本" />}
+      <div className="grid gap-3 p-3 lg:grid-cols-2 xl:grid-cols-4">
+        <FieldLabel>
+          {language === "zh" ? "模型来源" : "Model Source"}
+          <SelectField
+            value={config.llmProvider || ""}
+            onChange={(event) => updateConfig({
+              llmProvider: event.target.value,
+              llmBaseUrl: defaultBaseUrlForProvider(event.target.value),
+            })}
+            className="mt-1 w-full"
+          >
+            <option value="">{language === "zh" ? "未配置，使用 Mock fallback" : "Not configured, use mock fallback"}</option>
+            {LLM_PROVIDER_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>{language === "zh" ? option.zhLabel : option.label}</option>
+            ))}
+          </SelectField>
+        </FieldLabel>
+        <ConfigInput label={language === "zh" ? "Base URL（自动填充，可高级修改）" : "Base URL (auto-filled, advanced editable)"} value={config.llmBaseUrl || ""} onChange={(value) => updateConfig({ llmBaseUrl: value })} mono placeholder={language === "zh" ? "选择 Provider 后自动填充" : "Auto-filled after choosing provider"} />
+        <ConfigInput label={language === "zh" ? "API Key" : "API Key"} value={config.llmApiKey || ""} onChange={(value) => updateConfig({ llmApiKey: value })} mono type="password" placeholder={language === "zh" ? "本地模型通常可留空" : "often blank for local models"} />
+        <ConfigInput label={language === "zh" ? "模型名" : "Model Name"} value={config.defaultModel || ""} onChange={(value) => updateConfig({ defaultModel: value })} mono placeholder={language === "zh" ? "按所选供应商填写" : "Choose per provider"} />
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3 xl:col-span-3">
+          <BattleBadge tone={model?.mockFallbackActive ? "amber" : model ? "emerald" : "neutral"}>
+            {modelReadinessLabel(model, language)}
           </BattleBadge>
           <p className="mt-2 text-xs leading-5 text-slate-300">
-            {templateSummary || (language === "zh"
-              ? "上传后会显示归纳结果。模板确认后，单证页会按该模板生成。"
-              : "After upload, the template draft summary appears here. Once confirmed, document generation follows the template.")}
+            {model?.mockFallbackActive
+              ? (language === "zh" ? "当前没有真实模型可用，SSA 只会用 Mock fallback 做占位响应。" : "No real model is available. SSA will only use mock fallback placeholder responses.")
+              : (language === "zh" ? `当前模型：${model?.model || config.defaultModel}` : `Current model: ${model?.model || config.defaultModel}`)}
           </p>
+        </div>
+        <CommandButton type="button" variant="primary" onClick={testModel} loading={testingModel} disabled={testingModel || loading}>
+          <BattleText en="Test Model" zh="测试模型" />
+        </CommandButton>
+      </div>
+    );
+  }
+
+  if (step.id === "storage") {
+    return (
+      <div className="grid gap-3 p-3">
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-slate-500">{language === "zh" ? "数据目录" : "Data directory"}</p>
+          <p className="mt-2 break-all font-mono text-xs text-slate-200">{storage?.summary.dataRoot || (language === "zh" ? "保存访问口令后显示" : "Shown after access is saved")}</p>
+        </div>
+        <div className="grid gap-2 md:grid-cols-3">
+          {(storage?.summary.directories || []).map((directory) => (
+            <div key={directory.id} className="rounded-md border border-slate-800 bg-slate-950 p-3">
+              <p className="text-sm font-semibold text-slate-100">{directory.label}</p>
+              <p className="mt-1 font-mono text-xs text-slate-500">{formatBytes(directory.bytes)} / {directory.files}</p>
+              <p className="mt-1 truncate font-mono text-[10px] text-slate-600">{directory.relativePath}</p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-md border border-emerald-500/25 bg-emerald-500/10 p-3 text-xs leading-5 text-emerald-100">
+          <BattleText
+            en="File browsing stays inside SSA_DATA_ROOT and is served by the SSA gateway. Docker mode does not open host folders from the server."
+            zh="文件浏览只在 SSA_DATA_ROOT 内进行，并由 SSA 网关提供预览/下载。Docker 模式不会从服务端打开宿主机文件夹。"
+          />
+        </div>
+        <Link
+          href="/settings"
+          className="inline-flex h-9 w-fit items-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+        >
+          <BattleText en="Open Storage Settings" zh="打开本地存储设置" />
+        </Link>
+      </div>
+    );
+  }
+
+  if (step.id === "upload") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_320px_320px]">
+        <label className="block rounded-md border border-dashed border-slate-700 bg-slate-950 px-4 py-6 text-center text-sm text-slate-300 transition hover:border-emerald-500 hover:bg-slate-900 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-300/40">
+          <input
+            type="file"
+            accept=".txt,.md,.pdf,.doc,.docx,.xls,.xlsx,.csv,.html,.htm"
+            className="sr-only"
+            onChange={(event) => uploadTestFile(event.target.files)}
+            disabled={uploading || loading}
+          />
+          <span className="block font-semibold text-slate-100">
+            {uploading ? <BattleText en="Uploading test file" zh="正在上传测试文件" /> : <BattleText en="Choose a test file" zh="选择测试文件" />}
+          </span>
+          <span className="mt-2 block text-xs leading-5 text-slate-500">
+            <BattleText en="SSA saves the original locally and uses it for the synthesis check." zh="SSA 会把原始文件保存在本地，并用于下一步归纳测试。" />
+          </span>
+        </label>
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone="blue"><BattleText en="No file handy" zh="没有现成文件" /></BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            <BattleText
+              en="Create a small sample text file in the browser and upload it through the same Intake gateway."
+              zh="可以直接在浏览器里生成一个小的示例文本文件，并通过同一个投递台网关上传。"
+            />
+          </p>
+          <CommandButton type="button" variant="secondary" onClick={uploadSampleTestFile} loading={uploading} disabled={uploading || loading} className="mt-3">
+            <BattleText en="Use sample file" zh="使用示例文件" />
+          </CommandButton>
+        </div>
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone={uploadReceipt ? "emerald" : "amber"}>
+            {uploadReceipt ? <BattleText en="Uploaded" zh="已上传" /> : <BattleText en="Waiting" zh="等待文件" />}
+          </BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            {uploadReceipt
+              ? (language === "zh"
+                ? `已创建投递记录 ${uploadReceipt.id}，文件数 ${uploadReceipt.uploads?.length || 0}。`
+                : `Created intake ${uploadReceipt.id} with ${uploadReceipt.uploads?.length || 0} file(s).`)
+              : (language === "zh" ? "上传成功后，会在这里显示投递记录。" : "After upload, the intake receipt appears here.")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (step.id === "synthesize") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone={uploadReceipt ? "emerald" : "amber"}>
+            {uploadReceipt ? <BattleText en="Input ready" zh="输入已就绪" /> : <BattleText en="Upload first" zh="先上传文件" />}
+          </BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            <BattleText
+              en="Run one synthesis to prove SSA can read the uploaded file and write a markdown summary back to local storage."
+              zh="运行一次归纳，确认 SSA 能读取上传文件，并把 Markdown 总结写回本地存储。"
+            />
+          </p>
+          <div className="mt-3">
+            <CommandButton type="button" variant="primary" onClick={runSynthesis} loading={synthesizing} disabled={synthesizing || !uploadReceipt}>
+              <BattleText en="Run Synthesis" zh="运行归纳" />
+            </CommandButton>
+          </div>
+        </div>
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone={synthesisReceipt ? "emerald" : "amber"}>
+            {synthesisReceipt ? <BattleText en="Created" zh="已生成" /> : <BattleText en="Waiting" zh="等待生成" />}
+          </BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            {synthesisReceipt
+              ? synthesisReceipt.summary
+              : (language === "zh" ? "归纳完成后，会显示输出文件和下载入口。" : "After synthesis, the output file and download link appear here.")}
+          </p>
+          {synthesisReceipt?.downloadUrl ? (
+            <a
+              href={synthesisReceipt.downloadUrl}
+              className="mt-3 inline-flex h-8 items-center rounded-md border border-emerald-500/50 bg-emerald-500/15 px-3 text-xs font-semibold text-emerald-100 transition hover:border-emerald-300 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+            >
+              <BattleText en="Download output" zh="下载结果" />
+            </a>
+          ) : null}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-3 p-3 md:grid-cols-3">
-      <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-        <BattleBadge tone="emerald"><BattleText en="Cockpit" zh="驾驶舱" /></BattleBadge>
-        <p className="mt-2 text-xs leading-5 text-slate-300">
-          <BattleText en="Operate leads, inbox, approvals, docs, and quotes." zh="处理线索、收件箱、审批、单证和报价。" />
+    <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="rounded-md border border-slate-800 bg-slate-950 p-3 text-sm leading-6 text-slate-300">
+        <BattleBadge tone="emerald"><BattleText en="Ready to enter" zh="可以进入" /></BattleBadge>
+        <p className="mt-3">
+          <BattleText
+            en="Finish saves the first-run state under the local SSA data folder. The guide will not reopen automatically unless you reset it from Settings."
+            zh="完成后，首次启动状态会写入本地 SSA 数据目录。之后不会反复弹出；需要时可从设置重新打开。"
+          />
         </p>
-        <Link href="/" className="mt-3 inline-flex text-xs font-semibold text-emerald-300 hover:text-emerald-200">
-          <BattleText en="Open Cockpit" zh="打开驾驶舱" />
-        </Link>
       </div>
-      <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-        <BattleBadge tone="blue"><BattleText en="Settings" zh="设置" /></BattleBadge>
-        <p className="mt-2 text-xs leading-5 text-slate-300">
-          <BattleText en="Change keys, mail, search, CRM, and notification setup later." zh="之后可修改密钥、邮件、搜索、CRM 和通知设置。" />
-        </p>
-        <Link href="/settings" className="mt-3 inline-flex text-xs font-semibold text-emerald-300 hover:text-emerald-200">
+      <div className="flex flex-col justify-center gap-2">
+        <CommandButton type="button" variant="primary" onClick={markOnboardingComplete} loading={finishing} disabled={finishing}>
+          <BattleText en="Finish Onboarding" zh="完成引导" />
+        </CommandButton>
+        <Link
+          href="/settings"
+          className="inline-flex h-9 items-center justify-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+        >
           <BattleText en="Open Settings" zh="打开设置" />
-        </Link>
-      </div>
-      <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3">
-        <BattleBadge tone="amber"><BattleText en="Files" zh="文件" /></BattleBadge>
-        <p className="mt-2 text-xs leading-5 text-slate-300">
-          <BattleText en="Use Intake for catalogs, price sheets, templates, and customer documents." zh="用投递台管理产品册、价格表、模板和客户文件。" />
-        </p>
-        <Link href="/intake" className="mt-3 inline-flex text-xs font-semibold text-emerald-300 hover:text-emerald-200">
-          <BattleText en="Open Intake" zh="打开投递台" />
         </Link>
       </div>
     </div>
@@ -522,135 +532,286 @@ function StepBody({
 }
 
 export default function JadenosOnboarding() {
+  const router = useRouter();
   const language = useBattleLanguage();
-  const { apiUrl } = useProject();
+  const {
+    apiFetch,
+    betaToken,
+    setBetaToken,
+    clearBetaToken,
+  } = useProject();
   const [config, setConfig] = useState<ConfigState>(DEFAULT_CONFIG);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [accessTokenInput, setAccessTokenInput] = useState("");
+  const [gateway, setGateway] = useState<GatewayStatus | null>(null);
+  const [onboardingStatus, setOnboardingStatus] = useState<LocalOnboardingStatus | null>(null);
+  const [storage, setStorage] = useState<LocalStorageState | null>(null);
+  const [model, setModel] = useState<ModelHealth | null>(null);
+  const [uploadReceipt, setUploadReceipt] = useState<IntakeUploadReceipt | null>(null);
+  const [synthesisReceipt, setSynthesisReceipt] = useState<SynthesisReceipt | null>(null);
+  const [currentIntakeId, setCurrentIntakeId] = useState("");
+  const [testUploadCompleted, setTestUploadCompleted] = useState(false);
+  const [synthesisTestCompleted, setSynthesisTestCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState<"imap" | "smtp" | null>(null);
-  const [templateUploading, setTemplateUploading] = useState(false);
-  const [templateSummary, setTemplateSummary] = useState("");
+  const [testingModel, setTestingModel] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [synthesizing, setSynthesizing] = useState(false);
+  const [finishing, setFinishing] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const runtimeState: OnboardingRuntimeState = useMemo(() => ({
+    tokenPresent: Boolean(betaToken),
+    storageKnown: Boolean(storage?.summary.dataRoot),
+    testUploadCompleted,
+    synthesisTestCompleted,
+  }), [betaToken, storage?.summary.dataRoot, testUploadCompleted, synthesisTestCompleted]);
+
+  const readiness = useMemo(() => getOnboardingReadiness(config, runtimeState), [config, runtimeState]);
+  const steps = useMemo(() => getJadenosOnboardingSteps(config, runtimeState), [config, runtimeState]);
+  const activeStep = steps[activeIndex] ?? steps[0];
+
+  const loadAll = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const configResponse = await apiFetch("/api/config", { cache: "no-store" });
+      const configJson = await configResponse.json().catch(() => ({}));
+      if (configResponse.ok && configJson.success) {
+        setConfig((prev) => ({ ...prev, ...configJson.data }));
+      } else if (configResponse.status === 401 || configResponse.status === 403) {
+        setError(language === "zh" ? "请先保存访问口令。" : "Save the access pass first.");
+      }
+
+      const gatewayResponse = await apiFetch(LOCAL_GATEWAY_API, { cache: "no-store" });
+      const gatewayJson = await gatewayResponse.json().catch(() => ({}));
+      if (gatewayResponse.ok && gatewayJson.success) {
+        setGateway(gatewayJson.data.gateway || null);
+        setOnboardingStatus(gatewayJson.data.onboarding || null);
+        setTestUploadCompleted((prev) => prev || Boolean(gatewayJson.data.onboarding?.testUploadCompleted));
+        setSynthesisTestCompleted((prev) => prev || Boolean(gatewayJson.data.onboarding?.synthesisTestCompleted));
+      }
+
+      const storageResponse = await apiFetch(`${LOCAL_STORAGE_API}?path=documents`, { cache: "no-store" });
+      const storageJson = await storageResponse.json().catch(() => ({}));
+      if (storageResponse.ok && storageJson.success) setStorage(storageJson.data);
+
+      const healthResponse = await apiFetch("/api/health", { cache: "no-store" });
+      const healthJson = await healthResponse.json().catch(() => ({}));
+      if (healthResponse.ok) setModel(healthJson.beta?.model || null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : (language === "zh" ? "读取失败" : "Failed to load setup"));
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFetch, language]);
+
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/config")
-      .then((res) => res.json())
-      .then((json) => {
-        if (!cancelled && json.success) {
-          setConfig((prev) => ({ ...prev, ...json.data }));
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load onboarding");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setAccessTokenInput(betaToken);
+  }, [betaToken]);
+
+  useEffect(() => {
+    void loadAll();
+  }, [loadAll]);
 
   const updateConfig = useCallback((partial: Partial<ConfigState>) => {
     setConfig((prev) => ({ ...prev, ...partial }));
   }, []);
 
-  const readiness = useMemo(() => getOnboardingReadiness(config), [config]);
-  const steps = useMemo(() => getJadenosOnboardingSteps(config), [config]);
-  const activeStep = steps[activeIndex] ?? steps[0];
-
-  const save = useCallback(async () => {
+  const saveConfig = useCallback(async () => {
     setSaving(true);
     setError(null);
     setMessage("");
     try {
-      const res = await fetch("/api/config", {
+      const res = await apiFetch("/api/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
       });
       const json = await res.json();
-      if (!json.success) throw new Error(json.error || (language === "zh" ? "保存失败" : "Save failed"));
+      if (!res.ok || !json.success) throw new Error(json.error || (language === "zh" ? "保存失败" : "Save failed"));
       setConfig((prev) => ({ ...prev, ...json.data }));
-      setMessage(language === "zh" ? "设置已保存。之后可以在设置页修改。" : "Setup saved. You can change it later in Settings.");
+      setMessage(language === "zh" ? "设置已保存。" : "Settings saved.");
+      await loadAll();
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : (language === "zh" ? "保存失败" : "Save failed"));
+      return false;
     } finally {
       setSaving(false);
     }
-  }, [config, language]);
+  }, [apiFetch, config, language, loadAll]);
 
-  const saveAndNext = useCallback(async () => {
-    await save();
-    setActiveIndex((current) => Math.min(current + 1, steps.length - 1));
-  }, [save, steps.length]);
+  const saveAccess = useCallback(() => {
+    setBetaToken(accessTokenInput);
+    setError(null);
+    setMessage(language === "zh" ? "访问口令已保存。" : "Access pass saved.");
+    setActiveIndex((current) => Math.max(current, 1));
+  }, [accessTokenInput, language, setBetaToken]);
 
-  const testConnection = useCallback(async (kind: "imap" | "smtp") => {
-    setTesting(kind);
+  const clearAccess = useCallback(() => {
+    clearBetaToken();
+    setAccessTokenInput("");
+    setGateway(null);
+    setStorage(null);
+    setError(null);
+    setMessage(language === "zh" ? "访问口令已清除。" : "Access pass cleared.");
+  }, [clearBetaToken, language]);
+
+  const testModel = useCallback(async () => {
+    const saved = await saveConfig();
+    if (!saved) return;
+    setTestingModel(true);
     setError(null);
     setMessage("");
     try {
-      const res = await fetch(apiUrl("/api/email-connection/test"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind }),
-      });
+      const res = await apiFetch(LLM_TEST_API, { method: "POST" });
       const json = await res.json();
       if (!res.ok || json.success === false) {
-        throw new Error(json.error || (language === "zh" ? "测试失败" : "Connection test failed"));
+        throw new Error(json.data?.message || json.error || (language === "zh" ? "模型连接失败" : "Model test failed"));
       }
-      setMessage(json.detail || (language === "zh" ? "连接测试完成。" : "Connection test completed."));
+      setModel(json.data?.status || null);
+      setMessage(json.data?.message || (language === "zh" ? "模型连接测试完成。" : "Model connection tested."));
+      setActiveIndex((current) => Math.max(current, 3));
     } catch (err) {
-      setError(err instanceof Error ? err.message : (language === "zh" ? "测试失败" : "Connection test failed"));
+      setError(err instanceof Error ? err.message : (language === "zh" ? "模型连接失败" : "Model test failed"));
     } finally {
-      setTesting(null);
+      setTestingModel(false);
     }
-  }, [apiUrl, language]);
+  }, [apiFetch, language, saveConfig]);
 
-  const uploadDocumentTemplates = useCallback(async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    setTemplateUploading(true);
+  const uploadFiles = useCallback(async (files: File[]) => {
+    if (files.length === 0) return;
+    setUploading(true);
     setError(null);
     setMessage("");
     try {
       const form = new FormData();
-      Array.from(files).slice(0, 5).forEach((file) => form.append("files", file));
-      const res = await fetch(apiUrl("/api/documents/templates"), {
+      form.append("message", language === "zh" ? "首次启动测试上传" : "First-run test upload");
+      form.append("pastedText", language === "zh" ? "这是首次启动测试文件，请保存并用于归纳。" : "This is a first-run test file. Save it and use it for synthesis.");
+      form.append("files", files[0]);
+      const res = await apiFetch("/api/intake", {
         method: "POST",
         body: form,
       });
       const json = await res.json();
-      if (!json.success) throw new Error(json.error || (language === "zh" ? "上传失败" : "Upload failed"));
-      const status = json.templateDraft?.status;
-      const sampleCount = json.sampleCount || 0;
-      setTemplateSummary(language === "zh"
-        ? `已保存 ${sampleCount} 份样本。状态：${status === "ready_for_confirmation" ? "可确认模板草案" : "样本不足，请补到 3-5 份"}。`
-        : `Saved ${sampleCount} samples. Status: ${status === "ready_for_confirmation" ? "ready for confirmation" : "needs 3-5 samples"}.`);
-      setMessage(language === "zh" ? "单证模板样本已保存。" : "Document template samples saved.");
+      if (!res.ok || !json.success) throw new Error(json.error || (language === "zh" ? "上传失败" : "Upload failed"));
+      const receipt = json.data as IntakeUploadReceipt;
+      setUploadReceipt(receipt);
+      setCurrentIntakeId(receipt.id);
+      setTestUploadCompleted(true);
+      setMessage(language === "zh" ? "测试文件已保存到本地投递台。" : "The test file has been saved in local Intake.");
+      setActiveIndex((current) => Math.max(current, 5));
+      void loadAll();
     } catch (err) {
       setError(err instanceof Error ? err.message : (language === "zh" ? "上传失败" : "Upload failed"));
     } finally {
-      setTemplateUploading(false);
+      setUploading(false);
     }
-  }, [apiUrl, language]);
+  }, [apiFetch, language, loadAll]);
+
+  const uploadTestFile = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    void uploadFiles(Array.from(files).slice(0, 1));
+  }, [uploadFiles]);
+
+  const uploadSampleTestFile = useCallback(() => {
+    const sample = new File([
+      "SSA first-run sample file\nCustomer: Example Industrial Buyer\nRequest: summarize attached buying notes and next steps.\n",
+    ], "ssa-first-run-sample.txt", { type: "text/plain" });
+    void uploadFiles([sample]);
+  }, [uploadFiles]);
+
+  const runSynthesis = useCallback(async () => {
+    if (!currentIntakeId) {
+      setError(language === "zh" ? "请先上传一个测试文件。" : "Upload a test file first.");
+      return;
+    }
+    setSynthesizing(true);
+    setError(null);
+    setMessage("");
+    try {
+      const res = await apiFetch(`/api/intake/${encodeURIComponent(currentIntakeId)}/synthesize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: language === "zh" ? "首次启动测试归纳" : "First-run test synthesis",
+          instruction: language === "zh" ? "请归纳上传文件中的核心信息，输出简明总结。" : "Summarize the uploaded file into a concise note.",
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || (language === "zh" ? "归纳失败" : "Synthesis failed"));
+      setSynthesisReceipt(json.data as SynthesisReceipt);
+      setSynthesisTestCompleted(true);
+      setMessage(language === "zh" ? "归纳结果已写入本地存储。" : "Synthesis output has been written to local storage.");
+      setActiveIndex((current) => Math.max(current, 6));
+      void loadAll();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : (language === "zh" ? "归纳失败" : "Synthesis failed"));
+    } finally {
+      setSynthesizing(false);
+    }
+  }, [apiFetch, currentIntakeId, language, loadAll]);
+
+  const markOnboardingComplete = useCallback(async () => {
+    const saved = await saveConfig();
+    if (!saved) return;
+    setFinishing(true);
+    setError(null);
+    setMessage("");
+    try {
+      const res = await apiFetch(LOCAL_GATEWAY_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessMode: config.gatewayAccessMode || "local",
+          modelProvider: config.llmProvider || config.defaultModel || "",
+          testUploadCompleted,
+          synthesisTestCompleted,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || (language === "zh" ? "完成失败" : "Could not finish onboarding"));
+      setOnboardingStatus(json.data);
+      setMessage(language === "zh" ? "首次引导已完成。" : "First-run onboarding is complete.");
+      router.push("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : (language === "zh" ? "完成失败" : "Could not finish onboarding"));
+    } finally {
+      setFinishing(false);
+    }
+  }, [apiFetch, config.defaultModel, config.gatewayAccessMode, config.llmProvider, language, router, saveConfig, synthesisTestCompleted, testUploadCompleted]);
 
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="JadenOS Onboarding"
-        zhTitle="JadenOS 入门"
-        meta="OPENCLAW FOR SALESPEOPLE / TERMINAL SETUP"
-        zhMeta="销售版 OPENCLAW / 终端式设置"
+        title="SSA Local Gateway"
+        zhTitle="SSA 本地网关"
+        meta="Access / LAN / Model / Local files"
+        zhMeta="访问 / 局域网 / 模型 / 本地文件"
         active={JADENOS_ONBOARDING_ROUTE}
       >
         <BattleBadge tone={loading ? "blue" : readiness.allReady ? "emerald" : "amber"} pulse={loading}>
           {loading ? <BattleText en="LOAD" zh="加载" /> : readiness.allReady ? <BattleText en="READY" zh="就绪" /> : <BattleText en="SETUP" zh="设置" />}
         </BattleBadge>
-        <CommandButton variant="primary" onClick={save} disabled={saving || loading}>
-          {saving ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Save" zh="保存" />}
+        {onboardingStatus?.completed ? (
+          <BattleBadge tone="emerald"><BattleText en="Completed" zh="已完成" /></BattleBadge>
+        ) : null}
+        <Link
+          href="/docs/PUBLIC_BETA_READINESS.md"
+          className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+        >
+          <BattleText en="Beta guide" zh="内测指南" />
+        </Link>
+        <Link
+          href="/user-guide"
+          className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+        >
+          <BattleText en="User guide" zh="使用指南" />
+        </Link>
+        <CommandButton variant="primary" onClick={saveConfig} disabled={saving || loading} loading={saving}>
+          <BattleText en="Save" zh="保存" />
         </CommandButton>
       </BattlePageHeader>
 
@@ -667,7 +828,7 @@ export default function JadenosOnboarding() {
             <StepList steps={steps} activeIndex={activeIndex} onSelect={setActiveIndex} language={language} />
             <BattlePanel
               title={language === "zh" ? "核心清单" : "Core checklist"}
-              meta={language === "zh" ? "不含可选连接器" : "optional connectors excluded"}
+              meta={language === "zh" ? "本地网关首次启动" : "local gateway first run"}
             >
               <div className="divide-y divide-slate-800">
                 {readiness.items.map((item) => (
@@ -683,22 +844,37 @@ export default function JadenosOnboarding() {
           </aside>
 
           <div className="order-1 space-y-3 xl:order-2">
-            <TerminalPanel steps={steps} activeIndex={activeIndex} language={language} />
-
             <BattlePanel
               title={`${activeIndex + 1}. ${language === "zh" ? activeStep.zhTitle : activeStep.title}`}
               meta={activeStep.command}
               action={<StatusBadge status={activeStep.status} />}
             >
+              <div className="border-b border-slate-800 bg-slate-950/70 px-3 py-2 text-xs leading-5 text-slate-400">
+                {language === "zh" ? activeStep.zhPrompt : activeStep.prompt}
+              </div>
               <StepBody
                 step={activeStep}
                 config={config}
                 updateConfig={updateConfig}
-                testConnection={testConnection}
-                uploadDocumentTemplates={uploadDocumentTemplates}
-                testing={testing}
-                templateUploading={templateUploading}
-                templateSummary={templateSummary}
+                accessTokenInput={accessTokenInput}
+                setAccessTokenInput={setAccessTokenInput}
+                saveAccess={saveAccess}
+                clearAccess={clearAccess}
+                betaToken={betaToken}
+                gateway={gateway}
+                storage={storage}
+                model={model}
+                testModel={testModel}
+                testingModel={testingModel}
+                uploadTestFile={uploadTestFile}
+                uploadSampleTestFile={uploadSampleTestFile}
+                uploading={uploading}
+                uploadReceipt={uploadReceipt}
+                runSynthesis={runSynthesis}
+                synthesizing={synthesizing}
+                synthesisReceipt={synthesisReceipt}
+                markOnboardingComplete={markOnboardingComplete}
+                finishing={finishing}
                 loading={loading}
                 language={language}
               />
@@ -715,10 +891,16 @@ export default function JadenosOnboarding() {
                   <CommandButton
                     type="button"
                     variant={activeStep.status === "missing" && activeStep.core ? "primary" : "secondary"}
-                    onClick={saveAndNext}
+                    onClick={() => {
+                      if (activeStep.id === "token") saveAccess();
+                      else if (activeStep.id === "model") void testModel();
+                      else void saveConfig();
+                      setActiveIndex((current) => Math.min(current + 1, steps.length - 1));
+                    }}
                     disabled={saving || loading || activeIndex === steps.length - 1}
+                    loading={saving}
                   >
-                    {saving ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Save and next" zh="保存并继续" />}
+                    <BattleText en="Save and next" zh="保存并继续" />
                   </CommandButton>
                   <CommandButton
                     type="button"
@@ -730,11 +912,17 @@ export default function JadenosOnboarding() {
                   </CommandButton>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Link href="/settings" className="inline-flex h-7 items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-600">
-                    <BattleText en="Change in Settings" zh="到设置修改" />
+                  <Link
+                    href="/settings"
+                    className="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+                  >
+                    <BattleText en="Settings" zh="设置" />
                   </Link>
-                  <Link href="/" className="inline-flex h-7 items-center rounded-md border border-emerald-600 bg-emerald-600 px-3 text-xs font-semibold text-white transition hover:bg-emerald-500">
-                    <BattleText en="Open Cockpit" zh="打开驾驶舱" />
+                  <Link
+                    href="/intake"
+                    className="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+                  >
+                    <BattleText en="Open Intake" zh="打开投递台" />
                   </Link>
                 </div>
               </div>

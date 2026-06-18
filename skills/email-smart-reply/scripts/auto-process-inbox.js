@@ -284,11 +284,8 @@ function extractComplaintInfo(text) {
  */
 async function main() {
   try {
-    // 加载环境变量
-    const envPath = path.join(__dirname, '..', '.env');
-    if (fs.existsSync(envPath)) {
-      require('dotenv').config({ path: envPath });
-    }
+    const { loadSsaProfileEnv } = require('../../../shared/ssa-secrets');
+    loadSsaProfileEnv({ profile: 'email-smart-reply' });
     
     // 获取邮件
     const emails = await fetchUnreadEmails(LIMIT);

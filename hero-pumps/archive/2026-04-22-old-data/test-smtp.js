@@ -1,12 +1,13 @@
-const nodemailer = require('/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/node_modules/nodemailer');
+const path = require('path');
+const nodemailer = require(path.join(__dirname, '..', '..', '..', '..', 'skills', 'imap-smtp-email', 'node_modules', 'nodemailer'));
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.qiye.aliyun.com',
   port: 465,
   secure: true,
   auth: {
-    user: 'sales@heropumps.com.cn',
-    pass: 'xCxoAELWyxue5GMg'
+    user: process.env.HERO_PUMPS_SMTP_USER || process.env.SMTP_USER,
+    pass: process.env.HERO_PUMPS_SMTP_PASS || process.env.SMTP_PASS
   }
 });
 
