@@ -17,6 +17,7 @@ export * from "./files";
 export * from "./inbox";
 export * from "./intelligence-collector";
 export * from "./intake";
+export * from "./hitl-policy";
 export * from "./lead-import";
 export * from "./llm";
 export * from "./llm-cache";
