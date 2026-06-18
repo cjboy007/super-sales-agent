@@ -1,0 +1,88 @@
+name: Deploy qwensales.com
+
+on:
+  push:
+    branches:
+      - main
+      - codex/local-battle-station-main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-qwensales
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web-frontend/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web-frontend
+        run: npm ci
+
+      - name: Build web app
+        working-directory: web-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: npm run build
+
+      - name: Prepare standalone runtime
+        working-directory: web-frontend
+        run: node ../scripts/prepare-next-standalone.mjs .
+
+      - name: Create release archive
+        run: |
+          set -euo pipefail
+          release_name="ssa-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}"
+          echo "release_name=$release_name" >> "$GITHUB_ENV"
+          tar -czf "$RUNNER_TEMP/qwensales-release.tgz" \
+            --exclude='web-frontend/.next/cache' \
+            web-frontend/package.json \
+            web-frontend/.next \
+            web-frontend/public \
+            scripts/prepare-next-standalone.mjs
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.QWENSALES_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.QWENSALES_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_PRIVATE_KEY"
+          test -n "$SSH_KNOWN_HOSTS"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload release archive
+        env:
+          DEPLOY_HOST: 47.90.253.48
+          DEPLOY_USER: ssa-deploy
+        run: |
+          set -euo pipefail
+          scp "$RUNNER_TEMP/qwensales-release.tgz" "$DEPLOY_USER@$DEPLOY_HOST:/home/ssa-deploy/qwensales-release.tgz"
+
+      - name: Activate release
+        env:
+          DEPLOY_HOST: 47.90.253.48
+          DEPLOY_USER: ssa-deploy
+        run: |
+          set -euo pipefail
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" \
+            "SSA_RELEASE_TARBALL=/home/ssa-deploy/qwensales-release.tgz SSA_RELEASE_NAME='$release_name' bash -s" \
+            < scripts/deploy-qwensales-release.sh
