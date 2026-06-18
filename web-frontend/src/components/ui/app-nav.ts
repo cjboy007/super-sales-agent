@@ -6,6 +6,7 @@ export interface AppNavItem {
 
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Cockpit", zhLabel: "驾驶舱", href: "/" },
+  { label: "Growth", zhLabel: "增长", href: "/growth" },
   { label: "Intake", zhLabel: "投递台", href: "/intake" },
   { label: "Customers", zhLabel: "客户", href: "/leads" },
   { label: "Inbox", zhLabel: "收件箱", href: "/inbox" },

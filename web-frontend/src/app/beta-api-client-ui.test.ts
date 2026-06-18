@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const protectedPages = [
   "src/app/page.tsx",
+  "src/app/growth/page.tsx",
   "src/app/emails/page.tsx",
   "src/app/inbox/[emailId]/page.tsx",
   "src/app/inbox/page.tsx",
