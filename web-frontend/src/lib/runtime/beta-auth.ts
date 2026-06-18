@@ -293,6 +293,10 @@ function explicitWorkspaceId(request: NextRequest, body?: Record<string, unknown
   return request.nextUrl.searchParams.get("project")?.trim() || request.nextUrl.searchParams.get("workspaceId")?.trim() || "";
 }
 
+export function resolveWorkspaceId(request: NextRequest, body?: Record<string, unknown> | null): string {
+  return explicitWorkspaceId(request, body) || "farreach";
+}
+
 export function betaAccessSessionView(session: BetaAuthSession): BetaAccessSessionView {
   const wildcard = session.workspaces.includes("*");
   const scoped = session.workspaces.filter((workspace) => workspace !== "*");
