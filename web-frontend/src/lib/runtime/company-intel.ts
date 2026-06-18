@@ -1,11 +1,24 @@
 import fs from "fs";
+import dns from "node:dns/promises";
 import path from "path";
 import type { Lead } from "../leads";
+import { readSettings } from "../config-store";
 import { ensureDir, ensureSsaCompanyDataPath, readJsonFile, ssaCompanyDataPath, sanitizeSsaPathSegment } from "../ssa-data-paths";
 import type { MemoryWriteInput, RuntimeJob, RuntimeWorkflowType, WorkspaceAdapter, WorkspaceId } from "./types";
 
 export type CompanyIntelStatus = "not_started" | "queued" | "running" | "ready" | "failed";
 export type CompanyIntelRating = "Hot" | "Warm" | "Cold";
+export type CompanyIntelChannelStatus = "used" | "attempted" | "not_configured" | "no_result" | "failed" | "skipped";
+export type CompanyIntelChannelName =
+  | "lead_pool"
+  | "official_website"
+  | "public_search"
+  | "linkedin_public"
+  | "registry_financial"
+  | "hunter_email_verification"
+  | "apollo_contact_discovery"
+  | "mx_dns"
+  | "crm_handoff";
 
 export interface CompanyIntelLeadInput {
   companyName?: string;
@@ -31,6 +44,16 @@ export interface CompanyIntelDossier {
     confidence: "high" | "medium" | "low";
   };
   red_lines: string[];
+  channel_audit: Array<{
+    channel: CompanyIntelChannelName;
+    status: CompanyIntelChannelStatus;
+    provider: string;
+    query?: string;
+    source_url?: string;
+    note: string;
+    checked_at: string;
+    details?: Record<string, unknown>;
+  }>;
   financial_data: {
     revenue: string | null;
     currency: string | null;
@@ -117,6 +140,20 @@ export interface CompanyIntelRuntimeHost {
   writeMemory(input: MemoryWriteInput): unknown;
 }
 
+export interface CompanyIntelEnrichment {
+  website?: {
+    ok: boolean;
+    status?: number;
+    title?: string;
+    error?: string;
+  };
+  mx?: {
+    ok: boolean;
+    exchanges?: string[];
+    error?: string;
+  };
+}
+
 function compact(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -188,6 +225,209 @@ function productPortfolioFromLead(lead: CompanyIntelLeadInput): string[] {
   return Array.from(new Set(parts)).slice(0, 6);
 }
 
+function hasEnvOrSetting(envKey: string, settingValue: string): boolean {
+  return Boolean((process.env[envKey] || settingValue || "").trim());
+}
+
+function companyIntelPublicQuery(lead: CompanyIntelLeadInput): string {
+  return [
+    leadName(lead),
+    compact(lead.country),
+    domainFromLead(lead),
+  ].filter(Boolean).join(" ");
+}
+
+function channelAuditEntry(
+  channel: CompanyIntelChannelName,
+  status: CompanyIntelChannelStatus,
+  provider: string,
+  note: string,
+  checkedAt: string,
+  extra: Partial<CompanyIntelDossier["channel_audit"][number]> = {}
+): CompanyIntelDossier["channel_audit"][number] {
+  return {
+    channel,
+    status,
+    provider,
+    note,
+    checked_at: checkedAt,
+    ...extra,
+  };
+}
+
+function extractHtmlTitle(html: string): string {
+  const match = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  return match ? match[1].replace(/\s+/g, " ").trim().slice(0, 120) : "";
+}
+
+export async function collectCompanyIntelEnrichment(lead: CompanyIntelLeadInput): Promise<CompanyIntelEnrichment> {
+  const website = normalizeWebsite(compact(lead.homepage));
+  const domain = domainFromLead(lead);
+  const enrichment: CompanyIntelEnrichment = {};
+
+  if (website) {
+    try {
+      const response = await fetch(website, {
+        method: "GET",
+        headers: {
+          "User-Agent": "SSA company-intel/1.0",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+        signal: AbortSignal.timeout(8_000),
+      });
+      const contentType = response.headers.get("content-type") || "";
+      const body = contentType.includes("text") || contentType.includes("html")
+        ? await response.text()
+        : "";
+      enrichment.website = {
+        ok: response.ok,
+        status: response.status,
+        title: extractHtmlTitle(body),
+      };
+    } catch (error) {
+      enrichment.website = {
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  if (domain) {
+    try {
+      const records = await dns.resolveMx(domain);
+      enrichment.mx = {
+        ok: records.length > 0,
+        exchanges: records.map((record) => record.exchange),
+      };
+    } catch (error) {
+      enrichment.mx = {
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  return enrichment;
+}
+
+function buildCompanyIntelChannelAudit(
+  workspace: Pick<WorkspaceAdapter, "id">,
+  lead: CompanyIntelLeadInput,
+  checkedAt: string,
+  enrichment: CompanyIntelEnrichment = {}
+): CompanyIntelDossier["channel_audit"] {
+  const settings = readSettings();
+  const website = normalizeWebsite(compact(lead.homepage));
+  const domain = domainFromLead(lead);
+  const email = compact(lead.email);
+  const publicQuery = companyIntelPublicQuery(lead);
+  const searchProvider = settings.searchEngine || "public_search";
+  const tavilyConfigured = hasEnvOrSetting("TAVILY_API_KEY", settings.tavilyApiKey);
+  const hunterConfigured = hasEnvOrSetting("HUNTER_API_KEY", settings.hunterApiKey);
+  const apolloConfigured = hasEnvOrSetting("APOLLO_API_KEY", settings.apolloApiKey);
+  const registryConfigured = Boolean((process.env.COMPANY_GOAT_PATH || "").trim());
+  const crmConfigured = Boolean(settings.crmProvider && settings.crmProvider !== "none" && (process.env.CRM_API_KEY || settings.crmApiKey || "").trim());
+
+  return [
+    channelAuditEntry(
+      "lead_pool",
+      "used",
+      "sales-memory",
+      "Used the lead-pool record as the starting point; this never satisfies the whole background check by itself.",
+      checkedAt,
+      { query: leadName(lead) }
+    ),
+    channelAuditEntry(
+      "official_website",
+      !website ? "no_result" : enrichment.website?.ok ? "used" : enrichment.website ? "failed" : "attempted",
+      "direct_fetch",
+      !website
+        ? "No website was present in the lead, so this channel needs public search to discover the official site."
+        : enrichment.website?.ok
+          ? `Fetched official website successfully${enrichment.website.title ? ` (${enrichment.website.title})` : ""}.`
+          : enrichment.website
+            ? `Official website fetch failed: ${enrichment.website.error || `HTTP ${enrichment.website.status}`}.`
+            : "Official website channel is part of every company-intel run and is pending fetch.",
+      checkedAt,
+      website ? { source_url: website, details: enrichment.website } : {}
+    ),
+    channelAuditEntry(
+      "public_search",
+      !publicQuery ? "no_result" : tavilyConfigured ? "attempted" : "not_configured",
+      tavilyConfigured ? "tavily" : searchProvider,
+      tavilyConfigured
+        ? "Public search provider is configured and must be queried for company, product, registry, news, risk, hiring, and exhibition signals."
+        : "No public-search API key is configured; public company/news/risk search cannot run in this environment.",
+      checkedAt,
+      publicQuery ? { query: publicQuery } : {}
+    ),
+    channelAuditEntry(
+      "linkedin_public",
+      !publicQuery ? "no_result" : tavilyConfigured ? "attempted" : "not_configured",
+      tavilyConfigured ? "tavily:linkedin_public" : "public_search:linkedin",
+      tavilyConfigured
+        ? "LinkedIn public search is included for public company/contact snippets only; authenticated scraping is not allowed."
+        : "LinkedIn public search needs a configured public-search provider; authenticated scraping is not allowed.",
+      checkedAt,
+      publicQuery ? { query: `site:linkedin.com/company ${publicQuery}` } : {}
+    ),
+    channelAuditEntry(
+      "registry_financial",
+      registryConfigured ? "attempted" : "not_configured",
+      registryConfigured ? "company-goat" : "company-goat",
+      registryConfigured
+        ? "Company GOAT is configured and should be used for registry, financial, DNS, and company enrichment."
+        : "Company GOAT is not configured; financial and registry data cannot be considered complete.",
+      checkedAt,
+      publicQuery ? { query: `${publicQuery} registry financial revenue employees` } : {}
+    ),
+    channelAuditEntry(
+      "hunter_email_verification",
+      hunterConfigured ? "attempted" : "not_configured",
+      "hunter",
+      hunterConfigured
+        ? "Hunter is configured and should verify direct emails or discover domain emails."
+        : "Hunter API key is not configured; email remains unverified unless another verification channel is added.",
+      checkedAt,
+      email ? { query: email } : domain ? { query: domain } : {}
+    ),
+    channelAuditEntry(
+      "apollo_contact_discovery",
+      apolloConfigured ? "attempted" : "not_configured",
+      "apollo",
+      apolloConfigured
+        ? "Apollo is configured and should be used for contact discovery."
+        : "Apollo API key is not configured; contact discovery is limited to lead data and public snippets.",
+      checkedAt,
+      domain ? { query: domain } : publicQuery ? { query: publicQuery } : {}
+    ),
+    channelAuditEntry(
+      "mx_dns",
+      !domain ? "no_result" : enrichment.mx?.ok ? "used" : enrichment.mx ? "failed" : "attempted",
+      "node:dns",
+      !domain
+        ? "No domain is available for MX/DNS checks."
+        : enrichment.mx?.ok
+          ? `Resolved MX records: ${(enrichment.mx.exchanges || []).join(", ")}.`
+          : enrichment.mx
+            ? `MX/DNS check failed: ${enrichment.mx.error || "no MX records found"}.`
+            : "MX/DNS is a built-in availability check for email-domain plausibility and is pending.",
+      checkedAt,
+      domain ? { query: domain, details: enrichment.mx } : {}
+    ),
+    channelAuditEntry(
+      "crm_handoff",
+      crmConfigured ? "attempted" : "not_configured",
+      settings.crmProvider || "none",
+      crmConfigured
+        ? `CRM provider ${settings.crmProvider} is configured; real handoff still requires explicit approval.`
+        : "CRM provider/API key is not configured; no CRM write is attempted.",
+      checkedAt,
+      { query: workspace.id }
+    ),
+  ];
+}
+
 export function companyIntelLeadKey(lead: CompanyIntelLeadInput): string {
   return [
     leadName(lead),
@@ -223,8 +463,10 @@ export function companyIntelPaths(workspaceId: WorkspaceId, lead: CompanyIntelLe
 export function buildCompanyIntelDossier(
   workspace: Pick<WorkspaceAdapter, "id" | "brandName" | "industry">,
   lead: CompanyIntelLeadInput,
-  now = new Date()
+  now = new Date(),
+  enrichment: CompanyIntelEnrichment = {}
 ): CompanyIntelDossier {
+  const generatedAt = now.toISOString();
   const score = leadScore(lead);
   const rating = ratingFromScore(score);
   const domain = domainFromLead(lead);
@@ -253,6 +495,7 @@ export function buildCompanyIntelDossier(
       confidence: confidenceLevel(lead),
     },
     red_lines: [],
+    channel_audit: buildCompanyIntelChannelAudit(workspace, lead, generatedAt, enrichment),
     financial_data: {
       revenue: null,
       currency: null,
@@ -313,10 +556,10 @@ export function buildCompanyIntelDossier(
     ],
     source_list: [
       website
-        ? { label: "Lead website", url: website, note: "来自入池线索字段。" }
+        ? { label: "Official website", url: website, note: enrichment.website?.ok ? "已抓取官网。" : "来自入池线索字段，官网抓取未完成或失败。" }
         : { label: "Lead import", url: "", note: "入池线索未提供官网。" },
     ],
-    generated_at: now.toISOString(),
+    generated_at: generatedAt,
     skill: "company-intel",
     workflow: "company_intel.run",
   };
@@ -333,6 +576,16 @@ export function renderCompanyIntelMarkdown(dossier: CompanyIntelDossier): string
   const evidence = dossier.sales_entry.evidence.length
     ? dossier.sales_entry.evidence.map((item) => `- ${item}`).join("\n")
     : "- 暂无来源证据";
+  const channelAudit = dossier.channel_audit?.length
+    ? dossier.channel_audit.map((item) => [
+      `- ${item.channel}: ${item.status}`,
+      `  - Provider: ${item.provider}`,
+      item.query ? `  - Query: ${item.query}` : "",
+      item.source_url ? `  - Source: ${item.source_url}` : "",
+      item.details ? `  - Details: ${JSON.stringify(item.details)}` : "",
+      `  - Note: ${item.note}`,
+    ].filter(Boolean).join("\n")).join("\n")
+    : "- N/A";
 
   return [
     `# ${dossier.company.name} 客户背调`,
@@ -365,6 +618,9 @@ export function renderCompanyIntelMarkdown(dossier: CompanyIntelDossier): string
     "",
     "## Evidence",
     evidence,
+    "",
+    "## Channel Audit",
+    channelAudit,
     "",
     "## Verified Contacts",
     contacts,
@@ -440,12 +696,12 @@ export function writeCompanyIntelDossier(
   host: Pick<CompanyIntelRuntimeHost, "getWorkspace" | "recordEvent" | "writeMemory">,
   workspaceId: WorkspaceId,
   lead: CompanyIntelLeadInput,
-  options: { jobId?: string; note?: string } = {}
+  options: { jobId?: string; note?: string; enrichment?: CompanyIntelEnrichment } = {}
 ): CompanyIntelReadModel {
   const workspace = host.getWorkspace(workspaceId);
   const paths = companyIntelPaths(workspace.id, lead);
   ensureDir(paths.directory);
-  const dossier = buildCompanyIntelDossier(workspace, lead);
+  const dossier = buildCompanyIntelDossier(workspace, lead, new Date(), options.enrichment);
   const markdown = renderCompanyIntelMarkdown(dossier);
 
   fs.writeFileSync(paths.json, JSON.stringify(dossier, null, 2), "utf-8");

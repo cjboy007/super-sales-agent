@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/lib/api-types";
 import { createSalesRuntime, type DashboardOverviewReadModel, type SideEffectDecision } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { withPublicAction } from "../../public-action";
 
 export const dynamic = "force-dynamic";
 
@@ -10,14 +11,15 @@ interface DashboardOverview extends DashboardOverviewReadModel {
 }
 
 export async function GET(request: NextRequest) {
-  const project = request.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(request, project);
+  const auth = requireResolvedWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
 
   try {
     const runtime = createSalesRuntime();
     const resp: ApiResponse<DashboardOverview> = await runtime.getDashboardOverview(project);
-    return NextResponse.json(resp, {
+    const data = resp.data ? withPublicAction(resp.data) : resp.data;
+    return NextResponse.json({ ...resp, data }, {
       headers: { "Cache-Control": "public, max-age=30, s-maxage=30" },
     });
   } catch (error) {

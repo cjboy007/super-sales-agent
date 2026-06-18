@@ -17,10 +17,11 @@ const { promisify } = require('util');
 
 const execAsync = promisify(exec);
 const FARREACH_DATA_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'farreach');
+const REPO_ROOT = path.resolve(__dirname, '..');
 
 // ==================== 配置 ====================
 const CONFIG = {
-  IMAP_CLI: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/imap.js',
+  IMAP_CLI: path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'scripts', 'imap.js'),
   KNOWLEDGE_BASE: '/Users/wilson/obsidian-vault/Farreach 知识库',
   STATE_FILE: path.join(FARREACH_DATA_DIR, 'state', 'reply-state.json'),
   LOG_DIR: path.join(process.env.HOME, '.ssa', 'logs', 'companies', 'farreach', 'reply-processor'),

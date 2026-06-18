@@ -7,6 +7,14 @@ import {
 } from "./onboarding-flow";
 
 const baseConfig = {
+  gatewayAccessMode: "local" as const,
+  gatewayBindHost: "127.0.0.1",
+  gatewayPublicHost: "",
+  intakeRetentionMode: "keep" as const,
+  intakeMaxActiveSessions: 100,
+  llmProvider: "",
+  llmBaseUrl: "",
+  llmApiKey: "",
   deepseekApiKey: "",
   openaiApiKey: "",
   openrouterApiKey: "",
@@ -18,7 +26,7 @@ const baseConfig = {
   crmApiKey: "",
   notificationProvider: "none",
   notificationWebhookUrl: "",
-  defaultModel: "deepseek-v4-pro",
+  defaultModel: "",
   smtpHost: "",
   smtpPort: "465",
   smtpEncryption: "ssl",
@@ -41,58 +49,79 @@ const baseConfig = {
 };
 
 describe("JadenOS onboarding flow", () => {
-  it("uses the JadenOS route and terminal command", () => {
+  it("uses the JadenOS route with local-gateway first-run actions", () => {
     const steps = getJadenosOnboardingSteps(baseConfig);
+    const visibleStepText = steps.map((step) => [
+      step.title,
+      step.zhTitle,
+      step.command,
+      step.prompt,
+      step.zhPrompt,
+    ].join(" ")).join("\n");
 
     expect(JADENOS_ONBOARDING_ROUTE).toBe("/jadenos/onboarding");
-    expect(steps[0]).toMatchObject({
-      id: "identity",
-      command: "$ jadenos onboarding",
-      title: "Name the workspace",
-    });
+    expect(steps.map((step) => step.id)).toEqual([
+      "token",
+      "access",
+      "model",
+      "storage",
+      "upload",
+      "synthesize",
+      "finish",
+    ]);
+    expect(steps[0]).toMatchObject({ id: "token", command: "Save access pass" });
+    expect(visibleStepText).not.toMatch(/\$\s/);
+    expect(visibleStepText).toContain("LAN");
+    expect(visibleStepText).toContain("local folder");
+    expect(visibleStepText).toContain("test file");
+    expect(visibleStepText).toContain("synthesis");
   });
 
-  it("tracks core readiness without counting optional connectors", () => {
+  it("tracks local gateway readiness without counting optional sales connectors", () => {
     const ready = {
       ...baseConfig,
-      deepseekApiKey: "deepseek-secret",
-      openrouterApiKey: "sk-or-vision",
-      email: "sales@example.com",
-      emailPassword: "mail-secret",
-      imapHost: "imap.example.com",
-      smtpHost: "smtp.example.com",
-      hunterApiKey: "hunter-secret",
-      tavilyApiKey: "tavily-secret",
+      llmProvider: "ollama",
+      llmBaseUrl: "http://127.0.0.1:11434",
     };
 
-    const readiness = getOnboardingReadiness(ready);
+    const readiness = getOnboardingReadiness(ready, {
+      tokenPresent: true,
+      storageKnown: true,
+      testUploadCompleted: true,
+      synthesisTestCompleted: true,
+    });
 
-    expect(readiness.completed).toBe(5);
-    expect(readiness.total).toBe(5);
+    expect(readiness.completed).toBe(6);
+    expect(readiness.total).toBe(6);
     expect(readiness.allReady).toBe(true);
   });
 
-  it("treats vision LLM as a separate core onboarding item", () => {
-    const textOnly = {
+  it("allows first-run completion with mock fallback while keeping model readiness separate", () => {
+    const withoutModel = {
       ...baseConfig,
-      deepseekApiKey: "deepseek-secret",
-      email: "sales@example.com",
-      emailPassword: "mail-secret",
-      imapHost: "imap.example.com",
-      smtpHost: "smtp.example.com",
-      hunterApiKey: "hunter-secret",
-      tavilyApiKey: "tavily-secret",
     };
 
-    const readiness = getOnboardingReadiness(textOnly);
-    const steps = getJadenosOnboardingSteps(textOnly);
+    const readiness = getOnboardingReadiness(withoutModel, {
+      tokenPresent: true,
+      storageKnown: true,
+      testUploadCompleted: true,
+      synthesisTestCompleted: true,
+    });
+    const steps = getJadenosOnboardingSteps(withoutModel, {
+      tokenPresent: true,
+      storageKnown: true,
+      testUploadCompleted: true,
+      synthesisTestCompleted: true,
+    });
 
-    expect(readiness.items.find((item) => item.id === "vision")?.done).toBe(false);
-    expect(readiness.allReady).toBe(false);
-    expect(steps.map((step) => step.id)).toContain("vision");
-    expect(steps.find((step) => step.id === "vision")).toMatchObject({
+    expect(readiness.items.find((item) => item.id === "model")?.done).toBe(false);
+    expect(readiness.allReady).toBe(true);
+    expect(steps.find((step) => step.id === "model")).toMatchObject({
       status: "missing",
       core: true,
+    });
+    expect(steps.find((step) => step.id === "finish")).toMatchObject({
+      status: "done",
     });
   });
 

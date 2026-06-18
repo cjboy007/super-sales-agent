@@ -23,6 +23,17 @@ function request(body: Record<string, unknown>): NextRequest {
   });
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 beforeEach(() => {
   vi.resetModules();
   execFileMock.mockReset();
@@ -64,12 +75,13 @@ describe("/api/email-connection/test route", () => {
       success: true,
       blocked: true,
       kind: "smtp",
-      sideEffect: {
-        kind: "email.send",
-        workspaceId: "demo-exporter",
+      action: {
+        title: "Customer email send",
         status: "blocked",
+        blocked: true,
       },
     });
+    expectNoInternalActionFields(json);
     expect(execFileMock).not.toHaveBeenCalled();
   });
 

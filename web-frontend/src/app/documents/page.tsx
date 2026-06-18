@@ -23,12 +23,14 @@ import {
   useBattleLanguage,
 } from "@/components/ui/BattlePage";
 import PageCommandPanel from "@/components/ui/PageCommandPanel";
+import { useProject } from "@/lib/project";
 
 interface GeneratedDoc {
   type: string;
   filename: string;
-  path: string;
+  fileName: string;
   size: number;
+  downloadUrl: string;
 }
 
 interface PiRecord {
@@ -51,6 +53,7 @@ function fileSize(size: number) {
 
 export default function DocumentsPage() {
   const language = useBattleLanguage();
+  const { apiFetch } = useProject();
   const [formData, setFormData] = useState<TradeDocumentData>(createDefaultTradeData());
   const [docTypes, setDocTypes] = useState<Array<Extract<DocType, "CI" | "PL">>>(["CI", "PL"]);
   const [generatedDocs, setGeneratedDocs] = useState<GeneratedDoc[]>([]);
@@ -86,13 +89,13 @@ export default function DocumentsPage() {
 
   const fetchHistory = useCallback(async () => {
     try {
-      const res = await fetch("/api/documents/generate");
+      const res = await apiFetch("/api/documents/generate");
       const json = await res.json();
       if (json.success) setHistoryDocs(json.documents || []);
     } catch {
       // history is optional
     }
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     fetchHistory();
@@ -102,7 +105,7 @@ export default function DocumentsPage() {
     setLoadingPiRecords(true);
     try {
       const params = new URLSearchParams({ query });
-      const res = await fetch(`/api/documents/pi-records?${params.toString()}`);
+      const res = await apiFetch(`/api/documents/pi-records?${params.toString()}`);
       const json = await res.json();
       if (json.success) setPiRecords(json.records || []);
     } catch {
@@ -110,7 +113,7 @@ export default function DocumentsPage() {
     } finally {
       setLoadingPiRecords(false);
     }
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     fetchPiRecords("");
@@ -149,7 +152,7 @@ export default function DocumentsPage() {
     setError(null);
     setGeneratedDocs([]);
     try {
-      const res = await fetch("/api/documents/generate", {
+      const res = await apiFetch("/api/documents/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: formData, docTypes }),
@@ -438,7 +441,7 @@ export default function DocumentsPage() {
               ) : (
                 <div className="divide-y divide-slate-800">
                   {generatedDocs.map((doc) => (
-                    <div key={doc.path} className="px-3 py-2">
+                    <div key={`${doc.type}:${doc.fileName || doc.filename}:${doc.downloadUrl}`} className="px-3 py-2">
                       <div className="flex items-center justify-between gap-3">
                         <p className="truncate text-xs font-semibold text-slate-200">{doc.filename}</p>
                         <BattleBadge tone="emerald">{doc.type}</BattleBadge>
@@ -456,7 +459,7 @@ export default function DocumentsPage() {
               ) : (
                 <div className="max-h-[420px] divide-y divide-slate-800 overflow-y-auto">
                   {historyDocs.slice(0, 20).map((doc) => (
-                    <div key={doc.path} className="px-3 py-2">
+                    <div key={`${doc.type}:${doc.fileName || doc.filename}:${doc.created}`} className="px-3 py-2">
                       <div className="flex items-center justify-between gap-3">
                         <p className="truncate text-xs text-slate-200">{doc.filename}</p>
                         <BattleBadge tone="purple">{doc.type}</BattleBadge>

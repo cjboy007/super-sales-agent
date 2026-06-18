@@ -389,6 +389,24 @@ function heroRowsToLeads(rows: Array<Record<string, string>>): LeadRecord[] {
     }));
 }
 
+function normalizeLeadSearchText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function leadMatchesSearch(lead: LeadRecord, search: string): boolean {
+  const normalizedSearch = normalizeLeadSearchText(search);
+  return [
+    lead.companyName,
+    lead.contact,
+    lead.email,
+    lead.industry,
+    lead.homepage,
+  ].some((value) => {
+    const lower = value.toLowerCase();
+    return lower.includes(search) || (normalizedSearch ? normalizeLeadSearchText(value).includes(normalizedSearch) : false);
+  });
+}
+
 function filterAndPaginateLeads(
   leads: LeadRecord[],
   params: {
@@ -408,13 +426,7 @@ function filterAndPaginateLeads(
   let filtered = leads;
 
   if (search) {
-    filtered = filtered.filter(
-      (lead) =>
-        lead.companyName.toLowerCase().includes(search) ||
-        lead.contact.toLowerCase().includes(search) ||
-        lead.email.toLowerCase().includes(search) ||
-        lead.industry.toLowerCase().includes(search)
-    );
+    filtered = filtered.filter((lead) => leadMatchesSearch(lead, search));
   }
 
   if (score && score !== "All") {

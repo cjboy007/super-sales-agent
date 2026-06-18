@@ -10,7 +10,7 @@
 ```
 hero-pumps/
 ├── email-rules.md              # 📋 发邮件规则（v1.1）
-├── .env                        # SMTP 配置
+├── .env.example                # SMTP/IMAP 配置示例（真实凭据放到 ~/.config/super-sales-agent/profiles/hero-pumps.env）
 ├── orchestrator/
 │   ├── hero-orchestrator.js    # 主调度器
 │   └── logs/

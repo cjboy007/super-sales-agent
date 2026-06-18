@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { queueCompanyIntelForLeads, type CompanyIntelLeadInput } from "./company-intel";
+import { upsertCustomerAccountsFromLeads, type CustomerUpsertResult } from "./customers";
 import type { SalesRuntime } from "./sales-runtime";
 
 export interface LeadImportInput {
@@ -20,6 +21,7 @@ export interface LeadImportResult {
     skipped: number;
     jobs: string[];
   };
+  customers: CustomerUpsertResult;
 }
 
 function safeFileName(value: string, fallback: string) {
@@ -136,10 +138,12 @@ export function importWorkspaceLeads(runtime: SalesRuntime, input: LeadImportInp
       format: "csv",
       sideEffects: "local-only",
     });
-    const companyIntel = queueCompanyIntelForLeads(runtime, workspace.id, csvToCompanyIntelLeads(input.csv), {
+    const intelLeads = csvToCompanyIntelLeads(input.csv);
+    const customers = upsertCustomerAccountsFromLeads(workspace.id, intelLeads);
+    const companyIntel = queueCompanyIntelForLeads(runtime, workspace.id, intelLeads, {
       source: "lead-import",
     });
-    return { workspaceId: workspace.id, path: target, count, format: "csv", companyIntel };
+    return { workspaceId: workspace.id, path: target, count, format: "csv", companyIntel, customers };
   }
 
   if (Array.isArray(input.json)) {
@@ -154,10 +158,12 @@ export function importWorkspaceLeads(runtime: SalesRuntime, input: LeadImportInp
       format: "json",
       sideEffects: "local-only",
     });
-    const companyIntel = queueCompanyIntelForLeads(runtime, workspace.id, input.json.map(rowToCompanyIntelLead), {
+    const intelLeads = input.json.map(rowToCompanyIntelLead);
+    const customers = upsertCustomerAccountsFromLeads(workspace.id, intelLeads);
+    const companyIntel = queueCompanyIntelForLeads(runtime, workspace.id, intelLeads, {
       source: "lead-import",
     });
-    return { workspaceId: workspace.id, path: target, count: input.json.length, format: "json", companyIntel };
+    return { workspaceId: workspace.id, path: target, count: input.json.length, format: "json", companyIntel, customers };
   }
 
   throw new Error("Provide csv text or json lead rows to import.");

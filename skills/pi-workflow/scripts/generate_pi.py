@@ -4,11 +4,31 @@
 import sys
 import json
 import argparse
+import html
 from pathlib import Path
 from datetime import datetime
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+try:
+    from bank_config import get_primary_bank
+except Exception:
+    get_primary_bank = None
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from pi_generator import generate_pi_excel
+
+def escape_html(value):
+    return html.escape(str(value or ''), quote=True)
+
+def load_primary_bank_info():
+    if get_primary_bank:
+        bank = get_primary_bank(throw_error=False)
+        if bank:
+            return bank
+    raise RuntimeError("Primary bank configuration is required for PI generation")
 
 def generate_pi_html(output_path, data):
     """生成传统风格 PI HTML"""
@@ -77,13 +97,7 @@ def generate_pi_html(output_path, data):
     total = subtotal + freight + tax
     
     # 银行信息
-    bank_info = data.get('bank_info', {
-        'beneficiary': 'FARREACH ELECTRONIC CO LIMITED',
-        'bank_name': 'HSBC Hong Kong',
-        'account_no': '411-758097-838',
-        'swift_code': 'HSBCHKHHHKH',
-        'bank_address': 'No.1 Queen\'s Road Central,Central, Hong Kong'
-    })
+    bank_info = data.get('bank_info') or load_primary_bank_info()
     
     # 条款
     terms_data = data.get('terms', {})
@@ -96,7 +110,7 @@ def generate_pi_html(output_path, data):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proforma Invoice - {pi_no}</title>
+    <title>Proforma Invoice - {escape_html(pi_no)}</title>
     <style>
         body {{
             font-family: 'Times New Roman', Times, serif;
@@ -193,14 +207,14 @@ def generate_pi_html(output_path, data):
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="flex: 1;">
                     <div class="title" style="text-align: left; font-size: 16pt;">
-                        {company_name}
+                        {escape_html(company_name)}
                     </div>
                     <div style="margin-top: 10px; font-size: 10pt;">
-                        <strong>Address:</strong> {company_address}<br>
-                        <strong>Tel:</strong> {company_phone} &nbsp;|&nbsp; 
-                        <strong>Fax:</strong> {company_fax}<br>
-                        <strong>Email:</strong> {company_email}<br>
-                        <strong>Website:</strong> {company_website}
+                        <strong>Address:</strong> {escape_html(company_address)}<br>
+                        <strong>Tel:</strong> {escape_html(company_phone)} &nbsp;|&nbsp; 
+                        <strong>Fax:</strong> {escape_html(company_fax)}<br>
+                        <strong>Email:</strong> {escape_html(company_email)}<br>
+                        <strong>Website:</strong> {escape_html(company_website)}
                     </div>
                 </div>
                 <div style="text-align: right; border: 2px solid #000; padding: 10px; margin-left: 20px;">
@@ -214,15 +228,15 @@ def generate_pi_html(output_path, data):
             <table style="width: 100%; margin-bottom: 15px;">
                 <tr>
                     <td style="width: 20%;" class="bold">PI No:</td>
-                    <td style="width: 30%;">{pi_no}</td>
+                    <td style="width: 30%;">{escape_html(pi_no)}</td>
                     <td style="width: 20%;" class="bold">Date:</td>
-                    <td style="width: 30%;">{pi_date}</td>
+                    <td style="width: 30%;">{escape_html(pi_date)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Valid Until:</td>
-                    <td>{valid_until}</td>
+                    <td>{escape_html(valid_until)}</td>
                     <td class="bold">Currency:</td>
-                    <td>{currency}</td>
+                    <td>{escape_html(currency)}</td>
                 </tr>
             </table>
         </div>
@@ -233,18 +247,18 @@ def generate_pi_html(output_path, data):
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 20%;" class="bold">Company:</td>
-                    <td>{customer_name}</td>
+                    <td>{escape_html(customer_name)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Attn:</td>
-                    <td>{customer_contact}</td>
+                    <td>{escape_html(customer_contact)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Address:</td>
-                    <td>{customer_address}</td>
+                    <td>{escape_html(customer_address)}</td>
                 </tr>
-                {f'<tr><td class="bold">Email:</td><td>{customer_email}</td></tr>' if customer_email else ''}
-                {f'<tr><td class="bold">Phone:</td><td>{customer_phone}</td></tr>' if customer_phone else ''}
+                {f'<tr><td class="bold">Email:</td><td>{escape_html(customer_email)}</td></tr>' if customer_email else ''}
+                {f'<tr><td class="bold">Phone:</td><td>{escape_html(customer_phone)}</td></tr>' if customer_phone else ''}
             </table>
         </div>
 
@@ -275,14 +289,14 @@ def generate_pi_html(output_path, data):
         # 规格显示
         spec_text = ''
         if specification:
-            specs = [s.strip() for s in specification.split(',') if s.strip()]
+            specs = [escape_html(s.strip()) for s in specification.split(',') if s.strip()]
             spec_text = '<br><small>' + ', '.join(specs) + '</small>'
         
         html_content += f'''
                     <tr>
                         <td class="center">{idx}</td>
                         <td>
-                            <strong>{description}</strong>{spec_text}
+                            <strong>{escape_html(description)}</strong>{spec_text}
                         </td>
                         <td class="center">{quantity}</td>
                         <td class="right">${unit_price:.2f}</td>
@@ -320,19 +334,19 @@ def generate_pi_html(output_path, data):
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 30%;" class="bold">Payment Method:</td>
-                    <td>{payment_terms}</td>
+                    <td>{escape_html(payment_terms)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Delivery Time:</td>
-                    <td>{delivery}</td>
+                    <td>{escape_html(delivery)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Port of Loading:</td>
-                    <td>{incoterms}</td>
+                    <td>{escape_html(incoterms)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Packaging:</td>
-                    <td>{packaging}</td>
+                    <td>{escape_html(packaging)}</td>
                 </tr>
             </table>
         </div>
@@ -344,23 +358,23 @@ def generate_pi_html(output_path, data):
                 <table style="width: 100%; border: none;">
                     <tr>
                         <td style="width: 25%; border: none;" class="bold">Beneficiary:</td>
-                        <td style="border: none;">{bank_info.get('beneficiary', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('beneficiary', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">Bank Name:</td>
-                        <td style="border: none;">{bank_info.get('bank_name', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('bank_name', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">Account No:</td>
-                        <td style="border: none;">{bank_info.get('account_no', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('account_no', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">SWIFT Code:</td>
-                        <td style="border: none;">{bank_info.get('swift_code', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('swift_code', ''))}</td>
                     </tr>
                     <tr>
                         <td style="border: none;" class="bold">Bank Address:</td>
-                        <td style="border: none;">{bank_info.get('bank_address', '')}</td>
+                        <td style="border: none;">{escape_html(bank_info.get('bank_address', ''))}</td>
                     </tr>
                 </table>
             </div>
@@ -372,15 +386,15 @@ def generate_pi_html(output_path, data):
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 30%;" class="bold">Payment:</td>
-                    <td>{payment_terms}</td>
+                    <td>{escape_html(payment_terms)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Delivery:</td>
-                    <td>{delivery}</td>
+                    <td>{escape_html(delivery)}</td>
                 </tr>
                 <tr>
                     <td class="bold">Packaging:</td>
-                    <td>{packaging}</td>
+                    <td>{escape_html(packaging)}</td>
                 </tr>
             </table>
         </div>
@@ -457,11 +471,11 @@ def main():
                 'currency': 'USD',
                 'freight': 350.00,
                 'bank_info': {
-                    'beneficiary': 'FARREACH ELECTRONIC CO LIMITED',
-                    'bank_name': 'HSBC Hong Kong',
-                    'account_no': '411-758097-838',
-                    'swift_code': 'HSBCHKHHHKH',
-                    'bank_address': 'No.1 Queen\'s Road Central,Central, Hong Kong'
+                    'beneficiary': 'YOUR COMPANY NAME',
+                    'bank_name': 'YOUR ACTIVE BANK NAME',
+                    'account_no': 'YOUR_ACCOUNT_NUMBER',
+                    'swift_code': 'YOUR_SWIFT_CODE',
+                    'bank_address': 'YOUR BANK ADDRESS'
                 }
             }
         

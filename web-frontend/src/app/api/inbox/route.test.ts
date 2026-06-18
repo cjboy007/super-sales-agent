@@ -41,6 +41,17 @@ function request(url: string): NextRequest {
   return new NextRequest(url);
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 describe("/api/inbox route", () => {
   it("serves local inbox memory without auditing an external fetch when the bridge is disabled", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
@@ -53,6 +64,7 @@ describe("/api/inbox route", () => {
     expect(json.total).toBeGreaterThan(0);
     expect(json.stats.pending_decision).toBeGreaterThan(0);
     expect(json.sideEffect).toBeUndefined();
+    expect(json.action).toBeUndefined();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -66,13 +78,14 @@ describe("/api/inbox route", () => {
 
     expect(json.success).toBe(true);
     expect(json.total).toBeGreaterThan(0);
-    expect(json.sideEffect).toMatchObject({
-      kind: "imap.fetch",
-      workspaceId: "farreach",
+    expect(json.action).toMatchObject({
+      title: "Mailbox sync",
       status: "blocked",
-      realExecutionEnabled: false,
+      blocked: true,
     });
-    expect(json.sideEffect.reason).toContain("SSA_ENABLE_REAL_IMAP=true");
+    expect(json.action.reason).toContain("explicit approval");
+    expect(json.action.reason).not.toContain("SSA_ENABLE_REAL_IMAP");
+    expectNoInternalActionFields(json);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -114,12 +127,12 @@ describe("/api/inbox route", () => {
       success: true,
       total: 1,
       data: [{ id: "bridge-email-1" }],
-      sideEffect: {
-        kind: "imap.fetch",
-        workspaceId: "farreach",
+      action: {
+        title: "Mailbox sync",
         status: "allowed",
-        realExecutionEnabled: true,
+        blocked: false,
       },
     });
+    expectNoInternalActionFields(json);
   });
 });

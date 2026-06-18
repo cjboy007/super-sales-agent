@@ -28,6 +28,7 @@ import {
   updateSettings as updateRuntimeSettings,
 } from "./configuration";
 import { getDashboardOverview } from "./dashboard";
+import { executeCrmWrite, requestCrmWrite, type CrmWriteInput } from "./crm-write";
 import {
   generateQuotationDocuments,
   generateTradeDocuments,
@@ -37,6 +38,7 @@ import {
   type QuotationGenerationInput,
   type TradeDocumentGenerationInput,
 } from "./documents";
+import { synthesizeIntakeDocuments, type SynthesizeIntakeInput } from "./document-synthesis";
 import { testEmailConnection, type EmailConnectionTestInput } from "./email-connection";
 import { sendEmailThroughRuntime, type EmailSendInput } from "./email-send";
 import { openRuntimeFile, previewRuntimeFile, serveRuntimeFile } from "./files";
@@ -52,23 +54,31 @@ import {
 import { refreshIntelligenceFeeds } from "./intelligence-collector";
 import { listIntakeSessions, processIntake, type IntakeInput } from "./intake";
 import {
+  collectCompanyIntelEnrichment,
   queueCompanyIntel,
   readCompanyIntel,
   writeCompanyIntelDossier,
+  type CompanyIntelEnrichment,
   type CompanyIntelLeadInput,
 } from "./company-intel";
 import { importWorkspaceLeads, type LeadImportInput } from "./lead-import";
 import { runLlmTask } from "./llm";
+import { listLlmTaskPolicies, getLlmTaskPolicy } from "./llm-policy";
 import { getSalesRuntimeManifest } from "./manifest";
 import { rebuildMemoryIndex } from "./memory-index";
 import { createOperatorCommand } from "./operator-commands";
 import { getSentLogSnapshot, runtimeEventsToAgentEvents } from "./activity-stream";
 import { createSalesMemory, type SalesMemory } from "./sales-memory";
 import { listSalesPacks } from "./sales-packs";
+import { buildSalesWorldModel } from "./sales-world-model";
+import { getSalesTool, listSalesTools } from "./sales-tool-registry";
+import { runSalesLoopDrill, type SalesLoopDrillInput } from "./sales-loop-drills";
 import {
   approveSideEffectDecision,
   getSideEffectDecision,
   listSideEffectDecisions,
+  recordSideEffectExecutionFailure,
+  recordSideEffectExecutionSuccess,
   rejectSideEffectDecision,
   requestSideEffect,
   retrySideEffectDecision,
@@ -142,6 +152,31 @@ export class SalesRuntime {
     return getSalesRuntimeManifest();
   }
 
+  getSalesWorldModel(workspaceId: WorkspaceId) {
+    const workspace = this.getWorkspace(workspaceId);
+    return buildSalesWorldModel(this, workspace.id);
+  }
+
+  listSalesTools() {
+    return listSalesTools();
+  }
+
+  getSalesTool(id: string) {
+    return getSalesTool(id);
+  }
+
+  listLlmTaskPolicies() {
+    return listLlmTaskPolicies();
+  }
+
+  getLlmTaskPolicy(task: LlmRequest["task"]) {
+    return getLlmTaskPolicy(task);
+  }
+
+  runSalesLoopDrill(input: SalesLoopDrillInput) {
+    return runSalesLoopDrill(this, input);
+  }
+
   getMaskedSettings() {
     return getMaskedSettings();
   }
@@ -206,6 +241,15 @@ export class SalesRuntime {
       ...input,
       workspaceId: this.getWorkspace(input.workspaceId).id,
     });
+  }
+
+  requestCrmWrite(input: CrmWriteInput) {
+    const workspace = this.getWorkspace(input.workspaceId);
+    return requestCrmWrite(this, { ...input, workspaceId: workspace.id });
+  }
+
+  executeCrmWrite(input: CrmWriteInput) {
+    return executeCrmWrite(this, input);
   }
 
   testEmailConnection(input: EmailConnectionTestInput) {
@@ -299,6 +343,27 @@ export class SalesRuntime {
     return decision;
   }
 
+  recordSideEffectExecuted(id: string, input: { result?: Record<string, unknown> } = {}): SideEffectDecision {
+    const decision = recordSideEffectExecutionSuccess(id, input);
+    this.recordEvent("side_effect.executed", decision.workspaceId, {
+      decisionId: decision.id,
+      kind: decision.kind,
+      status: decision.status,
+    });
+    return decision;
+  }
+
+  recordSideEffectFailed(id: string, input: { error: string; canRetry?: boolean }): SideEffectDecision {
+    const decision = recordSideEffectExecutionFailure(id, input);
+    this.recordEvent("side_effect.execution_failed", decision.workspaceId, {
+      decisionId: decision.id,
+      kind: decision.kind,
+      status: decision.status,
+      canRetry: decision.execution?.canRetry ?? true,
+    });
+    return decision;
+  }
+
   requestDocumentGeneration(request: DocumentGenerationRequest): SideEffectDecision {
     const workspace = this.getWorkspace(request.workspaceId);
     const decision = requestDocumentGeneration({ ...request, workspaceId: workspace.id });
@@ -381,6 +446,11 @@ export class SalesRuntime {
     return processIntake(this, { ...input, project: workspace.id });
   }
 
+  synthesizeIntake(input: SynthesizeIntakeInput) {
+    const workspace = this.getWorkspace(input.workspaceId);
+    return synthesizeIntakeDocuments(this, { ...input, workspaceId: workspace.id });
+  }
+
   async refreshIntelligence(workspaceId = "farreach") {
     const workspace = this.getWorkspace(workspaceId);
     const result = await refreshIntelligenceFeeds(workspace.id);
@@ -413,11 +483,17 @@ export class SalesRuntime {
     return readCompanyIntel(this, workspace.id, input.lead);
   }
 
-  completeCompanyIntel(input: { workspaceId: string; lead: CompanyIntelLeadInput; jobId?: string; note?: string }) {
+  async collectCompanyIntel(input: { workspaceId: string; lead: CompanyIntelLeadInput }) {
+    this.getWorkspace(input.workspaceId);
+    return collectCompanyIntelEnrichment(input.lead);
+  }
+
+  completeCompanyIntel(input: { workspaceId: string; lead: CompanyIntelLeadInput; jobId?: string; note?: string; enrichment?: CompanyIntelEnrichment }) {
     const workspace = this.getWorkspace(input.workspaceId);
     return writeCompanyIntelDossier(this, workspace.id, input.lead, {
       jobId: input.jobId,
       note: input.note,
+      enrichment: input.enrichment,
     });
   }
 
@@ -448,12 +524,12 @@ export class SalesRuntime {
       .slice(0, limit);
   }
 
-  listActivityEvents(limit = 20) {
-    return runtimeEventsToAgentEvents(this.listEvents(limit), limit);
+  listActivityEvents(limit = 20, workspaceId?: WorkspaceId) {
+    return runtimeEventsToAgentEvents(this.listEvents(limit, workspaceId), limit);
   }
 
-  getSentLogSnapshot(limit = 10) {
-    return getSentLogSnapshot(limit);
+  getSentLogSnapshot(limit = 10, workspaceId?: WorkspaceId) {
+    return getSentLogSnapshot(limit, workspaceId);
   }
 
   snapshot(): SalesRuntimeSnapshot {

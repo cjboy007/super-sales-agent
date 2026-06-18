@@ -29,6 +29,7 @@ class BankConfig:
     _instance = None
     _config = None
     _config_path = None
+    _config_mtime = None
     
     def __new__(cls):
         if cls._instance is None:
@@ -36,6 +37,15 @@ class BankConfig:
         return cls._instance
     
     def __init__(self):
+        env_path = os.environ.get('SSA_BANK_ACCOUNTS_PATH')
+        if env_path:
+            env_config_path = Path(env_path)
+            if self._config_path != env_config_path:
+                self._config_path = env_config_path
+                self._config = None
+                self._config_mtime = None
+            return
+
         if self._config_path is None:
             # 查找配置文件（支持多级目录）
             possible_paths = [
@@ -62,10 +72,24 @@ class BankConfig:
         Returns:
             配置字典，加载失败时返回 None
         """
+        env_path = os.environ.get('SSA_BANK_ACCOUNTS_PATH')
+        if env_path:
+            env_config_path = Path(env_path)
+            if self._config_path != env_config_path:
+                self._config_path = env_config_path
+                self._config = None
+                self._config_mtime = None
+
         if self._config is not None:
-            return self._config
+            try:
+                current_mtime = self._config_path.stat().st_mtime
+                if current_mtime == self._config_mtime:
+                    return self._config
+            except OSError:
+                pass
         
         try:
+            self._config_mtime = self._config_path.stat().st_mtime
             with open(self._config_path, 'r', encoding='utf-8') as f:
                 self._config = json.load(f)
                 return self._config
@@ -86,6 +110,7 @@ class BankConfig:
     def reload(self) -> Optional[Dict[str, Any]]:
         """重新加载配置（用于运行时配置更新）"""
         self._config = None
+        self._config_mtime = None
         return self.load(throw_error=True)
     
     def get_primary_bank(self, throw_error: bool = True) -> Optional[Dict[str, Any]]:

@@ -10,7 +10,7 @@
  *
  * ⭐⭐ 修复（2026-04-25）：
  * - Hero Pumps 不再依赖 Farreach 的 smtp.js CLI
- * - 直接用 nodemailer 发送，读取 hero-pumps/.env
+ * - 直接用 nodemailer 发送，读取外部 SSA profile
  * - 纯文本正文正确转为 HTML（\n → <br>）
  * - 发件人固定为 "Hero Pump" <sales@heropumps.com.cn>
  * - 跟进模板增强：每个阶段有不同切入角度，支持客户个性化信息
@@ -23,17 +23,30 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
 const { SalesState } = require('../shared/sales-state-db');
-const nodemailer = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/nodemailer');
-const dotenv = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/dotenv');
 const { verifyLegacyOutboundSafety } = require('../skills/imap-smtp-email/lib/outbound-safety');
+const { loadSsaEmailEnv, parseEnvFile, requireSmtpEnv } = require('../shared/ssa-secrets');
+const REPO_ROOT = path.resolve(__dirname, '..');
+const execFileAsync = promisify(execFile);
+
+function requireSkillDependency(name) {
+  try {
+    return require(name);
+  } catch {
+    return require(path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'node_modules', name));
+  }
+}
+
+const nodemailer = requireSkillDependency('nodemailer');
 
 // ==================== 配置 ====================
-const SIGNATURE_PATH = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/hero-pumps/config/signatures/signature-jordan.html';
+const SIGNATURE_PATH = path.join(REPO_ROOT, 'hero-pumps', 'config', 'signatures', 'signature-jordan.html');
 
 const PROJECTS = {
   farreach: {
-    SMTP_CLI: '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/scripts/smtp.js',
+    SMTP_CLI: path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'scripts', 'smtp.js'),
     SIGNATURE: 'jordan',
     FOLLOW_UP_INTERVAL_MIN: 2 * 60 * 1000,
     FOLLOW_UP_INTERVAL_MAX: 3 * 60 * 1000,
@@ -56,9 +69,8 @@ const PROJECTS = {
   },
   'hero-pumps': {
     // ⭐ 2026-04-25 修复：不再使用 Farreach smtp.js CLI
-    // 直接用 nodemailer 发送，读取 hero-pumps/.env
+    // 直接用 nodemailer 发送，读取外部 SSA profile
     SMTP_CLI: null,  // deprecated
-    ENV_PATH: path.join(__dirname, '../hero-pumps/.env'),
     SIGNATURE_PATH: SIGNATURE_PATH,
     SMTP_FROM: '"Hero Pump" <sales@heropumps.com.cn>',
     FOLLOW_UP_INTERVAL_MIN: 2 * 60 * 1000,
@@ -81,6 +93,24 @@ const PROJECTS = {
     }
   }
 };
+
+function buildFarreachSmtpInvocation({ smtpCli, signature, email, subject, body }) {
+  return {
+    command: process.execPath,
+    args: [
+      smtpCli,
+      'send',
+      '--to',
+      email,
+      '--subject',
+      subject,
+      '--body',
+      body,
+      '--signature',
+      signature,
+    ],
+  };
+}
 
 // ==================== 日志 ====================
 class Logger {
@@ -171,10 +201,8 @@ let heroTransporter = null;
 function getHeroTransporter() {
   if (heroTransporter) return heroTransporter;
 
-  const envPath = PROJECTS['hero-pumps'].ENV_PATH;
-  if (fs.existsSync(envPath)) {
-    dotenv.config({ path: envPath });
-  }
+  loadSsaEmailEnv({ profile: 'hero-pumps' });
+  requireSmtpEnv();
 
   heroTransporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.qiye.aliyun.com',
@@ -215,7 +243,7 @@ class FollowUpSender {
       workspaceId: project,
       to: email,
       subject,
-      humanApproval: true,
+      approvalId: process.env.SSA_RUNTIME_APPROVAL_ID,
     });
 
     // ⭐ Hero Pumps: 直接用 nodemailer 发送，不再调用 Farreach smtp.js
@@ -225,26 +253,20 @@ class FollowUpSender {
 
     // Farreach: 保持原有 CLI 调用
     try {
-      let cmd = `node "${config.SMTP_CLI}" send --to "${email}" --subject "${subject}" --body "${body.replace(/"/g, '\\"')}" --signature ${config.SIGNATURE}`;
-      
+      const invocation = buildFarreachSmtpInvocation({
+        smtpCli: config.SMTP_CLI,
+        signature: config.SIGNATURE,
+        email,
+        subject,
+        body,
+      });
       let execOptions = {};
       if (config.ENV_PATH && fs.existsSync(config.ENV_PATH)) {
-        const envContent = fs.readFileSync(config.ENV_PATH, 'utf8');
-        const envVars = {};
-        envContent.split('\n').forEach(line => {
-          const trimmed = line.trim();
-          if (trimmed && !trimmed.startsWith('#')) {
-            const [key, ...valueParts] = trimmed.split('=');
-            envVars[key.trim()] = valueParts.join('=').trim();
-          }
-        });
+        const envVars = parseEnvFile(config.ENV_PATH);
         execOptions.env = { ...process.env, ...envVars };
       }
 
-      const { exec } = require('child_process');
-      const { promisify } = require('util');
-      const execAsync = promisify(exec);
-      const { stdout, stderr } = await execAsync(cmd, execOptions);
+      const { stdout, stderr } = await execFileAsync(invocation.command, invocation.args, execOptions);
       logger.success(`已发送跟进: ${email}`, { subject });
       return { success: true, stdout, stderr };
     } catch(e) {
@@ -424,4 +446,4 @@ if (require.main === module) {
   main().catch(e => { logger.error('程序异常', { error: e.message }); process.exit(1); });
 }
 
-module.exports = { FollowUpEngine, HERO_PUMP_TEMPLATES };
+module.exports = { FollowUpEngine, HERO_PUMP_TEMPLATES, buildFarreachSmtpInvocation };

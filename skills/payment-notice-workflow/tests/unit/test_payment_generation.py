@@ -39,9 +39,9 @@ def load_fixture(filename):
             },
             "bank": {
                 "beneficiary": "FARREACH ELECTRONIC CO LIMITED",
-                "bank_name": "HSBC Hong Kong",
-                "account_no": "411-758097-838",
-                "swift_code": "HSBCHKHHHKH"
+                "bank_name": "TEST BANK",
+                "account_no": "TEST_ACCOUNT_NUMBER",
+                "swift_code": "TESTSWIFT"
             }
         }
         with open(filepath, 'w') as f:

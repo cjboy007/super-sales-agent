@@ -193,29 +193,35 @@ export function BattleBadge({
 
 export function CommandButton({
   variant = "secondary",
+  loading = false,
   className,
   children,
   ...props
 }: {
   variant?: "primary" | "secondary" | "danger" | "ghost";
+  loading?: boolean;
   children: React.ReactNode;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const variants = {
-    primary: "border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-500",
-    secondary: "border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-600",
-    danger: "border-red-600 bg-red-600/70 text-white hover:bg-red-500",
-    ghost: "border-slate-800 bg-transparent text-slate-400 hover:text-slate-200",
+    primary: "border-emerald-600 bg-emerald-600 text-white hover:border-emerald-400 hover:bg-emerald-500 active:bg-emerald-700 focus-visible:ring-emerald-300/70",
+    secondary: "border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-500 hover:bg-slate-700 hover:text-white active:bg-slate-900 focus-visible:ring-slate-300/60",
+    danger: "border-red-600 bg-red-600/70 text-white hover:border-red-400 hover:bg-red-500 active:bg-red-700 focus-visible:ring-red-300/70",
+    ghost: "border-slate-800 bg-transparent text-slate-400 hover:border-slate-600 hover:bg-slate-800/60 hover:text-slate-100 active:bg-slate-900 focus-visible:ring-slate-300/50",
   };
+  const disabled = Boolean(props.disabled || loading);
 
   return (
     <button
+      {...props}
       className={cx(
-        "h-[var(--ui-button-height)] rounded-md border px-4 text-[13px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-40",
+        "inline-flex h-[var(--ui-button-height)] min-w-0 items-center justify-center gap-2 rounded-md border px-4 text-[13px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-800 disabled:bg-slate-900/70 disabled:text-slate-600 disabled:opacity-70",
         variants[variant],
         className
       )}
-      {...props}
+      aria-busy={loading || undefined}
+      disabled={disabled}
     >
+      {loading ? <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" aria-hidden="true" /> : null}
       {children}
     </button>
   );
@@ -229,7 +235,7 @@ export function InputField({
   return (
     <input
       className={cx(
-        "h-[var(--ui-control-height)] rounded-md border border-slate-700 bg-slate-950 px-3 text-[13px] text-slate-200 outline-none placeholder:text-slate-600 focus:border-emerald-500",
+        "h-[var(--ui-control-height)] rounded-md border border-slate-700 bg-slate-950 px-3 text-[13px] text-slate-200 outline-none transition placeholder:text-slate-600 hover:border-slate-500 focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400/30 disabled:cursor-not-allowed disabled:border-slate-800 disabled:bg-slate-900 disabled:text-slate-600",
         mono && "font-mono",
         className
       )}
@@ -246,7 +252,7 @@ export function SelectField({
   return (
     <select
       className={cx(
-        "h-[var(--ui-control-height)] rounded-md border border-slate-700 bg-slate-950 px-3 text-[13px] text-slate-200 outline-none focus:border-emerald-500",
+        "h-[var(--ui-control-height)] rounded-md border border-slate-700 bg-slate-950 px-3 text-[13px] text-slate-200 outline-none transition hover:border-slate-500 focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400/30 disabled:cursor-not-allowed disabled:border-slate-800 disabled:bg-slate-900 disabled:text-slate-600",
         className
       )}
       {...props}
@@ -264,7 +270,7 @@ export function TextAreaField({
   return (
     <textarea
       className={cx(
-        "rounded-md border border-slate-700 bg-slate-950 px-3 py-2.5 text-[13px] leading-5 text-slate-200 outline-none placeholder:text-slate-600 focus:border-emerald-500",
+        "rounded-md border border-slate-700 bg-slate-950 px-3 py-2.5 text-[13px] leading-5 text-slate-200 outline-none transition placeholder:text-slate-600 hover:border-slate-500 focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400/30 disabled:cursor-not-allowed disabled:border-slate-800 disabled:bg-slate-900 disabled:text-slate-600",
         mono && "font-mono",
         className
       )}
@@ -298,10 +304,159 @@ export function StatCell({
   );
 }
 
-export function EmptyState({ label }: { label: string }) {
+export type AccessRequiredIssue = "beta_required" | "workspace_denied";
+
+/**
+ * Lightweight top-banner for access-gated pages.
+ * Shows a single recovery action; page content remains visible (dimmed) below.
+ */
+export function AccessBanner({
+  issue,
+  next,
+}: {
+  issue: AccessRequiredIssue;
+  next: string;
+}) {
+  const denied = issue === "workspace_denied";
+  const href = `/beta-access?next=${encodeURIComponent(next)}`;
+
   return (
-    <div className="px-3 py-10 text-center font-mono text-xs text-slate-600">
-      {label}
+    <div className="mx-4 mt-4 rounded-md border border-amber-500/25 bg-amber-500/8 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="inline-flex h-6 items-center gap-1.5 rounded bg-amber-500/15 px-2 font-mono text-[10px] font-semibold uppercase text-amber-300 ring-1 ring-amber-500/25">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+          <BattleText
+            en={denied ? "Access Denied" : "Access Required"}
+            zh={denied ? "权限不足" : "需要访问口令"}
+          />
+        </span>
+        <p className="min-w-0 flex-1 text-xs text-amber-100/85">
+          <BattleText
+            en={denied ? "Your access pass does not cover this module." : "Save your beta access pass in Settings to unlock this module."}
+            zh={denied ? "当前访问口令不能打开此模块。" : "请在设置中保存访问口令以解锁此模块。"}
+          />
+        </p>
+        <a
+          href={href}
+          className="inline-flex h-7 shrink-0 items-center rounded-md border border-amber-300/40 bg-amber-300 px-3 text-[11px] font-semibold text-slate-950 transition hover:bg-amber-200"
+        >
+          <BattleText en="Save Access Pass" zh="保存访问口令" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * @deprecated Use AccessBanner instead. Kept for backward compatibility during migration.
+ */
+export function AccessRequiredState({
+  issue,
+  next,
+  title,
+  zhTitle,
+}: {
+  issue: AccessRequiredIssue;
+  next: string;
+  title: string;
+  zhTitle: string;
+}) {
+  const denied = issue === "workspace_denied";
+  const href = `/beta-access?next=${encodeURIComponent(next)}`;
+
+  return (
+    <div className="px-4 py-10">
+      <div className="mx-auto max-w-xl rounded-md border border-amber-500/30 bg-amber-500/10 px-5 py-6 text-center">
+        <BattleBadge tone="amber">
+          {denied ? <BattleText en="Workspace Access" zh="工作区权限" /> : <BattleText en="Beta Access Required" zh="需要内测访问" />}
+        </BattleBadge>
+        <p className="mt-4 text-sm font-semibold text-amber-50">
+          <BattleText
+            en={denied ? `Your current access pass cannot open ${title}.` : `Save your beta access pass before opening ${title}.`}
+            zh={denied ? `当前访问口令不能打开${zhTitle}。` : `请先保存内测访问口令，再打开${zhTitle}。`}
+          />
+        </p>
+        <p className="mt-2 text-xs leading-5 text-amber-100/80">
+          <BattleText
+            en="Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines."
+            zh="访问确认前，客户数据会为安全而隐藏。保存访问口令后，可以继续查看客户、订单和时间线。"
+          />
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <a
+            href={href}
+            className="inline-flex h-9 items-center justify-center rounded-md border border-amber-300/40 bg-amber-300 px-4 text-xs font-semibold text-slate-950 transition hover:bg-amber-200"
+          >
+            <BattleText en="Open Beta Access" zh="打开内测访问" />
+          </a>
+          <a
+            href="/user-guide"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-amber-300/30 bg-slate-950/40 px-4 text-xs font-semibold text-amber-100 transition hover:border-amber-200/50"
+          >
+            <BattleText en="User guide" zh="使用指南" />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function LoadFailedState({
+  title,
+  zhTitle,
+  onRetry,
+}: {
+  title: string;
+  zhTitle: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <div className="px-4 py-10">
+      <div className="mx-auto max-w-xl rounded-md border border-red-500/25 bg-red-500/10 px-5 py-6 text-center">
+        <BattleBadge tone="red">
+          <BattleText en="Load Failed" zh="读取失败" />
+        </BattleBadge>
+        <p className="mt-4 text-sm font-semibold text-red-50">
+          <BattleText en={`We could not load ${title}.`} zh={`${zhTitle}暂时无法读取。`} />
+        </p>
+        <p className="mt-2 text-xs leading-5 text-red-100/75">
+          <BattleText
+            en="Your data is protected while the page recovers. Retry the request or check Operations if the problem continues."
+            zh="页面恢复前会继续保护业务数据。请重试；如果仍失败，再到运维页检查。"
+          />
+        </p>
+        {onRetry ? (
+          <div className="mt-5">
+            <CommandButton variant="danger" onClick={onRetry}>
+              <BattleText en="Retry" zh="重试" />
+            </CommandButton>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export function EmptyState({
+  label,
+  action,
+  actionHref,
+}: {
+  label: string;
+  action?: string;
+  actionHref?: string;
+}) {
+  return (
+    <div className="px-3 py-10 text-center">
+      <p className="font-mono text-xs text-slate-600">{label}</p>
+      {action && actionHref && (
+        <a
+          href={actionHref}
+          className="mt-3 inline-flex h-7 items-center rounded-md border border-slate-700 bg-slate-800/60 px-3 text-[11px] font-semibold text-slate-300 transition hover:border-slate-600 hover:text-slate-100"
+        >
+          {action}
+        </a>
+      )}
     </div>
   );
 }

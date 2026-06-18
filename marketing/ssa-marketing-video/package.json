@@ -1,0 +1,11 @@
+{
+  "name": "ssa-marketing-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.6.108 preview",
+    "check": "npx --yes hyperframes@0.6.108 lint && npx --yes hyperframes@0.6.108 validate && npx --yes hyperframes@0.6.108 inspect",
+    "render": "npx --yes hyperframes@0.6.108 render",
+    "publish": "npx --yes hyperframes@0.6.108 publish"
+  }
+}

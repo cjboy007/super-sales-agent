@@ -40,6 +40,17 @@ function request(url: string, body: Record<string, unknown>): NextRequest {
   });
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 describe("/api/quotations/generate route", () => {
   it("audits and blocks quotation generation by default without running scripts", async () => {
     const { POST } = await import("./route");
@@ -54,12 +65,12 @@ describe("/api/quotations/generate route", () => {
     expect(json.blocked).toBe(true);
     expect(json.quotationNo).toMatch(/^QT-\d{8}-\d{3}$/);
     expect(json.files).toEqual([]);
-    expect(json.sideEffect).toMatchObject({
-      kind: "document.generate",
-      workspaceId: "demo-exporter",
+    expect(json.action).toMatchObject({
+      title: "Document generation",
       status: "blocked",
-      realExecutionEnabled: false,
+      blocked: true,
     });
+    expectNoInternalActionFields(json);
     expect(execFileMock).not.toHaveBeenCalled();
 
     const decisions = JSON.parse(
@@ -72,7 +83,7 @@ describe("/api/quotations/generate route", () => {
     });
   });
 
-  it("runs quotation generation only when real document generation is enabled", async () => {
+  it("blocks quotation generation when real document generation is enabled but approval is missing", async () => {
     process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = "true";
     execFileMock.mockImplementation(
       (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
@@ -90,12 +101,55 @@ describe("/api/quotations/generate route", () => {
 
     expect(json.success).toBe(true);
     expect(json.quotationNo).toMatch(/^QT-\d{8}-\d{3}$/);
-    expect(json.sideEffect).toMatchObject({
-      kind: "document.generate",
-      workspaceId: "demo-exporter",
+    expect(json.blocked).toBe(true);
+    expect(json.action).toMatchObject({
+      title: "Document generation",
       status: "allowed",
-      realExecutionEnabled: true,
+      blocked: false,
+      reason: "Document generation blocked: approved action record is required before files are generated.",
     });
+    expectNoInternalActionFields(json);
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it("runs quotation generation only after explicit enablement and an approved action record", async () => {
+    process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = "true";
+    execFileMock.mockImplementation(
+      (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        callback(null, "generated ok", "");
+      }
+    );
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    const runtime = createSalesRuntime();
+    const approval = runtime.approveSideEffect(runtime.requestDocumentGeneration({
+      workspaceId: "demo-exporter",
+      documentType: "QT",
+      customer: "Example Buyer",
+      payload: {
+        items: [{ name: "Pump", qty: 2, unitPrice: 10 }],
+        terms: "",
+        notes: "",
+      },
+      idempotencyKey: "demo-exporter:document:QT:Example Buyer",
+    }).id, { by: "Wilson", note: "Approved quotation generation." });
+
+    const { POST } = await import("./route");
+    const response = await POST(request("http://localhost/api/quotations/generate?project=demo-exporter", {
+      type: "QT",
+      customer: "Example Buyer",
+      items: [{ name: "Pump", qty: 2, unitPrice: 10 }],
+      decisionId: approval.id,
+    }));
+    const json = await response.json();
+
+    expect(json.success).toBe(true);
+    expect(json.quotationNo).toMatch(/^QT-\d{8}-\d{3}$/);
+    expect(json.action).toMatchObject({
+      title: "Document generation",
+      status: "executed",
+      blocked: false,
+    });
+    expectNoInternalActionFields(json);
     expect(execFileMock).toHaveBeenCalledOnce();
   });
 });

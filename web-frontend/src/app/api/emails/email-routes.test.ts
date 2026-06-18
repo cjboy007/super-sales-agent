@@ -103,10 +103,19 @@ describe("/api/emails routes", () => {
         {
           id: "hero-draft-1",
           subject: "ada",
-          template: "followup-ada.md",
+          status: "draft",
         },
       ],
     });
+    expect(JSON.stringify(drafts)).not.toContain("template");
+    expect(JSON.stringify(drafts)).not.toContain(".md");
+    expect(JSON.stringify(drafts)).not.toContain(tempRoot);
+    expect(JSON.stringify(drafts)).not.toContain("/Users/");
+    expect(JSON.stringify(drafts)).not.toContain(".ssa");
+    expect(JSON.stringify(drafts)).not.toContain("workspaceId");
+    expect(JSON.stringify(drafts)).not.toContain("provider");
+    expect(JSON.stringify(drafts)).not.toContain("jobId");
+    expect(JSON.stringify(drafts)).not.toContain("workflow");
     expect(pending).toEqual({
       success: true,
       data: [

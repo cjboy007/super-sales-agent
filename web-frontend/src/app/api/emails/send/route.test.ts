@@ -24,6 +24,37 @@ function request(body: Record<string, unknown>): NextRequest {
   });
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
+async function approvedEmailDecision(input: { to: string; subject: string; html?: boolean }) {
+  const { createSalesRuntime } = await import("@/lib/runtime");
+  const runtime = createSalesRuntime();
+  const decision = runtime.requestSideEffect({
+    kind: "email.send",
+    workspaceId: "demo-exporter",
+    summary: `Send email to ${input.to}: ${input.subject}`,
+    payload: {
+      to: input.to,
+      subject: input.subject,
+      html: Boolean(input.html),
+    },
+    idempotencyKey: `demo-exporter:email:${input.to}:${input.subject}`,
+  });
+  return runtime.approveSideEffect(decision.id, {
+    by: "Wilson",
+    note: "Approved for real SMTP test.",
+  });
+}
+
 beforeEach(() => {
   vi.resetModules();
   execFileMock.mockReset();
@@ -60,13 +91,13 @@ describe("/api/emails/send route", () => {
       success: true,
       blocked: true,
       detail: "Email captured locally. Real SMTP send is disabled for this runtime.",
-      sideEffect: {
-        kind: "email.send",
-        workspaceId: "demo-exporter",
+      action: {
+        title: "Customer email send",
         status: "blocked",
-        realExecutionEnabled: false,
+        blocked: true,
       },
     });
+    expectNoInternalActionFields(json);
     expect(execFileMock).not.toHaveBeenCalled();
 
     const requests = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "mail", "send-requests.json"), "utf-8"));
@@ -77,7 +108,7 @@ describe("/api/emails/send route", () => {
     });
   });
 
-  it("runs SMTP only when email side effects are explicitly enabled", async () => {
+  it("runs SMTP only when email side effects are explicitly enabled and a side-effect decision is approved", async () => {
     process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
     process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND = "true";
     execFileMock.mockImplementation(
@@ -85,36 +116,57 @@ describe("/api/emails/send route", () => {
         callback(null, "Message-ID: <msg-123>", "");
       }
     );
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Approved quote",
+    });
 
     const { POST } = await import("./route");
     const response = await POST(request({
       to: "buyer@example.com",
       subject: "Approved quote",
       body: "Approved body",
-      humanApproval: {
-        approved: true,
-        approvedBy: "Wilson",
-      },
+      decisionId: decision.id,
     }));
     const json = await response.json();
 
-    expect(json).toEqual({
+    expect(json).toMatchObject({
       success: true,
       messageId: "msg-123",
       detail: "Email sent successfully",
+      action: {
+        actionId: decision.id,
+        status: "executed",
+        blocked: false,
+      },
+    });
+    expectNoInternalActionFields(json);
+    const decisions = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8"));
+    expect(decisions[0]).toMatchObject({
+      id: decision.id,
+      status: "executed",
+      execution: expect.objectContaining({
+        status: "executed",
+        result: expect.objectContaining({
+          messageId: "msg-123",
+          to: "buyer@example.com",
+          subject: "Approved quote",
+        }),
+      }),
     });
     expect(execFileMock).toHaveBeenCalledOnce();
     expect(execFileMock.mock.calls[0][1]).toEqual(expect.arrayContaining([
       "send",
       "--confirm-send",
       "--approval-id",
-      expect.stringMatching(/^ssa-local-/),
+      decision.id,
     ]));
     expect(execFileMock.mock.calls[0][2]).toMatchObject({
       env: expect.objectContaining({
-        SSA_RUNTIME_APPROVAL_ID: expect.stringMatching(/^ssa-local-/),
+        SSA_RUNTIME_APPROVAL_ID: decision.id,
         SSA_RUNTIME_APPROVED_TO: "buyer@example.com",
         SSA_RUNTIME_APPROVED_SUBJECT: "Approved quote",
+        SSA_RUNTIME_APPROVED_BY: "Wilson",
         SSA_RUNTIME_VERIFICATION_STATUS: "unknown",
         SSA_RUNTIME_VERIFICATION_PROVIDER: "hunter",
       }),
@@ -124,6 +176,134 @@ describe("/api/emails/send route", () => {
     expect(sent[0]).toMatchObject({
       email: "buyer@example.com",
       subject: "Approved quote",
+    });
+  });
+
+  it("records SMTP execution failures on the approval record for retry review", async () => {
+    process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
+    process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND = "true";
+    execFileMock.mockImplementation(
+      (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        callback(new Error("SMTP rejected recipient"), "", "550 rejected");
+      }
+    );
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Failing send",
+    });
+
+    const { POST } = await import("./route");
+    const response = await POST(request({
+      to: "buyer@example.com",
+      subject: "Failing send",
+      body: "Approved body",
+      decisionId: decision.id,
+    }));
+    const json = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(json.success).toBe(false);
+    expect(json.error).toContain("SMTP rejected recipient");
+
+    const decisions = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8"));
+    expect(decisions[0]).toMatchObject({
+      id: decision.id,
+      status: "execution_failed",
+      execution: expect.objectContaining({
+        status: "failed",
+        canRetry: true,
+        error: expect.stringContaining("SMTP rejected recipient"),
+      }),
+    });
+  });
+
+  it("reuses an approved retryable failure decision for a later SMTP retry", async () => {
+    process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
+    process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND = "true";
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Retry send",
+    });
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    const runtime = createSalesRuntime();
+    runtime.recordSideEffectFailed(decision.id, {
+      error: "SMTP temporarily unavailable",
+      canRetry: true,
+    });
+    execFileMock.mockImplementation(
+      (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        callback(null, "Message-ID: <msg-retry>", "");
+      }
+    );
+
+    const { POST } = await import("./route");
+    const response = await POST(request({
+      to: "buyer@example.com",
+      subject: "Retry send",
+      body: "Approved body",
+      decisionId: decision.id,
+    }));
+    const json = await response.json();
+
+    expect(json).toMatchObject({
+      success: true,
+      messageId: "msg-retry",
+      action: {
+        actionId: decision.id,
+        status: "executed",
+        blocked: false,
+      },
+    });
+    expect(execFileMock).toHaveBeenCalledOnce();
+
+    const decisions = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8"));
+    expect(decisions[0]).toMatchObject({
+      id: decision.id,
+      status: "executed",
+      execution: expect.objectContaining({
+        status: "executed",
+        result: expect.objectContaining({
+          messageId: "msg-retry",
+        }),
+      }),
+    });
+  });
+
+  it("rolls back the sent-log if recording the final approved send result fails", async () => {
+    process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
+    process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND = "true";
+    execFileMock.mockImplementation(
+      (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        callback(null, "Message-ID: <msg-rollback>", "");
+      }
+    );
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Rollback send log",
+    });
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    const runtime = createSalesRuntime();
+    vi.spyOn(runtime, "recordSideEffectExecuted").mockImplementation(() => {
+      throw new Error("approval store unavailable");
+    });
+
+    await expect(runtime.sendEmail({
+      workspaceId: "demo-exporter",
+      to: "buyer@example.com",
+      subject: "Rollback send log",
+      body: "Approved body",
+      decisionId: decision.id,
+    })).rejects.toThrow("approval store unavailable");
+
+    expect(fs.existsSync(path.join(tempRoot, "companies", "demo-exporter", "mail", "sent-log.json"))).toBe(false);
+    const decisions = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8"));
+    expect(decisions[0]).toMatchObject({
+      id: decision.id,
+      status: "execution_failed",
+      execution: expect.objectContaining({
+        status: "failed",
+        canRetry: true,
+      }),
     });
   });
 
@@ -145,16 +325,17 @@ describe("/api/emails/send route", () => {
         callback(null, "Message-ID: <msg-valid>", "");
       }
     );
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Verified quote",
+    });
 
     const { POST } = await import("./route");
     const response = await POST(request({
       to: "buyer@example.com",
       subject: "Verified quote",
       body: "Approved body",
-      humanApproval: {
-        approved: true,
-        approvedBy: "Wilson",
-      },
+      decisionId: decision.id,
     }));
     const json = await response.json();
 
@@ -171,7 +352,42 @@ describe("/api/emails/send route", () => {
     });
   });
 
-  it("blocks real SMTP when human approval is missing even if real sends are enabled", async () => {
+  it("uses the current real-send flag for approved decisions that were requested while safe mode was on", async () => {
+    process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND = "true";
+    execFileMock.mockImplementation(
+      (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        callback(null, "Message-ID: <msg-late-flag>", "");
+      }
+    );
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Late enabled send",
+    });
+
+    process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
+    const { POST } = await import("./route");
+    const response = await POST(request({
+      to: "buyer@example.com",
+      subject: "Late enabled send",
+      body: "Approved body",
+      decisionId: decision.id,
+    }));
+    const json = await response.json();
+
+    expect(json).toMatchObject({
+      success: true,
+      messageId: "msg-late-flag",
+      detail: "Email sent successfully",
+      action: {
+        actionId: decision.id,
+        status: "executed",
+      },
+    });
+    expectNoInternalActionFields(json);
+    expect(execFileMock).toHaveBeenCalledOnce();
+  });
+
+  it("blocks real SMTP when a side-effect approval record is missing even if the request claims human approval", async () => {
     process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
     process.env.SSA_ALLOW_UNVERIFIED_EMAIL_SEND = "true";
 
@@ -180,13 +396,17 @@ describe("/api/emails/send route", () => {
       to: "buyer@example.com",
       subject: "Needs approval",
       body: "Approved body",
+      humanApproval: {
+        approved: true,
+        approvedBy: "Forged browser payload",
+      },
     }));
     const json = await response.json();
 
     expect(json).toMatchObject({
       success: true,
       blocked: true,
-      detail: "Email blocked: human approval is required before real customer send.",
+      detail: "Email blocked: approved side-effect decision is required before real customer send.",
     });
     expect(execFileMock).not.toHaveBeenCalled();
 
@@ -194,22 +414,23 @@ describe("/api/emails/send route", () => {
     expect(requests[0]).toMatchObject({
       email: "buyer@example.com",
       subject: "Needs approval",
-      status: "blocked_missing_approval",
+      status: "blocked_missing_approval_record",
     });
   });
 
   it("blocks real SMTP when verification is missing even if email side effects are enabled", async () => {
     process.env.SSA_ENABLE_REAL_EMAIL_SEND = "true";
+    const decision = await approvedEmailDecision({
+      to: "buyer@example.com",
+      subject: "Approved quote",
+    });
 
     const { POST } = await import("./route");
     const response = await POST(request({
       to: "buyer@example.com",
       subject: "Approved quote",
       body: "Approved body",
-      humanApproval: {
-        approved: true,
-        approvedBy: "Wilson",
-      },
+      decisionId: decision.id,
     }));
     const json = await response.json();
 
@@ -229,6 +450,17 @@ describe("/api/emails/send route", () => {
       email: "buyer@example.com",
       subject: "Approved quote",
       status: "blocked_verification_unknown",
+    });
+
+    const decisions = JSON.parse(fs.readFileSync(path.join(tempRoot, "companies", "demo-exporter", "approvals", "side-effect-decisions.json"), "utf-8"));
+    expect(decisions[0]).toMatchObject({
+      id: decision.id,
+      status: "execution_failed",
+      execution: expect.objectContaining({
+        status: "failed",
+        canRetry: true,
+        error: expect.stringContaining("recipient verification is unknown"),
+      }),
     });
   });
 });

@@ -12,6 +12,8 @@ vi.mock("child_process", async (importOriginal) => ({
 }));
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
+const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
+const originalLocalGateway = process.env.SSA_LOCAL_GATEWAY;
 let tempRoot = "";
 
 beforeEach(() => {
@@ -25,12 +27,19 @@ afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
 
+  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
+  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
+
+  if (originalLocalGateway === undefined) delete process.env.SSA_LOCAL_GATEWAY;
+  else process.env.SSA_LOCAL_GATEWAY = originalLocalGateway;
+
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function requestFor(filePath: string, project = "farreach"): NextRequest {
+function requestFor(filePath: string, project = "farreach", token?: string): NextRequest {
   return new NextRequest(`http://localhost/api/files/open?project=${encodeURIComponent(project)}`, {
     method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     body: JSON.stringify({ path: filePath }),
   });
 }
@@ -52,6 +61,14 @@ describe("/api/files/open route", () => {
 
     expect(response.status).toBe(200);
     expect(json).toMatchObject({ success: true, fileName: "QT-20260512-001.html" });
+    expect(json).not.toHaveProperty("path");
+    expect(JSON.stringify(json)).not.toContain(tempRoot);
+    expect(JSON.stringify(json)).not.toContain("/Users/");
+    expect(JSON.stringify(json)).not.toContain(".ssa");
+    expect(JSON.stringify(json)).not.toContain("workspaceId");
+    expect(JSON.stringify(json)).not.toContain("provider");
+    expect(JSON.stringify(json)).not.toContain("jobId");
+    expect(JSON.stringify(json)).not.toContain("workflow");
     expect(execFileMock).toHaveBeenCalledOnce();
   });
 
@@ -66,6 +83,29 @@ describe("/api/files/open route", () => {
 
     expect(response.status).toBe(403);
     expect(json.error).toContain("outside allowed workspace directories");
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it("disables server-side file opening in local gateway mode", async () => {
+    execFileMock.mockImplementation(
+      (_file: string, _args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        callback(null, "", "");
+      }
+    );
+    process.env.SSA_LOCAL_GATEWAY = "true";
+    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
+      { token: "gateway-auth", workspaces: ["farreach"] },
+    ]);
+    const filePath = path.join(tempRoot, "companies", "farreach", "quotations", "QT-20260512-002.html");
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, "quote", "utf-8");
+    const { POST } = await import("./route");
+
+    const response = await POST(requestFor(filePath, "farreach", "gateway-auth"));
+    const json = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(json.error).toContain("disabled in local gateway mode");
     expect(execFileMock).not.toHaveBeenCalled();
   });
 });

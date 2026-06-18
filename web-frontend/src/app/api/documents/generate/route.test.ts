@@ -103,6 +103,17 @@ function getRequest(url: string, token?: string): NextRequest {
   });
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain("/Users/");
+  expect(serialized).not.toContain(".ssa");
+}
+
 function writeSavedPiRecord(workspaceId = "demo-exporter") {
   const data = tradeData();
   const dir = path.join(tempRoot, "companies", workspaceId, "documents", "pi-records");
@@ -149,17 +160,17 @@ describe("/api/documents/generate route", () => {
       success: true,
       blocked: true,
       documents: [],
-      sideEffect: {
-        kind: "document.generate",
-        workspaceId: "demo-exporter",
+      action: {
+        title: "Document generation",
         status: "blocked",
-        realExecutionEnabled: false,
+        blocked: true,
       },
     });
+    expectNoInternalActionFields(json);
     expect(execFileMock).not.toHaveBeenCalled();
   });
 
-  it("runs CI / PL generation only when real document generation is enabled", async () => {
+  it("blocks CI / PL generation when real document generation is enabled but approval is missing", async () => {
     writeSavedPiRecord();
     process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = "true";
     execFileMock.mockImplementation(
@@ -179,14 +190,72 @@ describe("/api/documents/generate route", () => {
     const json = await response.json();
 
     expect(json.success).toBe(true);
-    expect(json.documents).toHaveLength(2);
-    expect(json.sideEffect).toMatchObject({
-      kind: "document.generate",
-      workspaceId: "demo-exporter",
+    expect(json.blocked).toBe(true);
+    expect(json.documents).toEqual([]);
+    expect(json.action).toMatchObject({
+      title: "Document generation",
       status: "allowed",
-      realExecutionEnabled: true,
+      blocked: false,
+      reason: "Document generation blocked: approved action record is required before files are generated.",
     });
+    expectNoInternalActionFields(json);
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it("runs CI / PL generation only after explicit enablement and an approved action record", async () => {
+    writeSavedPiRecord();
+    process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = "true";
+    execFileMock.mockImplementation(
+      (_file: string, args: string[], _options: unknown, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+        const outputIndex = args.indexOf("--output");
+        const outputPath = args[outputIndex + 1];
+        fs.writeFileSync(outputPath, "<html>PI</html>", "utf-8");
+        callback(null, "generated", "");
+      }
+    );
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    const runtime = createSalesRuntime();
+    const data = tradeData();
+    const approval = runtime.approveSideEffect(runtime.requestDocumentGeneration({
+      workspaceId: "demo-exporter",
+      documentType: "CI+PL",
+      customer: data.customer.company_name,
+      payload: {
+        docTypes: ["CI", "PL"],
+        piNo: data.pi_info.pi_no,
+        ciNo: data.ci_info.ci_no,
+        plNo: data.pl_info.pl_no,
+        customer: data.customer,
+      },
+      idempotencyKey: `demo-exporter:trade-docs:${data.pi_info.pi_no}:CI+PL`,
+    }).id, { by: "Wilson", note: "Approved CI and PL generation." });
+
+    const { POST } = await import("./route");
+    const response = await POST(request("http://localhost/api/documents/generate?project=demo-exporter", {
+      data,
+      docTypes: ["CI", "PL"],
+      decisionId: approval.id,
+    }));
+    const json = await response.json();
+
+    expect(json.success).toBe(true);
+    expect(json.documents).toHaveLength(2);
+    expect(json.documents[0]).not.toHaveProperty("path");
+    expect(json.documents[0]).toEqual(expect.objectContaining({
+      filename: expect.any(String),
+      fileName: expect.any(String),
+      downloadUrl: expect.stringContaining("/api/files?"),
+    }));
+    expect(json.action).toMatchObject({
+      title: "Document generation",
+      status: "executed",
+      blocked: false,
+    });
+    expectNoInternalActionFields(json);
     expect(execFileMock).toHaveBeenCalledTimes(2);
+    const serialized = JSON.stringify(json);
+    expect(serialized).not.toContain(tempRoot);
+    expect(serialized).not.toContain("trade-docs");
   });
 
   it("rejects CI / PL generation when the PI was not exported first", async () => {
@@ -221,8 +290,16 @@ describe("/api/documents/generate route", () => {
 
     expect(farreachResponse.status).toBe(200);
     expect(farreachJson.documents.map((item: { filename: string }) => item.filename)).toEqual(["PI-farreach.html"]);
+    expect(farreachJson.documents[0]).not.toHaveProperty("path");
+    expect(farreachJson.documents[0]).toEqual(expect.objectContaining({
+      fileName: "PI-farreach.html",
+      downloadUrl: expect.stringContaining("/api/files?"),
+    }));
     expect(heroResponse.status).toBe(200);
     expect(heroJson.documents.map((item: { filename: string }) => item.filename)).toEqual(["PI-hero.html"]);
+    const serialized = JSON.stringify({ farreachJson, heroJson });
+    expect(serialized).not.toContain(tempRoot);
+    expect(serialized).not.toContain("trade-docs");
   });
 
   it("uses the saved PI source data without writing a new price-memory row", async () => {

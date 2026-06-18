@@ -1,0 +1,23 @@
+services:
+  ssa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${SSA_BIND_HOST:-127.0.0.1}:${SSA_PORT:-3001}:3000"
+    environment:
+      SSA_APP_ROOT: /app
+      SSA_DATA_ROOT: /app/data
+      SSA_LOCAL_GATEWAY: "true"
+      SSA_BETA_AUTH_REQUIRED: "true"
+      SSA_BIND_HOST: "${SSA_BIND_HOST:-127.0.0.1}"
+      SSA_PUBLIC_HOST: "${SSA_PUBLIC_HOST:-127.0.0.1}"
+      SSA_PUBLIC_PORT: "${SSA_PORT:-3001}"
+      SSA_GATEWAY_ACCESS_MODE: "${SSA_GATEWAY_ACCESS_MODE:-}"
+      SSA_LLM_PROVIDER: "${SSA_LLM_PROVIDER:-}"
+      SSA_LLM_BASE_URL: "${SSA_LLM_BASE_URL:-}"
+      SSA_LLM_MODEL: "${SSA_LLM_MODEL:-}"
+      SSA_LLM_API_KEY: "${SSA_LLM_API_KEY:-}"
+    volumes:
+      - "${HOME}/.ssa/data:/app/data"
+    restart: unless-stopped

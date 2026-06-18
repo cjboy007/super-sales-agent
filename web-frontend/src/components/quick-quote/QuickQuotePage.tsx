@@ -8,6 +8,7 @@ import {
   type QuickQuoteData,
   type QuickQuoteLine,
 } from "@/lib/quick-quote";
+import { useProject } from "@/lib/project";
 import type { CustomerSuggestion, PriceReference } from "@/lib/quick-quote-reference";
 import {
   BattleBadge,
@@ -32,7 +33,6 @@ interface ExchangeRateReference {
   base: "USD";
   quoteCurrency: string;
   rates: Record<string, number>;
-  provider: string;
   updatedAt: string;
   error?: string;
 }
@@ -47,12 +47,6 @@ interface QuickQuoteReferenceState {
 interface QuickQuoteExportResult {
   piNo: string;
   customer: string;
-  packageDir: string;
-  git: {
-    committed: boolean;
-    commitHash: string;
-    message: string;
-  };
 }
 
 interface QuickQuotePageProps {
@@ -130,6 +124,7 @@ export default function QuickQuotePage({
   backHref = "/documents",
 }: QuickQuotePageProps) {
   const language = useBattleLanguage();
+  const { apiFetch } = useProject();
   const isQuotationEntry = active === "/quotations";
   const [quote, setQuote] = useState<QuickQuoteData>(() => createQuickQuoteDefaults());
   const [reference, setReference] = useState<QuickQuoteReferenceState>({
@@ -165,13 +160,12 @@ export default function QuickQuotePage({
       setReferenceLoading(true);
       setReferenceError("");
       const params = new URLSearchParams({
-        project: "farreach",
         scope: "customers",
         customer: quote.customer,
       });
 
       try {
-        const response = await fetch(`/api/documents/quick-quote/reference?${params.toString()}`, {
+        const response = await apiFetch(`/api/documents/quick-quote/reference?${params.toString()}`, {
           signal: controller.signal,
         });
         const json = await response.json();
@@ -194,20 +188,19 @@ export default function QuickQuotePage({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [quote.customer]);
+  }, [apiFetch, quote.customer]);
 
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       const params = new URLSearchParams({
-        project: "farreach",
         scope: "prices",
         customer: quote.customer,
         products: referenceProducts.join(","),
       });
 
       try {
-        const response = await fetch(`/api/documents/quick-quote/reference?${params.toString()}`, {
+        const response = await apiFetch(`/api/documents/quick-quote/reference?${params.toString()}`, {
           signal: controller.signal,
         });
         const json = await response.json();
@@ -229,19 +222,18 @@ export default function QuickQuotePage({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [quote.customer, referenceProducts]);
+  }, [apiFetch, quote.customer, referenceProducts]);
 
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       const params = new URLSearchParams({
-        project: "farreach",
         scope: "exchange",
         currency: quote.currency,
       });
 
       try {
-        const response = await fetch(`/api/documents/quick-quote/reference?${params.toString()}`, {
+        const response = await apiFetch(`/api/documents/quick-quote/reference?${params.toString()}`, {
           signal: controller.signal,
         });
         const json = await response.json();
@@ -262,7 +254,7 @@ export default function QuickQuotePage({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [quote.currency]);
+  }, [apiFetch, quote.currency]);
 
   function updateCharge(field: keyof QuickQuoteData["charges"], value: number) {
     setQuote((current) => ({
@@ -331,7 +323,7 @@ export default function QuickQuotePage({
     setModifyingQuote(true);
 
     try {
-      const response = await fetch("/api/documents/quick-quote/modify?project=farreach", {
+      const response = await apiFetch("/api/documents/quick-quote/modify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quote, message }),
@@ -368,7 +360,7 @@ export default function QuickQuotePage({
     setExportError("");
     setExportResult(null);
     try {
-      const response = await fetch("/api/documents/quick-quote/export-pi?project=farreach", {
+      const response = await apiFetch("/api/documents/quick-quote/export-pi", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quote }),
@@ -556,61 +548,94 @@ export default function QuickQuotePage({
                   <p className="text-[10px] uppercase tracking-wide text-slate-500">
                     {language === "zh" ? "实时汇率参考" : "Exchange Reference"}
                   </p>
-                  <p className="mt-2 font-mono text-xs text-slate-200">{rateLine(reference.exchangeRate, language)}</p>
-                  <p className="mt-2 text-[10px] text-slate-600">
-                    {reference.exchangeRate
-                      ? `${reference.exchangeRate.provider} / ${referenceDate(reference.exchangeRate.updatedAt)}`
-                      : (language === "zh" ? "等待数据" : "waiting for data")}
-                  </p>
+                  {referenceError ? (
+                    <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
+                      <p className="font-mono text-[10px] text-amber-300">
+                        {language === "zh" ? "访问口令无效 — 汇率锁定" : "Access pass invalid — rates locked"}
+                      </p>
+                      <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
+                        {language === "zh" ? "保存访问口令" : "Save access pass"}
+                      </a>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="mt-2 font-mono text-xs text-slate-200">{rateLine(reference.exchangeRate, language)}</p>
+                      <p className="mt-2 text-[10px] text-slate-600">
+                        {reference.exchangeRate
+                          ? `${language === "zh" ? "汇率参考已更新" : "Rate reference updated"} / ${referenceDate(reference.exchangeRate.updatedAt)}`
+                          : (language === "zh" ? "等待数据" : "waiting for data")}
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div className="rounded-md border border-slate-800 bg-slate-950/70 p-3">
                   <p className="text-[10px] uppercase tracking-wide text-slate-500">
                     {language === "zh" ? "客户历史参考价" : "Customer Price History"}
                   </p>
-                  <div className="mt-2 space-y-2">
-                    {reference.customerPriceReferences.length === 0 ? (
-                      <p className="text-xs text-slate-600">
-                        {language === "zh" ? "暂无同客户历史价" : "No same-customer price yet"}
+                  {referenceError ? (
+                    <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
+                      <p className="font-mono text-[10px] text-amber-300">
+                        {language === "zh" ? "访问口令无效 — 历史价格锁定" : "Access pass invalid — history locked"}
                       </p>
-                    ) : reference.customerPriceReferences.map((item) => (
-                      <div key={`${item.source}-${item.product}`} className="text-xs">
-                        <p className="truncate font-semibold text-slate-200">{item.product}</p>
-                        <p className="font-mono text-emerald-300">{formatUnitPrice(item)} · {item.quantity}</p>
-                        <p className="font-mono text-[10px] text-slate-400">{formatUnitCost(item, language)}</p>
-                        <p className="truncate text-[10px] text-slate-500">{supplierLine(item, language)}</p>
-                        <p className="truncate text-[10px] text-slate-600">{item.source} / {referenceDate(item.date)}</p>
-                      </div>
-                    ))}
-                  </div>
+                      <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
+                        {language === "zh" ? "保存访问口令" : "Save access pass"}
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      {reference.customerPriceReferences.length === 0 ? (
+                        <p className="text-xs text-slate-600">
+                          {language === "zh" ? "暂无同客户历史价" : "No same-customer price yet"}
+                        </p>
+                      ) : reference.customerPriceReferences.map((item) => (
+                        <div key={`${item.source}-${item.product}`} className="text-xs">
+                          <p className="truncate font-semibold text-slate-200">{item.product}</p>
+                          <p className="font-mono text-emerald-300">{formatUnitPrice(item)} · {item.quantity}</p>
+                          <p className="font-mono text-[10px] text-slate-400">{formatUnitCost(item, language)}</p>
+                          <p className="truncate text-[10px] text-slate-500">{supplierLine(item, language)}</p>
+                          <p className="truncate text-[10px] text-slate-600">{item.source} / {referenceDate(item.date)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="rounded-md border border-slate-800 bg-slate-950/70 p-3">
                   <p className="text-[10px] uppercase tracking-wide text-slate-500">
                     {language === "zh" ? "同类出货参考价" : "Similar Shipment Prices"}
                   </p>
-                  <div className="mt-2 space-y-2">
-                    {reference.similarProductReferences.length === 0 ? (
-                      <p className="text-xs text-slate-600">
-                        {language === "zh" ? "输入产品名后匹配" : "Enter product names to match"}
+                  {referenceError ? (
+                    <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
+                      <p className="font-mono text-[10px] text-amber-300">
+                        {language === "zh" ? "访问口令无效 — 参考价锁定" : "Access pass invalid — references locked"}
                       </p>
-                    ) : reference.similarProductReferences.map((item) => (
-                      <div key={`${item.source}-${item.customer}-${item.product}`} className="text-xs">
-                        <p className="truncate font-semibold text-slate-200">{item.product}</p>
-                        <p className="font-mono text-amber-300">{formatUnitPrice(item)} · {item.quantity}</p>
-                        <p className="font-mono text-[10px] text-slate-400">{formatUnitCost(item, language)}</p>
-                        <p className="truncate text-[10px] text-slate-500">{supplierLine(item, language)}</p>
-                        <p className="truncate text-[10px] text-slate-600">{item.customer} / {item.source}</p>
-                      </div>
-                    ))}
-                  </div>
+                      <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
+                        {language === "zh" ? "保存访问口令" : "Save access pass"}
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      {reference.similarProductReferences.length === 0 ? (
+                        <p className="text-xs text-slate-600">
+                          {language === "zh" ? "输入产品名后匹配" : "Enter product names to match"}
+                        </p>
+                      ) : reference.similarProductReferences.map((item) => (
+                        <div key={`${item.source}-${item.customer}-${item.product}`} className="text-xs">
+                          <p className="truncate font-semibold text-slate-200">{item.product}</p>
+                          <p className="font-mono text-amber-300">{formatUnitPrice(item)} · {item.quantity}</p>
+                          <p className="font-mono text-[10px] text-slate-400">{formatUnitCost(item, language)}</p>
+                          <p className="truncate text-[10px] text-slate-500">{supplierLine(item, language)}</p>
+                          <p className="truncate text-[10px] text-slate-600">{item.customer} / {item.source}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-              {(referenceLoading || referenceError) && (
+              {referenceLoading && (
                 <div className="border-t border-slate-800 px-3 py-2 font-mono text-[10px] text-slate-600">
-                  {referenceLoading
-                    ? (language === "zh" ? "正在更新参考信息" : "refreshing references")
-                    : referenceError}
+                  {language === "zh" ? "正在更新参考信息" : "refreshing references"}
                 </div>
               )}
             </BattlePanel>
@@ -727,12 +752,9 @@ export default function QuickQuotePage({
                     {exportResult ? (
                       <>
                         <p className="text-slate-300">
-                          <BattleText en="Customer folder created with English PI, cost file, and product material index." zh="已创建客户文件夹，包含英文 PI、价格成本文件和产品资料索引。" />
+                          <BattleText en="PI package is ready with the quote, cost reference, and product material index." zh="PI 套件已准备好，包含报价、成本参考和产品资料索引。" />
                         </p>
-                        <p className="mt-2 break-all font-mono text-[10px] text-slate-500">{exportResult.packageDir}</p>
-                        <p className="mt-2 font-mono text-[10px] text-emerald-400">
-                          git {exportResult.git.committed ? "commit" : "version"} {exportResult.git.commitHash}
-                        </p>
+                        <p className="mt-2 font-mono text-[10px] text-emerald-400">{exportResult.piNo}</p>
                       </>
                     ) : (
                       <p className="font-mono text-[10px] text-red-300">{exportError}</p>

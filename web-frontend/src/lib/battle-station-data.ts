@@ -581,7 +581,7 @@ export const battleStationI18n: Record<
   en: {
     copy: {
       topBar: {
-        title: "OpenClaw for salespeople",
+        title: "Super Sales Agent",
         activeAgents: (count) => `${count} background items`,
         feedReconnecting: "event feed reconnecting",
         sessionEvents: (count) => `${count} session events`,
@@ -695,7 +695,7 @@ export const battleStationI18n: Record<
   zh: {
     copy: {
       topBar: {
-        title: "OpenClaw for salespeople",
+        title: "Super Sales Agent",
         activeAgents: (count) => `${count} 项后台进度`,
         feedReconnecting: "事件流重连中",
         sessionEvents: (count) => `${count} 条会话事件`,

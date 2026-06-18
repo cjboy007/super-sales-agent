@@ -3,14 +3,12 @@ import type { AppSettings } from "@/lib/config-store";
 export type ConfigState = AppSettings;
 
 export type OnboardingStepId =
-  | "identity"
-  | "llm"
-  | "vision"
-  | "email"
-  | "verification"
-  | "research"
-  | "documentTemplates"
-  | "optional"
+  | "token"
+  | "access"
+  | "model"
+  | "storage"
+  | "upload"
+  | "synthesize"
   | "finish";
 
 export type StepStatus = "done" | "missing" | "optional";
@@ -27,7 +25,7 @@ export interface JadenosOnboardingStep {
 }
 
 export interface ReadinessItem {
-  id: "llm" | "vision" | "email" | "verification" | "research";
+  id: "token" | "access" | "model" | "storage" | "upload" | "synthesize";
   label: string;
   zhLabel: string;
   done: boolean;
@@ -35,7 +33,22 @@ export interface ReadinessItem {
 
 export const JADENOS_ONBOARDING_ROUTE = "/jadenos/onboarding";
 
+export interface OnboardingRuntimeState {
+  tokenPresent?: boolean;
+  storageKnown?: boolean;
+  testUploadCompleted?: boolean;
+  synthesisTestCompleted?: boolean;
+}
+
 export const DEFAULT_CONFIG: ConfigState = {
+  gatewayAccessMode: "local",
+  gatewayBindHost: "127.0.0.1",
+  gatewayPublicHost: "",
+  intakeRetentionMode: "keep",
+  intakeMaxActiveSessions: 100,
+  llmProvider: "",
+  llmBaseUrl: "",
+  llmApiKey: "",
   deepseekApiKey: "",
   openaiApiKey: "",
   openrouterApiKey: "",
@@ -47,7 +60,7 @@ export const DEFAULT_CONFIG: ConfigState = {
   crmApiKey: "",
   notificationProvider: "none",
   notificationWebhookUrl: "",
-  defaultModel: "deepseek-v4-pro",
+  defaultModel: "",
   smtpHost: "",
   smtpPort: "465",
   smtpEncryption: "ssl",
@@ -69,162 +82,164 @@ export const DEFAULT_CONFIG: ConfigState = {
   },
 };
 
-export function hasValue(value: string) {
-  return value.trim().length > 0;
+export function hasValue(value: string | undefined) {
+  return String(value || "").trim().length > 0;
 }
 
-export function isConfiguredSecret(value: string) {
-  return hasValue(value) || value.includes("****");
+export function isConfiguredSecret(value: string | undefined) {
+  return hasValue(value) || String(value || "").includes("****");
 }
 
-export function getReadinessItems(config: ConfigState): ReadinessItem[] {
+export function hasRealModelConfig(config: ConfigState) {
+  return hasValue(config.llmProvider)
+    || hasValue(config.llmBaseUrl)
+    || isConfiguredSecret(config.llmApiKey)
+    || isConfiguredSecret(config.deepseekApiKey)
+    || isConfiguredSecret(config.openaiApiKey)
+    || isConfiguredSecret(config.openrouterApiKey);
+}
+
+export function getReadinessItems(
+  config: ConfigState,
+  runtime: OnboardingRuntimeState = {}
+): ReadinessItem[] {
   return [
     {
-      id: "llm",
-      label: "LLM",
-      zhLabel: "LLM",
-      done: isConfiguredSecret(config.deepseekApiKey) || isConfiguredSecret(config.openaiApiKey) || isConfiguredSecret(config.openrouterApiKey),
+      id: "token",
+      label: "Access pass",
+      zhLabel: "访问口令",
+      done: Boolean(runtime.tokenPresent),
     },
     {
-      id: "vision",
-      label: "Vision LLM",
-      zhLabel: "识图模型",
-      done: isConfiguredSecret(config.openrouterApiKey) || isConfiguredSecret(config.openaiApiKey) || isConfiguredSecret(config.geminiApiKey),
+      id: "access",
+      label: "Access mode",
+      zhLabel: "访问模式",
+      done: config.gatewayAccessMode === "local" || config.gatewayAccessMode === "lan",
     },
     {
-      id: "email",
-      label: "Work email",
-      zhLabel: "工作邮箱",
-      done: hasValue(config.email) && hasValue(config.imapHost) && hasValue(config.smtpHost) && isConfiguredSecret(config.emailPassword),
+      id: "model",
+      label: "Real model",
+      zhLabel: "真实模型",
+      done: hasRealModelConfig(config),
     },
     {
-      id: "verification",
-      label: "Hunter verification",
-      zhLabel: "Hunter 邮箱核验",
-      done: isConfiguredSecret(config.hunterApiKey),
+      id: "storage",
+      label: "Local folder",
+      zhLabel: "本地目录",
+      done: Boolean(runtime.storageKnown),
     },
     {
-      id: "research",
-      label: "Search research",
-      zhLabel: "搜索调研",
-      done: hasValue(config.searchEngine) && isConfiguredSecret(config.tavilyApiKey),
+      id: "upload",
+      label: "Test file",
+      zhLabel: "测试文件",
+      done: Boolean(runtime.testUploadCompleted),
+    },
+    {
+      id: "synthesize",
+      label: "Synthesis",
+      zhLabel: "文件归纳",
+      done: Boolean(runtime.synthesisTestCompleted),
     },
   ];
 }
 
-export function getOnboardingReadiness(config: ConfigState) {
-  const items = getReadinessItems(config);
+export function getOnboardingReadiness(
+  config: ConfigState,
+  runtime: OnboardingRuntimeState = {}
+) {
+  const items = getReadinessItems(config, runtime);
   const completed = items.filter((item) => item.done).length;
   const total = items.length;
+  const blockingItems = items.filter((item) => item.id !== "model");
   return {
     items,
     completed,
     total,
-    allReady: completed === total,
+    allReady: blockingItems.every((item) => item.done),
   };
 }
 
-export function getJadenosOnboardingSteps(config: ConfigState): JadenosOnboardingStep[] {
-  const readiness = getOnboardingReadiness(config);
+export function getJadenosOnboardingSteps(
+  config: ConfigState,
+  runtime: OnboardingRuntimeState = {}
+): JadenosOnboardingStep[] {
+  const readiness = getOnboardingReadiness(config, runtime);
   const statusFor = (id: ReadinessItem["id"]) => (
     readiness.items.find((item) => item.id === id)?.done ? "done" : "missing"
   );
-  const isOptionalConnected = isConfiguredSecret(config.apolloApiKey)
-    || (config.crmProvider !== "none" && isConfiguredSecret(config.crmApiKey))
-    || (config.notificationProvider !== "none" && isConfiguredSecret(config.notificationWebhookUrl));
 
   return [
     {
-      id: "identity",
-      title: "Name the workspace",
-      zhTitle: "确认工作台",
-      command: "$ jadenos onboarding",
-      prompt: "JadenOS starts with a local sales workspace. Files go through Intake; keys and connectors stay editable in Settings.",
-      zhPrompt: "JadenOS 会先建立本地销售工作台。文件走投递台；密钥和连接器之后可在设置里修改。",
-      status: "done",
-      core: false,
-    },
-    {
-      id: "llm",
-      title: "Connect DeepSeek",
-      zhTitle: "连接 DeepSeek",
-      command: "$ connect deepseek",
-      prompt: "Paste the DeepSeek key and keep deepseek-v4-pro as the default model unless you intentionally change it.",
-      zhPrompt: "填入 DeepSeek 密钥，默认模型保持 deepseek-v4-pro，除非你明确要换。",
-      status: statusFor("llm"),
+      id: "token",
+      title: "Save access pass",
+      zhTitle: "保存访问口令",
+      command: "Save access pass",
+      prompt: "Save the access pass in this browser. Local-only and LAN access both keep token protection.",
+      zhPrompt: "先在这个浏览器保存访问口令。仅本机和 LAN 局域网访问都保留口令保护。",
+      status: statusFor("token"),
       core: true,
     },
     {
-      id: "vision",
-      title: "Connect vision model",
-      zhTitle: "连接识图模型",
-      command: "$ connect vision-llm",
-      prompt: "Connect OpenRouter, OpenAI, or Gemini for Intake image reading. Product drawings, catalogs, and screenshots can still be saved without it, but visual extraction will be limited.",
-      zhPrompt: "连接 OpenRouter、OpenAI 或 Gemini，用于投递台识图。没有它也能保存产品图纸、目录和截图，但视觉提取会降级。",
-      status: statusFor("vision"),
+      id: "access",
+      title: "Choose access mode",
+      zhTitle: "选择访问方式",
+      command: "Local only or LAN",
+      prompt: "Use local-only on this computer, or enable LAN so devices on the same network can open SSA by host IP and port.",
+      zhPrompt: "可选择仅本机使用，也可开启 LAN，让同一局域网设备通过本机 IP 和端口打开 SSA。",
+      status: statusFor("access"),
       core: true,
     },
     {
-      id: "email",
-      title: "Connect work email",
-      zhTitle: "连接工作邮箱",
-      command: "$ connect mailbox",
-      prompt: "Connect IMAP for reading and SMTP for drafts. Customer sends still require approval.",
-      zhPrompt: "连接 IMAP 收信和 SMTP 草稿。客户邮件发送仍需要审批。",
-      status: statusFor("email"),
+      id: "model",
+      title: "Connect a real model",
+      zhTitle: "连接真实模型",
+      command: "Configure model",
+      prompt: "Choose a local model or China model service when ready. Mock fallback is allowed for first run, but it is not counted as a real model.",
+      zhPrompt: "你可以按自己的供应商选择本地模型或国内模型服务。首次启动可以先用 Mock fallback，但它不会被算作真实模型。",
+      status: statusFor("model"),
       core: true,
     },
     {
-      id: "verification",
-      title: "Enable verification",
-      zhTitle: "开启邮箱核验",
-      command: "$ connect hunter",
-      prompt: "Hunter is the first verifier before cold outbound. Keep checks on before sending to new leads.",
-      zhPrompt: "Hunter 是冷邮件的第一版核验器。给新线索发信前建议保持核验开启。",
-      status: statusFor("verification"),
+      id: "storage",
+      title: "Review local folder",
+      zhTitle: "查看本地目录",
+      command: "Check local folder",
+      prompt: "Review the local folder used by SSA. Browser preview and download go through the SSA gateway, not direct host file access.",
+      zhPrompt: "查看 SSA 使用的本地目录。浏览器预览和下载都通过 SSA 网关完成，不直接读取宿主机文件。",
+      status: statusFor("storage"),
       core: true,
     },
     {
-      id: "research",
-      title: "Connect research",
-      zhTitle: "连接调研",
-      command: "$ connect tavily",
-      prompt: "Tavily gives JadenOS company context, lead research, and personalization inputs.",
-      zhPrompt: "Tavily 为 JadenOS 提供公司背景、线索调研和个性化素材。",
-      status: statusFor("research"),
+      id: "upload",
+      title: "Upload a test file",
+      zhTitle: "上传测试文件",
+      command: "Test Intake upload",
+      prompt: "Drop one test file into Intake so SSA saves it in the local folder and keeps the original.",
+      zhPrompt: "向投递台放入一个测试文件，让 SSA 保存到本地目录，并保留原始文件。",
+      status: statusFor("upload"),
       core: true,
     },
     {
-      id: "documentTemplates",
-      title: "Train document templates",
-      zhTitle: "训练单证模板",
-      command: "$ upload docs --pi-ci-pl --samples 3-5",
-      prompt: "Upload 3-5 approved PI, CI, and PL files. JadenOS will summarize the layout rules into a template draft for customer confirmation.",
-      zhPrompt: "上传 3-5 份已确认的 PI、CI、PL 样本。JadenOS 会归纳版式规则，形成模板草案给客户确认。",
-      status: "optional",
-      core: false,
-    },
-    {
-      id: "optional",
-      title: "Add optional connectors",
-      zhTitle: "添加可选连接",
-      command: "$ connect extras --later-ok",
-      prompt: "Apollo, CRM sync, and notifications help after the first flow works. They do not block launch.",
-      zhPrompt: "Apollo、CRM 同步和通知适合核心流程跑通后再接，不阻塞上线。",
-      status: isOptionalConnected ? "done" : "optional",
-      core: false,
+      id: "synthesize",
+      title: "Run synthesis once",
+      zhTitle: "运行一次归纳",
+      command: "Create synthesis",
+      prompt: "Ask SSA to summarize the uploaded test file and write the result back to local storage.",
+      zhPrompt: "让 SSA 归纳刚上传的测试文件，并把结果写回本地存储。",
+      status: statusFor("synthesize"),
+      core: true,
     },
     {
       id: "finish",
       title: "Finish setup",
       zhTitle: "完成设置",
-      command: "$ jadenos status",
+      command: "Review launch readiness",
       prompt: readiness.allReady
-        ? "Core setup is ready. Open Cockpit to operate or Settings to revise the setup later."
-        : "Some core setup is still missing. You can keep going now or finish the missing items in Settings.",
+        ? "First-run setup is ready. Open Cockpit now, and connect a real model later from Settings if needed."
+        : "Some first-run items are still missing. You can keep going now or finish the missing items in Settings.",
       zhPrompt: readiness.allReady
-        ? "核心设置已就绪。打开驾驶舱开始操作，或之后到设置里修改。"
-        : "还有核心设置未完成。你可以继续设置，也可以之后在设置里补齐。",
+        ? "首次启动设置已就绪。现在可以进入驾驶舱；真实模型之后可在设置里连接。"
+        : "还有首次启动项目未完成。你可以继续设置，也可以之后在设置里补齐。",
       status: readiness.allReady ? "done" : "missing",
       core: false,
     },

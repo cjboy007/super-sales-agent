@@ -25,8 +25,13 @@ const path = require('path');
 const crypto = require('crypto');
 
 // 存储文件路径
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const STORAGE_FILE = path.join(DATA_DIR, 'approvals.json');
+let DATA_DIR = path.join(__dirname, '..', 'data');
+let STORAGE_FILE = path.join(DATA_DIR, 'approvals.json');
+
+function setStorageFileForTest(filePath) {
+  STORAGE_FILE = filePath;
+  DATA_DIR = path.dirname(filePath);
+}
 
 /**
  * 确保存储文件存在
@@ -161,6 +166,36 @@ function updateApproval(approvalId, updates) {
 }
 
 /**
+ * 消耗一次性审批令牌。只有 approved 状态可以被消耗。
+ * @param {string} approvalId - 审批 ID
+ * @returns {object|null} 消耗后的审批记录或 null
+ */
+function consumeApproval(approvalId) {
+  const storage = readStorage();
+  const index = storage.approvals.findIndex(a => a.id === approvalId);
+
+  if (index === -1) {
+    console.log(`[ApprovalStore] Approval not found for consumption: ${approvalId}`);
+    return null;
+  }
+
+  const approval = storage.approvals[index];
+  if (approval.status !== 'approved' || approval.consumed_at) {
+    console.log(`[ApprovalStore] Approval cannot be consumed: ${approvalId} (status: ${approval.status})`);
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  approval.status = 'consumed';
+  approval.consumed_at = now;
+  approval.updated_at = now;
+  storage.approvals[index] = approval;
+  writeStorage(storage);
+  console.log(`[ApprovalStore] Consumed approval: ${approvalId}`);
+  return approval;
+}
+
+/**
  * 提交审批决策
  * @param {string} approvalId - 审批 ID
  * @param {string} approverId - 审批人 ID
@@ -259,6 +294,7 @@ module.exports = {
   getAllApprovals,
   updateApproval,
   deleteApproval,
+  consumeApproval,
   
   // 决策
   submitDecision,
@@ -271,5 +307,9 @@ module.exports = {
   // 工具
   generateApprovalId,
   readStorage,
-  writeStorage
+  writeStorage,
+  setStorageFileForTest,
+  get STORAGE_FILE() {
+    return STORAGE_FILE;
+  }
 };

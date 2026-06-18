@@ -86,6 +86,26 @@ interface IntakeSessionSummary {
   messages: number;
 }
 
+interface IntakeSynthesisResult {
+  intakeId: string;
+  synthesisId: string;
+  title: string;
+  fileName: string;
+  downloadUrl: string;
+  filesRead: number;
+  filesSkipped: number;
+  warnings: string[];
+  source: "local" | "llm";
+  summary: string;
+  includedFiles: Array<{
+    name: string;
+    type: string;
+    size: number;
+    chars: number;
+    method: string;
+  }>;
+}
+
 const EMPTY_ANALYSIS: IntakeAnalysis = {
   source: "local",
   itemType: "Unclassified",
@@ -230,16 +250,16 @@ function localizedActionLabel(action: IntakeAction, language: "en" | "zh") {
       ? "等待客户匹配"
       : `关联到 ${action.label.replace(/^Link context to /, "")}`;
   }
-  if (action.id === "place-file") return `建议归入 ${localizedDestination(action.target.replace(/^~\/.ssa\/data\//, ""), language)}`;
+  if (action.id === "place-file") return `建议归入 ${localizedDestination(action.target.split("/").slice(-2).join("/"), language)}`;
   return action.label;
 }
 
 function localizedActionTarget(action: IntakeAction, language: "en" | "zh") {
-  if (language !== "zh") return action.target;
+  const destination = action.target.split("/").slice(-2).join("/");
+  if (language !== "zh") return localizedDestination(destination, language);
   if (action.target === "manual review queue") return "人工复核队列";
   if (action.target === "local client context") return "本地客户资料";
-  if (action.target.startsWith("~/.ssa/data/")) return action.target.replace("~/.ssa/data/", "SSA 数据区 / ");
-  return action.target;
+  return localizedDestination(destination, language);
 }
 
 function pickFiles(fileList: FileList | null) {
@@ -247,7 +267,7 @@ function pickFiles(fileList: FileList | null) {
 }
 
 export default function IntakePage() {
-  const { apiUrl, project } = useProject();
+  const { apiFetch, project } = useProject();
   const language = useBattleLanguage();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -258,6 +278,9 @@ export default function IntakePage() {
   const [dragActive, setDragActive] = useState(false);
   const [sending, setSending] = useState(false);
   const [queueing, setQueueing] = useState(false);
+  const [synthesizing, setSynthesizing] = useState(false);
+  const [synthesis, setSynthesis] = useState<IntakeSynthesisResult | null>(null);
+  const [synthesisReceipt, setSynthesisReceipt] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [queuedReceipt, setQueuedReceipt] = useState("");
 
@@ -267,13 +290,13 @@ export default function IntakePage() {
 
   const loadSessions = useCallback(async () => {
     try {
-      const res = await fetch(apiUrl("/api/intake"));
+      const res = await apiFetch("/api/intake");
       const json = await res.json();
       if (json.success) setSessions(json.data || []);
     } catch {
       // Recent intake history is helpful but not required for the workspace to run.
     }
-  }, [apiUrl]);
+  }, [apiFetch]);
 
   useEffect(() => {
     loadSessions();
@@ -302,7 +325,7 @@ export default function IntakePage() {
       if (trimmedMessage) form.append("message", trimmedMessage);
       files.forEach((file) => form.append("files", file));
 
-      const res = await fetch(apiUrl("/api/intake"), {
+      const res = await apiFetch("/api/intake", {
         method: "POST",
         body: form,
       });
@@ -312,6 +335,8 @@ export default function IntakePage() {
       setRecord(json.data);
       setFiles([]);
       setMessage("");
+      setSynthesis(null);
+      setSynthesisReceipt("");
       await loadSessions();
     } catch (err) {
       setError(err instanceof Error ? err.message : "SSA intake rejected the item");
@@ -325,7 +350,7 @@ export default function IntakePage() {
     setQueueing(true);
     setQueuedReceipt("");
     try {
-      const res = await fetch(apiUrl("/api/operator-command"), {
+      const res = await apiFetch("/api/operator-command", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -343,11 +368,47 @@ export default function IntakePage() {
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Review queue rejected the item");
-      setQueuedReceipt(json.data?.id || "queued");
+      const queuedTasks = Number(json.data?.queuedTasks || 0);
+      setQueuedReceipt(
+        language === "zh"
+          ? queuedTasks > 0
+            ? `已保存待复核，Jaden 会准备 ${queuedTasks} 项后续任务。`
+            : "已保存待复核。"
+          : queuedTasks > 0
+            ? `Saved for review. Jaden will prepare ${queuedTasks} next-step task${queuedTasks === 1 ? "" : "s"}.`
+            : "Saved for review."
+      );
     } catch (err) {
       setQueuedReceipt(err instanceof Error ? err.message : "Review queue rejected the item");
     } finally {
       setQueueing(false);
+    }
+  }
+
+  async function synthesizeRecord() {
+    if (!record || synthesizing) return;
+    setSynthesizing(true);
+    setSynthesisReceipt("");
+    try {
+      const instruction = message.trim() || "Create a concise synthesis from this intake.";
+      const res = await apiFetch(`/api/intake/${encodeURIComponent(record.id)}/synthesize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instruction }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Synthesis failed");
+      const result = json.data as IntakeSynthesisResult;
+      setSynthesis(result);
+      setSynthesisReceipt(
+        language === "zh"
+          ? `已生成归纳，读取 ${result.filesRead} 个文件。`
+          : `Synthesis generated from ${result.filesRead} file${result.filesRead === 1 ? "" : "s"}.`
+      );
+    } catch (err) {
+      setSynthesisReceipt(err instanceof Error ? err.message : "Synthesis failed");
+    } finally {
+      setSynthesizing(false);
     }
   }
 
@@ -357,6 +418,8 @@ export default function IntakePage() {
     setMessage("");
     setError(null);
     setQueuedReceipt("");
+    setSynthesis(null);
+    setSynthesisReceipt("");
   }
 
   function handleDrop(event: React.DragEvent<HTMLDivElement>) {
@@ -599,11 +662,16 @@ export default function IntakePage() {
                 </div>
 
                 <div>
-                  <div className="mb-2 flex items-center justify-between">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <p className="text-[10px] uppercase tracking-wide text-slate-500"><BattleText en="Suggested Actions" zh="建议动作" /></p>
-                    <CommandButton variant="ghost" disabled={!record || queueing} onClick={queueReview}>
-                      {queueing ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Send for Review" zh="提交复核" />}
-                    </CommandButton>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <CommandButton variant="ghost" disabled={!record || synthesizing} onClick={synthesizeRecord}>
+                        {synthesizing ? <BattleText en="Synthesizing" zh="归纳中" /> : <BattleText en="Synthesize" zh="生成归纳" />}
+                      </CommandButton>
+                      <CommandButton variant="ghost" disabled={!record || queueing} onClick={queueReview}>
+                        {queueing ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Send for Review" zh="提交复核" />}
+                      </CommandButton>
+                    </div>
                   </div>
                   {analysis.actions.length === 0 ? (
                     <div className="rounded-md border border-slate-800 bg-slate-950 px-3 py-3 text-center font-mono text-[10px] text-slate-600">
@@ -622,8 +690,34 @@ export default function IntakePage() {
                       ))}
                     </div>
                   )}
+                  {synthesis && (
+                    <div className="mt-3 rounded-md border border-blue-500/25 bg-blue-500/10 px-3 py-3">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-semibold text-slate-100">{synthesis.fileName}</p>
+                          <p className="mt-1 font-mono text-[10px] uppercase text-blue-300">
+                            {synthesis.filesRead} <BattleText en="read" zh="已读取" /> / {synthesis.filesSkipped} <BattleText en="skipped" zh="跳过" /> / {synthesis.source}
+                          </p>
+                        </div>
+                        <a
+                          href={synthesis.downloadUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded border border-blue-500/30 px-2 py-1 text-[11px] font-semibold text-blue-200 transition hover:border-blue-300 hover:text-white"
+                        >
+                          <BattleText en="Open" zh="打开" />
+                        </a>
+                      </div>
+                      <p className="mt-2 line-clamp-3 text-xs leading-5 text-slate-300">{synthesis.summary}</p>
+                      {synthesis.warnings.length > 0 && (
+                        <p className="mt-2 truncate font-mono text-[10px] text-amber-300">
+                          {synthesis.warnings.length} <BattleText en="warning(s)" zh="条提醒" />
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <p className="mt-2 truncate font-mono text-[10px] text-slate-500">
-                    {queuedReceipt || (language === "zh" ? "不会移动文件，只保存复核请求。" : "No files are moved. This only saves a review request.")}
+                    {synthesisReceipt || queuedReceipt || (language === "zh" ? "不会移动文件，只保存复核请求。" : "No files are moved. This only saves a review request.")}
                   </p>
                 </div>
               </div>

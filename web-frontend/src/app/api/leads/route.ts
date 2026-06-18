@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse, PaginatedResponse } from "@/lib/api-types";
 import type { CompanyIntelLeadInput } from "@/lib/runtime";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +17,9 @@ function liveJson<T>(data: T): NextResponse<T> {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get("action");
-  const project = searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(request, project);
+  const auth = requireResolvedWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
   const runtime = createSalesRuntime();
   const memory = runtime.memory;
 
@@ -97,9 +97,9 @@ export async function POST(request: NextRequest) {
       lead?: CompanyIntelLeadInput;
       force?: boolean;
     };
-    const project = body.project || request.nextUrl.searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
+    const auth = requireResolvedWorkspaceAccess(request, body as Record<string, unknown>);
     if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
 
     if (body.action === "queue-company-intel") {
       if (!body.lead || typeof body.lead !== "object") {

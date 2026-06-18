@@ -17,18 +17,22 @@
 const fs = require('fs');
 const path = require('path');
 const { SalesState } = require('../../shared/sales-state-db');
-const nodemailer = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/nodemailer');
-const dotenv = require('/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/node_modules/dotenv');
 const { verifyLegacyOutboundSafety } = require('../../skills/imap-smtp-email/lib/outbound-safety');
+const { loadSsaEmailEnv, requireSmtpEnv } = require('../../shared/ssa-secrets');
 
-// 读取项目自己的 .env（Hero Pump SMTP 配置）
-const envPath = path.join(__dirname, '../.env');
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
+function requireSkillDependency(name) {
+  try {
+    return require(name);
+  } catch {
+    return require(path.join(__dirname, '..', '..', 'skills', 'imap-smtp-email', 'node_modules', name));
+  }
 }
 
+const nodemailer = requireSkillDependency('nodemailer');
 const PROJECT = 'hero-pumps';
-const SIGNATURE_PATH = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills/imap-smtp-email/signatures/signature-hero-jordan.html';
+loadSsaEmailEnv({ profile: PROJECT });
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
+const SIGNATURE_PATH = path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'signatures', 'signature-hero-jordan.html');
 const DRAFTS_DIR = path.join(__dirname, '../campaign-tracker/templates');
 const SENT_LOG = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'mail', 'sent-log.json');
 
@@ -215,9 +219,10 @@ function buildHtmlBody(body, signatureHtml) {
 
 /**
  * 创建 Hero Pump 专属 nodemailer transporter。
- * 读取项目 .env 中的 SMTP 配置，不依赖 Farreach 的 CLI。
+ * 读取外部 SSA profile，不依赖 Farreach 的 CLI。
  */
 function createTransporter() {
+  requireSmtpEnv();
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.qiye.aliyun.com',
     port: parseInt(process.env.SMTP_PORT || '465', 10),
@@ -239,7 +244,7 @@ function checkRateLimit() {
   const recentCount = sentLog.filter(
     (entry) => new Date(entry.sent_at) >= oneHourAgo
   ).length;
-  // 默认 50 封/小时，从 .env 中读取 SMTP_RATE_LIMIT
+  // 默认 50 封/小时，从外部 profile 或环境变量读取 SMTP_RATE_LIMIT
   const limit = parseInt(process.env.SMTP_RATE_LIMIT || '50', 10);
   return { ok: recentCount < limit, count: recentCount, limit };
 }
@@ -267,7 +272,7 @@ async function sendEmail(draft, dryRun = false) {
       workspaceId: PROJECT,
       to: draft.email,
       subject: draft.subject,
-      humanApproval: true,
+      approvalId: process.env.SSA_RUNTIME_APPROVAL_ID,
     });
 
     // 发送前验证速率限制（防御性检查，虽然 main() 已控制数量）
@@ -301,6 +306,7 @@ async function main() {
   const limitArg = args.indexOf('--limit');
   const limit = limitArg >= 0 ? parseInt(args[limitArg + 1]) : 10;  // 默认 10 封/天
   const dryRun = args.includes('--dry-run');
+  const noDelay = args.includes('--no-delay');
   
   // 加载联系人信息（用于 DB 记录）
   const leadsMap = loadLeadsMap();
@@ -473,8 +479,8 @@ async function main() {
       console.log(`   ❌ 失败: ${result.error}`);
     }
     
-    // 随机间隔 3-8 分钟
-    if (i < Math.min(drafts.length, limit) - 1 && !dryRun) {
+    // 随机间隔 3-8 分钟（--no-delay 模式下跳过，避免 cron 超时）
+    if (i < Math.min(drafts.length, limit) - 1 && !dryRun && !noDelay) {
       const interval = 180 + Math.floor(Math.random() * 300);
       const mins = Math.floor(interval / 60);
       const secs = interval % 60;

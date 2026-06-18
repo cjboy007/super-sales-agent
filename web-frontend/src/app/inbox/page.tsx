@@ -5,12 +5,15 @@ import { useEffect, useMemo, useState } from "react";
 import {
   BattleBadge,
   BattleText,
+  AccessRequiredState,
+  AccessBanner,
   BattlePageBody,
   BattlePageHeader,
   BattlePageShell,
   BattlePanel,
   CommandButton,
   EmptyState,
+  LoadFailedState,
   StatCell,
   type BattleTone,
   useBattleLanguage,
@@ -27,6 +30,7 @@ import {
   localizedSentiment,
   localizedUrgency,
 } from "@/lib/inbox-i18n";
+import { useProject } from "@/lib/project";
 import type { InboundEmail, InboxStats, ReplyOption } from "@/types/inbox";
 
 interface FullEmail {
@@ -36,6 +40,7 @@ interface FullEmail {
 }
 
 type Language = "en" | "zh";
+type AccessIssue = "none" | "beta_required" | "workspace_denied";
 
 interface SendResult {
   tone: BattleTone;
@@ -201,12 +206,12 @@ function ReplyDraftLightbox({
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="text-sm font-semibold text-amber-200">
-                  <BattleText en="Confirm customer send" zh="二次确认发送" />
+                  <BattleText en="Submit send request" zh="提交发送申请" />
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
                   <BattleText
-                    en={`This will submit the draft to ${email.from_email}. Safe mode may capture the approval instead of sending real email.`}
-                    zh={`将把这封草稿提交给 ${email.from_email}。安全模式下可能只记录审批，不真实外发。`}
+                    en={`This will queue the draft for ${email.from_email}. Real delivery requires an approved server-side decision.`}
+                    zh={`将把这封草稿提交给 ${email.from_email}。真实外发必须有服务端审批记录。`}
                   />
                 </p>
               </div>
@@ -215,7 +220,7 @@ function ReplyDraftLightbox({
                   <BattleText en="Cancel" zh="取消" />
                 </CommandButton>
                 <CommandButton variant="danger" onClick={onConfirmSend} disabled={sending || !draft}>
-                  {sending ? <BattleText en="Sending" zh="发送中" /> : <BattleText en="Confirm Send" zh="确认发送" />}
+                  {sending ? <BattleText en="Submitting" zh="提交中" /> : <BattleText en="Submit Request" zh="提交申请" />}
                 </CommandButton>
               </div>
             </div>
@@ -240,6 +245,7 @@ function ReplyDraftLightbox({
 
 export default function InboxPage() {
   const language = useBattleLanguage();
+  const { apiFetch } = useProject();
   const [emails, setEmails] = useState<InboundEmail[]>([]);
   const [stats, setStats] = useState<InboxStats | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -252,14 +258,23 @@ export default function InboxPage() {
   const [sendResult, setSendResult] = useState<SendResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accessIssue, setAccessIssue] = useState<AccessIssue>("none");
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       setError(null);
+      setAccessIssue("none");
       try {
-        const res = await fetch("/api/inbox");
+        const res = await apiFetch("/api/inbox");
         const json = await res.json();
+        if (res.status === 401 || res.status === 403) {
+          setAccessIssue(res.status === 403 ? "workspace_denied" : "beta_required");
+          setEmails([]);
+          setStats(null);
+          setSelectedId(null);
+          return;
+        }
         if (!json.success) throw new Error("Failed to load inbox");
         setEmails(json.data || []);
         setStats(json.stats || null);
@@ -271,7 +286,7 @@ export default function InboxPage() {
       }
     }
     load();
-  }, []);
+  }, [apiFetch]);
 
   const selected = useMemo(
     () => emails.find((email) => email.id === selectedId) || emails[0] || null,
@@ -286,6 +301,7 @@ export default function InboxPage() {
     return selected.options?.find((option) => option.id === modalOptionId) || null;
   }, [modalOptionId, selected]);
   const modalDraft = modalOption ? draftsByOptionId[modalOption.id] || null : null;
+  const metricValue = (value: string | number) => accessIssue !== "none" ? "--" : value;
 
   useEffect(() => {
     setSelectedOptionId(selected?.options?.[0]?.id || null);
@@ -301,7 +317,7 @@ export default function InboxPage() {
       try {
         const prepared = await Promise.all(
           (selected.options || []).map(async (option) => {
-            const res = await fetch(`/api/inbox/${selected.id}/select`, {
+            const res = await apiFetch(`/api/inbox/${selected.id}/select`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ style: option.style }),
@@ -323,7 +339,7 @@ export default function InboxPage() {
     return () => {
       cancelled = true;
     };
-  }, [selected?.id, selected?.options]);
+  }, [apiFetch, selected?.id, selected?.options]);
 
   function openReplyDraft(option: ReplyOption) {
     setSelectedOptionId(option.id);
@@ -344,7 +360,7 @@ export default function InboxPage() {
     setSending(true);
     setSendResult(null);
     try {
-      const res = await fetch(`/api/inbox/${selected.id}/send`, {
+      const res = await apiFetch(`/api/inbox/${selected.id}/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -352,12 +368,6 @@ export default function InboxPage() {
           subject: modalDraft.subject,
           body: modalDraft.body,
           style: modalOption.style,
-          humanApproval: {
-            approved: true,
-            approvedBy: "local-operator",
-            approvedAt: new Date().toISOString(),
-            note: `Approved ${modalOption.style} reply from inbox lightbox.`,
-          },
         }),
       });
       const json = await res.json();
@@ -366,7 +376,7 @@ export default function InboxPage() {
       setSendResult({
         tone: json.blocked ? "amber" : "emerald",
         message: json.blocked
-          ? language === "zh" ? "已记录审批" : "approval captured"
+          ? language === "zh" ? "已提交待审批" : "submitted for approval"
           : language === "zh" ? "已发送" : "sent",
       });
     } catch (err) {
@@ -394,17 +404,20 @@ export default function InboxPage() {
       </BattlePageHeader>
 
       <BattlePageBody className="space-y-3">
+        {accessIssue !== "none" && <AccessBanner issue={accessIssue} next="/inbox" />}
         <div className="grid gap-3 md:grid-cols-4">
-          <StatCell label={language === "zh" ? "待处理" : "Pending"} value={stats?.pending_decision ?? emails.length} tone="amber" />
-          <StatCell label={language === "zh" ? "今日已处理" : "Handled Today"} value={stats?.sent_today ?? 0} tone="emerald" />
-          <StatCell label={language === "zh" ? "待分析" : "Pending Analysis"} value={emails.filter((email) => email.status === "pending_analysis").length} tone="blue" />
-          <StatCell label={language === "zh" ? "待复核" : "Pending Review"} value={emails.filter((email) => email.status === "pending_decision").length} tone="purple" />
+          <StatCell label={language === "zh" ? "待处理" : "Pending"} value={metricValue(stats?.pending_decision ?? emails.length)} tone="amber" />
+          <StatCell label={language === "zh" ? "今日已处理" : "Handled Today"} value={metricValue(stats?.sent_today ?? 0)} tone="emerald" />
+          <StatCell label={language === "zh" ? "待分析" : "Pending Analysis"} value={metricValue(emails.filter((email) => email.status === "pending_analysis").length)} tone="blue" />
+          <StatCell label={language === "zh" ? "待复核" : "Pending Review"} value={metricValue(emails.filter((email) => email.status === "pending_decision").length)} tone="purple" />
         </div>
 
         <div className="grid min-h-[calc(100vh-190px)] gap-3 lg:grid-cols-[420px_minmax(0,1fr)]">
           <BattlePanel title={language === "zh" ? "待处理邮件" : "Email Review List"} meta={language === "zh" ? "需要操作员决策的客户邮件" : "customer emails that need operator decision"}>
-            {error ? (
-              <EmptyState label={error} />
+            {accessIssue !== "none" ? (
+              <EmptyState label={language === "zh" ? "解锁访问后可查看" : "unlock access to view emails"} />
+            ) : error ? (
+              <LoadFailedState title="customer inbox" zhTitle="客户收件箱" onRetry={() => window.location.reload()} />
             ) : emails.length === 0 ? (
               <EmptyState label={language === "zh" ? (loading ? "正在读取收件箱" : "没有待处理邮件") : (loading ? "loading inbox" : "no pending decisions")} />
             ) : (
@@ -450,7 +463,9 @@ export default function InboxPage() {
               ) : null
             }
           >
-            {!selected ? (
+            {accessIssue !== "none" ? (
+              <EmptyState label={language === "zh" ? "解锁访问后可查看" : "unlock access to view messages"} />
+            ) : !selected ? (
               <EmptyState label={language === "zh" ? "请选择一封邮件" : "select an email"} />
             ) : (
               <div className="grid gap-3 p-3 xl:grid-cols-[minmax(0,1fr)_320px]">

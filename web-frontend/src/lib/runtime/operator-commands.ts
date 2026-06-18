@@ -3,15 +3,14 @@ import path from "path";
 import type { AgentEvent } from "../events";
 import { publishAndRemember } from "../events";
 import { ensureSsaCompanyDataPath } from "../ssa-data-paths";
+import { ingestCustomerInteraction, type CustomerMemoryRuntimeHost } from "./customer-memory-ingestor";
 import { createJadenPlan } from "./jaden-planner";
 import type { OperatorCommandInput, OperatorCommandRecord, RuntimeWorkflowType, WorkspaceId } from "./types";
 
-interface OperatorCommandRuntime {
-  getWorkspace(id?: WorkspaceId | null): { id: WorkspaceId };
+interface OperatorCommandRuntime extends CustomerMemoryRuntimeHost {
   workflows: {
     enqueue(workspaceId: WorkspaceId, workflow: RuntimeWorkflowType, input: Record<string, unknown>): { id: string; workflow: RuntimeWorkflowType };
   };
-  recordEvent(type: string, workspaceId: WorkspaceId, payload: Record<string, unknown>): unknown;
 }
 
 function nowIso() {
@@ -106,6 +105,26 @@ export function createOperatorCommand(
 
   const filePath = writeCommand(recordWithJob);
   const liveEvent = publishOperatorCommand(recordWithJob, filePath);
+  ingestCustomerInteraction(runtime, {
+    workspaceId: workspace.id,
+    direction: "operator_note",
+    customerName: sanitizeText(recordWithJob.context.customerName),
+    subject: `Operator command from ${recordWithJob.page}`,
+    body: recordWithJob.message,
+    text: recordWithJob.message,
+    occurredAt: recordWithJob.createdAt,
+    source: {
+      type: "operator",
+      id: recordWithJob.id,
+    },
+    metadata: {
+      page: recordWithJob.page,
+      url: recordWithJob.url,
+      context: recordWithJob.context,
+      jobIds,
+    },
+    idempotencyKey: `${workspace.id}:operator-command:${recordWithJob.id}`,
+  });
 
   runtime.recordEvent("operator.command.queued", workspace.id, {
     commandId: record.id,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { withPublicAction } from "../../public-action";
 
 export const dynamic = "force-dynamic";
 
@@ -9,20 +10,15 @@ interface SendRequestBody {
   subject: string;
   body: string;
   html?: boolean;
-  humanApproval?: {
-    approved?: boolean;
-    approvedBy?: string;
-    approvedAt?: string;
-    note?: string;
-  };
+  decisionId?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: SendRequestBody = await request.json();
-    const project = new URL(request.url).searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
+    const auth = requireResolvedWorkspaceAccess(request, body as unknown as Record<string, unknown>);
     if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
 
     if (!body.to || !body.subject || !body.body) {
       return NextResponse.json(
@@ -38,10 +34,10 @@ export async function POST(request: NextRequest) {
       subject: body.subject,
       body: body.body,
       html: body.html,
-      humanApproval: body.humanApproval,
+      decisionId: body.decisionId,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json(withPublicAction(result));
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     // Check for common error patterns

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { cleanPublicText, withPublicAction } from "../../../public-action";
 
 export const dynamic = "force-dynamic";
 
@@ -11,14 +12,18 @@ export async function POST(
 ) {
   const { emailId } = await params;
   const body = await req.json();
-  const project = req.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(req, project);
+  const auth = requireResolvedWorkspaceAccess(req, body as Record<string, unknown>);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
   const runtime = createSalesRuntime();
 
-  return NextResponse.json(await runtime.sendInboxReply({
+  const result = withPublicAction(await runtime.sendInboxReply({
     workspaceId: project,
     emailId,
     ...body,
   }));
+  return NextResponse.json({
+    ...result,
+    message: typeof result.message === "string" ? cleanPublicText(result.message) : result.message,
+  });
 }

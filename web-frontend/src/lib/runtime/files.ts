@@ -2,6 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { repoPath, sanitizeSsaPathSegment, ssaCompanyDataPath, ssaDataRoot } from "../ssa-data-paths";
+import { allowServerSideFileOpen, isLocalGatewayMode } from "./local-gateway";
 import type { SalesRuntime } from "./sales-runtime";
 import type { SideEffectDecision } from "./types";
 
@@ -28,6 +29,75 @@ export interface RuntimeFileRef {
   contentType: string;
   fileName: string;
   size: number;
+}
+
+interface RuntimeFileTokenRecord {
+  token: string;
+  path: string;
+  workspaceId: string;
+  createdAt: string;
+}
+
+function fileTokenRegistryPath(workspaceId: string) {
+  return path.join(ssaCompanyDataPath(sanitizeSsaPathSegment(workspaceId)), ".jadenos", "file-tokens.json");
+}
+
+function readFileTokenRegistry(workspaceId: string): RuntimeFileTokenRecord[] {
+  try {
+    const filePath = fileTokenRegistryPath(workspaceId);
+    if (!fs.existsSync(filePath)) return [];
+    const records = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return Array.isArray(records) ? records.filter((record): record is RuntimeFileTokenRecord => (
+      record &&
+      typeof record === "object" &&
+      typeof record.token === "string" &&
+      typeof record.path === "string" &&
+      typeof record.workspaceId === "string" &&
+      typeof record.createdAt === "string"
+    )) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeFileTokenRegistry(workspaceId: string, records: RuntimeFileTokenRecord[]) {
+  const filePath = fileTokenRegistryPath(workspaceId);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(records.slice(-500), null, 2), "utf-8");
+}
+
+function makeOpaqueFileToken() {
+  return `file_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 14)}`;
+}
+
+export function runtimeFileToken(filePath: string, workspaceId: string): string {
+  const resolved = path.resolve(filePath);
+  const existing = readFileTokenRegistry(workspaceId).find((record) => record.path === resolved);
+  if (existing) return existing.token;
+
+  const record: RuntimeFileTokenRecord = {
+    token: makeOpaqueFileToken(),
+    path: resolved,
+    workspaceId,
+    createdAt: new Date().toISOString(),
+  };
+  writeFileTokenRegistry(workspaceId, [...readFileTokenRegistry(workspaceId), record]);
+  return record.token;
+}
+
+export function runtimeFilePathFromToken(token: string | null, workspaceId: string): string | null {
+  if (!token) return null;
+  const record = readFileTokenRegistry(workspaceId).find((item) => item.token === token);
+  return record?.path || null;
+}
+
+export function runtimeFileUrl(filePath: string, workspaceId: string, download = false) {
+  const params = new URLSearchParams({
+    token: runtimeFileToken(filePath, workspaceId),
+    project: workspaceId,
+  });
+  if (download) params.set("download", "true");
+  return `/api/files?${params.toString()}`;
 }
 
 export type RuntimeFilePreviewResult =
@@ -66,8 +136,10 @@ export type RuntimeFileOpenResult =
     };
 
 export function allowedFileDirs(): string[] {
+  const dirs = [ssaDataRoot()];
+  if (isLocalGatewayMode()) return dirs;
   return [
-    ssaDataRoot(),
+    ...dirs,
     repoPath("skills", "quotation-workflow", "examples"),
     repoPath("skills", "quotation-workflow", "tests", "output"),
     repoPath("skills", "sample-workflow", "examples"),
@@ -76,8 +148,16 @@ export function allowedFileDirs(): string[] {
 }
 
 export function allowedWorkspaceFileDirs(workspaceId: string): string[] {
+  const workspaceRoot = ssaCompanyDataPath(sanitizeSsaPathSegment(workspaceId));
+  const dirs = [
+    path.join(workspaceRoot, "customers"),
+    path.join(workspaceRoot, "documents"),
+    path.join(workspaceRoot, "intake", "uploads"),
+    path.join(workspaceRoot, "quotations"),
+  ];
+  if (isLocalGatewayMode()) return dirs;
   return [
-    ssaCompanyDataPath(sanitizeSsaPathSegment(workspaceId)),
+    ...dirs,
     repoPath("skills", "quotation-workflow", "examples"),
     repoPath("skills", "quotation-workflow", "tests", "output"),
     repoPath("skills", "sample-workflow", "examples"),
@@ -97,6 +177,11 @@ export function isRuntimeFileAllowed(resolvedPath: string): boolean {
 
 export function isWorkspaceRuntimeFileAllowed(resolvedPath: string, workspaceId: string): boolean {
   const resolved = path.resolve(resolvedPath);
+  const workspaceRoot = path.resolve(ssaCompanyDataPath(sanitizeSsaPathSegment(workspaceId)));
+  if (resolved === workspaceRoot || resolved.startsWith(`${workspaceRoot}${path.sep}`)) {
+    const relativeSegments = path.relative(workspaceRoot, resolved).split(path.sep);
+    if (relativeSegments.some((segment) => segment.startsWith("."))) return false;
+  }
   return allowedWorkspaceFileDirs(workspaceId).some((dir) => resolved === path.resolve(dir) || resolved.startsWith(`${path.resolve(dir)}${path.sep}`));
 }
 
@@ -160,6 +245,17 @@ export function serveRuntimeFile(filePath: string | null, download = false, work
 }
 
 export async function openRuntimeFile(filePath: string | null, workspaceId?: string): Promise<RuntimeFileOpenResult> {
+  if (!allowServerSideFileOpen()) {
+    return {
+      kind: "error",
+      status: 409,
+      body: {
+        success: false,
+        error: "Server-side file opening is disabled in local gateway mode. Use browser preview or download instead.",
+      },
+    };
+  }
+
   const file = resolveRuntimeFile(filePath, { workspaceId });
 
   if (!isRuntimeFileRef(file)) {
@@ -258,7 +354,7 @@ export async function previewRuntimeFile(
 
   const resolved = file.resolved;
   const extension = path.extname(resolved).toLowerCase();
-  const downloadUrl = `/api/files?path=${encodeURIComponent(resolved)}&project=${encodeURIComponent(input.workspaceId)}`;
+  const downloadUrl = runtimeFileUrl(resolved, input.workspaceId);
 
   if (extension === ".pdf" || extension === ".html" || extension === ".htm") {
     return {
@@ -274,7 +370,7 @@ export async function previewRuntimeFile(
 
   if (extension === ".xlsx" || extension === ".xls" || extension === ".docx" || extension === ".doc") {
     const sideEffect = documentPreviewRequest(runtime, input.workspaceId, resolved, extension);
-    const downloadOnlyUrl = `${downloadUrl}&download=true`;
+    const downloadOnlyUrl = runtimeFileUrl(resolved, input.workspaceId, true);
 
     if (sideEffect.status !== "allowed") {
       return {
@@ -322,7 +418,7 @@ export async function previewRuntimeFile(
     body: {
       previewAvailable: false,
       reason: "unsupported_format",
-      downloadUrl: `${downloadUrl}&download=true`,
+      downloadUrl: runtimeFileUrl(resolved, input.workspaceId, true),
     },
   };
 }

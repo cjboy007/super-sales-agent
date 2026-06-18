@@ -66,9 +66,10 @@ export interface GenerateResult {
   documents: {
     type: string;
     filename: string;
-    path: string;
+    fileName: string;
     size: number;
     created?: string;
+    downloadUrl: string;
   }[];
   error?: string;
 }
@@ -76,9 +77,10 @@ export interface GenerateResult {
 export interface HistoryDoc {
   type: string;
   filename: string;
-  path: string;
+  fileName: string;
   size: number;
   created: string;
+  downloadUrl: string;
 }
 
 // ─── Default template ─────────────────────────────────────────────────────

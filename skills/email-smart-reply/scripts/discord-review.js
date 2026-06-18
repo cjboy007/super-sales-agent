@@ -12,21 +12,15 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
+const { loadSsaProfileEnv } = require('../../../shared/ssa-secrets');
 
 // 配置
 const CONFIG_PATH = path.join(__dirname, 'config', 'discord-config.json');
 const DRAFTS_DIR = path.join(__dirname, 'drafts');
-const ENV_PATH = path.join(__dirname, '..', '..', '.env');
+loadSsaProfileEnv({ profile: 'email-smart-reply' });
 
 // 加载 Discord Bot Token
 function loadDiscordToken() {
-  if (fs.existsSync(ENV_PATH)) {
-    const envContent = fs.readFileSync(ENV_PATH, 'utf8');
-    const match = envContent.match(/^DISCORD_BOT_TOKEN=(.+)$/m);
-    if (match) {
-      return match[1].trim();
-    }
-  }
   return process.env.DISCORD_BOT_TOKEN;
 }
 

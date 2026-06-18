@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse } from "@/lib/api-types";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 import {
   createSalesRuntime,
   type ApprovalInput,
@@ -10,6 +10,39 @@ import {
 
 export const dynamic = "force-dynamic";
 
+type PublicApprovalRecord = Omit<ApprovalRecord, "workspaceId" | "project" | "deal_id" | "metadata">;
+
+function cleanPublicText(value: string): string {
+  return value
+    .replace(/\/Users\/[^\s"'`]+/g, "the local runtime")
+    .replace(/\.ssa\/[^\s"'`]+/g, "the local runtime");
+}
+
+function publicApproval(record: ApprovalRecord): PublicApprovalRecord {
+  const {
+    workspaceId: _workspaceId,
+    project: _project,
+    deal_id: _deal_id,
+    metadata: _metadata,
+    ...rest
+  } = record;
+
+  return {
+    ...rest,
+    dealId: cleanPublicText(rest.dealId),
+    account: cleanPublicText(rest.account),
+    title: cleanPublicText(rest.title),
+    triggerType: cleanPublicText(rest.triggerType),
+    value: cleanPublicText(rest.value),
+    risk: cleanPublicText(rest.risk),
+    due: cleanPublicText(rest.due),
+    recommendation: cleanPublicText(rest.recommendation),
+    guardrail: cleanPublicText(rest.guardrail),
+    decisionBy: rest.decisionBy ? cleanPublicText(rest.decisionBy) : undefined,
+    decisionNote: rest.decisionNote ? cleanPublicText(rest.decisionNote) : undefined,
+  };
+}
+
 function errorResponse(error: unknown, fallbackStatus = 500) {
   const message = error instanceof Error ? error.message : String(error);
   const status = message.includes("required") || message.includes("not found") ? 400 : fallbackStatus;
@@ -18,27 +51,27 @@ function errorResponse(error: unknown, fallbackStatus = 500) {
 
 export async function GET(request: NextRequest) {
   const runtime = createSalesRuntime();
-  const project = request.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(request, project);
+  const auth = requireResolvedWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
   const id = request.nextUrl.searchParams.get("id");
-  const data = runtime.memory.listApprovals(project, id);
-  const response: ApiResponse<ApprovalRecord[]> = { success: true, data };
+  const data = runtime.memory.listApprovals(project, id).map(publicApproval);
+  const response: ApiResponse<PublicApprovalRecord[]> = { success: true, data };
   return NextResponse.json(response);
 }
 
 export async function POST(request: NextRequest) {
   try {
     const runtime = createSalesRuntime();
-    const project = request.nextUrl.searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
-    if (!auth.ok) return auth.response;
     const body = (await request.json().catch(() => ({}))) as ApprovalInput;
-    const data = runtime.memory.upsertApproval(
+    const auth = requireResolvedWorkspaceAccess(request, body as Record<string, unknown>);
+    if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
+    const data = publicApproval(runtime.memory.upsertApproval(
       { ...body, workspaceId: project },
       runtime.recordEvent.bind(runtime)
-    );
-    const response: ApiResponse<ApprovalRecord> = { success: true, data };
+    ));
+    const response: ApiResponse<PublicApprovalRecord> = { success: true, data };
     return NextResponse.json(response);
   } catch (error) {
     return errorResponse(error);
@@ -48,16 +81,16 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const runtime = createSalesRuntime();
-    const project = request.nextUrl.searchParams.get("project") || "farreach";
-    const auth = requireWorkspaceAccess(request, project);
-    if (!auth.ok) return auth.response;
     const body = (await request.json().catch(() => ({}))) as ApprovalPatchInput;
-    const data = runtime.memory.updateApproval(
+    const auth = requireResolvedWorkspaceAccess(request, body as Record<string, unknown>);
+    if (!auth.ok) return auth.response;
+    const project = auth.workspaceId;
+    const data = publicApproval(runtime.memory.updateApproval(
       project,
       body,
       runtime.recordEvent.bind(runtime)
-    );
-    const response: ApiResponse<ApprovalRecord> = { success: true, data };
+    ));
+    const response: ApiResponse<PublicApprovalRecord> = { success: true, data };
     return NextResponse.json(response);
   } catch (error) {
     return errorResponse(error);

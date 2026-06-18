@@ -26,7 +26,7 @@ interface SentEmail {
 interface Draft {
   id: string;
   subject: string;
-  template: string;
+  status: string;
 }
 
 interface PendingEmail {
@@ -60,7 +60,7 @@ function formatDate(iso: string) {
 }
 
 export default function EmailsPage() {
-  const { apiUrl, project } = useProject();
+  const { apiFetch, project } = useProject();
   const language = useBattleLanguage();
   const [activeTab, setActiveTab] = useState<Tab>("sent");
   const [stats, setStats] = useState<EmailStats>({ totalSent: 0, totalReceived: 0, totalReplied: 0, replyRate: 0 });
@@ -80,10 +80,10 @@ export default function EmailsPage() {
     setError(null);
     try {
       const [statsRes, sentRes, draftsRes, pendingRes] = await Promise.all([
-        fetch(apiUrl("/api/emails/stats")),
-        fetch(apiUrl("/api/emails/sent?page=1&limit=30")),
-        fetch(apiUrl("/api/emails/drafts")),
-        fetch(apiUrl("/api/emails/pending")),
+        apiFetch("/api/emails/stats"),
+        apiFetch("/api/emails/sent?page=1&limit=30"),
+        apiFetch("/api/emails/drafts"),
+        apiFetch("/api/emails/pending"),
       ]);
       const [statsJson, sentJson, draftsJson, pendingJson] = await Promise.all([
         statsRes.json(),
@@ -100,7 +100,7 @@ export default function EmailsPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiUrl]);
+  }, [apiFetch]);
 
   useEffect(() => {
     load();
@@ -111,7 +111,7 @@ export default function EmailsPage() {
     setSaving(true);
     setSaveMessage("");
     try {
-      const res = await fetch(apiUrl("/api/emails/send"), {
+      const res = await apiFetch("/api/emails/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ to, subject, body }),
@@ -180,7 +180,11 @@ export default function EmailsPage() {
             {error ? (
               <EmptyState label={error} />
             ) : rows.length === 0 ? (
-              <EmptyState label={language === "zh" ? (loading ? "正在读取开发信记录" : "没有记录") : (loading ? "loading outreach records" : "no records")} />
+              <EmptyState
+                label={language === "zh" ? (loading ? "正在读取开发信记录" : "暂无草稿。创建开发信草稿或连接邮箱历史。") : (loading ? "loading outreach records" : "No drafts yet. Create a review draft or connect your mailbox.")}
+                action={loading ? undefined : (language === "zh" ? "前往收件箱" : "Open Inbox")}
+                actionHref={loading ? undefined : "/inbox"}
+              />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-[13px]">
@@ -206,7 +210,7 @@ export default function EmailsPage() {
                         <td className="px-4 py-3 font-mono text-slate-500">{draft.id}</td>
                         <td className="px-4 py-3 text-slate-200">{draft.subject}</td>
                         <td className="px-4 py-3"><BattleBadge tone="amber"><BattleText en="draft" zh="草稿" /></BattleBadge></td>
-                        <td className="px-4 py-3 font-mono text-slate-500">{draft.template}</td>
+                        <td className="px-4 py-3 font-mono text-slate-500">{draft.status || "draft"}</td>
                       </tr>
                     ))}
                     {activeTab === "pending" && pendingEmails.map((email) => (

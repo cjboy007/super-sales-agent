@@ -1,0 +1,4782 @@
+[
+  {
+    "file": "01-dashboard-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/",
+    "metrics": {
+      "buttons": [],
+      "controls": [],
+      "documentHeight": 1161,
+      "focusables": [],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "404"
+        },
+        {
+          "tag": "H2",
+          "text": "This page could not be found."
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [],
+      "overflows": [],
+      "regions": [],
+      "text": "404\nThis page could not be found.",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "02-inbox-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/inbox",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        }
+      ],
+      "controls": [],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "收件箱分诊"
+        },
+        {
+          "tag": "H2",
+          "text": "待处理邮件"
+        },
+        {
+          "tag": "H2",
+          "text": "邮件预览"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "待处理0今日已处理0待分析0待复核0待处理邮件需要操作员决策的客户邮件Failed to load inbox邮件预览未选择请选择一封邮件"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "待处理邮件需要操作员决策的客户邮件Failed to load inbox"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "邮件预览未选择请选择一封邮件"
+        }
+      ],
+      "text": "收件箱分诊\n\nAI 辅助 / 需要人工决策 / 客户发送已锁定\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n0 待处理\nEN\n中文\n深色\n\n待处理\n\n0\n\n今日已处理\n\n0\n\n待分析\n\n0\n\n待复核\n\n0\n\n待处理邮件\n\n需要操作员决策的客户邮件\n\nFailed to load inbox\n邮件预览\n\n未选择\n\n请选择一封邮件",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "03-leads-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/leads",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "上一页"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "下一页"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "提交给 Jaden"
+        }
+      ],
+      "controls": [
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "搜索公司、联系人、邮箱、国家、行业",
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "SELECT",
+          "type": null,
+          "value": "All"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "SELECT",
+          "type": null,
+          "value": "All"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "让 Jaden 总结客户、准备跟进优先级，或对比最近订单",
+          "tag": "TEXTAREA",
+          "type": null,
+          "value": ""
+        }
+      ],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "SELECT",
+          "text": "AllProspectActive CustomerDormantRiskArchived",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "SELECT",
+          "text": "All",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "上一页",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "下一页",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "TEXTAREA",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "提交给 Jaden",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "客户"
+        },
+        {
+          "tag": "H2",
+          "text": "客户列表 / 客户详情"
+        },
+        {
+          "tag": "H2",
+          "text": "让 Jaden 帮我看"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "全部客户0活跃客户0风险客户0国家/地区0客户列表 / 客户详情0 个可见客户 / 每页 20 个AllProspectActive CustomerDormantRiskArchivedAllBeta access token is required.第 1 / 1上一页下一页让 Jaden 帮我看会带上本页筛选和当前数据，不会外发就绪Jaden 会参考这"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "客户列表 / 客户详情0 个可见客户 / 每页 20 个AllProspectActive CustomerDormantRiskArchivedAllBeta access token is required."
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "让 Jaden 帮我看会带上本页筛选和当前数据，不会外发就绪Jaden 会参考这些内容你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。客户列表 / 筛选 All / All / 当前显示 0 / 活跃客户 0 / 搜索 无不会发给客户，只会保存到 JadenOS 内等待复核。提交给 Jaden"
+        }
+      ],
+      "text": "客户\n\nFARREACH / 客户列表 / 第 1 页\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n实时\n刷新\nEN\n中文\n深色\n\n全部客户\n\n0\n\n活跃客户\n\n0\n\n风险客户\n\n0\n\n国家/地区\n\n0\n\n客户列表 / 客户详情\n\n0 个可见客户 / 每页 20 个\n\nAll\nProspect\nActive Customer\nDormant\nRisk\nArchived\nAll\nBeta access token is required.\n第 1 / 1\n上一页\n下一页\n让 Jaden 帮我看\n\n会带上本页筛选和当前数据，不会外发\n\n就绪\n\nJADEN 会参考这些内容\n\n你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。\n\n客户列表 / 筛选 All / All / 当前显示 0 / 活跃客户 0 / 搜索 无\n\n不会发给客户，只会保存到 JadenOS 内等待复核。\n\n提交给 Jaden",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "04-quotations-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/quotations",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "上一页"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "下一页"
+        }
+      ],
+      "controls": [
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "搜索客户或编号",
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "SELECT",
+          "type": null,
+          "value": "All"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "SELECT",
+          "type": null,
+          "value": "All"
+        }
+      ],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "SELECT",
+          "text": "全部报价样品单大货 PI",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "SELECT",
+          "text": "全部草稿已发送已确认已过期",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations/quick-quote",
+          "tag": "A",
+          "text": "打开快速报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "上一页",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "下一页",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "报价控制台"
+        },
+        {
+          "tag": "H2",
+          "text": "报价清单"
+        },
+        {
+          "tag": "H2",
+          "text": "快速报价"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/quotations/quick-quote",
+          "text": "打开快速报价"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "全部报价0草稿0已发送0已确认0报价清单第 1 页 / 共 1 页全部报价样品单大货 PI全部草稿已发送已确认已过期Beta access token is required.快速报价客户 / 成本 / 参考价 / PI报价输入客户 / 产品 / 条款内部参考成本 / 供应商 / 历史价输出文件英文预览 / 导出 PI报价统一从快速报价开始，再导出 PI 并"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "报价清单第 1 页 / 共 1 页全部报价样品单大货 PI全部草稿已发送已确认已过期Beta access token is required."
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "快速报价客户 / 成本 / 参考价 / PI报价输入客户 / 产品 / 条款内部参考成本 / 供应商 / 历史价输出文件英文预览 / 导出 PI报价统一从快速报价开始，再导出 PI 并归档文件。打开快速报价"
+        }
+      ],
+      "text": "报价控制台\n\n报价文件 / 状态复核 / 只生成文件\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n刷新\nEN\n中文\n深色\n\n全部报价\n\n0\n\n草稿\n\n0\n\n已发送\n\n0\n\n已确认\n\n0\n\n报价清单\n\n第 1 页 / 共 1 页\n\n全部\n报价\n样品单\n大货 PI\n全部\n草稿\n已发送\n已确认\n已过期\nBeta access token is required.\n快速报价\n\n客户 / 成本 / 参考价 / PI\n\n报价输入\n\n客户 / 产品 / 条款\n\n内部参考\n\n成本 / 供应商 / 历史价\n\n输出文件\n\n英文预览 / 导出 PI\n\n报价统一从快速报价开始，再导出 PI 并归档文件。\n打开快速报价\n总金额 —\n上一页\n下一页",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "05-intelligence-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/intelligence",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "重载"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新新闻"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "重载"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新新闻"
+        }
+      ],
+      "controls": [],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "重载",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新新闻",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "重载",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新新闻",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "情报面板"
+        },
+        {
+          "tag": "H2",
+          "text": "AI 情报摘要"
+        },
+        {
+          "tag": "H2",
+          "text": "风险提醒"
+        },
+        {
+          "tag": "H2",
+          "text": "市场新闻"
+        },
+        {
+          "tag": "H2",
+          "text": "竞品监控"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "情报摘要0市场信号0竞品动态0风险提醒0AI 情报摘要市场影响摘要没有情报摘要风险提醒成本、汇率与来源状态暂无风险提醒市场新闻筛选后的市场信号没有市场新闻竞品监控产品、工厂、价格提及没有竞品动态"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "AI 情报摘要市场影响摘要没有情报摘要"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "风险提醒成本、汇率与来源状态暂无风险提醒"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "市场新闻筛选后的市场信号没有市场新闻"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "竞品监控产品、工厂、价格提及没有竞品动态"
+        }
+      ],
+      "text": "情报面板\n\nAI 摘要 / 市场信号 / -\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n情报\n重载\n刷新新闻\nEN\n中文\n深色\n\n情报摘要\n\n0\n\n市场信号\n\n0\n\n竞品动态\n\n0\n\n风险提醒\n\n0\n\nAI 情报摘要\n\n市场影响摘要\n\n没有情报摘要\n风险提醒\n\n成本、汇率与来源状态\n\n暂无风险提醒\n市场新闻\n\n筛选后的市场信号\n\n没有市场新闻\n竞品监控\n\n产品、工厂、价格提及\n\n没有竞品动态",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "06-settings-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/settings",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "保存"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "保存"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "保存访问"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "清除"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "小紧凑，适合高密度表格"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中默认，按钮和正文更清楚"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "大更大字号，适合长时间操作"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "AI 与调研"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "邮件连接"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "搜索"
+        }
+      ],
+      "controls": [
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "输入团队发给你的内测口令",
+          "tag": "INPUT",
+          "type": "password",
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "SELECT",
+          "type": null,
+          "value": "deepseek-v4-pro"
+        }
+      ],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "保存",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "保存",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/jadenos/onboarding",
+          "tag": "A",
+          "text": "打开",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "password"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "保存访问",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "清除",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "小紧凑，适合高密度表格",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中默认，按钮和正文更清楚",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "大更大字号，适合长时间操作",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "AI 与调研",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "邮件连接",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "搜索",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "text"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "text"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "text"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "text"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "SELECT",
+          "text": "deepseek-v4-prodeepseekv4progpt-4o-minigpt-4.1deepseek/deepseek-v4-proopenai/gpt-4o-minianthropic/claude-sonnet-4mock",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "系统设置"
+        },
+        {
+          "tag": "H2",
+          "text": "JadenOS 入门终端"
+        },
+        {
+          "tag": "H2",
+          "text": "内测访问"
+        },
+        {
+          "tag": "H2",
+          "text": "界面大小"
+        },
+        {
+          "tag": "H2",
+          "text": "数据保护状态"
+        },
+        {
+          "tag": "H2",
+          "text": "邮箱同步准备"
+        },
+        {
+          "tag": "H2",
+          "text": "AI 与调研服务"
+        },
+        {
+          "tag": "H2",
+          "text": "安全规则"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/jadenos/onboarding",
+          "text": "打开"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "JadenOS 入门终端运行 /jadenos onboarding 逐步设置打开$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。完整设置仍可在本页修改。内测访问给外部试用用户准备的访问口令待填写访问口令保存访问清除保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "JadenOS 入门终端运行 /jadenos onboarding 逐步设置打开$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。完整设置仍可在本页修改。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "内测访问给外部试用用户准备的访问口令待填写访问口令保存访问清除保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底层配置。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "界面大小控制全局字号、按钮和输入框尺寸小紧凑，适合高密度表格中默认，按钮和正文更清楚大更大字号，适合长时间操作"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "数据保护状态客户数据与产品代码分开保存当前状态需要运维检查运行文件、缓存和客户归档不会在客户页面显示。如果这是生产或内测环境，请让运维确认数据隔离设置。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "邮箱同步准备确认新邮件能进入客户时间线待设置Mailbox setup needs attention before incoming customer email can enter CRM.Complete the mailbox connection in Settings, then run the resident worker again.连接邮"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "AI 与调研服务AI 只辅助阅读、起草和总结；关键动作仍由 SSA 控制DeepSeek 密钥OpenAI 密钥OpenRouter 密钥Tavily 调研密钥默认 AI 模型deepseek-v4-prodeepseekv4progpt-4o-minigpt-4.1deepseek/deepseek-v4-proopenai/gpt-4o-minianth"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "安全规则哪些可以自动做，哪些必须审批核心SSA 自己保存销售状态、审批、任务和文件。需要审批客户邮件、外部系统、付款和真实业务变更，在批准前都会锁定。可选工具开发和监督工具可以辅助操作员，但 OpenClaw 不依赖它们运行。"
+        }
+      ],
+      "text": "系统设置\n\n安全设置 / 密钥隐藏 / 客户发送已锁定\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n保存\nEN\n中文\n深色\nJadenOS 入门终端\n\n运行 /jadenos onboarding 逐步设置\n\n打开\n$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。\n\n完整设置仍可在本页修改。\n\n内测访问\n\n给外部试用用户准备的访问口令\n\n待填写\n访问口令\n保存访问\n清除\n\n保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底层配置。\n\n界面大小\n\n控制全局字号、按钮和输入框尺寸\n\n小\n紧凑，适合高密度表格\n中\n默认，按钮和正文更清楚\n大\n更大字号，适合长时间操作\n数据保护状态\n\n客户数据与产品代码分开保存\n\n当前状态\n\n需要运维检查\n\n运行文件、缓存和客户归档不会在客户页面显示。\n\n如果这是生产或内测环境，请让运维确认数据隔离设置。\n邮箱同步准备\n\n确认新邮件能进入客户时间线\n\n待设置\n\nMailbox setup needs attention before incoming customer email can enter CRM.\n\nComplete the mailbox connection in Settings, then run the resident worker again.\n\n连接邮箱\n自动捕获已开\nCRM 已有动态\nAdd the mailbox account.\nAdd the incoming mail server.\nAdd the mailbox password or app password.\nAI 与调研\n邮件连接\n搜索\nAI 与调研服务\n\nAI 只辅助阅读、起草和总结；关键动作仍由 SSA 控制\n\nDEEPSEEK 密钥\nOPENAI 密钥\nOPENROUTER 密钥\nTAVILY 调研密钥\n默认 AI 模型\ndeepseek-v4-pro\ndeepseekv4pro\ngpt-4o-mini\ngpt-4.1\ndeepseek/deepseek-v4-pro\nopenai/gpt-4o-mini\nanthropic/claude-sonnet-4\nmock\n安全规则\n\n哪些可以自动做，哪些必须审批\n\n核心\n\nSSA 自己保存销售状态、审批、任务和文件。\n\n需要审批\n\n客户邮件、外部系统、付款和真实业务变更，在批准前都会锁定。\n\n可选工具\n\n开发和监督工具可以辅助操作员，但 OpenClaw 不依赖它们运行。",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "07-intake-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/intake",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "新建投递"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "新建投递"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "选择文件"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "交给 Jaden"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "提交复核"
+        }
+      ],
+      "controls": [
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "例如：这是德国客户的新 PI，匹配到正确报价，先不要移动文件。",
+          "tag": "TEXTAREA",
+          "type": null,
+          "value": ""
+        }
+      ],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "新建投递",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "新建投递",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "file"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "选择文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "TEXTAREA",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "交给 Jaden",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "提交复核",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "投递台"
+        },
+        {
+          "tag": "H2",
+          "text": "投递区"
+        },
+        {
+          "tag": "H2",
+          "text": "说明给 Jaden"
+        },
+        {
+          "tag": "H2",
+          "text": "判断结果"
+        },
+        {
+          "tag": "H2",
+          "text": "匹配结果"
+        },
+        {
+          "tag": "H2",
+          "text": "最近投递"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "投递区项目 Farreach / 文件 0新建把文件拖到这里SSA 会安全保留原件，结合你的说明，建议它们应该归到哪里。还没有选择文件待保存 0 / 0 B选择文件说明给 Jaden告诉 Jaden 这是什么、该怎么处理0 条写一句说明，然后交给 Jaden 分析你批准动作前，文件和变更只保存在 SSA 内。交给 Jaden判断结果暂无投递0%未分类待人工复"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "投递区项目 Farreach / 文件 0新建把文件拖到这里SSA 会安全保留原件，结合你的说明，建议它们应该归到哪里。还没有选择文件待保存 0 / 0 B选择文件"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "说明给 Jaden告诉 Jaden 这是什么、该怎么处理0 条写一句说明，然后交给 Jaden 分析你批准动作前，文件和变更只保存在 SSA 内。交给 Jaden"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "判断结果暂无投递0%未分类待人工复核本地判断等待文件或说明。内容类型未分类把握度0%匹配结果0文件0相关公司未识别更新时间-判断依据等待更多信息建议动作提交复核暂无建议动作不会移动文件，只保存复核请求。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "匹配结果客户、报价、单证还没有找到匹配结果"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "最近投递最近保存的内容暂无最近投递"
+        }
+      ],
+      "text": "投递台\n\n投递文件、备注、询盘 / SSA 整理后待复核 / FARREACH\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n新建投递\nEN\n中文\n深色\n投递区\n\n项目 Farreach / 文件 0\n\n新建\n\n把文件拖到这里\n\nSSA 会安全保留原件，结合你的说明，建议它们应该归到哪里。\n\n还没有选择文件\n\n待保存 0 / 0 B\n\n选择文件\n说明给 Jaden\n\n告诉 Jaden 这是什么、该怎么处理\n\n0 条\n写一句说明，然后交给 Jaden 分析\n\n你批准动作前，文件和变更只保存在 SSA 内。\n\n交给 Jaden\n判断结果\n\n暂无投递\n\n0%\n\n未分类\n\n待人工复核\n\n本地判断\n\n等待文件或说明。\n\n内容类型\n\n未分类\n\n把握度\n\n0%\n\n匹配结果\n\n0\n\n文件\n\n0\n\n相关公司\n\n未识别\n\n更新时间\n\n-\n\n判断依据\n\n等待更多信息\n\n建议动作\n\n提交复核\n暂无建议动作\n\n不会移动文件，只保存复核请求。\n\n匹配结果\n\n客户、报价、单证\n\n还没有找到匹配结果\n最近投递\n\n最近保存的内容\n\n暂无最近投递",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "08-agent-status-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/agent-status",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "演练一封邮件"
+        }
+      ],
+      "controls": [],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "演练一封邮件",
+          "type": "button"
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "运维状态"
+        },
+        {
+          "tag": "H2",
+          "text": "内测准备"
+        },
+        {
+          "tag": "H2",
+          "text": "首次体验路径"
+        },
+        {
+          "tag": "H2",
+          "text": "邮件进入 CRM"
+        },
+        {
+          "tag": "H2",
+          "text": "后台 Worker"
+        },
+        {
+          "tag": "H2",
+          "text": "需要关注"
+        },
+        {
+          "tag": "H2",
+          "text": "失败任务"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-4",
+          "role": null,
+          "tag": "MAIN",
+          "text": "Beta access token is required.内测准备-检查中健康检查返回后会显示内测准备项。首次体验路径-健康检查返回后会显示首次体验路径。邮件进入 CRM等待同步检查中健康检查返回后会显示邮件同步状态。连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。待连接邮箱自动捕获未开暂无最近同步演练一封邮件后台 Worker-checki"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "内测准备-检查中健康检查返回后会显示内测准备项。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "首次体验路径-健康检查返回后会显示首次体验路径。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "邮件进入 CRM等待同步检查中健康检查返回后会显示邮件同步状态。连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。待连接邮箱自动捕获未开暂无最近同步演练一封邮件"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "后台 Worker-checking等待健康检查无心跳真实动作已上锁本地开放模式访问页未保护排队0运行中0已完成0失败0待重试0"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "需要关注当前没有 worker 告警。"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "失败任务0 项需要处理当前没有待处理的失败任务。"
+        }
+      ],
+      "text": "运维状态\n\n内测就绪 / worker 健康 / 安全门\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n刷新\nEN\n中文\n深色\nBeta access token is required.\n内测准备\n\n-\n\n检查中\n\n健康检查返回后会显示内测准备项。\n\n首次体验路径\n\n-\n\n健康检查返回后会显示首次体验路径。\n\n邮件进入 CRM\n\n等待同步\n\n检查中\n\n健康检查返回后会显示邮件同步状态。\n\n连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。\n\n待连接邮箱\n自动捕获未开\n暂无最近同步\n演练一封邮件\n后台 Worker\n\n-\n\nCHECKING\n\n等待健康检查\n\n无心跳\n真实动作已上锁\n本地开放模式\n访问页未保护\n\n排队\n\n0\n\n运行中\n\n0\n\n已完成\n\n0\n\n失败\n\n0\n\n待重试\n\n0\n\n需要关注\n\n当前没有 worker 告警。\n\n失败任务\n\n0 项需要处理\n\n当前没有待处理的失败任务。",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "09-focus-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/focus",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "返回作战指挥台"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "返回作战指挥台"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "批准并发送"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "保存草稿"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "让 AI 重写"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "拒绝"
+        }
+      ],
+      "controls": [
+        {
+          "aria": null,
+          "id": "focus-subject",
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": "RE: PO-88392 - UL1007 22AWG 修订价格与条款"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "TEXTAREA",
+          "type": null,
+          "value": "李伟您好，\n\n感谢您对报价的反馈。我们理解这批订单对价格非常敏感，也非常重视双方 3 年的合作关系。\n\n我们建议调整为以下方案：\n\n- 8% 批量折扣\n  单价"
+        }
+      ],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "返回作战指挥台",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "返回作战指挥台",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "TEXTAREA",
+          "text": "李伟您好， 感谢您对报价的反馈。我们理解这批订单对价格非常敏感，也非常重视双方 3 年的合作关系。 我们建议调整为以下方案： - 8% 批量折扣 单价：$0.916/m（原价 $0.996/m） 订单总额：$778,600 - 批次免运费 单批 >=100K 米适用 深圳发至 Amphenol 深圳仓库 - 按 LME 铜价进行季度价格复核 基准铜价：$9,",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "批准并发送",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "保存草稿",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "让 AI 重写",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "拒绝",
+          "type": "button"
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "聚焦: Amphenol PO-88392 还盘审批"
+        },
+        {
+          "tag": "H2",
+          "text": "邮件线程"
+        },
+        {
+          "tag": "H3",
+          "text": "李伟 - Amphenol Asia"
+        },
+        {
+          "tag": "H3",
+          "text": "SSA 收件箱 Agent"
+        },
+        {
+          "tag": "H3",
+          "text": "Wilson Chen - Farreach"
+        },
+        {
+          "tag": "H2",
+          "text": "AI 交易分析"
+        },
+        {
+          "tag": "H3",
+          "text": "交易背景"
+        },
+        {
+          "tag": "H3",
+          "text": "价格分析"
+        },
+        {
+          "tag": "H3",
+          "text": "竞品情报"
+        },
+        {
+          "tag": "H3",
+          "text": "建议"
+        },
+        {
+          "tag": "H3",
+          "text": "审批关卡"
+        },
+        {
+          "tag": "H2",
+          "text": "草稿编辑器"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 border-r border-slate-800 bg-slate-900/35 lg:col-span-4",
+          "role": null,
+          "tag": "SECTION",
+          "text": "邮件线程3 天内 8 封邮件LW李伟 - Amphenol Asia5月20日 14:23Wilson 你好，我们已收到 PO-88392（UL1007 22AWG，850,000 米）的报价。$0.996/m 的单价高于我们的目标价。之前供应商报价为 $0.870/m，能否重新考虑？这是季度复购订单，我们希望寻找长期合作伙伴。AISSA 收件箱 Agent"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border p-3 bg-blue-500/10 border-blue-500/35",
+          "role": null,
+          "tag": "ARTICLE",
+          "text": "LW李伟 - Amphenol Asia5月20日 14:23Wilson 你好，我们已收到 PO-88392（UL1007 22AWG，850,000 米）的报价。$0.996/m 的单价高于我们的目标价。之前供应商报价为 $0.870/m，能否重新考虑？这是季度复购订单，我们希望寻找长期合作伙伴。"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border p-3 bg-violet-500/10 border-violet-500/35",
+          "role": null,
+          "tag": "ARTICLE",
+          "text": "AISSA 收件箱 Agent09:09 生成建议 8% 批量折扣至 $0.916/m，并对 >=100K 米批次免运费。加入铜价指数季度复核条款，用于在 LME 超出约定区间时保护毛利。任何客户可见发送都必须先经过人工审批。"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border p-3 bg-emerald-500/10 border-emerald-500/35",
+          "role": null,
+          "tag": "ARTICLE",
+          "text": "FRWilson Chen - Farreach5月19日 10:05李伟您好，附件是我们针对 PO-88392 的正式报价：品项UL1007 22AWG数量850,000m 季度采购单价$0.996/m总额$846,600交期14 天账期Net 60"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 border-r border-slate-800 bg-slate-950/65 lg:col-span-4",
+          "role": null,
+          "tag": "SECTION",
+          "text": "AI 交易分析价格、竞品、毛利、建议交易背景客户Amphenol Asia（深圳）订单金额$847K 季度订单年化金额~$3.4M合作关系3 年，12 个历史 PO付款记录准时付款，无争议价格分析我方报价$0.996/m客户目标价$0.870/m (-12.6%)AI 还盘价$0.916/m (-8.0%)底价 (成本+8%)$0.891/m还盘后毛利19."
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border border-slate-800 bg-slate-900/65 p-3",
+          "role": null,
+          "tag": "SECTION",
+          "text": "交易背景客户Amphenol Asia（深圳）订单金额$847K 季度订单年化金额~$3.4M合作关系3 年，12 个历史 PO付款记录准时付款，无争议"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border border-slate-800 bg-slate-900/65 p-3",
+          "role": null,
+          "tag": "SECTION",
+          "text": "价格分析我方报价$0.996/m客户目标价$0.870/m (-12.6%)AI 还盘价$0.916/m (-8.0%)底价 (成本+8%)$0.891/m还盘后毛利19.2% (-3.9pts)"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border border-slate-800 bg-slate-900/65 p-3",
+          "role": null,
+          "tag": "SECTION",
+          "text": "竞品情报可能的前供应商：深圳恒达电缆。UL1007 22AWG 常见报价区间为 $0.850-$0.890/m，但 2025 年质量记录中有两次火花测试失败，出口认证覆盖也有限。Farreach 优势：UL 认证100% 测试出口就绪"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border border-slate-800 bg-slate-900/65 p-3",
+          "role": null,
+          "tag": "SECTION",
+          "text": "建议批准带 LME 条款的还盘。8% 折扣仍高于底价，季度指数复核可以保护后续批次毛利。若失去该客户，可能影响 Amphenol 其他工厂的合作机会。置信度 87%中等风险接受阈值 >=$0.900/m"
+        },
+        {
+          "aria": null,
+          "cls": "rounded-lg border border-amber-500/30 bg-amber-500/5 p-3",
+          "role": null,
+          "tag": "SECTION",
+          "text": "审批关卡已阻断JadenOS 可以起草、评分和给出建议，但在操作员明确批准最终草稿之前，不会执行任何客户可见动作。"
+        },
+        {
+          "aria": null,
+          "cls": "flex min-h-0 flex-col bg-slate-900/35 lg:col-span-4",
+          "role": null,
+          "tag": "SECTION",
+          "text": "草稿编辑器客户可见发送已锁定主题李伟您好， 感谢您对报价的反馈。我们理解这批订单对价格非常敏感，也非常重视双方 3 年的合作关系。 我们建议调整为以下方案： - 8% 批量折扣 单价：$0.916/m（原价 $0.996/m） 订单总额：$778,600 - 批次免运费 单批 >=100K 米适用 深圳发至 Amphenol 深圳仓库 - 按 LME 铜价进"
+        }
+      ],
+      "text": "聚焦: Amphenol PO-88392 还盘审批\n\n需要人工审批\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n等待人工\n返回作战指挥台\nEN\n中文\n深色\n邮件线程\n\n3 天内 8 封邮件\n\nLW\n李伟 - Amphenol Asia\n5月20日 14:23\n\nWilson 你好，\n\n我们已收到 PO-88392（UL1007 22AWG，850,000 米）的报价。$0.996/m 的单价高于我们的目标价。之前供应商报价为 $0.870/m，能否重新考虑？\n\n这是季度复购订单，我们希望寻找长期合作伙伴。\n\nAI\nSSA 收件箱 Agent\n09:09 生成\n\n建议 8% 批量折扣至 $0.916/m，并对 >=100K 米批次免运费。\n\n加入铜价指数季度复核条款，用于在 LME 超出约定区间时保护毛利。\n\n任何客户可见发送都必须先经过人工审批。\n\nFR\nWilson Chen - Farreach\n5月19日 10:05\n\n李伟您好，\n\n附件是我们针对 PO-88392 的正式报价：\n\n品项\nUL1007 22AWG\n数量\n850,000m 季度采购\n单价\n$0.996/m\n总额\n$846,600\n交期\n14 天\n账期\nNet 60\n已折叠 5 封早期邮件：初始询盘、规格书、样品申请、合规检查、报价交接\nAI 交易分析\n\n价格、竞品、毛利、建议\n\n交易背景\n客户\nAmphenol Asia（深圳）\n订单金额\n$847K 季度订单\n年化金额\n~$3.4M\n合作关系\n3 年，12 个历史 PO\n付款记录\n准时付款，无争议\n价格分析\n我方报价\n$0.996/m\n客户目标价\n$0.870/m (-12.6%)\nAI 还盘价\n$0.916/m (-8.0%)\n底价 (成本+8%)\n$0.891/m\n还盘后毛利\n19.2% (-3.9pts)\n竞品情报\n\n可能的前供应商：深圳恒达电缆。UL1007 22AWG 常见报价区间为 $0.850-$0.890/m，但 2025 年质量记录中有两次火花测试失败，出口认证覆盖也有限。\n\nFarreach 优势：UL 认证\n100% 测试\n出口就绪\n建议\n\n批准带 LME 条款的还盘。8% 折扣仍高于底价，季度指数复核可以保护后续批次毛利。若失去该客户，可能影响 Amphenol 其他工厂的合作机会。\n\n置信度 87%\n中等风险\n接受阈值 >=$0.900/m\n审批关卡\n已阻断\n\nJadenOS 可以起草、评分和给出建议，但在操作员明确批准最终草稿之前，不会执行任何客户可见动作。\n\n草稿编辑器\n\n客户可见发送已锁定\n\n主题\n批准并发送\n保存草稿\n让 AI 重写\n拒绝\n\n任何客户可见发送都必须先经过人工审批。本演示只在本地记录审批状态。",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  },
+  {
+    "file": "10-documents-desktop.png",
+    "title": "SSA",
+    "finalUrl": "http://localhost:3000/documents",
+    "metrics": {
+      "buttons": [
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "EN"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "中文"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "深色"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "刷新"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "CI"
+        },
+        {
+          "aria": null,
+          "disabled": false,
+          "text": "PL"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "生成 CI / PL"
+        },
+        {
+          "aria": null,
+          "disabled": true,
+          "text": "提交给 Jaden"
+        }
+      ],
+      "controls": [
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "输入 PI 编号或客户名",
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": "PI-20260609-001"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "date",
+          "value": "2026-06-09"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": "Shenzhen, China"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "SELECT",
+          "type": null,
+          "value": "USD"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": "Carton"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "40x30x20cm",
+          "tag": "INPUT",
+          "type": null,
+          "value": ""
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": null,
+          "tag": "INPUT",
+          "type": null,
+          "value": "N/M"
+        },
+        {
+          "aria": null,
+          "id": null,
+          "name": null,
+          "placeholder": "让 Jaden 检查 CI/PL 字段、补齐装箱信息，或核对运输条款",
+          "tag": "TEXTAREA",
+          "type": null,
+          "value": ""
+        }
+      ],
+      "documentHeight": 1161,
+      "focusables": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "tag": "A",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "EN",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "中文",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "深色",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "刷新",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "tag": "A",
+          "text": "驾驶舱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "tag": "A",
+          "text": "投递台",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "tag": "A",
+          "text": "客户",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "tag": "A",
+          "text": "收件箱",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "tag": "A",
+          "text": "开发信",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "tag": "A",
+          "text": "报价",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "tag": "A",
+          "text": "出货文件",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "tag": "A",
+          "text": "情报",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "tag": "A",
+          "text": "运维",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "tag": "A",
+          "text": "设置",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "CI",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "PL",
+          "type": "button"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "date"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "SELECT",
+          "text": "USDEURCNYGBP",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": "number"
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "INPUT",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "生成 CI / PL",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "TEXTAREA",
+          "text": "",
+          "type": null
+        },
+        {
+          "aria": null,
+          "href": null,
+          "tag": "BUTTON",
+          "text": "提交给 Jaden",
+          "type": null
+        }
+      ],
+      "headings": [
+        {
+          "tag": "H1",
+          "text": "出货文件"
+        },
+        {
+          "tag": "H2",
+          "text": "PI 后续文件"
+        },
+        {
+          "tag": "H2",
+          "text": "装箱与出货补充"
+        },
+        {
+          "tag": "H2",
+          "text": "让 Jaden 帮我看"
+        },
+        {
+          "tag": "H2",
+          "text": "新生成文件"
+        },
+        {
+          "tag": "H2",
+          "text": "最近文件"
+        }
+      ],
+      "lang": "zh-CN",
+      "links": [
+        {
+          "aria": "SSA home",
+          "href": "/",
+          "text": ""
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        },
+        {
+          "aria": null,
+          "href": "/",
+          "text": "驾驶舱"
+        },
+        {
+          "aria": null,
+          "href": "/intake",
+          "text": "投递台"
+        },
+        {
+          "aria": null,
+          "href": "/leads",
+          "text": "客户"
+        },
+        {
+          "aria": null,
+          "href": "/inbox",
+          "text": "收件箱"
+        },
+        {
+          "aria": null,
+          "href": "/emails",
+          "text": "开发信"
+        },
+        {
+          "aria": null,
+          "href": "/quotations",
+          "text": "报价"
+        },
+        {
+          "aria": null,
+          "href": "/documents",
+          "text": "出货文件"
+        },
+        {
+          "aria": null,
+          "href": "/intelligence",
+          "text": "情报"
+        },
+        {
+          "aria": null,
+          "href": "/agent-status",
+          "text": "运维"
+        },
+        {
+          "aria": null,
+          "href": "/settings",
+          "text": "设置"
+        }
+      ],
+      "overflows": [],
+      "regions": [
+        {
+          "aria": null,
+          "cls": "mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "flex h-10 items-center gap-1.5 overflow-x-auto border-t border-slate-700 px-4 lg:hidden",
+          "role": null,
+          "tag": "NAV",
+          "text": "驾驶舱投递台客户收件箱开发信报价出货文件情报运维设置"
+        },
+        {
+          "aria": null,
+          "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
+          "role": null,
+          "tag": "MAIN",
+          "text": "PI 来源未选择金额USD 0.00净重0.0kg待生成CI+PLPI 后续文件PI-20260609-001 / FOB ShenzhenCIPL检索 PI 编号先选择已保存的 PI还没有保存的 PI。请先从快速报价导出 PI。PI No.CustomerContactEmailAddressShip DateDepartureDestinationCur"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "PI 后续文件PI-20260609-001 / FOB ShenzhenCIPL检索 PI 编号先选择已保存的 PI还没有保存的 PI。请先从快速报价导出 PI。PI No.CustomerContactEmailAddressShip DateDepartureDestinationCurrencyUSDEURCNYGBPFreightInsurance"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "装箱与出货补充按 PI 产品补齐DescriptionHS CodeSpecificationQtyUnit PriceNet kgGross kgPackagesCarton / Package TypeDimensionsMarks"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "让 Jaden 帮我看会带上本页筛选和当前数据，不会外发就绪Jaden 会参考这些内容你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。出货文件 / 文件 CI+PL / 客户 未填写 / 金额 USD 0.00 / 已生成 0不会发给客户，只会保存到 JadenOS 内等待复核。提交给 Jaden"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "新生成文件本次操作本次还没有生成文件"
+        },
+        {
+          "aria": null,
+          "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
+          "role": null,
+          "tag": "SECTION",
+          "text": "最近文件0 个已保存文件还没有已生成文件"
+        }
+      ],
+      "text": "出货文件\n\n从已保存 PI 生成 CI / PL / 不会外发\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n刷新\nEN\n中文\n深色\n\nPI 来源\n\n未选择\n\n金额\n\nUSD 0.00\n\n净重\n\n0.0kg\n\n待生成\n\nCI+PL\n\nPI 后续文件\n\nPI-20260609-001 / FOB Shenzhen\n\nCI\nPL\n检索 PI 编号\n\n先选择已保存的 PI\n\n还没有保存的 PI。请先从快速报价导出 PI。\nPI NO.\nCUSTOMER\nCONTACT\nEMAIL\nADDRESS\nSHIP DATE\nDEPARTURE\nDESTINATION\nCURRENCY\nUSD\nEUR\nCNY\nGBP\nFREIGHT\nINSURANCE\n装箱与出货补充\n\n按 PI 产品补齐\n\nDESCRIPTION\nHS CODE\nSPECIFICATION\nQTY\nUNIT PRICE\nNET KG\nGROSS KG\nPACKAGES\nCARTON / PACKAGE TYPE\nDIMENSIONS\nMARKS\n本次已生成 0 个文件\n生成 CI / PL\n让 Jaden 帮我看\n\n会带上本页筛选和当前数据，不会外发\n\n就绪\n\nJADEN 会参考这些内容\n\n你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。\n\n出货文件 / 文件 CI+PL / 客户 未填写 / 金额 USD 0.00 / 已生成 0\n\n不会发给客户，只会保存到 JadenOS 内等待复核。\n\n提交给 Jaden\n新生成文件\n\n本次操作\n\n本次还没有生成文件\n最近文件\n\n0 个已保存文件\n\n还没有已生成文件",
+      "theme": "light",
+      "uiSize": "large",
+      "viewport": {
+        "height": 1161,
+        "width": 2560
+      }
+    }
+  }
+]

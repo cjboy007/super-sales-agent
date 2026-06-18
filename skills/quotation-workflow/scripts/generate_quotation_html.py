@@ -4,8 +4,28 @@
 import sys
 import json
 import argparse
+import html
 from pathlib import Path
 from datetime import datetime
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+try:
+    from bank_config import get_primary_bank
+except Exception:
+    get_primary_bank = None
+
+def escape_html(value):
+    return html.escape(str(value or ''), quote=True)
+
+def load_primary_bank_info():
+    if get_primary_bank:
+        bank = get_primary_bank(throw_error=False)
+        if bank:
+            return bank
+    raise RuntimeError("Primary bank configuration is required for quotation generation")
 
 def generate_html_quotation(output_path, data):
     """生成 HTML 报价单（基于提供的模板优化）"""
@@ -73,12 +93,7 @@ def generate_html_quotation(output_path, data):
     total = subtotal + freight + tax
     
     # 银行信息
-    bank_info = data.get('bank_info', {
-        'beneficiary': 'Your Company Name, Ltd.',
-        'bank_name': 'Standard Chartered Bank',
-        'account_no': '1234 5678 9012',
-        'swift_code': 'SCBLHKHH'
-    })
+    bank_info = data.get('bank_info') or load_primary_bank_info()
     
     # 条款（支持字典和列表两种格式）
     terms_data = data.get('terms', {})
@@ -107,7 +122,7 @@ def generate_html_quotation(output_path, data):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotation {quotation_no} - {customer_name}</title>
+    <title>Quotation {escape_html(quotation_no)} - {escape_html(customer_name)}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -259,14 +274,14 @@ def generate_html_quotation(output_path, data):
         <!-- Header -->
         <header class="flex justify-between items-start border-b-2 border-slate-100 pb-8 mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{company_name}</h1>
-                <p class="text-sm text-slate-500 font-medium tracking-wide">{company_tagline}</p>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{escape_html(company_name)}</h1>
+                <p class="text-sm text-slate-500 font-medium tracking-wide">{escape_html(company_tagline)}</p>
                 <p class="text-xs text-brand-600 font-medium italic mt-2">"real cables for real people"</p>
                 
                 <div class="mt-6 space-y-1 text-sm text-slate-600">
-                    <p class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-slate-400"></i> {company_address}</p>
-                    <p class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4 text-slate-400"></i> {company_email}</p>
-                    <p class="flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4 text-slate-400"></i> {company_website}</p>
+                    <p class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-slate-400"></i> {escape_html(company_address)}</p>
+                    <p class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4 text-slate-400"></i> {escape_html(company_email)}</p>
+                    <p class="flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4 text-slate-400"></i> {escape_html(company_website)}</p>
                 </div>
             </div>
             
@@ -274,11 +289,11 @@ def generate_html_quotation(output_path, data):
                 <h2 class="text-4xl font-light text-brand-600 tracking-widest uppercase mb-4">Quotation</h2>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <span class="text-slate-500 font-medium">Quote No:</span>
-                    <span class="font-semibold text-slate-900">{quotation_no}</span>
+                    <span class="font-semibold text-slate-900">{escape_html(quotation_no)}</span>
                     <span class="text-slate-500 font-medium">Date:</span>
-                    <span class="font-semibold text-slate-900">{quotation_date}</span>
+                    <span class="font-semibold text-slate-900">{escape_html(quotation_date)}</span>
                     <span class="text-slate-500 font-medium">Valid Until:</span>
-                    <span class="font-semibold text-slate-900">{valid_until}</span>
+                    <span class="font-semibold text-slate-900">{escape_html(valid_until)}</span>
                 </div>
             </div>
         </header>
@@ -287,9 +302,9 @@ def generate_html_quotation(output_path, data):
         <div class="grid grid-cols-2 gap-8 mb-8">
             <div class="bg-slate-50 p-5 rounded-lg border border-slate-100">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Prepared For</h3>
-                <p class="font-bold text-slate-900 text-lg">{customer_name}</p>
-                <p class="text-sm text-slate-600 mt-1">Attn: {customer_contact}</p>
-                <p class="text-sm text-slate-600 mt-1">{customer_address}</p>
+                <p class="font-bold text-slate-900 text-lg">{escape_html(customer_name)}</p>
+                <p class="text-sm text-slate-600 mt-1">Attn: {escape_html(customer_contact)}</p>
+                <p class="text-sm text-slate-600 mt-1">{escape_html(customer_address)}</p>
             </div>
             
             <div class="bg-slate-50 p-5 rounded-lg border border-slate-100">
@@ -297,15 +312,15 @@ def generate_html_quotation(output_path, data):
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-slate-500">Incoterms:</span>
-                        <span class="font-medium text-slate-900">{incoterms}</span>
+                        <span class="font-medium text-slate-900">{escape_html(incoterms)}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500">Currency:</span>
-                        <span class="font-medium text-slate-900">{currency}</span>
+                        <span class="font-medium text-slate-900">{escape_html(currency)}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500">Lead Time:</span>
-                        <span class="font-medium text-slate-900">{lead_time}</span>
+                        <span class="font-medium text-slate-900">{escape_html(lead_time)}</span>
                     </div>
                 </div>
             </div>
@@ -337,7 +352,7 @@ def generate_html_quotation(output_path, data):
         # 规格 inline 显示（节省空间）
         spec_text = ''
         if specification:
-            specs = [s.strip() for s in specification.split(',') if s.strip()]
+            specs = [escape_html(s.strip()) for s in specification.split(',') if s.strip()]
             spec_text = ' | '.join(specs)
         
         html_content += f'''
@@ -345,7 +360,7 @@ def generate_html_quotation(output_path, data):
                     <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                         <td class="p-2 text-center font-medium text-slate-500 text-xs">{idx:02d}</td>
                         <td class="p-2 py-1.5">
-                            <p class="font-bold text-slate-900 text-xs">{description}</p>
+                            <p class="font-bold text-slate-900 text-xs">{escape_html(description)}</p>
                             <p class="text-slate-600 text-xs mt-0.5">{spec_text}</p>
                         </td>
                         <td class="p-2 text-center text-slate-700 text-xs">{quantity}</td>
@@ -371,7 +386,7 @@ def generate_html_quotation(output_path, data):
                     <span class="font-semibold text-slate-900 text-sm italic">{"$" + str(freight) if freight > 0 else "To be advised"}</span>
                 </div>
                 <div class="flex justify-between items-center border-t-2 border-slate-200 pt-4">
-                    <span class="text-xl font-bold text-slate-900">Total ({incoterms})</span>
+                    <span class="text-xl font-bold text-slate-900">Total ({escape_html(incoterms)})</span>
                     <span class="text-3xl font-bold text-brand-600">${total:,.2f}</span>
                 </div>
             </div>
@@ -388,7 +403,7 @@ def generate_html_quotation(output_path, data):
     
     for i, term in enumerate(terms_list, start=1):
         html_content += f'''
-                    <li class="flex gap-2"><span class="text-brand-500 font-bold">{i}.</span> {term}</li>
+                    <li class="flex gap-2"><span class="text-brand-500 font-bold">{i}.</span> {escape_html(term)}</li>
 '''
     
     html_content += f'''
@@ -400,10 +415,10 @@ def generate_html_quotation(output_path, data):
                     <i data-lucide="building-2" class="w-4 h-4 text-brand-500"></i> Bank Details
                 </h4>
                 <div class="bg-slate-50 p-4 rounded text-slate-600 space-y-1">
-                    <p><span class="font-medium text-slate-900">Beneficiary:</span> {bank_info.get('beneficiary', '')}</p>
-                    <p><span class="font-medium text-slate-900">Bank Name:</span> {bank_info.get('bank_name', '')}</p>
-                    <p><span class="font-medium text-slate-900">Account No:</span> {bank_info.get('account_no', '')}</p>
-                    <p><span class="font-medium text-slate-900">SWIFT Code:</span> {bank_info.get('swift_code', '')}</p>
+                    <p><span class="font-medium text-slate-900">Beneficiary:</span> {escape_html(bank_info.get('beneficiary', ''))}</p>
+                    <p><span class="font-medium text-slate-900">Bank Name:</span> {escape_html(bank_info.get('bank_name', ''))}</p>
+                    <p><span class="font-medium text-slate-900">Account No:</span> {escape_html(bank_info.get('account_no', ''))}</p>
+                    <p><span class="font-medium text-slate-900">SWIFT Code:</span> {escape_html(bank_info.get('swift_code', ''))}</p>
                 </div>
 
                 <!-- 签名区域（暂时移除，待确认） -->

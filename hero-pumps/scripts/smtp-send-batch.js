@@ -18,15 +18,15 @@
 
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const DRAFTS_DIR = path.join(__dirname, '../campaign-tracker/templates');
-const SIGNATURE_PATH = '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/signatures/signature-hero-jordan.html';
-const SMTP_CLI = '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js';
-const ENV_PATH = path.join(__dirname, '../.env');
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
+const SIGNATURE_PATH = path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'signatures', 'signature-hero-jordan.html');
+const SMTP_CLI = path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'scripts', 'smtp.js');
 const PROJECT = 'hero-pumps';
 
 // ==================== 解析草稿 ====================
@@ -77,13 +77,17 @@ async function sendEmail(draft, dryRun = false) {
     const signature = fs.readFileSync(SIGNATURE_PATH, 'utf8');
     const fullBody = `${draft.body}\n\n${signature}`;
     
-    // 转义特殊字符
-    const safeSubject = draft.subject.replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`');
-    const safeBody = fullBody.replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`');
-    
-    const cmd = `node "${SMTP_CLI}" send --to "${draft.email}" --subject "${safeSubject}" --html --body "${safeBody}"`;
-    
-    const { stdout, stderr } = await execAsync(cmd, { timeout: 30000 });
+    const { stdout, stderr } = await execFileAsync(process.execPath, [
+      SMTP_CLI,
+      'send',
+      '--to',
+      draft.email,
+      '--subject',
+      draft.subject,
+      '--html',
+      '--body',
+      fullBody,
+    ], { timeout: 30000 });
     return { success: true, stdout, stderr };
   } catch(e) {
     return { success: false, error: e.message };

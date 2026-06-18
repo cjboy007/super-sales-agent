@@ -17,12 +17,13 @@ const { SalesState } = require('../shared/sales-state-db');
 const { verifyLegacyOutboundSafety } = require('../skills/imap-smtp-email/lib/outbound-safety');
 
 const execAsync = promisify(exec);
+const REPO_ROOT = path.resolve(__dirname, '..');
 const PROJECT = 'farreach';
 
 // ==================== 配置 ====================
 const CONFIG = {
   OKKI_CLI: '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_cli.py',
-  SMTP_CLI: '/Users/wilson/.openclaw/workspace/skills/imap-smtp-email/scripts/smtp.js',
+  SMTP_CLI: path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'scripts', 'smtp.js'),
   TEMPLATES_DIR: path.join(__dirname, 'config/templates'),
   COUNTRIES_FILE: path.join(__dirname, 'config/okki-countries.json'),
   LOG_DIR: path.join(process.env.HOME, '.ssa', 'logs', 'companies', 'farreach', 'sales-orchestrator'),
@@ -143,7 +144,7 @@ class EmailSender {
         workspaceId: PROJECT,
         to,
         subject,
-        humanApproval: true,
+        approvalId: process.env.SSA_RUNTIME_APPROVAL_ID,
       });
       const cmd = `node "${CONFIG.SMTP_CLI}" send --to "${to}" --subject "${subject}" --body "${body.replace(/"/g, '\\"')}" --signature jordan`;
       const { stdout, stderr } = await execAsync(cmd);

@@ -20,7 +20,7 @@ export default function PageCommandPanel({
   placeholder = "Tell Jaden what to inspect, draft, verify, or prepare from this page",
   zhPlaceholder = "告诉 Jaden 要检查、整理、起草或准备什么",
 }: PageCommandPanelProps) {
-  const { apiUrl } = useProject();
+  const { apiFetch } = useProject();
   const { language } = useTheme();
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "queued" | "error">("idle");
@@ -32,7 +32,7 @@ export default function PageCommandPanel({
     setStatus("sending");
     setReceipt("");
     try {
-      const res = await fetch(apiUrl("/api/operator-command"), {
+      const res = await apiFetch("/api/operator-command", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -45,7 +45,16 @@ export default function PageCommandPanel({
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Command rejected");
       setStatus("queued");
-      setReceipt(json.data?.id || "queued");
+      const queuedTasks = Number(json.data?.queuedTasks || 0);
+      setReceipt(
+        language === "zh"
+          ? queuedTasks > 0
+            ? `已保存待复核，Jaden 会准备 ${queuedTasks} 项后续任务。`
+            : "已保存待复核。"
+          : queuedTasks > 0
+            ? `Saved for review. Jaden will prepare ${queuedTasks} next-step task${queuedTasks === 1 ? "" : "s"}.`
+            : "Saved for review."
+      );
       setMessage("");
     } catch (err) {
       setStatus("error");

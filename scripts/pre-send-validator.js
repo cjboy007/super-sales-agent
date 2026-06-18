@@ -62,6 +62,7 @@ class PreSendValidator {
   _validateRecipientEmail(docData, recipientEmail) {
     const customer = docData.customer || {};
     const customerEmail = customer.contact_email || customer.email || '';
+    const normalize = (value) => String(value || '').trim().toLowerCase();
 
     if (!recipientEmail) {
       this.errors.push('收件人邮箱为空');
@@ -73,12 +74,12 @@ class PreSendValidator {
       return;
     }
 
-    const recipientDomain = recipientEmail.split('@')[1]?.toLowerCase();
-    const customerDomain = customerEmail.split('@')[1]?.toLowerCase();
+    const normalizedRecipient = normalize(recipientEmail);
+    const normalizedCustomerEmail = normalize(customerEmail);
 
-    if (recipientDomain !== customerDomain) {
+    if (normalizedRecipient !== normalizedCustomerEmail) {
       this.errors.push(
-        `收件人邮箱域名不匹配:\n` +
+        `收件人邮箱不匹配:\n` +
         `  文档客户邮箱：${customerEmail}\n` +
         `  实际收件人：${recipientEmail}\n` +
         `  请确认是否发错客户`

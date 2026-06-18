@@ -4,6 +4,7 @@ import type { SalesRuntime } from "./sales-runtime";
 import type { LlmResult } from "./types";
 import type { ProductDocReaderSummary } from "./product-doc-reader";
 import { ensureDir, ensureSsaCompanyDataPath, sanitizeSsaPathSegment, ssaCompanyDataPath } from "../ssa-data-paths";
+import { readSettings } from "../config-store";
 
 export type IntakeMessageRole = "user" | "assistant";
 
@@ -101,7 +102,7 @@ export interface IntakeSessionSummary {
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_TOTAL_UPLOAD_SIZE = 150 * 1024 * 1024;
 const MAX_FILES_PER_REQUEST = 8;
-const MAX_INTAKE_SESSIONS = 25;
+const DEFAULT_INTAKE_SESSION_LIST_LIMIT = 100;
 
 const EMPTY_ANALYSIS: IntakeAnalysis = {
   source: "local",
@@ -161,29 +162,65 @@ function readSessionRecords(project: string): IntakeRecord[] {
     .filter((record): record is IntakeRecord => Boolean(record));
 }
 
-function pruneIntakeStorage(project: string) {
+function intEnv(name: string, fallback: number): number {
+  const parsed = Number.parseInt(process.env[name] || "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function intakeSessionListLimit() {
+  return intEnv("SSA_INTAKE_LIST_LIMIT", DEFAULT_INTAKE_SESSION_LIST_LIMIT);
+}
+
+function intakeRetentionMode() {
+  return String(process.env.SSA_INTAKE_RETENTION_MODE || readSettings().intakeRetentionMode || "keep").trim().toLowerCase();
+}
+
+function intakeMaxActiveSessions(): number | null {
+  const parsed = Number.parseInt(process.env.SSA_INTAKE_MAX_ACTIVE_SESSIONS || "", 10);
+  if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  const configured = Number(readSettings().intakeMaxActiveSessions || 0);
+  return Number.isFinite(configured) && configured > 0 ? configured : null;
+}
+
+function uniqueArchivePath(targetPath: string): string {
+  if (!fs.existsSync(targetPath)) return targetPath;
+  const parsed = path.parse(targetPath);
+  const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return path.join(parsed.dir, `${parsed.name}-${suffix}${parsed.ext}`);
+}
+
+function moveToArchive(sourcePath: string, targetPath: string) {
+  if (!fs.existsSync(sourcePath)) return;
+  const finalTarget = uniqueArchivePath(targetPath);
+  fs.mkdirSync(path.dirname(finalTarget), { recursive: true });
+  fs.renameSync(sourcePath, finalTarget);
+}
+
+function applyIntakeRetention(project: string) {
+  if (intakeRetentionMode() !== "archive") return;
+  const maxActiveSessions = intakeMaxActiveSessions();
+  if (!maxActiveSessions) return;
+
   const sessionsDir = ssaCompanyDataPath(project, "intake", "sessions");
   const uploadsDir = ssaCompanyDataPath(project, "intake", "uploads");
+  const archiveSessionsDir = ssaCompanyDataPath(project, "intake", "archive", "sessions");
+  const archiveUploadsDir = ssaCompanyDataPath(project, "intake", "archive", "uploads");
   const records = readSessionRecords(project).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  const kept = new Set(records.slice(0, MAX_INTAKE_SESSIONS).map((record) => record.id));
 
-  for (const record of records.slice(MAX_INTAKE_SESSIONS)) {
+  for (const record of records.slice(maxActiveSessions)) {
     try {
-      fs.rmSync(path.join(sessionsDir, `${sanitizeSegment(record.id)}.json`), { force: true });
+      const sessionName = `${sanitizeSegment(record.id)}.json`;
+      moveToArchive(
+        path.join(sessionsDir, sessionName),
+        path.join(archiveSessionsDir, sessionName)
+      );
+      moveToArchive(
+        path.join(uploadsDir, sanitizeSegment(record.id)),
+        path.join(archiveUploadsDir, sanitizeSegment(record.id))
+      );
     } catch {
-      // Best-effort cleanup should never block intake processing.
+      // Best-effort archive should never block intake processing.
     }
-  }
-
-  try {
-    if (!fs.existsSync(uploadsDir)) return;
-    for (const entry of fs.readdirSync(uploadsDir, { withFileTypes: true })) {
-      if (entry.isDirectory() && !kept.has(entry.name)) {
-        fs.rmSync(path.join(uploadsDir, entry.name), { recursive: true, force: true });
-      }
-    }
-  } catch {
-    // Best-effort cleanup should never block intake processing.
   }
 }
 
@@ -470,7 +507,7 @@ function enqueueUploadProcessing(runtime: SalesRuntime, record: IntakeRecord, ta
 export function listIntakeSessions(project: string): IntakeSessionSummary[] {
   return readSessionRecords(project)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-    .slice(0, MAX_INTAKE_SESSIONS)
+    .slice(0, intakeSessionListLimit())
     .map((record) => ({
       id: record.id,
       project: record.project,
@@ -523,7 +560,7 @@ export async function processIntake(runtime: SalesRuntime, input: IntakeInput): 
   record.updatedAt = nowIso();
   writeRecord(record);
   enqueueUploadProcessing(runtime, record, queuedProcessing);
-  pruneIntakeStorage(record.project);
+  applyIntakeRetention(record.project);
 
   runtime.recordEvent("intake.processed", record.project, {
     intakeId: record.id,

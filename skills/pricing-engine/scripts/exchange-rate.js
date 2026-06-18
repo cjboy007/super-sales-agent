@@ -29,6 +29,7 @@ const CACHE_TTL_MS = parseInt(process.env.CACHE_TTL_MS, 10) || 4 * 60 * 60 * 100
 const API_URL = 'https://open.er-api.com/v6/latest/USD';
 const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'CNY'];
 const REQUEST_TIMEOUT_MS = 10000;
+const MAX_STALE_CACHE_MS = parseInt(process.env.EXCHANGE_RATE_MAX_STALE_CACHE_MS, 10) || 24 * 60 * 60 * 1000;
 
 // ========== 模拟汇率（dry-run 模式） ==========
 const MOCK_RATES = {
@@ -108,6 +109,13 @@ function isCacheValid(cache) {
   if (!cache || !cache.fetched_at || !cache.rates) return false;
   const age = Date.now() - new Date(cache.fetched_at).getTime();
   return age < CACHE_TTL_MS;
+}
+
+function cacheAgeMs(cache) {
+  if (!cache?.fetched_at) return Infinity;
+  const fetchedAt = new Date(cache.fetched_at).getTime();
+  if (!Number.isFinite(fetchedAt)) return Infinity;
+  return Date.now() - fetchedAt;
 }
 
 // ========== HTTP 请求 ==========
@@ -202,8 +210,18 @@ async function getRatesData() {
 
     // 离线降级：使用过期缓存
     if (cache && cache.rates) {
+      const staleAgeMs = cacheAgeMs(cache);
+      if (process.env.EXCHANGE_RATE_ALLOW_STALE_CACHE === 'false' || staleAgeMs > MAX_STALE_CACHE_MS) {
+        throw new Error(`Cannot get exchange rates: API failed (${apiErr.message}) and cached rate is stale from ${cache.fetched_at}`);
+      }
       log('warn', `Offline fallback: using stale cache from ${cache.fetched_at}`);
-      return { ...cache, _stale: true };
+      return {
+        ...cache,
+        _stale: true,
+        stale: true,
+        stale_age_ms: staleAgeMs,
+        warning: `Using stale exchange-rate cache from ${cache.fetched_at} because the API failed: ${apiErr.message}`,
+      };
     }
 
     // 无缓存可用
@@ -238,6 +256,34 @@ async function getRate(from, to) {
 
   log('info', `getRate(${fromCode}, ${toCode}) = ${rate}`);
   return rate;
+}
+
+async function getRateWithMeta(from, to) {
+  const fromCode = validateCurrency(from);
+  const toCode = validateCurrency(to);
+
+  if (fromCode === toCode) {
+    return { rate: 1.0, from: fromCode, to: toCode, stale: false };
+  }
+
+  const data = await getRatesData();
+  const fromRate = data.rates[fromCode];
+  const toRate = data.rates[toCode];
+
+  if (fromRate === undefined || toRate === undefined) {
+    throw new Error(`Rate not available for ${fromCode} or ${toCode}`);
+  }
+
+  return {
+    rate: toRate / fromRate,
+    from: fromCode,
+    to: toCode,
+    fetched_at: data.fetched_at,
+    source: data.source,
+    stale: Boolean(data._stale || data.stale),
+    stale_age_ms: data.stale_age_ms,
+    warning: data.warning,
+  };
 }
 
 /**
@@ -351,6 +397,7 @@ if (require.main === module) {
 // ========== 导出 ==========
 module.exports = {
   getRate,
+  getRateWithMeta,
   convertAmount,
   refreshRates,
   getAllRates,

@@ -42,6 +42,16 @@ function conversionCalls() {
   return execFileSyncMock.mock.calls.filter((call) => call[0] === "soffice");
 }
 
+function expectNoInternalActionFields(value: unknown) {
+  const serialized = JSON.stringify(value);
+  expect(serialized).not.toContain("sideEffect");
+  expect(serialized).not.toContain("workspaceId");
+  expect(serialized).not.toContain("realExecutionEnabled");
+  expect(serialized).not.toContain("payload");
+  expect(serialized).not.toContain("idempotencyKey");
+  expect(serialized).not.toContain(".ssa");
+}
+
 describe("/api/files/preview route", () => {
   it("returns direct preview metadata for HTML without a side-effect gate", async () => {
     const htmlPath = path.join(tempRoot, "companies", "demo-exporter", "documents", "preview.html");
@@ -55,8 +65,18 @@ describe("/api/files/preview route", () => {
     expect(json).toMatchObject({
       previewAvailable: false,
       reason: "direct",
-      inlineUrl: `/api/files?path=${encodeURIComponent(htmlPath)}&project=demo-exporter`,
     });
+    expect(json.inlineUrl).toContain("/api/files?token=");
+    expect(json.inlineUrl).toContain("project=demo-exporter");
+    expect(json.downloadUrl).toContain("/api/files?token=");
+    expect(JSON.stringify(json)).not.toContain(htmlPath);
+    expect(JSON.stringify(json)).not.toContain(tempRoot);
+    expect(JSON.stringify(json)).not.toContain("/Users/");
+    expect(JSON.stringify(json)).not.toContain(".ssa");
+    expect(JSON.stringify(json)).not.toContain("workspaceId");
+    expect(JSON.stringify(json)).not.toContain("provider");
+    expect(JSON.stringify(json)).not.toContain("jobId");
+    expect(JSON.stringify(json)).not.toContain("workflow");
     expect(conversionCalls()).toHaveLength(0);
   });
 
@@ -73,14 +93,15 @@ describe("/api/files/preview route", () => {
       previewAvailable: false,
       blocked: true,
       reason: "preview_conversion_blocked",
-      sideEffect: {
-        kind: "document.preview",
-        workspaceId: "demo-exporter",
+      action: {
+        title: "Document preview",
         status: "blocked",
-        realExecutionEnabled: false,
+        blocked: true,
       },
     });
-    expect(json.sideEffect.reason).toContain("SSA_ENABLE_REAL_DOCUMENT_PREVIEW=true");
+    expect(json.action.reason).toContain("explicit approval");
+    expect(json.action.reason).not.toContain("SSA_ENABLE_REAL_DOCUMENT_PREVIEW");
+    expectNoInternalActionFields(json);
     expect(conversionCalls()).toHaveLength(0);
   });
 

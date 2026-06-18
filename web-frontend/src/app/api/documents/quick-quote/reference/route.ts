@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildQuickQuoteReference } from "@/lib/quick-quote-reference";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
 import { findPriceReferences } from "@/lib/runtime/price-memory";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,8 @@ interface ExchangeRateReference {
   updatedAt: string;
   error?: string;
 }
+
+type PublicExchangeRateReference = Omit<ExchangeRateReference, "provider" | "error">;
 
 const RATE_CURRENCIES = ["CNY", "EUR", "GBP"] as const;
 const RATE_CACHE_TTL_MS = 30 * 60 * 1000;
@@ -75,10 +77,16 @@ async function getExchangeRateReference(currency: string): Promise<ExchangeRateR
   }
 }
 
+function publicExchangeRateReference(rate: ExchangeRateReference | null): PublicExchangeRateReference | null {
+  if (!rate) return null;
+  const { provider: _provider, error: _error, ...publicRate } = rate;
+  return publicRate;
+}
+
 export async function GET(request: NextRequest) {
-  const project = request.nextUrl.searchParams.get("project") || "farreach";
-  const auth = requireWorkspaceAccess(request, project);
+  const auth = requireResolvedWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
+  const project = auth.workspaceId;
 
   const customer = request.nextUrl.searchParams.get("customer") || "";
   const products = parseProducts(request.nextUrl.searchParams.get("products") || "");
@@ -117,7 +125,7 @@ export async function GET(request: NextRequest) {
     data: {
       ...reference,
       ...priceReferences,
-      exchangeRate,
+      exchangeRate: publicExchangeRateReference(exchangeRate),
     },
   });
 }

@@ -1,13 +1,32 @@
 import type { RuntimeJob, RuntimeEvent } from "./types";
 import { createSalesRuntime, type SalesRuntime } from "./sales-runtime";
+import { alertsForQueue, recordWorkerStatus, summarizeQueue } from "./worker-health";
+import { syncCustomerLifecycleStatuses } from "./customers";
 
 export interface JadenWorkerTickOptions {
   runtime?: SalesRuntime;
   workerId?: string;
+  workspaceId?: string;
+  syncInbox?: boolean;
+  syncInboxWith?: (input: {
+    workspaceId: string;
+    limit: number;
+    now: string;
+  }) => Promise<JadenWorkerInboxSyncResult>;
+  inboxLimit?: number;
   maxJobs?: number;
   maxAttempts?: number;
   leaseMs?: number;
   now?: Date;
+}
+
+export interface JadenWorkerInboxSyncResult {
+  messageCount: number;
+  crmActivities: number;
+  orderActivities: number;
+  customersUpdated: number;
+  lifecycleStatuses?: number;
+  realExecutionEnabled?: boolean;
 }
 
 export interface JadenWorkerTickResult {
@@ -17,6 +36,11 @@ export interface JadenWorkerTickResult {
   failed: number;
   retried: number;
   exhausted: number;
+  inboxSynced: number;
+  crmActivities: number;
+  orderActivities: number;
+  customersUpdated: number;
+  lifecycleStatuses: number;
   processedJobIds: string[];
 }
 
@@ -41,6 +65,11 @@ function resultFor(workerId: string): JadenWorkerTickResult {
     failed: 0,
     retried: 0,
     exhausted: 0,
+    inboxSynced: 0,
+    crmActivities: 0,
+    orderActivities: 0,
+    customersUpdated: 0,
+    lifecycleStatuses: 0,
     processedJobIds: [],
   };
 }
@@ -70,10 +99,66 @@ function recordWorkerEvent(
 export async function runJadenWorkerTick(options: JadenWorkerTickOptions = {}): Promise<JadenWorkerTickResult> {
   const runtime = options.runtime || createSalesRuntime();
   const workerId = options.workerId || defaultWorkerId();
+  const workspaceId = runtime.getWorkspace(options.workspaceId || "farreach").id;
   const maxJobs = clampPositive(options.maxJobs, DEFAULT_MAX_JOBS, 50);
   const maxAttempts = clampPositive(options.maxAttempts, DEFAULT_MAX_ATTEMPTS, 10);
   const leaseMs = clampPositive(options.leaseMs, DEFAULT_LEASE_MS, 60 * 60 * 1000);
   const result = resultFor(workerId);
+  const shouldSyncInbox = options.syncInbox !== false;
+  const startedAt = (options.now || new Date()).toISOString();
+
+  if (shouldSyncInbox) {
+    try {
+      const inboxLimit = clampPositive(options.inboxLimit, 20, 100);
+      const inbox = options.syncInboxWith
+        ? await options.syncInboxWith({
+          workspaceId,
+          limit: inboxLimit,
+          now: startedAt,
+        })
+        : await runtime.getInbox(workspaceId, inboxLimit).then((view) => ({
+          messageCount: view.total || view.data?.length || 0,
+          crmActivities: Number(view.crm?.newActivities || 0),
+          orderActivities: Number(view.crm?.orderActivities || 0),
+          customersUpdated: Number(view.crm?.customersUpserted || 0),
+          lifecycleStatuses: Number(view.crm?.lifecycleStatuses || 0),
+          realExecutionEnabled: view.sideEffect?.realExecutionEnabled === true,
+        }));
+      result.inboxSynced = Number(inbox.messageCount || 0);
+      result.crmActivities += Number(inbox.crmActivities || 0);
+      result.orderActivities += Number(inbox.orderActivities || 0);
+      result.customersUpdated += Number(inbox.customersUpdated || 0);
+      result.lifecycleStatuses += Number(inbox.lifecycleStatuses || 0);
+      runtime.recordEvent("jaden.worker.inbox.synced", workspaceId, {
+        workerId,
+        count: result.inboxSynced,
+        crmActivities: result.crmActivities,
+        orderActivities: result.orderActivities,
+        customersUpdated: result.customersUpdated,
+        lifecycleStatuses: result.lifecycleStatuses,
+        sideEffects: inbox.realExecutionEnabled ? "imap-read" : "local-only",
+      });
+    } catch (error) {
+      runtime.recordEvent("jaden.worker.inbox.sync_failed", options.workspaceId || "farreach", {
+        workerId,
+        error: errorMessage(error),
+      });
+    }
+  }
+
+  const heartbeat = () => {
+    const queue = summarizeQueue(runtime.workflows.listJobs(500));
+    recordWorkerStatus({
+      workerId,
+      workspaceId,
+      startedAt,
+      lastHeartbeatAt: (options.now || new Date()).toISOString(),
+      status: queue.failed > 0 || result.exhausted > 0 ? "degraded" : "running",
+      queue,
+      alerts: alertsForQueue(queue),
+      lastResult: result,
+    });
+  };
 
   for (let index = 0; index < maxJobs; index += 1) {
     const claimed = runtime.workflows.claimNext(workerId, {
@@ -127,5 +212,18 @@ export async function runJadenWorkerTick(options: JadenWorkerTickOptions = {}): 
     }
   }
 
+  try {
+    const lifecycle = syncCustomerLifecycleStatuses(runtime, workspaceId, {
+      now: (options.now || new Date()).toISOString(),
+    });
+    result.lifecycleStatuses += lifecycle.recorded;
+  } catch (error) {
+    runtime.recordEvent("jaden.worker.lifecycle.sync_failed", workspaceId, {
+      workerId,
+      error: errorMessage(error),
+    });
+  }
+
+  heartbeat();
   return result;
 }
