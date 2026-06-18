@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime, type AssistantQueryResult } from "@/lib/runtime";
 import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { consumeTrialQuota, type TrialAccessSession } from "@/lib/runtime/trial-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,21 @@ function publicResult(result: AssistantQueryResult) {
   };
 }
 
+function trialQuotaResponse(trial: TrialAccessSession | undefined, kind: "ai" | "document") {
+  if (!trial) return null;
+  const quota = consumeTrialQuota(trial, kind);
+  if (quota.ok) return null;
+  return NextResponse.json(
+    {
+      success: false,
+      error: quota.message,
+      reason: quota.reason,
+      contactPhone: quota.contactPhone,
+    },
+    { status: quota.reason === "quota_exceeded" ? 429 : 403 }
+  );
+}
+
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as AssistantQueryBody;
   const runtime = createSalesRuntime();
@@ -75,6 +91,8 @@ export async function POST(request: NextRequest) {
   if (!question) {
     return NextResponse.json({ success: false, error: "Question is required" }, { status: 400 });
   }
+  const quotaResponse = trialQuotaResponse(auth.session.trial, "ai");
+  if (quotaResponse) return quotaResponse;
 
   try {
     const result = await runtime.runAssistantQuery({
