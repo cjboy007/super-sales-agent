@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cx } from "@/components/battle-station/theme";
 import { useTheme } from "./ThemeProvider";
 import { APP_NAV_ITEMS, type AppNavItem } from "./app-nav";
+import { useOpsStatus } from "./OpsStatusProvider";
 export { APP_NAV_ITEMS };
 
 interface AppTopBarProps {
@@ -30,9 +31,12 @@ export default function AppTopBar({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobilePreferencesOpen, setMobilePreferencesOpen] = useState(false);
   const { theme, language, toggleTheme, setLanguage } = useTheme();
+  const opsStatus = useOpsStatus();
   const activeItem = navItems.find((item) => item.href === active) ?? navItems[0];
   const activeLabel = activeItem
-    ? language === "zh" ? activeItem.zhLabel ?? activeItem.label : activeItem.label
+    ? activeItem?.href === "/agent-status"
+      ? language === "zh" ? opsStatus.zhNavLabel : opsStatus.navLabel
+      : language === "zh" ? activeItem.zhLabel ?? activeItem.label : activeItem.label
     : language === "zh" ? "当前页面" : "Current";
   const modulesLabel = language === "zh" ? "模块" : "Modules";
   const preferencesLabel = language === "zh" ? "偏好" : "Preferences";
@@ -69,20 +73,41 @@ export default function AppTopBar({
         </div>
 
         <nav className="mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex">
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+            const isOps = item.href === "/agent-status";
+            const label = isOps
+              ? language === "zh" ? opsStatus.zhNavLabel : opsStatus.navLabel
+              : language === "zh" ? item.zhLabel ?? item.label : item.label;
+            return (
             <Link
               key={item.href}
               href={item.href}
+              title={isOps ? (language === "zh" ? opsStatus.zhSummary : opsStatus.summary) : undefined}
+              aria-label={isOps ? `${label}: ${language === "zh" ? opsStatus.zhSummary : opsStatus.summary}` : undefined}
               className={cx(
-                "shrink-0 whitespace-nowrap rounded border px-2.5 py-1.5 font-mono text-[11px] font-semibold uppercase leading-none transition",
+                "relative shrink-0 whitespace-nowrap rounded border px-2.5 py-1.5 font-mono text-[11px] font-semibold uppercase leading-none transition",
                 active === item.href
                   ? "border-[var(--accent)]/55 bg-[var(--accent)]/15 text-slate-100"
                   : "border-slate-600 bg-slate-900/45 text-slate-300 hover:border-slate-500 hover:text-white"
               )}
             >
-              {language === "zh" ? item.zhLabel ?? item.label : item.label}
+              {label}
+              {isOps && opsStatus.badge ? (
+                <span
+                  id="ops-status-dot"
+                  aria-hidden="true"
+                  className={cx(
+                    "absolute -right-1 -top-1 h-2.5 min-w-2.5 rounded-full border border-slate-900",
+                    opsStatus.level === "critical" && "bg-red-400",
+                    opsStatus.level === "attention" && "bg-amber-400",
+                    opsStatus.level === "running" && "bg-emerald-400",
+                    opsStatus.level === "unknown" && "bg-slate-400"
+                  )}
+                />
+              ) : null}
             </Link>
-          ))}
+            );
+          })}
         </nav>
 
         <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2">
@@ -194,7 +219,10 @@ export default function AppTopBar({
             className="mt-2 grid grid-cols-2 gap-1 rounded-md border border-slate-700 bg-slate-900/85 p-1 shadow-xl"
           >
             {navItems.map((item) => {
-              const label = language === "zh" ? item.zhLabel ?? item.label : item.label;
+              const isOps = item.href === "/agent-status";
+              const label = isOps
+                ? language === "zh" ? opsStatus.zhNavLabel : opsStatus.navLabel
+                : language === "zh" ? item.zhLabel ?? item.label : item.label;
               return (
                 <Link
                   key={item.href}
