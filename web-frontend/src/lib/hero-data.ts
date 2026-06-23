@@ -16,6 +16,7 @@ async function fetchJson<T>(endpoint: string): Promise<T | null> {
       path: endpoint,
     },
     idempotencyKey: `hero-pumps:data-api:${endpoint}`,
+    toolId: "data.read_external",
   });
 
   if (sideEffect.status !== "allowed") return null;
@@ -102,6 +103,7 @@ export async function isDataApiAvailable(): Promise<boolean> {
       path: "/health",
     },
     idempotencyKey: "hero-pumps:data-api:/health",
+    toolId: "data.read_external",
   });
 
   if (sideEffect.status !== "allowed") return false;

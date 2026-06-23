@@ -2,6 +2,7 @@ import fs from "fs";
 import type { SideEffectDecision, SideEffectKind, SideEffectRequest } from "./types";
 import { ensureSsaCompanyDataPath, readJsonFile, ssaDataPath } from "../ssa-data-paths";
 import { listWorkspaceAdapters } from "./workspaces";
+import { enforceSalesToolForSideEffect, getSalesTool } from "./sales-tool-registry";
 
 const SIDE_EFFECT_FLAGS: Record<SideEffectKind, string> = {
   "email.send": "SSA_ENABLE_REAL_EMAIL_SEND",
@@ -13,6 +14,7 @@ const SIDE_EFFECT_FLAGS: Record<SideEffectKind, string> = {
   "bank.read": "SSA_ENABLE_REAL_BANK",
   "document.generate": "SSA_ENABLE_REAL_DOCUMENT_GENERATION",
   "document.preview": "SSA_ENABLE_REAL_DOCUMENT_PREVIEW",
+  "price.discount": "SSA_ENABLE_REAL_PRICE_DISCOUNT",
 };
 
 function decisionPath(workspaceId: string) {
@@ -57,7 +59,44 @@ function readAllDecisions(): SideEffectDecision[] {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+function registryEnforcementForRequest(request: SideEffectRequest) {
+  if (!request.toolId) {
+    throw new Error(`Sales tool registry enforcement required before requesting ${request.kind}.`);
+  }
+  return enforceSalesToolForSideEffect({
+    toolId: request.toolId,
+    sideEffectKind: request.kind,
+    workspaceId: request.workspaceId,
+    input: {
+      ...(request.payload || {}),
+      ...(request.toolInput || {}),
+      workspaceId: request.workspaceId,
+    },
+    idempotencyKey: request.idempotencyKey,
+  });
+}
+
+function assertDecisionRegistryEnforced(decision: SideEffectDecision) {
+  if (!decision.tool || decision.payload.registryEnforced !== true || decision.payload.toolId !== decision.tool.toolId) {
+    throw new Error(`Sales tool registry enforcement required before recording ${decision.kind} execution.`);
+  }
+  const tool = getSalesTool(decision.tool.toolId);
+  if (!tool || tool.sideEffectKind !== decision.kind) {
+    throw new Error(`Sales tool registry enforcement required before recording ${decision.kind} execution.`);
+  }
+  if (!tool.approvalRequired || tool.approvalRequirement !== "operator_approval_required") {
+    throw new Error(`Sales tool registry rejected ${tool.id}: high-risk side-effect tools require operator approval.`);
+  }
+  if (decision.tool.approvalRequired !== true || decision.tool.approvalRequirement !== "operator_approval_required") {
+    throw new Error(`Sales tool registry enforcement required before recording ${decision.kind} execution.`);
+  }
+  if (typeof decision.payload.idempotencyKey !== "string" || !decision.payload.idempotencyKey.trim()) {
+    throw new Error(`Sales tool registry enforcement required before recording ${decision.kind} execution.`);
+  }
+}
+
 export function requestSideEffect(request: SideEffectRequest): SideEffectDecision {
+  const enforcement = registryEnforcementForRequest(request);
   const idempotencyKey = request.idempotencyKey || "";
   if (idempotencyKey) {
     const existing = readDecisions(request.workspaceId).find((decision) =>
@@ -78,9 +117,17 @@ export function requestSideEffect(request: SideEffectRequest): SideEffectDecisio
       : `Real execution blocked by default. Set ${SIDE_EFFECT_FLAGS[request.kind]}=true to allow this side effect.`,
     realExecutionEnabled,
     createdAt: new Date().toISOString(),
+    tool: enforcement.audit,
     payload: {
       summary: request.summary,
       idempotencyKey: idempotencyKey || null,
+      registryEnforced: true,
+      toolId: enforcement.tool.id,
+      toolName: enforcement.tool.name,
+      toolRequiredPermissions: enforcement.tool.requiredPermissions,
+      toolApprovalRequirement: enforcement.tool.approvalRequirement,
+      toolIdempotencyStrategy: enforcement.tool.idempotencyStrategy,
+      toolFailureRetryBehavior: enforcement.tool.failureRetryBehavior,
       ...request.payload,
     },
   };
@@ -136,6 +183,7 @@ export function rejectSideEffectDecision(id: string, input: { by?: string; note?
 export function retrySideEffectDecision(id: string): SideEffectDecision {
   const existing = getSideEffectDecision(id);
   if (!existing) throw new Error(`Side effect decision not found: ${id}`);
+  assertDecisionRegistryEnforced(existing);
   const retryCount = (existing.retryCount || 0) + 1;
   const originalIdempotencyKey = typeof existing.payload.idempotencyKey === "string"
     ? existing.payload.idempotencyKey
@@ -151,6 +199,7 @@ export function retrySideEffectDecision(id: string): SideEffectDecision {
       originalIdempotencyKey: originalIdempotencyKey || null,
     },
     idempotencyKey: `${existing.workspaceId}:${existing.kind}:${existing.id}:retry:${retryCount}`,
+    toolId: existing.tool?.toolId,
   });
 
   const retried = {
@@ -176,6 +225,9 @@ export function recordSideEffectExecutionSuccess(
   id: string,
   input: { result?: Record<string, unknown> } = {}
 ): SideEffectDecision {
+  const existing = getSideEffectDecision(id);
+  if (!existing) throw new Error(`Side effect decision not found: ${id}`);
+  assertDecisionRegistryEnforced(existing);
   return updateDecision(id, (decision) => ({
     ...decision,
     status: "executed",
@@ -193,6 +245,9 @@ export function recordSideEffectExecutionFailure(
   id: string,
   input: { error: string; canRetry?: boolean }
 ): SideEffectDecision {
+  const existing = getSideEffectDecision(id);
+  if (!existing) throw new Error(`Side effect decision not found: ${id}`);
+  assertDecisionRegistryEnforced(existing);
   return updateDecision(id, (decision) => ({
     ...decision,
     status: "execution_failed",

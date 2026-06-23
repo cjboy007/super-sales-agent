@@ -50,6 +50,7 @@ function titleForAction(kind: SideEffectDecision["kind"]): string {
   if (kind === "imap.fetch") return "Mailbox sync";
   if (kind === "document.generate") return "Document generation";
   if (kind === "document.preview") return "Document preview";
+  if (kind === "price.discount") return "Price adjustment";
   if (kind === "data.read") return "Data access";
   if (kind === "bank.read") return "Bank data check";
   if (kind === "payment.write") return "Payment update";

@@ -246,3 +246,42 @@ test("can fetch envelopes through a mocked Himalaya adapter without Hermes", asy
     fs.rmSync(dataRoot, { recursive: true, force: true });
   }
 });
+
+test("reads Himalaya message bodies only when explicitly requested", async () => {
+  const dataRoot = tempDataRoot();
+  const calls = [];
+
+  try {
+    const result = await runInboxMonitor({
+      workspace: "farreach",
+      dataRoot,
+      now: "2026-05-28T04:30:00.000Z",
+      sourceMode: "himalaya",
+      includeHimalayaBody: true,
+      commandRunner: async (command, args) => {
+        calls.push([command, args]);
+        if (args[0] === "envelope") {
+          return {
+            stdout: JSON.stringify([
+              {
+                id: 88,
+                message_id: "<rfq-88@example.com>",
+                from: { name: "Body Buyer", address: "body@example.com" },
+                subject: "RFQ with readable body",
+                date: "2026-05-28T04:20:00.000Z",
+              },
+            ]),
+          };
+        }
+        assert.deepEqual(args, ["message", "read", "--account", "farreach", "--folder", "INBOX", "<rfq-88@example.com>"]);
+        return { stdout: JSON.stringify({ text: "From: x\nSubject: y\n\nPlease quote 50 units." }) };
+      },
+    });
+
+    assert.equal(result.newCount, 1);
+    assert.equal(result.newMessages[0].body, "Please quote 50 units.");
+    assert.equal(calls.length, 2);
+  } finally {
+    fs.rmSync(dataRoot, { recursive: true, force: true });
+  }
+});

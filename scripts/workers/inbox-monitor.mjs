@@ -169,7 +169,62 @@ async function readHimalayaMessages(options) {
   return {
     source: `himalaya:${account}/${folder}`,
     messages: parseHimalayaOutput(result.stdout).map(normalizeHimalayaEnvelope).filter((message) => message.id),
+    commandRunner,
+    account,
+    folder,
   };
+}
+
+async function readHimalayaMessageBody(commandRunner, account, folder, messageId) {
+  try {
+    const readArgs = ["message", "read", "--account", account, "--folder", folder, messageId];
+    const readResult = await commandRunner("himalaya", readArgs);
+    return parseHimalayaMessageBody(readResult.stdout);
+  } catch {
+    return "";
+  }
+}
+
+function parseHimalayaMessageBody(stdout) {
+  if (!String(stdout || "").trim()) return "";
+  try {
+    const parsed = JSON.parse(stdout);
+    if (typeof parsed === "string") return stripEmailHeaders(parsed);
+    if (parsed && typeof parsed === "object") {
+      const body = parsed.body || parsed.text || parsed.content || parsed.html || "";
+      return stripEmailHeaders(String(body));
+    }
+  } catch {
+    return stripEmailHeaders(String(stdout));
+  }
+  return "";
+}
+
+function stripEmailHeaders(text) {
+  if (!text) return "";
+  // Find the first blank line (end of headers) and return everything after it
+  const headerEnd = text.search(/\n\s*\n/);
+  if (headerEnd !== -1) {
+    return text.slice(headerEnd).trim();
+  }
+  // If no blank line found, check if it starts with common header patterns
+  if (/^(From|To|Subject|Date|Cc|Bcc|Reply-To|Message-ID|Content-Type|Return-Path|MIME-Version):/i.test(text)) {
+    // Look for first line that doesn't look like a header
+    const lines = text.split("\n");
+    let bodyStart = 0;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim() === "") {
+        bodyStart = i + 1;
+        break;
+      }
+      if (!/^(From|To|Subject|Date|Cc|Bcc|Reply-To|Message-ID|Content-Type|Return-Path|MIME-Version|Sent|Priority|X-|In-Reply-To|References|Thread-Topic|Thread-Index|List-|DKIM|Authentication|Received|ARC-|Content-Transfer|Content-Disposition):/i.test(lines[i]) && !/^\s/.test(lines[i])) {
+        bodyStart = i;
+        break;
+      }
+    }
+    return lines.slice(bodyStart).join("\n").trim();
+  }
+  return text.trim();
 }
 
 function stringValue(...values) {
@@ -521,26 +576,46 @@ function stripEmailAngleBrackets(raw) {
   return m ? m[1].trim() : String(raw).trim() || "—";
 }
 
+function extractSnippet(value, maxLength = 120) {
+  const text = stringValue(value)
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  const limit = Number.isFinite(maxLength) && maxLength > 0 ? Math.floor(maxLength) : 120;
+  return text.length > limit ? `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…` : text;
+}
+
+function extractFirstParagraph(body) {
+  if (!body) return "";
+  const text = stringValue(body).replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  const lines = text.split("\n").filter((line) => line.trim().length > 20);
+  const firstLine = lines[0] || text;
+  const match = firstLine.match(/^(.{10,200}?)(?:\.|。|\!|\?|$)/);
+  return match ? match[0].trim() : firstLine.slice(0, 200);
+}
+
 function reportForMessages(workspace, messages) {
   if (messages.length === 0) return "";
   const importantCount = messages.filter((m) => m.important).length;
   const lines = [
     `📬 **${workspace}** 收件箱监控`,
-    `新邮件 **${messages.length}** 封` + (importantCount > 0 ? ` | ⚠️ 重要 **${importantCount}** 封` : ""),
+    `新邮件 **${messages.length}** 封` + (importantCount > 0 ? ` | 重要 ${importantCount} 封` : ""),
     "",
-    "| 时间 | 发件人 | 主题 |",
-    "|------|--------|------|",
+    "| 时间 | 发件人 | 主题 | 摘要 |",
+    "|------|--------|------|------|",
   ];
 
   for (const message of messages.slice(0, 10)) {
     const time = formatTimestamp(message.receivedAt);
     const sender = stripEmailAngleBrackets(message.from);
     const subject = message.subject || "（无主题）";
+    const paragraph = extractFirstParagraph(message.body);
     const prefix = message.important ? "🔴 " : "";
-    lines.push(`| ${time} | ${prefix}${sender} | ${subject} |`);
+    lines.push(`| ${time} | ${prefix}${sender} | ${subject} | ${paragraph || "-"} |`);
   }
 
-  if (messages.length > 10) lines.push(`| | | ... 还有 ${messages.length - 10} 封 |`);
+  if (messages.length > 10) lines.push(`\n_... 还有 ${messages.length - 10} 封_`);
   return `${lines.join("\n")}\n`;
 }
 
@@ -553,9 +628,11 @@ export async function runInboxMonitor(options = {}) {
   const state = loadState(stateFile, now);
   let source = sourcePath(dataRoot, workspace);
   let messages = [];
+  let himalayaContext = null;
 
   if (sourceMode === "himalaya") {
     const himalaya = await readHimalayaMessages({ ...options, workspace });
+    himalayaContext = himalaya;
     source = himalaya.source;
     messages = himalaya.messages;
   } else if (source) {
@@ -581,6 +658,22 @@ export async function runInboxMonitor(options = {}) {
   const newMessages = messages
     .filter((message) => !state.seen[message.id])
     .slice(0, pageLimit(options.pageSize));
+
+  if (
+    sourceMode === "himalaya" &&
+    himalayaContext &&
+    newMessages.length > 0 &&
+    (options.includeHimalayaBody === true || process.env.SSA_HIMALAYA_INCLUDE_BODY === "true")
+  ) {
+    const { commandRunner, account, folder } = himalayaContext;
+    const bodyLimit = Math.min(newMessages.length, 3);
+    for (let i = 0; i < bodyLimit; i++) {
+      const message = newMessages[i];
+      if (message.id) {
+        message.body = await readHimalayaMessageBody(commandRunner, account, folder, message.id);
+      }
+    }
+  }
 
   for (const message of newMessages) {
     state.seen[message.id] = {

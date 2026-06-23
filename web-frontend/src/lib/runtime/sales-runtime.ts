@@ -1,4 +1,5 @@
 import fs from "fs";
+import crypto from "crypto";
 import type {
   LlmRequest,
   LlmResult,
@@ -71,7 +72,7 @@ import { getSentLogSnapshot, runtimeEventsToAgentEvents } from "./activity-strea
 import { createSalesMemory, type SalesMemory } from "./sales-memory";
 import { listSalesPacks } from "./sales-packs";
 import { buildSalesWorldModel } from "./sales-world-model";
-import { getSalesTool, listSalesTools } from "./sales-tool-registry";
+import { getSalesTool, listSalesTools, selectSalesToolIdForSideEffect } from "./sales-tool-registry";
 import { runSalesLoopDrill, type SalesLoopDrillInput } from "./sales-loop-drills";
 import {
   approveSideEffectDecision,
@@ -89,6 +90,32 @@ import { ensureSsaCompanyDataPath, readJsonFile, ssaDataPath } from "../ssa-data
 
 function eventsPath(workspaceId: WorkspaceId) {
   return ensureSsaCompanyDataPath(workspaceId, "events", "events.json");
+}
+
+function stableSideEffectIdempotencyKey(request: SideEffectRequest, workspaceId: WorkspaceId): string {
+  if (request.idempotencyKey) return request.idempotencyKey;
+  const hash = crypto
+    .createHash("sha256")
+    .update(JSON.stringify({
+      kind: request.kind,
+      workspaceId,
+      summary: request.summary,
+      payload: request.payload,
+    }))
+    .digest("hex")
+    .slice(0, 16);
+  return `${workspaceId}:${request.kind}:${hash}`;
+}
+
+function documentToolInputCustomer(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const record = value as Record<string, unknown>;
+    for (const key of ["company_name", "companyName", "name", "email"]) {
+      if (typeof record[key] === "string" && record[key].trim()) return record[key].trim();
+    }
+  }
+  return "Unknown customer";
 }
 
 function readEvents(workspaceId: WorkspaceId): RuntimeEvent[] {
@@ -292,12 +319,25 @@ export class SalesRuntime {
 
   requestSideEffect(request: SideEffectRequest): SideEffectDecision {
     const workspace = this.getWorkspace(request.workspaceId);
-    const decision = requestSideEffect({ ...request, workspaceId: workspace.id });
+    const idempotencyKey = stableSideEffectIdempotencyKey(request, workspace.id);
+    const toolId = request.toolId || selectSalesToolIdForSideEffect(request.kind, request.payload);
+    const decision = requestSideEffect({
+      ...request,
+      workspaceId: workspace.id,
+      idempotencyKey,
+      toolId: toolId || request.toolId,
+      toolInput: {
+        ...(request.payload || {}),
+        ...(request.toolInput || {}),
+        workspaceId: workspace.id,
+      },
+    });
     this.recordEvent("side_effect.requested", workspace.id, {
       decisionId: decision.id,
       kind: decision.kind,
       status: decision.status,
       reason: decision.reason,
+      toolId: decision.tool?.toolId,
     });
     return decision;
   }
@@ -366,7 +406,27 @@ export class SalesRuntime {
 
   requestDocumentGeneration(request: DocumentGenerationRequest): SideEffectDecision {
     const workspace = this.getWorkspace(request.workspaceId);
-    const decision = requestDocumentGeneration({ ...request, workspaceId: workspace.id });
+    const decision = this.requestSideEffect({
+      kind: "document.generate",
+      workspaceId: workspace.id,
+      summary: `Generate ${request.documentType} document for ${request.customer}`,
+      payload: {
+        documentType: request.documentType,
+        customer: request.customer,
+        ...request.payload,
+      },
+      idempotencyKey: request.idempotencyKey,
+      toolId: request.documentType === "QT" || request.documentType === "PI" || request.documentType === "SPL"
+        ? "document.generate_quotation_pi"
+        : "document.request_generation",
+      toolInput: {
+        workspaceId: workspace.id,
+        documentType: request.documentType,
+        payload: request.payload,
+        ...request.payload,
+        customer: documentToolInputCustomer(request.customer),
+      },
+    });
     this.recordEvent("document.generate.requested", workspace.id, {
       decisionId: decision.id,
       documentType: request.documentType,

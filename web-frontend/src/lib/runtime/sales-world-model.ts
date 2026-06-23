@@ -9,6 +9,7 @@ import { buildCustomerDirectory } from "./customers";
 import type { PiRecord } from "./documents";
 import type { SalesRuntime } from "./sales-runtime";
 import type { MemoryRecord, WorkspaceAdapter, WorkspaceId } from "./types";
+import { listSalesFacts, salesFactToWorldFact, type SalesFactConflictStatus, type SalesFactSourceRef } from "./sales-fact-ledger";
 
 export type SalesWorldFactType =
   | "workspace"
@@ -35,13 +36,22 @@ export interface SalesWorldFactSource {
     | "quotation"
     | "pi-record"
     | "customer-intelligence"
-    | "memory";
+    | "memory"
+    | "sales-fact-ledger"
+    | "quotation-draft"
+    | "price-memory"
+    | "prospecting-packet"
+    | "outbound-approval"
+    | "document"
+    | "system";
   id?: string;
   path?: string;
+  url?: string;
 }
 
 export interface SalesWorldFact {
   id: string;
+  factId?: string;
   workspaceId: WorkspaceId;
   type: SalesWorldFactType;
   subject: string;
@@ -53,7 +63,12 @@ export interface SalesWorldFact {
   source: SalesWorldFactSource;
   confidence: number;
   provenance: SalesWorldFactSource[];
+  sourceRefs?: SalesFactSourceRef[];
   idempotencyKey: string;
+  version?: number;
+  conflictStatus?: SalesFactConflictStatus;
+  supersedes?: string;
+  supersededBy?: string;
   data: Record<string, unknown>;
 }
 
@@ -477,6 +492,10 @@ export function buildSalesWorldModel(runtime: SalesRuntime, workspaceId: Workspa
   addQuotationFacts(facts, workspace.id, runtime.memory.getQuotations(workspace.id, { page: 1, pageSize: 500 }).quotations || []);
   addPiFacts(facts, workspace.id, runtime.listPiRecords(workspace.id).records || []);
   addMemoryFacts(facts, workspace.id, runtime.memory.engine.list(workspace.id, 500));
+  for (const ledgerFact of listSalesFacts(workspace.id)) {
+    const worldFact = salesFactToWorldFact(ledgerFact);
+    facts.set(`${worldFact.type}:${worldFact.idempotencyKey}`, worldFact);
+  }
 
   const sortedFacts = withResolvedCustomerIds(Array.from(facts.values()), directory.customers).sort((a, b) =>
     b.updatedAt.localeCompare(a.updatedAt) ||
@@ -501,6 +520,7 @@ export function buildSalesWorldModel(runtime: SalesRuntime, workspaceId: Workspa
         "quotations",
         "pi-records",
         "memory",
+        "sales-fact-ledger",
       ],
     },
   };

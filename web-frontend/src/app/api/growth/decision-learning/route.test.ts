@@ -1,0 +1,227 @@
+import fs from "fs";
+import { NextRequest } from "next/server";
+import os from "os";
+import path from "path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
+const originalDataRoot = process.env.SSA_DATA_ROOT;
+const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
+const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
+const originalCrmFlag = process.env.SSA_ENABLE_REAL_CRM_WRITE;
+const originalDocumentFlag = process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
+let tempRoot = "";
+
+beforeEach(() => {
+  tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-growth-decision-learning-route-test-"));
+  process.env.SSA_DATA_ROOT = tempRoot;
+  process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
+    { token: "hero-token", workspaces: ["hero-pumps"] },
+  ]);
+  delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
+  delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
+  delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
+});
+
+afterEach(() => {
+  if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
+  else process.env.SSA_DATA_ROOT = originalDataRoot;
+
+  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
+  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
+
+  if (originalEmailFlag === undefined) delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
+  else process.env.SSA_ENABLE_REAL_EMAIL_SEND = originalEmailFlag;
+
+  if (originalCrmFlag === undefined) delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
+  else process.env.SSA_ENABLE_REAL_CRM_WRITE = originalCrmFlag;
+
+  if (originalDocumentFlag === undefined) delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
+  else process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = originalDocumentFlag;
+
+  fs.rmSync(tempRoot, { recursive: true, force: true });
+});
+
+function request(url: string, init: { method?: string; body?: unknown; token?: string } = {}): NextRequest {
+  return new NextRequest(url, {
+    method: init.method,
+    body: init.body ? JSON.stringify(init.body) : undefined,
+    headers: {
+      Authorization: `Bearer ${init.token || "hero-token"}`,
+      ...(init.body ? { "content-type": "application/json" } : {}),
+    },
+  });
+}
+
+function seedPriceMemory() {
+  const dir = path.join(tempRoot, "companies", "hero-pumps", "pricing");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, "price-memory.json"),
+    JSON.stringify([
+      {
+        id: "PI-API-PHASE11:0:industrial-pump",
+        workspaceId: "hero-pumps",
+        customer: "API Learning Buyer",
+        contact: "Ari",
+        email: "ari@example.com",
+        country: "USA",
+        product: "Industrial transfer pump",
+        specification: "stainless steel / 380V",
+        model: "HP-380",
+        hsCode: "841370",
+        quantity: 10,
+        unitPrice: 450,
+        unitCost: 280,
+        costCurrency: "USD",
+        supplier: "Hero Pump Factory",
+        supplierCandidates: ["Hero Pump Factory"],
+        currency: "USD",
+        piNo: "PI-API-PHASE11",
+        date: "2026-05-20",
+        incoterms: "FOB",
+        source: "test",
+        updatedAt: "2026-05-21T00:00:00.000Z",
+      },
+    ], null, 2),
+    "utf-8"
+  );
+}
+
+async function createPhase10Approval() {
+  seedPriceMemory();
+  const { createSalesRuntime, runProspectingDryRun, runProductQuotationDraft, requestOutboundApproval } = await import("@/lib/runtime");
+  const runtime = createSalesRuntime();
+  const prospectingRun = runProspectingDryRun(runtime, {
+    workspaceId: "hero-pumps",
+    idempotencyKey: "hero-pumps:api:phase11:prospecting",
+    seeds: [{
+      companyName: "API Learning Buyer",
+      website: "https://api-learning.example",
+      country: "US",
+      industry: "industrial pump distribution",
+      contactName: "Ari Buyer",
+      contactRole: "Procurement",
+      contactEmail: "ari@api-learning.example",
+      sourceUrl: "https://directory.example/api-learning",
+      notes: "Imports replacement pumps.",
+    }],
+  });
+  const draftRun = runProductQuotationDraft(runtime, {
+    workspaceId: "hero-pumps",
+    prospectingRunId: prospectingRun.id,
+    prospectingPacketId: prospectingRun.packets[0].id,
+    idempotencyKey: "hero-pumps:api:phase11:draft",
+  });
+  const approvalRun = requestOutboundApproval(runtime, {
+    workspaceId: "hero-pumps",
+    sourceDraftRunId: draftRun.id,
+    sourceDraftId: draftRun.drafts[0].quotationDraft.id,
+    intendedActionType: "email_send",
+    idempotencyKey: "hero-pumps:api:phase11:approval",
+  });
+  return { runtime, approvalRun, candidate: approvalRun.candidates[0] };
+}
+
+describe("/api/growth/decision-learning routes", () => {
+  it("enforces workspace-scoped auth on reads and decision recording", async () => {
+    const listRoute = await import("./route");
+    const recordRoute = await import("./record/route");
+
+    expect((await listRoute.GET(request("http://localhost/api/growth/decision-learning?project=farreach"))).status).toBe(403);
+    expect((await recordRoute.POST(request("http://localhost/api/growth/decision-learning/record?project=farreach", {
+      method: "POST",
+      body: { approvalRunId: "blocked", candidateId: "blocked", decision: "reject" },
+    }))).status).toBe(403);
+
+    const allowed = await listRoute.GET(request("http://localhost/api/growth/decision-learning?project=hero-pumps"));
+    const json = await allowed.json();
+    expect(allowed.status).toBe(200);
+    expect(json).toMatchObject({
+      success: true,
+      data: {
+        workspaceId: "hero-pumps",
+        noPolicyAutoApproval: true,
+        highRiskStillReview: true,
+      },
+    });
+  });
+
+  it("records and lists sanitized decision memory without approving or executing side effects", async () => {
+    const { createSalesRuntime } = await import("@/lib/runtime");
+    const { runtime, approvalRun, candidate } = await createPhase10Approval();
+    const beforeSideEffects = runtime.listSideEffects(50).length;
+    const recordRoute = await import("./record/route");
+    const listRoute = await import("./route");
+
+    const createdResponse = await recordRoute.POST(request("http://localhost/api/growth/decision-learning/record?project=hero-pumps", {
+      method: "POST",
+      body: {
+        idempotencyKey: "hero-pumps:api:phase11:decision",
+        approvalRunId: approvalRun.id,
+        candidateId: candidate.id,
+        decision: "update_policy",
+        humanEdits: "Remove unsupported lead time claim.",
+        rejectionReason: "",
+        policySuggestion: "Require evidence-backed delivery terms before approval.",
+        scope: "workspace",
+        rollbackNote: "Delete suggestion if it blocks valid reviewed outreach.",
+        operator: "wilson",
+        confidence: 0.8,
+        payload: "raw-body",
+        secret: "policy-secret",
+        localPath: "/Users/wilson/private/policy.json",
+        envName: "SSA_ENABLE_REAL_EMAIL_SEND",
+      },
+    }));
+    const created = await createdResponse.json();
+    const listedResponse = await listRoute.GET(request("http://localhost/api/growth/decision-learning?project=hero-pumps"));
+    const listed = await listedResponse.json();
+    const serialized = JSON.stringify({ created, listed });
+    const sideEffects = createSalesRuntime().listSideEffects(50);
+
+    expect(createdResponse.status).toBe(200);
+    expect(created.data).toMatchObject({
+      workspaceId: "hero-pumps",
+      approvalRunId: approvalRun.id,
+      candidateId: candidate.id,
+      sideEffectDecisionId: candidate.sideEffectDecisionId,
+      actionKind: "email.send",
+      decision: "update_policy",
+      humanEdits: "Remove unsupported lead time claim.",
+      policySuggestion: "Require evidence-backed delivery terms before approval.",
+      scope: "workspace",
+      rollbackNote: "Delete suggestion if it blocks valid reviewed outreach.",
+      operator: "wilson",
+      autoApproval: false,
+      autoEnforced: false,
+      policySuggestionOnly: true,
+      sideEffectGateStillRequired: true,
+      highRiskStillReview: true,
+      noPolicyAutoApproval: true,
+    });
+    expect(listed.data.records).toHaveLength(1);
+    expect(listed.data.records[0].id).toBe(created.data.id);
+    expect(sideEffects).toHaveLength(beforeSideEffects);
+    expect(sideEffects[0]).toMatchObject({
+      id: candidate.sideEffectDecisionId,
+      status: "blocked",
+      realExecutionEnabled: false,
+    });
+    expect(sideEffects[0].execution).toBeUndefined();
+
+    expect(serialized).toContain("no policy auto-approval");
+    expect(serialized).toContain("high-risk still review");
+    expect(serialized).not.toContain("/Users/");
+    expect(serialized).not.toContain(".ssa");
+    expect(serialized).not.toContain("SSA_");
+    expect(serialized).not.toContain("payload");
+    expect(serialized).not.toContain("policy-secret");
+    expect(serialized).not.toContain("raw-body");
+    expect(serialized).not.toContain("secret");
+    expect(serialized).not.toContain("policy auto-approved");
+    expect(serialized).not.toContain("email sent");
+    expect(serialized).not.toContain("CRM updated");
+    expect(serialized).not.toContain("PI generated");
+    expect(serialized).not.toContain("formal quote generated");
+  });
+});
