@@ -23,6 +23,7 @@ export const SIDE_EFFECT_KINDS: SideEffectKind[] = [
   "bank.read",
   "document.generate",
   "document.preview",
+  "price.discount",
 ];
 
 export const LLM_TASKS: LlmTask[] = [

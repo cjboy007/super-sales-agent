@@ -6,6 +6,7 @@ import type { CompanyIntelLeadInput } from "./company-intel";
 import { companyIntelClientSlug } from "./company-intel";
 import { syncCustomerLifecycleStatuses, upsertCustomerAccountsFromLeads } from "./customers";
 import { ingestCustomerInteraction } from "./customer-memory-ingestor";
+import { ingestCustomerActivityRecordToFactLedger } from "./sales-fact-ledger-ingestion";
 import type { MemoryWriteInput, RuntimeJob, RuntimeWorkflowType, WorkspaceAdapter, WorkspaceId } from "./types";
 
 export type CustomerActivityKind =
@@ -192,6 +193,7 @@ export function appendCustomerActivity(workspaceId: WorkspaceId, activity: Custo
     ...existing.filter((item) => item.id !== activity.id),
   ].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
   writeCustomerActivities(workspaceId, next);
+  ingestCustomerActivityRecordToFactLedger(activity);
   return activity;
 }
 
@@ -565,6 +567,9 @@ export function syncInboxEmailsToCustomers(
   }
 
   writeCustomerActivities(workspace.id, [...newOrderActivities, ...newActivities, ...existing].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt)));
+  for (const activity of [...newOrderActivities, ...newActivities]) {
+    ingestCustomerActivityRecordToFactLedger(activity);
+  }
   const lifecycle = syncCustomerLifecycleStatuses(host as Parameters<typeof syncCustomerLifecycleStatuses>[0], workspace.id, {
     now,
   });

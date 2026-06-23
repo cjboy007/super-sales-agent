@@ -177,6 +177,115 @@ PI 或订单进系统 → 识别付款/部分付款/逾期/出货/退款/售后/
 
 ---
 
+## 自主增长轨道 — Phase 7 到 Phase 12
+
+这个轨道把 SSA 从「安全销售 cockpit」推进到「可控的自主开发客户系统」。
+它不是一次性实现的 prompt,必须按 Phase 分片推进。没有完成安全、事实层、
+tool registry、LLM 治理和闭环验证前,所有增长自动化只能是 dry-run / draft-only /
+HITL,不得真实外联。
+
+### Phase 7 — Minimum HITL Kernel + Autonomous Growth Control Center
+
+**做什么**
+- 新增 `/growth` 或 `/autonomous-growth` 操作台,不是营销页。
+- 展示 Automation Mode: observe、assist、autopilot、locked。
+- 当前只允许 observe / assist / locked; autopilot 必须 visible 但 disabled / not ready。
+- 展示 HITL Policy Matrix: auto / review / blocked。
+- 汇总现有 side-effect decisions,并链接到 agent-status。
+- 展示 dry-run prospecting preview 和 read-only decision learning 结构。
+
+**默认策略**
+- `payment.bank` = blocked。
+- `email.send`、`crm.write`、`quotation.generate`、`pi.generate`、`price.discount` = review。
+- 草稿/研究类动作可 auto 或 review,但不得触发外部动作。
+
+**停止点**:页面、runtime policy、API、测试和 boundary check 通过后暂停,
+不要进入 Phase 8。
+
+---
+
+### Phase 8 — Autonomous Prospecting Loop dry-run
+
+**做什么**
+- 自动生成候选客户开发任务,但只 dry-run,不发送邮件、不写外部 CRM、不发布页面。
+- 流程:discover leads → enrich company/person → score ICP fit →
+  generate opening angle → produce prospecting packet。
+- 每个 prospecting packet 必须包含来源、证据、置信度、ICP 评分、推荐切入角度、
+  风险标记、下一步建议。
+- 结果写入 workspace 内的 SSA 运行数据或既有 runtime/memory/world model,
+  不能写入 `farreach` / `hero-pumps` demo 数据; demo 默认只能用 `demo-exporter`。
+- 页面或 API 必须能让 operator 看到 dry-run 结果,并明确标记为 draft-only。
+
+**禁止**
+- 不真实外联。
+- 不真实写 CRM。
+- 不生成真实报价/PI。
+- 不调用真实视频/广告/外联平台。
+- 不把低证据或 mock 结果标成可直接执行。
+
+**停止点**:dry-run pipeline、数据结构、API/UI 摘要和测试通过后暂停,
+不要进入 Phase 9。
+
+---
+
+### Phase 9 — Personalized Product + Quotation Draft Engine
+
+**做什么**
+- 基于 Phase 8 prospecting packet 生成“客户适配产品 + quotation draft”。
+- 引用现有本地能力: sales world model、customer memory、company intel、
+  product docs / product materials、price memory、历史 quotation / PI records。
+- 输出 product fit recommendations、quotation draft lines、成本/售价/毛利参考、
+  assumptions、missing info checklist、evidence references、recommended human edits。
+- 如果缺产品、成本、MOQ、供应商、交期、HS code、包装、币种、Incoterms、
+  运费或付款条款,必须进入 missing info checklist。
+- 低证据 prospecting packet 只能生成“需要补证据/补询盘信息”的 draft,
+  不得伪装成可报价。
+- quotation draft 只可 draft-only,不得生成正式报价单、PI、PDF、Excel 或外部文件。
+- 不做 video script,不调用真实视频/广告/页面发布/外联平台。
+
+**停止点**:产品适配、quotation draft、缺失信息检查、预览、脱敏和测试通过后暂停,
+不要进入 Phase 10。
+
+---
+
+### Phase 10 — Outbound Approval Pipeline
+
+**做什么**
+- 把 Phase 9 的外联方案转换成 side-effect review request。
+- operator 必须看到:目标客户、收件人、内容摘要、证据、风险、预期动作、
+  idempotency key、失败/重试策略。
+- 真实 `email.send`、`crm.write`、报价/PI、价格调整仍必须走 side-effect gate 和 explicit runtime flag。
+
+**停止点**:审批请求链路可演示、可测试、可追踪后暂停,不要进入 Phase 11。
+
+---
+
+### Phase 11 — Decision Learning
+
+**做什么**
+- 将人工裁决沉淀为可审计 policy memory:
+  approve once、edit then approve、reject、update policy。
+- 记录人类修改点、拒绝原因、策略变更建议、适用范围和回滚能力。
+- 任何 policy 更新必须可追踪,且不能自动放宽高风险动作。
+
+**停止点**:policy memory 数据结构、读写 API、UI 回放和测试通过后暂停,
+不要进入 Phase 12。
+
+---
+
+### Phase 12 — Autonomous Scheduler + Metrics
+
+**做什么**
+- 让 worker 定时跑 dry-run prospecting / asset generation / approval preparation。
+- 增加指标:候选客户数、证据覆盖率、ICP 分布、人工编辑率、approve/reject 率、
+  回复率、失败原因、误判原因。
+- failed/retryable work 必须能在 agent-status 或 growth ops 中看到并处理。
+
+**停止点**:scheduler、metrics、worker 恢复和验证门禁通过后暂停,
+再评估是否进入真实外联受控试点。
+
+---
+
 ## 验收标准(v1 达标 = 全过)
 
 | # | 标准 | 主要 Phase |
@@ -214,3 +323,9 @@ PI 或订单进系统 → 识别付款/部分付款/逾期/出货/退款/售后/
 
 每个 Phase 完成、review 通过后,再发下一个切片。涉及付款/邮件/CRM 的改动,
 务必在 Phase 1 审计后、Phase 2 数据模型定稿后各 review 一次。
+
+自主增长轨道也必须分片执行,例如:
+
+> 读 `docs/SSA_V1_ROADMAP.md`。这次只执行 **Phase 8**:
+> Autonomous Prospecting Loop dry-run。不要真实外联,不要写外部 CRM,
+> 不要进入 Phase 9。完成后报告数据结构、页面/API 入口、测试和风险。

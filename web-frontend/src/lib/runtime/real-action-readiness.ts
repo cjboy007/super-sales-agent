@@ -33,6 +33,7 @@ const REAL_ACTION_FLAGS: Record<SideEffectKind, string> = {
   "bank.read": "SSA_ENABLE_REAL_BANK",
   "document.generate": "SSA_ENABLE_REAL_DOCUMENT_GENERATION",
   "document.preview": "SSA_ENABLE_REAL_DOCUMENT_PREVIEW",
+  "price.discount": "SSA_ENABLE_REAL_PRICE_DISCOUNT",
 };
 
 function realActionsBlockedByDefault(): boolean {

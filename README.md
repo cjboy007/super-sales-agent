@@ -1,6 +1,29 @@
-# 🚀 Super Sales Agent — 超级业务员系统
+# Super Sales Agent — 超级业务员系统
 
-**AI 驱动的全自动销售助手** — 邮件自动处理、报价单生成、客户跟进、订单追踪，一站式销售自动化。
+**审批门控的销售执行系统** — 统一客户事实、销售草稿、报价准备、客户跟进、订单信号和 side-effect approval。当前定位是 controlled beta / HITL 操作台, 不是无人值守的真实外联销售员。
+
+## Current Capability Boundary
+
+SSA v1 的目标不是承诺“全自动成交”, 而是提供一个可运行、可测试、可审计、可逐步放行的销售执行闭环。
+
+当前已支持:
+
+- 本地 inbox monitor、客户时间线、sales memory、customer detail 和 worker queue。
+- `/growth` HITL 增长操作台: prospecting dry-run、product fit、quotation draft、outbound approval request、decision learning、scheduler metrics。
+- quotation / PI / email / CRM / payment / bank / price discount 等高风险动作的 side-effect gate。
+- 三条核心销售闭环的 dry-run/mock drill: 新邮件到回复审批、RFQ 到报价/PI 审批请求、PI/order 到付款/出货/异常建议。
+
+当前不应声称或默认执行:
+
+- 不自动发送真实客户邮件。
+- 不自动写外部 CRM。
+- 不自动生成正式 quotation、PI、PDF 或 Excel。
+- 不自动改价格、确认付款、读取银行或执行付款相关动作。
+- 不启用无人值守 autopilot。
+
+任何真实客户可见动作都必须同时满足: operator review、side-effect decision approval、对应 `SSA_ENABLE_REAL_*` runtime flag、执行/失败记录、workspace scope 校验。
+
+Status details: [docs/SSA_V1_ACCEPTANCE_AUDIT.md](./docs/SSA_V1_ACCEPTANCE_AUDIT.md)
 
 ## Runtime Boundary
 
@@ -154,29 +177,26 @@ Hermes, OpenClaw, and other operator tools should write company material into th
 
 ## 核心功能
 
-### 📧 邮件自动处理
-- IMAP/SMTP 邮件收发（支持网易企业邮、Gmail 等）
-- 智能意图识别（询盘/催货/投诉/技术/合作/垃圾邮件）
-- 自动回复生成（基于知识库 + AI）
-- OKKI 双向同步（邮件自动写入跟进记录）
+### 📧 邮件与客户时间线
+- 本地 mailbox scan / read-only inbox monitor。
+- 意图识别、RFQ/订单/异常信号提取和客户时间线写入。
+- 基于客户事实和 memory 生成回复草稿。
+- 真实发送必须走 side-effect approval gate、收件人校验和显式 runtime flag。
 
-### 💰 报价单工作流
-- Excel/Word/HTML 多种格式报价单生成
-- PDF 自动导出（LibreOffice）
-- 一键生成全套报价单
-- 客户信息自动填充
+### 💰 报价与 PI 准备
+- 基于产品资料、price memory、历史 quotation / PI 和客户上下文生成 draft-only quotation lines。
+- 输出成本、售价、毛利参考、assumptions、missing info checklist 和 evidence refs。
+- 正式 quotation、PI、PDF、Excel 生成默认关闭, 必须人工确认并审批。
 
-### 🎯 客户跟进
-- 自动跟进计划生成
-- 跟进提醒（Discord/邮件）
-- 跟进记录自动同步 OKKI
-- 客户分层管理
+### 🎯 客户开发与跟进
+- `/growth` 支持 prospecting dry-run、ICP score、opening angle 和下一步建议。
+- 支持 outbound approval request, 只创建审批请求, 不直接外联。
+- decision learning 记录人工修改、拒绝原因和 policy suggestion, 不自动放宽高风险动作。
 
-### 📦 订单与物流
-- 订单状态追踪
-- 物流信息自动抓取
-- 发货提醒
-- 异常订单预警
+### 📦 订单、付款与异常信号
+- 从客户活动中聚合 PI/order、payment、shipment、refund、after-sales 和 exception 信号。
+- 为 operator 生成下一步建议和待审批 milestone request。
+- 付款、银行、价格调整保持最高风险边界, 默认 blocked。
 
 ### 📊 销售仪表板
 - 销售数据可视化
@@ -184,10 +204,10 @@ Hermes, OpenClaw, and other operator tools should write company material into th
 - 业绩统计
 - 实时数据更新
 
-### 🤖 自动进化
-- Revolution 系统自动开发新 skill
-- 审阅 → 执行 → 审核 闭环
-- 新 skill 自动打包发布
+### 🤖 Worker 与运营恢复
+- Jaden worker 处理本地队列、heartbeat、失败任务和 retryable work。
+- `/agent-status` 展示 worker health、side-effect review queue、失败任务和恢复操作。
+- Phase 12 scheduler 当前是 dry-run tick, 不是生产级无人值守 outbound worker。
 
 ---
 
@@ -401,24 +421,31 @@ bash hero-pumps/scripts/inbox-monitor-scan.sh
 
 ---
 
-## 路线图
+## 路线图状态
 
-### Phase 1 ✅ (已完成)
-- [x] 邮件自动处理
-- [x] OKKI 双向同步
-- [x] 报价单工作流
-- [x] Revolution 自动进化系统
+当前路线图以 [docs/SSA_V1_ROADMAP.md](./docs/SSA_V1_ROADMAP.md) 为准。
 
-### Phase 2 🚧 (进行中)
-- [ ] 客户跟进引擎
-- [ ] 订单追踪
-- [ ] 销售仪表板
+已完成的本地 v1 能力:
 
-### Phase 3 📋 (计划中)
-- [ ] 营销活动追踪
-- [ ] 审批引擎
-- [ ] 售后管理
-- [ ] 物流追踪
+- [x] Runtime boundary、repo boundary 和 side-effect gate。
+- [x] Canonical sales world model 最小事实账本、source replay、lifecycle draft + 聚合层。
+- [x] Sales tool registry 契约层。
+- [x] 三条核心销售闭环 dry-run/mock drill。
+- [x] LLM provider / mock fallback / task policy 边界。
+- [x] `/growth` HITL console、prospecting dry-run、quotation draft、outbound approval request、decision learning、scheduler metrics。
+
+已收口的高风险项:
+
+- [x] Tool registry 已成为高风险 side-effect 的受控入口; 直接绕过 registry context 的真实动作请求会被 gate 拒绝。
+- [x] README 已从“全自动销售助手”收口为“审批门控的销售执行系统”, 并明确真实外联、CRM、正式报价/PI、付款/银行和 autopilot 默认不执行。
+
+仍需收口的高风险项:
+
+- [ ] Sales world model 仍不是强一致订单/付款/会计权威主账本。
+- [ ] Phase 12 scheduler 仍是 dry-run tick, 不是生产级无人值守增长 worker。
+- [ ] 回复率和误判原因需要真实受控试点数据。
+
+真实外联试点前请先阅读 [docs/SSA_V1_ACCEPTANCE_AUDIT.md](./docs/SSA_V1_ACCEPTANCE_AUDIT.md) 的 Pilot Readiness Gate。
 
 ---
 

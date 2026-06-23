@@ -3,11 +3,11 @@ import os from "os";
 import path from "path";
 import { ensureDir, repoPath, sanitizeSsaPathSegment, ssaCompanyDataPath } from "../ssa-data-paths";
 import type { DocumentGenerationRequest, SideEffectDecision } from "./types";
-import { requestSideEffect } from "./side-effect-gate";
 import type { SalesRuntime } from "./sales-runtime";
 import { upsertFileManifestRecords, type FileManifestRecord } from "./file-manifest";
 import { recordPiPrices } from "./price-memory";
 import { ingestCustomerInteraction } from "./customer-memory-ingestor";
+import { ingestPiRecordToFactLedger, ingestPriceMemoryRecordToFactLedger } from "./sales-fact-ledger-ingestion";
 
 const QUOTATION_GENERATE_SCRIPT = repoPath("skills", "quotation-workflow", "scripts", "generate-all.sh");
 function quotationOutputDir(workspaceId: string) {
@@ -139,17 +139,7 @@ function piRecordsDir(workspaceId = "farreach") {
 }
 
 export function requestDocumentGeneration(request: DocumentGenerationRequest): SideEffectDecision {
-  return requestSideEffect({
-    kind: "document.generate",
-    workspaceId: request.workspaceId,
-    summary: `Generate ${request.documentType} document for ${request.customer}`,
-    payload: {
-      documentType: request.documentType,
-      customer: request.customer,
-      ...request.payload,
-    },
-    idempotencyKey: request.idempotencyKey,
-  });
+  throw new Error("Document generation requests must go through SalesRuntime.requestDocumentGeneration for sales tool registry enforcement.");
 }
 
 function makeQuotationNo(type: string) {
@@ -532,7 +522,9 @@ export function savePiRecord(workspaceId: string, data: TradeDocumentData, sourc
     data,
   };
   fs.writeFileSync(piRecordPath(workspaceId, piNo), JSON.stringify(record, null, 2), "utf-8");
-  recordPiPrices(workspaceId, data, source);
+  const priceRecords = recordPiPrices(workspaceId, data, source);
+  ingestPiRecordToFactLedger(workspaceId, record);
+  for (const priceRecord of priceRecords) ingestPriceMemoryRecordToFactLedger(priceRecord);
   return record;
 }
 

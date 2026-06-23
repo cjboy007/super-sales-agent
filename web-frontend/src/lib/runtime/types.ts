@@ -85,7 +85,8 @@ export type SideEffectKind =
   | "payment.write"
   | "bank.read"
   | "document.generate"
-  | "document.preview";
+  | "document.preview"
+  | "price.discount";
 
 export interface SideEffectRequest {
   kind: SideEffectKind;
@@ -93,6 +94,19 @@ export interface SideEffectRequest {
   summary: string;
   payload: Record<string, unknown>;
   idempotencyKey?: string;
+  toolId?: string;
+  toolInput?: Record<string, unknown>;
+}
+
+export interface SideEffectToolAudit {
+  toolId: string;
+  name: string;
+  sideEffectKind: SideEffectKind;
+  approvalRequired: boolean;
+  approvalRequirement: "not_required" | "operator_approval_required";
+  requiredPermissions: string[];
+  idempotencyStrategy: string;
+  failureRetryBehavior: string;
 }
 
 export interface SideEffectDecision {
@@ -119,6 +133,7 @@ export interface SideEffectDecision {
     result?: Record<string, unknown>;
   };
   payload: Record<string, unknown>;
+  tool?: SideEffectToolAudit;
 }
 
 export interface DocumentGenerationRequest {

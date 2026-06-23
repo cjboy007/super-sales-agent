@@ -180,5 +180,5 @@ API auth coverage 中明确将以下试用入口列为公开 bootstrap route:
 
 - 本轮完成的是本地可验证 v1 闭环；外部 beta 仍需要真实 mailbox、worker supervisor、LLM provider、真实邮件/文档/CRM 凭据按环境配置后再做一次 operator 演练。
 - `sales-tool-registry` 当前是契约层，尚未替换所有 UI/API 调用路径为 registry-driven dispatch。
-- canonical sales world model 当前是 read-only 聚合层；冲突解决、TTL、版本化事实账本仍是后续增强。
+- canonical sales world model 已补最小 workspace-scoped fact ledger、source replay 和 order/payment lifecycle draft，支持版本化和冲突标记；银行/财务确认、TTL、权威产品/价格源、强一致订单/付款/会计主账本仍是后续增强。
 - 付款/银行相关能力仍保持保守边界: 已有 side-effect kind 与 policy gate，但不是完整银行或收款适配器。

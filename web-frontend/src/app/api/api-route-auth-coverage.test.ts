@@ -8,6 +8,7 @@ const allowedPublicRoutes = new Set([
   "src/app/api/health/route.ts",
   "src/app/api/trial-access/send-code/route.ts",
   "src/app/api/trial-access/verify-code/route.ts",
+  "src/app/api/webhooks/okki/route.ts",
 ]);
 
 describe("API route beta auth coverage", () => {

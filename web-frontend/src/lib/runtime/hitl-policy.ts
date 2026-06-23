@@ -282,6 +282,7 @@ function actionKindForSideEffect(kind: SideEffectKind): HitlActionKind {
   if (kind === "payment.write" || kind === "bank.read") return "payment.bank";
   if (kind === "document.generate") return "quotation.generate";
   if (kind === "document.preview") return "quotation.generate";
+  if (kind === "price.discount") return "price.discount";
   if (kind === "data.read" || kind === "imap.fetch") return "prospect.enrichment";
   return "outbound.sequence.request";
 }
@@ -291,6 +292,7 @@ function titleForSideEffect(kind: SideEffectKind): string {
   if (kind === "crm.write") return "CRM write";
   if (kind === "document.generate") return "Document generation";
   if (kind === "document.preview") return "Document preview";
+  if (kind === "price.discount") return "Price adjustment";
   if (kind === "payment.write" || kind === "bank.read") return "Payment or bank action";
   if (kind === "imap.fetch") return "Mailbox sync";
   if (kind === "data.read") return "Data read";
