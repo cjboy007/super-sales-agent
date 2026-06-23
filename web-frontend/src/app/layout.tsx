@@ -3,6 +3,7 @@ import "./globals.css";
 import ClientLayout from "@/components/ClientLayout";
 import { ProjectProvider } from "@/lib/project";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { OpsStatusProvider } from "@/components/ui/OpsStatusProvider";
 
 export const metadata: Metadata = {
   title: "SSA",
@@ -36,7 +37,9 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider>
           <ProjectProvider>
-            <ClientLayout>{children}</ClientLayout>
+            <OpsStatusProvider>
+              <ClientLayout>{children}</ClientLayout>
+            </OpsStatusProvider>
           </ProjectProvider>
         </ThemeProvider>
       </body>
