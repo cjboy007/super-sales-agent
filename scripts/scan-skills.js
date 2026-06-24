@@ -6,8 +6,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const SKILLS_DIR = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills';
-const OUTPUT_FILE = '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/test-plan.json';
+const REPO_ROOT = path.resolve(__dirname, '..');
+const SKILLS_DIR = process.env.SSA_SKILLS_DIR || path.join(REPO_ROOT, 'skills');
+const OUTPUT_FILE = process.env.SSA_TEST_PLAN_PATH || path.join(REPO_ROOT, 'test-plan.json');
 
 const skills = fs.readdirSync(SKILLS_DIR).filter(f => 
   fs.statSync(path.join(SKILLS_DIR, f)).isDirectory()

@@ -42,7 +42,7 @@ const CUSTOMER_OVERRIDES_FILE = path.join(CONFIG_DIR, 'customer-overrides.json')
 // 依赖模块
 // ============================================================
 
-const { getRate, convertAmount } = require('./exchange-rate');
+const { getRateWithMeta } = require('./exchange-rate');
 const { getCopperPrice, getCopperCostForProduct } = require('./copper-price-adapter');
 
 // ============================================================
@@ -78,6 +78,54 @@ function loadJSON(filePath) {
 function roundTo(num, decimals) {
   const factor = Math.pow(10, decimals);
   return Math.round(num * factor) / factor;
+}
+
+function decimalToScaled(value, scale = 2) {
+  if (typeof value !== 'number' && typeof value !== 'string') {
+    throw new Error(`Invalid money value: ${value}`);
+  }
+  const text = String(value).trim();
+  const match = text.match(/^(-?)(\d+)(?:\.(\d+))?$/);
+  if (!match) throw new Error(`Invalid money value: ${value}`);
+
+  const sign = match[1] === '-' ? -1n : 1n;
+  const whole = BigInt(match[2]);
+  const fraction = match[3] || '';
+  const padded = (fraction + '0'.repeat(scale + 1)).slice(0, scale + 1);
+  const base = 10n ** BigInt(scale);
+  const truncated = BigInt(padded.slice(0, scale) || '0');
+  const nextDigit = Number(padded[scale] || '0');
+  const rounded = whole * base + truncated + (nextDigit >= 5 ? 1n : 0n);
+  return sign * rounded;
+}
+
+function scaledToNumber(value, scale = 2) {
+  const sign = value < 0n ? -1 : 1;
+  const abs = value < 0n ? -value : value;
+  const base = 10n ** BigInt(scale);
+  const whole = abs / base;
+  const fraction = String(abs % base).padStart(scale, '0');
+  return Number(`${sign < 0 ? '-' : ''}${whole}.${fraction}`);
+}
+
+function multiplyMoney(unitPrice, quantity, unitScale = 4, outputScale = 2) {
+  if (!Number.isInteger(quantity) || quantity < 0) {
+    throw new Error(`Invalid quantity for money multiplication: ${quantity}`);
+  }
+  const scaledUnit = decimalToScaled(unitPrice, unitScale);
+  const outputFactor = 10n ** BigInt(outputScale);
+  const unitFactor = 10n ** BigInt(unitScale);
+  const raw = scaledUnit * BigInt(quantity) * outputFactor;
+  const rounded = (raw + unitFactor / 2n) / unitFactor;
+  return scaledToNumber(rounded, outputScale);
+}
+
+function sumMoney(values, outputScale = 2) {
+  const total = values.reduce(
+    (sum, value) => sum + decimalToScaled(value, outputScale),
+    0n
+  );
+  return scaledToNumber(total, outputScale);
 }
 
 // ============================================================
@@ -374,13 +422,17 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
     // 协议价直接使用，跳过公式
     let agreedUnitPrice = override.agreed_price_usd;
     let agreedCurrency = override.currency || 'USD';
+    let exchangeRate = 1;
+    let exchangeRateMeta = { stale: false };
 
     // 币种转换（协议价通常是 USD，如果目标不同需转换）
     if (cur !== agreedCurrency) {
-      agreedUnitPrice = await convertAmount(agreedUnitPrice, agreedCurrency, cur);
+      exchangeRateMeta = await getRateWithMeta(agreedCurrency, cur);
+      exchangeRate = exchangeRateMeta.rate;
+      agreedUnitPrice = roundTo(agreedUnitPrice * exchangeRate, 4);
     }
 
-    const totalPrice = roundTo(agreedUnitPrice * quantity, 2);
+    const totalPrice = multiplyMoney(agreedUnitPrice, quantity);
 
     // 计算参考利润率（仍需知道成本）
     const copperInfo = getCopperCostForProduct(sku);
@@ -389,7 +441,10 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
       + copperInfo.copperCost_usd;
     let costInCur = costUsd;
     if (cur !== 'USD') {
-      costInCur = await convertAmount(costUsd, 'USD', cur);
+      const costRateMeta = agreedCurrency === 'USD'
+        ? exchangeRateMeta
+        : await getRateWithMeta('USD', cur);
+      costInCur = roundTo(costUsd * costRateMeta.rate, 4);
     }
     const refMargin = costInCur > 0
       ? roundTo(((agreedUnitPrice - costInCur) / agreedUnitPrice) * 100, 2)
@@ -398,7 +453,7 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
     // 协议价也做底价红线检查
     const floorCheck = checkFloorPrice(agreedUnitPrice, costInCur, refMargin, sku, config);
 
-    return {
+    const result = {
       sku: product.sku,
       model: product.model,
       category: product.category,
@@ -424,12 +479,21 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
         copperCost: copperInfo.copperCost_usd,
         totalCostUsd: roundTo(costUsd, 4),
         totalCostLocal: roundTo(costInCur, 4),
-        exchangeRate: cur !== 'USD' ? roundTo(agreedUnitPrice / override.agreed_price_usd, 6) : 1,
+        exchangeRate: roundTo(exchangeRate, 6),
+        exchangeRateStale: Boolean(exchangeRateMeta.stale),
+        exchangeRateWarning: exchangeRateMeta.warning || null,
+        exchangeRateFetchedAt: exchangeRateMeta.fetched_at || null,
         margin: null,
         discount: null,
         note: 'Override price applied. Margin is reference only.'
       }
     };
+
+    if (exchangeRateMeta.warning) {
+      result.warnings = [exchangeRateMeta.warning];
+    }
+
+    return result;
   }
 
   // ---- Step 2: 公式定价 ----
@@ -467,8 +531,10 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
   // 2d. 币种转换
   let unitPriceLocal = unitPriceUsd;
   let exchangeRate = 1;
+  let exchangeRateMeta = { stale: false };
   if (cur !== 'USD') {
-    exchangeRate = await getRate('USD', cur);
+    exchangeRateMeta = await getRateWithMeta('USD', cur);
+    exchangeRate = exchangeRateMeta.rate;
     unitPriceLocal = roundTo(unitPriceUsd * exchangeRate, 4);
   }
 
@@ -481,7 +547,7 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
     ? roundTo(((unitPriceLocal - totalCostLocal) / unitPriceLocal) * 100, 2)
     : 0;
 
-  const totalPrice = roundTo(unitPriceLocal * quantity, 2);
+  const totalPrice = multiplyMoney(unitPriceLocal, quantity);
 
   // 2f. 底价红线检查
   const floorCheck = checkFloorPrice(unitPriceLocal, totalCostLocal, actualMarginPct, sku, config);
@@ -492,7 +558,7 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
     const suggestedUnitLocal = roundTo(totalCostLocal / (1 - floorMinMargin / 100), 4);
     suggestedPrice = {
       unitPrice: suggestedUnitLocal,
-      totalPrice: roundTo(suggestedUnitLocal * quantity, 2),
+      totalPrice: multiplyMoney(suggestedUnitLocal, quantity),
       marginRate: floorMinMargin,
       note: `Suggested price at floor margin ${floorMinMargin}%`
     };
@@ -541,10 +607,17 @@ async function calculatePrice(sku, quantity, customerGrade, currency, options) {
         ? roundTo(priceBeforeDiscountUsd * exchangeRate, 4)
         : roundTo(priceBeforeDiscountUsd, 4),
       exchangeRate: roundTo(exchangeRate, 6),
+      exchangeRateStale: Boolean(exchangeRateMeta.stale),
+      exchangeRateWarning: exchangeRateMeta.warning || null,
+      exchangeRateFetchedAt: exchangeRateMeta.fetched_at || null,
       isDryRun: copperInfo.isDryRun,
       isCopperFallback: copperInfo.isFallback
     }
   };
+
+  if (exchangeRateMeta.warning) {
+    result.warnings = [...(result.warnings || []), exchangeRateMeta.warning];
+  }
 
   log(`Result: unitPrice=${result.unitPrice} ${cur}, margin=${actualMarginPct}%, floor=${floorCheck.triggered}`);
   return result;
@@ -590,8 +663,8 @@ async function calculateBatch(items, customerGrade, currency, options) {
   }
 
   // 汇总
-  const totalAmount = results.reduce((sum, r) => sum + r.totalPrice, 0);
-  const totalCost = results.reduce((sum, r) => sum + r.breakdown.totalCostLocal * r.quantity, 0);
+  const totalAmount = sumMoney(results.map(r => r.totalPrice));
+  const totalCost = sumMoney(results.map(r => multiplyMoney(r.breakdown.totalCostLocal, r.quantity)));
   const avgMargin = totalAmount > 0
     ? roundTo(((totalAmount - totalCost) / totalAmount) * 100, 2)
     : 0;
@@ -823,5 +896,8 @@ module.exports = {
   calculateBatch,
   getProductCost,
   listProducts,
-  clearConfigCache
+  clearConfigCache,
+  decimalToScaled,
+  multiplyMoney,
+  sumMoney
 };

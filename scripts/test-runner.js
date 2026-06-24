@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const REPO_ROOT = path.resolve(__dirname, '..');
 
 // 加载配置
 const CONFIG_FILE = path.join(__dirname, '..', 'test-config.json');
@@ -25,7 +26,7 @@ try {
   process.exit(1);
 }
 
-const SKILLS_DIR = config.skills_dir || '/Users/wilson/.openclaw/workspace/monorepo/super-sales-agent/skills';
+const SKILLS_DIR = process.env.SSA_SKILLS_DIR || config.skills_dir || path.join(REPO_ROOT, 'skills');
 const REPORTS_DIR = path.join(__dirname, 'test-reports');
 const LOGS_DIR = path.join(__dirname, 'logs');
 

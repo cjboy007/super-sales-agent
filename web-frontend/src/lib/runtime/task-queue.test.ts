@@ -89,6 +89,27 @@ describe("SqliteTaskQueue", () => {
     expect(queue.claimNext("worker-2", { now: new Date("2026-05-27T03:00:30.000Z") })?.id).toBe("job-new");
   });
 
+  it("returns the atomically claimed row without a second post-claim lookup", () => {
+    const queue = new SqliteTaskQueue();
+    queue.enqueue(job("job-atomic", "email.reply", "2026-05-27T01:00:00.000Z"));
+    const queueWithoutPostClaimRead = queue as SqliteTaskQueue & { get(id: string): RuntimeJob | null };
+    queueWithoutPostClaimRead.get = () => {
+      throw new Error("post-claim read should not run");
+    };
+
+    const claimed = queue.claimNext("worker-atomic", {
+      now: new Date("2026-05-27T03:00:00.000Z"),
+      leaseMs: 60_000,
+    });
+
+    expect(claimed).toMatchObject({
+      id: "job-atomic",
+      status: "running",
+      attempts: 1,
+      claimedBy: "worker-atomic",
+    });
+  });
+
   it("reclaims expired running leases but leaves active leases alone", () => {
     const queue = new SqliteTaskQueue();
     const expired = queue.enqueue({

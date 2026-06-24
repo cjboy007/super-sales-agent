@@ -57,6 +57,52 @@ function statePath(dataRoot, workspace) {
   return path.join(inboxDir(dataRoot, workspace), "monitor-state.json");
 }
 
+function lockPath(dataRoot, workspace) {
+  return path.join(inboxDir(dataRoot, workspace), "monitor-state.lock");
+}
+
+function acquireLock(filePath, options = {}) {
+  ensureDir(path.dirname(filePath));
+  const staleMs = Number.isFinite(options.staleMs) ? options.staleMs : 15 * 60 * 1000;
+  try {
+    const fd = fs.openSync(filePath, "wx");
+    fs.writeFileSync(fd, JSON.stringify({
+      pid: process.pid,
+      createdAt: new Date().toISOString(),
+    }, null, 2));
+    return {
+      acquired: true,
+      release() {
+        try {
+          fs.closeSync(fd);
+        } catch {
+          // ignore close errors during shutdown
+        }
+        try {
+          fs.rmSync(filePath, { force: true });
+        } catch {
+          // ignore release races
+        }
+      },
+    };
+  } catch (error) {
+    if (error?.code !== "EEXIST") throw error;
+    try {
+      const stat = fs.statSync(filePath);
+      if (Date.now() - stat.mtimeMs > staleMs) {
+        fs.rmSync(filePath, { force: true });
+        return acquireLock(filePath, options);
+      }
+    } catch {
+      return acquireLock(filePath, options);
+    }
+    return {
+      acquired: false,
+      release() {},
+    };
+  }
+}
+
 function eventsPath(dataRoot, workspace) {
   return path.join(companyDir(dataRoot, workspace), "events", "events.json");
 }
@@ -625,6 +671,22 @@ export async function runInboxMonitor(options = {}) {
   const sourceMode = stringValue(options.sourceMode, process.env.SSA_INBOX_SOURCE) || DEFAULT_SOURCE_MODE;
   const now = stringValue(options.now) || new Date().toISOString();
   const stateFile = statePath(dataRoot, workspace);
+  const lock = acquireLock(lockPath(dataRoot, workspace), { staleMs: options.lockStaleMs });
+  if (!lock.acquired) {
+    return {
+      status: "locked",
+      workspace,
+      dataRoot,
+      sourceMode,
+      source: null,
+      newCount: 0,
+      importantCount: 0,
+      newMessages: [],
+      output: "",
+    };
+  }
+
+  try {
   const state = loadState(stateFile, now);
   let source = sourcePath(dataRoot, workspace);
   let messages = [];
@@ -724,6 +786,9 @@ export async function runInboxMonitor(options = {}) {
     newMessages,
     output: reportForMessages(workspace, newMessages),
   };
+  } finally {
+    lock.release();
+  }
 }
 
 export function parseArgs(argv = process.argv.slice(2)) {

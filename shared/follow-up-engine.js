@@ -40,6 +40,7 @@ function requireSkillDependency(name) {
 }
 
 const nodemailer = requireSkillDependency('nodemailer');
+const DEFAULT_DAILY_SEND_CAP = 25;
 
 // ==================== 配置 ====================
 const SIGNATURE_PATH = path.join(REPO_ROOT, 'hero-pumps', 'config', 'signatures', 'signature-jordan.html');
@@ -51,6 +52,7 @@ const PROJECTS = {
     FOLLOW_UP_INTERVAL_MIN: 2 * 60 * 1000,
     FOLLOW_UP_INTERVAL_MAX: 3 * 60 * 1000,
     MAX_FOLLOW_UPS: 4,
+    DAILY_SEND_CAP: Number.parseInt(process.env.SSA_FOLLOW_UP_DAILY_CAP || '', 10) || DEFAULT_DAILY_SEND_CAP,
     COOLDOWN_DAYS: 90,
     STRATEGIES: {
       cold_email_sent: {
@@ -76,6 +78,7 @@ const PROJECTS = {
     FOLLOW_UP_INTERVAL_MIN: 2 * 60 * 1000,
     FOLLOW_UP_INTERVAL_MAX: 3 * 60 * 1000,
     MAX_FOLLOW_UPS: 4,
+    DAILY_SEND_CAP: Number.parseInt(process.env.SSA_FOLLOW_UP_DAILY_CAP || '', 10) || DEFAULT_DAILY_SEND_CAP,
     COOLDOWN_DAYS: 90,
     STRATEGIES: {
       cold_email_sent: {
@@ -133,6 +136,15 @@ class Logger {
   success(m, d) { this.log('SUCCESS', m, d); }
 }
 const logger = new Logger();
+
+function dailyCapFor(config, options = {}) {
+  const explicit = Number.parseInt(options.dailyCap, 10);
+  if (Number.isFinite(explicit) && explicit >= 0) return explicit;
+  const env = Number.parseInt(process.env.SSA_FOLLOW_UP_DAILY_CAP || '', 10);
+  if (Number.isFinite(env) && env >= 0) return env;
+  const configured = Number.parseInt(config.DAILY_SEND_CAP, 10);
+  return Number.isFinite(configured) && configured >= 0 ? configured : DEFAULT_DAILY_SEND_CAP;
+}
 
 // ==================== Hero Pump 跟进模板（增强版） ====================
 // 每个阶段有不同切入角度，支持客户个性化信息
@@ -316,7 +328,7 @@ class FollowUpEngine {
     return null;
   }
 
-  async processProject(project, dryRun = false) {
+  async processProject(project, dryRun = false, options = {}) {
     const config = PROJECTS[project];
     const templates = this.getTemplates(project);
 
@@ -327,14 +339,25 @@ class FollowUpEngine {
 
     // 获取需要跟进的客户
     const dueCustomers = SalesState.getDueFollowUps(project);
+    const dailyCap = dailyCapFor(config, options);
+    const customersToProcess = dueCustomers.slice(0, dailyCap);
     logger.info(`[${project}] 需要跟进: ${dueCustomers.length} 个客户`);
+    if (customersToProcess.length < dueCustomers.length) {
+      logger.warn(`[${project}] Daily follow-up cap reached`, {
+        due: dueCustomers.length,
+        cap: dailyCap,
+        skipped: dueCustomers.length - customersToProcess.length,
+      });
+    }
 
-    if (dueCustomers.length === 0) return { total: 0, success: 0, failed: 0 };
+    if (dueCustomers.length === 0 || customersToProcess.length === 0) {
+      return { total: 0, success: 0, failed: 0, skipped: dueCustomers.length - customersToProcess.length, dailyCap };
+    }
 
-    const results = { total: 0, success: 0, failed: 0 };
+    const results = { total: 0, success: 0, failed: 0, skipped: dueCustomers.length - customersToProcess.length, dailyCap };
 
-    for (let i = 0; i < dueCustomers.length; i++) {
-      const customer = dueCustomers[i];
+    for (let i = 0; i < customersToProcess.length; i++) {
+      const customer = customersToProcess[i];
       results.total++;
 
       try {
@@ -382,7 +405,7 @@ class FollowUpEngine {
         }
 
         // 间隔发送
-        if (i < dueCustomers.length - 1) {
+        if (i < customersToProcess.length - 1) {
           const delay = Math.random() * (config.FOLLOW_UP_INTERVAL_MAX - config.FOLLOW_UP_INTERVAL_MIN) + config.FOLLOW_UP_INTERVAL_MIN;
           logger.info(`等待 ${Math.round(delay / 1000)}s`);
           await new Promise(r => setTimeout(r, delay));
@@ -408,7 +431,7 @@ class FollowUpEngine {
 
     const allResults = {};
     for (const project of projects) {
-      allResults[project] = await this.processProject(project, dryRun);
+      allResults[project] = await this.processProject(project, dryRun, options);
     }
 
     logger.info('执行完成', allResults);
@@ -423,12 +446,14 @@ async function main() {
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--dry-run') options.dryRun = true;
     else if (args[i] === '--project' && args[i + 1]) { options.projects = [args[i + 1]]; i++; }
+    else if (args[i] === '--daily-cap' && args[i + 1]) { options.dailyCap = Number.parseInt(args[i + 1], 10); i++; }
     else if (['--help', '-h'].includes(args[i])) {
       console.log(`Follow-up Engine v2
 用法: node follow-up-engine.js [选项]
 选项:
   --dry-run             预览模式
   --project <name>      指定项目 (farreach / hero-pumps)
+  --daily-cap <n>       每个项目本次最多处理 n 封跟进
   --help, -h            帮助
 
 示例:
@@ -446,4 +471,4 @@ if (require.main === module) {
   main().catch(e => { logger.error('程序异常', { error: e.message }); process.exit(1); });
 }
 
-module.exports = { FollowUpEngine, HERO_PUMP_TEMPLATES, buildFarreachSmtpInvocation };
+module.exports = { FollowUpEngine, HERO_PUMP_TEMPLATES, buildFarreachSmtpInvocation, dailyCapFor };

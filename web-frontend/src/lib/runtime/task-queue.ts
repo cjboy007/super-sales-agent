@@ -221,7 +221,7 @@ export class SqliteTaskQueue {
     const nowText = now.toISOString();
     const leaseUntil = new Date(now.getTime() + leaseMs).toISOString();
 
-    const claimed = this.query<{ id: string }>(`
+    const claimed = this.query<SqliteRow>(`
       UPDATE runtime_jobs
       SET
         status = 'running',
@@ -237,10 +237,10 @@ export class SqliteTaskQueue {
         ORDER BY datetime(created_at) ASC, id ASC
         LIMIT 1
       )
-      RETURNING id;
+      RETURNING *;
     `);
 
-    return claimed[0] ? this.get(claimed[0].id) : null;
+    return claimed[0] ? rowToJob(claimed[0]) : null;
   }
 
   complete(id: string, output: Record<string, unknown> = {}): RuntimeJob {
