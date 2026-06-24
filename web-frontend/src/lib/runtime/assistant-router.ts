@@ -364,7 +364,7 @@ function answerFromEvidence(
 
 function sideEffectAnswer(kinds: string[]): string {
   const label = kinds.length ? kinds.join(", ") : "external action";
-  return `我不能直接执行这个请求，因为它涉及 ${label}。SSA 可以先整理建议或草稿，但发送邮件、写 CRM、改价格、改订单或付款相关动作都必须先确认。`;
+  return `我不能直接执行这个请求，因为它涉及 ${label}。SSA 可以先整理建议或草稿，但发送邮件、写 CRM、改价格、改订单或付款相关动作都必须先审批和确认。`;
 }
 
 function confidenceFor(local: AssistantLocalEvidence[], web: AssistantWebEvidence[], sideEffectRisk: boolean): number {

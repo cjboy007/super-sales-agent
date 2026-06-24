@@ -51,4 +51,5 @@ export * from "./product-quotation-drafts";
 export * from "./outbound-approval-pipeline";
 export * from "./decision-learning";
 export * from "./growth-scheduler";
+export * from "./skill-kernel";
 export * from "./sales-runtime";

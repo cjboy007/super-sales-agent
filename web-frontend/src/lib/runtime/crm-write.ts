@@ -354,7 +354,7 @@ export function executeCrmWrite(runtime: SalesRuntime, input: CrmWriteInput): Cr
     throw Object.assign(new Error(message), { status: 403 });
   }
   if (!crmFlagEnabled()) {
-    const message = "CRM write blocked. Enable real CRM writing and retry after confirmation.";
+    const message = "CRM write blocked. Real CRM writing requires explicit enablement; retry after confirmation.";
     runtime.recordSideEffectFailed(decision.id, {
       error: message,
       canRetry: true,

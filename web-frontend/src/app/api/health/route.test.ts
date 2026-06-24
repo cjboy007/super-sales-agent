@@ -404,7 +404,7 @@ describe("/api/health route", () => {
       expect.objectContaining({
         id: "worker-supervisor",
         status: "needs_setup",
-        label: expect.stringContaining("Worker recovery"),
+        label: expect.stringContaining("Task recovery"),
       }),
       expect.objectContaining({
         id: "resident-worker",
@@ -430,7 +430,7 @@ describe("/api/health route", () => {
         startStop: true,
         healthCheck: true,
       },
-      summary: "Worker recovery is prepared with restart and health controls.",
+      summary: "Task recovery is prepared with restart and health controls.",
       nextStep: "Keep the recovery setup installed and verify it after deployment changes.",
     });
     expect(json.beta.workerRecovery.availableActions).toEqual([
@@ -544,14 +544,14 @@ describe("/api/health route", () => {
         failed: 1,
         retryable: 1,
       },
-      summary: expect.stringContaining("waiting for operator review"),
+      summary: expect.stringContaining("waiting for review"),
       nextStep: expect.stringContaining("Review failed"),
     });
     expect(json.beta.readiness.checks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: "real-action-authorization",
         status: "needs_review",
-        label: expect.stringContaining("External action"),
+        label: expect.stringContaining("Customer action"),
       }),
     ]));
     const serialized = JSON.stringify(json.beta.realActions);
@@ -657,7 +657,7 @@ describe("/api/health route", () => {
         status: "needs_setup",
         label: expect.stringContaining("Mailbox"),
         detail: "Mailbox setup needs attention before incoming customer email can enter CRM.",
-        action: "Complete the mailbox connection in Settings, then run the resident worker again.",
+        action: "Complete the mailbox connection in Settings, then run automation again.",
       }),
       expect.objectContaining({
         id: "customer-activity",
@@ -670,7 +670,7 @@ describe("/api/health route", () => {
       autoCapture: true,
       recentlySynced: false,
       summary: "Mailbox setup needs attention before incoming customer email can enter CRM.",
-      nextStep: "Complete the mailbox connection in Settings, then run the resident worker again.",
+      nextStep: "Complete the mailbox connection in Settings, then run automation again.",
       requiredActions: ["Add the mailbox password or app password."],
     });
 

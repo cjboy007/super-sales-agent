@@ -213,7 +213,7 @@ describe("Outbound Approval Pipeline", () => {
       approvalStatus: "blocked",
       waitingForApproval: true,
       notExecuted: true,
-      expectedAction: expect.stringMatching(/approval/i),
+      expectedAction: "Submit draft email to Apex Pump Distributors for confirmation; not executed.",
     });
     expect(candidate.contentSummary).toMatch(/Apex Pump Distributors|pump/i);
     expect(candidate.productQuotationSummary).toMatch(/pump|USD|margin/i);
