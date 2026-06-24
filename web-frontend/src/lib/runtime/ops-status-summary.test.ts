@@ -13,7 +13,7 @@ describe("summarizeOpsStatus", () => {
     })).toMatchObject({
       level: "critical",
       badge: "!",
-      navLabel: "Ops !",
+      navLabel: "Task Progress !",
       summary: "1 failed task needs review",
     });
   });
@@ -29,7 +29,7 @@ describe("summarizeOpsStatus", () => {
     })).toMatchObject({
       level: "attention",
       badge: "3",
-      navLabel: "Ops 3",
+      navLabel: "Task Progress 3",
       summary: "3 actions waiting for review",
     });
   });
@@ -45,8 +45,8 @@ describe("summarizeOpsStatus", () => {
     })).toMatchObject({
       level: "running",
       badge: "●",
-      navLabel: "Ops ●",
-      summary: "3 background tasks active",
+      navLabel: "Task Progress ●",
+      summary: "3 automated tasks active",
     });
   });
 });

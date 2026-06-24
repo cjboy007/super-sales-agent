@@ -170,7 +170,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
     requiredPermissions: ["workspace.read", "email.send.request"],
     sideEffectKind: "email.send",
     idempotencyStrategy: "Use workspaceId + source email id + normalized recipient + subject.",
-    failureRetryBehavior: "Retry after confirmation, address verification, and adapter errors are visible.",
+    failureRetryBehavior: "Retry through a side-effect decision after confirmation, address verification, and adapter errors are visible.",
   }),
   sideEffectTool({
     id: "email.test_smtp",
@@ -347,7 +347,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
     requiredPermissions: ["workspace.read", "feishu.notify.request"],
     sideEffectKind: "feishu.notify",
     idempotencyStrategy: "Use workspaceId + channel + message hash.",
-    failureRetryBehavior: "Retry after review.",
+    failureRetryBehavior: "Retry through a side-effect decision after review.",
   }),
   localTool({
     id: "follow_up.create_plan",

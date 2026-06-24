@@ -5,6 +5,12 @@ import { describe, expect, it } from "vitest";
 const pageSource = readFileSync(join(process.cwd(), "src/app/leads/page.tsx"), "utf8");
 
 describe("customer page business-facing UI", () => {
+  it("wraps the search-param driven workspace in Suspense for production builds", () => {
+    expect(pageSource).toContain('import { Suspense, useCallback');
+    expect(pageSource).toContain("<Suspense fallback={null}>");
+    expect(pageSource).toContain("<CustomerWorkspacePage />");
+  });
+
   it("does not render internal order identifiers in customer-facing rows", () => {
     expect(pageSource).not.toContain("{order.id}</span>");
     expect(pageSource).not.toContain("customer.orders[0]?.id");

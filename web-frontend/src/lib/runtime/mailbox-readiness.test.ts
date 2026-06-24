@@ -105,7 +105,7 @@ describe("mailbox readiness", () => {
       autoCapture: true,
       recentlySynced: true,
       summary: "Mailbox setup needs attention before incoming customer email can enter CRM.",
-      nextStep: "Complete the mailbox connection in Settings, then run the resident worker again.",
+      nextStep: "Complete the mailbox connection in Settings, then run automation again.",
       requiredActions: ["Add the mailbox password or app password."],
     });
   });
@@ -133,8 +133,8 @@ describe("mailbox readiness", () => {
       configured: true,
       autoCapture: true,
       recentlySynced: false,
-      requiredActions: ["Run the resident worker until a new inbound mail sync is visible."],
-      nextStep: "Start or repair the resident worker, then confirm new mail appears in the customer timeline.",
+      requiredActions: ["Run automation until a new inbound mail sync is visible."],
+      nextStep: "Start or repair automation, then confirm new mail appears in the customer timeline.",
     });
   });
 

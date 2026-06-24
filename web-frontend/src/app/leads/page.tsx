@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useProject } from "@/lib/project";
@@ -969,5 +969,9 @@ function CustomerWorkspacePage() {
 }
 
 export default function CustomersPage() {
-  return <CustomerWorkspacePage />;
+  return (
+    <Suspense fallback={null}>
+      <CustomerWorkspacePage />
+    </Suspense>
+  );
 }

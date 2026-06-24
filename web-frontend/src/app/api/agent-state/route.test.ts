@@ -79,7 +79,7 @@ describe("/api/agent-state route", () => {
     expect(typeof json.data.updatedAt).toBe("string");
   });
 
-  it("shows Jaden-planned operator command jobs as background progress", async () => {
+  it("keeps targetless Jaden-planned operator commands as gated coordination progress", async () => {
     const { createSalesRuntime } = await import("@/lib/runtime");
     createSalesRuntime().createOperatorCommand({
       workspaceId: "demo-exporter",
@@ -95,19 +95,21 @@ describe("/api/agent-state route", () => {
     expect(json.success).toBe(true);
     expect(json.data.agents).toEqual(expect.arrayContaining([
       expect.objectContaining({
+        id: "jaden-runtime",
+        name: "Jaden Runtime",
+        activeTasks: 1,
+      }),
+    ]));
+    expect(json.data.agents).toEqual(expect.arrayContaining([
+      expect.objectContaining({
         id: "outreach-drafts",
         name: "Outreach Drafts",
-        activeTasks: 1,
+        activeTasks: 0,
       }),
       expect.objectContaining({
         id: "quote-docs",
         name: "Quotes and Ship Docs",
-        activeTasks: 1,
-      }),
-      expect.objectContaining({
-        id: "jaden-runtime",
-        name: "Jaden Runtime",
-        activeTasks: 2,
+        activeTasks: 0,
       }),
     ]));
     expect(json.data.agents).toHaveLength(6);

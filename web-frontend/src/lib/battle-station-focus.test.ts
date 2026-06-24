@@ -58,7 +58,7 @@ describe("resolveFocusCase", () => {
         title: `${approval?.account} - ${approval?.title}`,
       });
       expect(focusCase?.subject).toContain(approval?.title);
-      expect(focusCase?.draft).toContain("JadenOS");
+      expect(focusCase?.draft).toContain("Internal review note");
       expect(focusCase?.analysis.some((block) => block.title === "Recent Signals")).toBe(true);
     }
   });
