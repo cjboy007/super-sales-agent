@@ -27,7 +27,7 @@ const { execSync } = require("child_process");
 const BASE_DIR = path.join(__dirname, "..");
 const LEADS_DIR = path.join(process.env.HOME, '.ssa', 'data', 'companies', 'hero-pumps', 'leads');
 const OUTPUT_DIR = path.join(BASE_DIR, "campaign-tracker", "templates-v2");
-const TAVILY_SCRIPT = "/Users/wilson/.openclaw/workspace/skills/openclaw-tavily-search/scripts/tavily_search.py";
+const TAVILY_SCRIPT = process.env.TAVILY_SEARCH_SCRIPT || "tavily_search.py";
 
 /** 默认处理联系人数量（样本验证） */
 const DEFAULT_SAMPLE_SIZE = 5;

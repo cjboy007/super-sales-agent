@@ -146,6 +146,37 @@ test("dedupes messages already seen by the SSA-owned monitor state", async () =>
   }
 });
 
+test("skips processing when another inbox monitor owns the workspace lock", async () => {
+  const dataRoot = tempDataRoot();
+  try {
+    writeJson(path.join(dataRoot, "companies", "farreach", "inbox", "incoming.json"), [
+      {
+        id: "locked-msg",
+        from: "buyer@example.com",
+        subject: "RFQ while locked",
+        receivedAt: "2026-06-11T02:00:00.000Z",
+      }
+    ]);
+    const lockPath = path.join(dataRoot, "companies", "farreach", "inbox", "monitor-state.lock");
+    fs.mkdirSync(path.dirname(lockPath), { recursive: true });
+    fs.writeFileSync(lockPath, JSON.stringify({ pid: 12345, createdAt: "2026-06-11T01:59:00.000Z" }), "utf-8");
+
+    const result = await runInboxMonitor({
+      workspace: "farreach",
+      dataRoot,
+      now: "2026-06-11T02:10:00.000Z",
+      lockStaleMs: 60 * 60 * 1000,
+    });
+
+    assert.equal(result.status, "locked");
+    assert.equal(result.newCount, 0);
+    assert.equal(fs.existsSync(path.join(dataRoot, "companies", "farreach", "inbox", "monitor-state.json")), false);
+    assert.equal(fs.existsSync(lockPath), true);
+  } finally {
+    fs.rmSync(dataRoot, { recursive: true, force: true });
+  }
+});
+
 test("prunes monitor seen state to a bounded recent set", async () => {
   const dataRoot = tempDataRoot();
   try {

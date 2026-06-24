@@ -22,7 +22,7 @@ const PROJECT = 'farreach';
 
 // ==================== 配置 ====================
 const CONFIG = {
-  OKKI_CLI: '/Users/wilson/.openclaw/workspace/xiaoman-okki/api/okki_cli.py',
+  OKKI_CLI: process.env.OKKI_CLI_PATH || 'okki_cli.py',
   SMTP_CLI: path.join(REPO_ROOT, 'skills', 'imap-smtp-email', 'scripts', 'smtp.js'),
   TEMPLATES_DIR: path.join(__dirname, 'config/templates'),
   COUNTRIES_FILE: path.join(__dirname, 'config/okki-countries.json'),
