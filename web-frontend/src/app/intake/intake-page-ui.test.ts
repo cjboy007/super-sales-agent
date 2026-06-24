@@ -16,4 +16,21 @@ describe("intake page UI", () => {
     expect(source).toContain("Synthesize");
     expect(source).toContain("/synthesize");
   });
+
+  it("queues review through the shared Jaden intake envelope", () => {
+    expect(source).toContain('/api/operator-command');
+    expect(source).toContain('surface: "intake"');
+    expect(source).toContain('mode: "file_intake"');
+    expect(source).toContain('target:');
+    expect(source).toContain('type: "file"');
+  });
+
+  it("shows task-thread visibility after intake review is queued", () => {
+    expect(source).toContain("JadenTaskDrawer");
+    expect(source).toContain("commandThreadId");
+    expect(source).toContain("setTaskDrawerOpen");
+    expect(source).toContain("json.data?.commandThreadId");
+    expect(source).toContain("View task");
+    expect(source).toContain("查看任务");
+  });
 });

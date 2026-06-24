@@ -7,14 +7,22 @@ const pageSource = readFileSync(join(process.cwd(), "src/app/onboarding/JadenosO
 const userGuidePath = join(process.cwd(), "src/app/user-guide/page.tsx");
 
 describe("JadenOS onboarding page UI", () => {
-  it("guides first-run local gateway setup from the browser", () => {
+  it("presents setup as a non-blocking checklist with quick start and advanced local checks", () => {
     expect(pageSource).toContain("/api/local-gateway");
     expect(pageSource).toContain("/api/local-storage");
     expect(pageSource).toContain("/api/llm/test");
     expect(pageSource).toContain("/api/intake");
     expect(pageSource).toContain("synthesize");
-    expect(pageSource).toContain("Access Pass");
-    expect(pageSource).toContain("访问口令");
+    expect(pageSource).toContain("Quick start");
+    expect(pageSource).toContain("Recommended");
+    expect(pageSource).toContain("Advanced local");
+    expect(pageSource).toContain("Open Follow-up");
+    expect(pageSource).toContain("Demo data");
+    expect(pageSource).toContain("item.blocking ? \"missing\" : \"optional\"");
+    expect(pageSource).toContain("Activation Code");
+    expect(pageSource).toContain("会员激活码");
+    expect(pageSource).not.toContain("Access Pass");
+    expect(pageSource).not.toContain("访问口令");
     expect(pageSource).toContain("Local only");
     expect(pageSource).toContain("局域网");
     expect(pageSource).toContain("Data directory");
@@ -55,11 +63,11 @@ describe("JadenOS onboarding page UI", () => {
       "Start",
       "Connect mailbox",
       "Import customers",
-      "View customers",
+      "Customer follow-up",
       "Orders",
       "Timeline",
       "Demo data",
-      "Approval",
+      "Review",
     ]) {
       expect(guide).toContain(required);
     }
@@ -85,6 +93,6 @@ describe("JadenOS onboarding page UI", () => {
     expect(pageSource).toContain("testUploadCompleted");
     expect(pageSource).toContain("synthesisTestCompleted");
     expect(pageSource).toContain("prev || Boolean");
-    expect(pageSource).toContain("router.push(\"/\")");
+    expect(pageSource).toContain("router.push(\"/leads\")");
   });
 });

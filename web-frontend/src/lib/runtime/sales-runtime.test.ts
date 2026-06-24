@@ -393,8 +393,7 @@ describe("SalesRuntime", () => {
       docTypes: ["PI"],
     });
 
-    expect(result.success).toBe(true);
-    expect(result.blocked).toBe(true);
+    expect(result).toMatchObject({ success: true, blocked: true });
     expect(fs.existsSync(path.join(tempRoot, "companies", "farreach", "documents", "pi-records", "PI-20260618-001.json"))).toBe(false);
     expect(fs.existsSync(path.join(tempRoot, "companies", "farreach", "pricing", "price-memory.json"))).toBe(false);
   });
@@ -543,12 +542,22 @@ describe("SalesRuntime", () => {
       sideEffects: "blocked",
     });
     expect(command.jobId).toBeTruthy();
-    expect(command.jobIds).toHaveLength(3);
+    expect(command.jobIds).toHaveLength(1);
     expect(command.plan?.jobs.map((job) => job.workflow)).toEqual([
+      "operator.command",
+    ]);
+    expect(command.validatedPlan?.validation.acceptedWorkflows).toEqual([
+      "operator.command",
+    ]);
+    expect(command.validatedPlan?.validation.rejectedWorkflows).toEqual([
       "email.reply",
       "lead.import",
       "follow_up.plan",
     ]);
+    expect(command.validatedPlan?.validation.warnings).toEqual(expect.arrayContaining([
+      "No known target was supplied; action workflows were held as an operator-only task.",
+    ]));
+    expect(command.validatedPlan?.needsHumanReview).toBe(true);
 
     const commandPath = path.join(tempRoot, "companies", "demo-exporter", "operator-commands", `${command.id}.json`);
     expect(JSON.parse(fs.readFileSync(commandPath, "utf-8"))).toMatchObject({
@@ -560,9 +569,7 @@ describe("SalesRuntime", () => {
 
     const snapshot = runtime.snapshot();
     expect(snapshot.jobs.map((job) => job.workflow)).toEqual(expect.arrayContaining([
-      "email.reply",
-      "lead.import",
-      "follow_up.plan",
+      "operator.command",
     ]));
     expect(snapshot.jobs.map((job) => job.id)).toEqual(expect.arrayContaining(command.jobIds || []));
     expect(snapshot.jobs[0]).toMatchObject({
@@ -580,6 +587,46 @@ describe("SalesRuntime", () => {
         sideEffects: "blocked",
       },
     });
+  });
+
+  it("can queue operator commands from strict structured LLM plans", async () => {
+    const runtime = createSalesRuntime();
+    const runLlm = vi.spyOn(runtime, "runLlm").mockResolvedValue({
+      provider: "test",
+      source: "provider",
+      confidence: 0.9,
+      text: JSON.stringify({
+        intent: "prepare_quote_review",
+        confidence: 0.88,
+        workflows: ["quotation.prepare", "email.reply"],
+        tools: ["document.request_generation", "email.request_send"],
+        target: { type: "customer", id: "acme" },
+        needsHumanReview: true,
+        sideEffectKinds: ["document.generate", "email.send"],
+        memoryWrites: [],
+        notes: "Planner JSON",
+      }),
+    });
+
+    const command = await runtime.createStructuredOperatorCommand({
+      workspaceId: "demo-exporter",
+      page: "battle-station",
+      surface: "battle-station",
+      mode: "global_command",
+      message: "Prepare quote review and customer follow-up.",
+      context: { selectedCustomer: "Acme" },
+      target: { type: "customer", id: "acme" },
+    });
+
+    expect(runLlm).toHaveBeenCalledWith(expect.objectContaining({
+      task: "extract",
+      workspaceId: "demo-exporter",
+    }));
+    expect(command.validatedPlan?.source).toBe("llm-structured");
+    expect(command.validatedPlan?.intent).toBe("prepare_quote_review");
+    expect(command.jobIds).toHaveLength(2);
+    expect(command.plan?.jobs.map((job) => job.workflow)).toEqual(["quotation.prepare", "email.reply"]);
+    expect(command.commandThreadId).toMatch(/^thread-cmd-/);
   });
 
   it("maps persisted runtime events into operator activity events", () => {

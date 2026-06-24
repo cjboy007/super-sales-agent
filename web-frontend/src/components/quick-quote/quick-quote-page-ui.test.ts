@@ -12,4 +12,21 @@ describe("quick quote page UI", () => {
     expect(pageSource).not.toContain("commitHash");
     expect(pageSource).not.toContain("reference.exchangeRate.provider");
   });
+
+  it("sends quote edit chat with quick-quote Jaden context", () => {
+    expect(pageSource).toContain("/api/documents/quick-quote/modify");
+    expect(pageSource).toContain('surface: "quick-quote"');
+    expect(pageSource).toContain('mode: "object_edit"');
+    expect(pageSource).toContain("target:");
+    expect(pageSource).toContain('type: "quote"');
+  });
+
+  it("shows task-thread visibility for quick quote Jaden edits", () => {
+    expect(pageSource).toContain("JadenTaskDrawer");
+    expect(pageSource).toContain("commandThreadId");
+    expect(pageSource).toContain("setTaskDrawerOpen");
+    expect(pageSource).toContain("json.commandThreadId");
+    expect(pageSource).toContain("View task");
+    expect(pageSource).toContain("查看任务");
+  });
 });

@@ -32,8 +32,10 @@ describe("beta access UI plumbing", () => {
   });
 
   it("exposes local gateway access and storage sections in settings", () => {
-    expect(settingsSource).toContain("Access Pass");
-    expect(settingsSource).toContain("访问口令");
+    expect(settingsSource).toContain("Activation Code");
+    expect(settingsSource).toContain("会员激活码");
+    expect(settingsSource).not.toContain("Access Pass");
+    expect(settingsSource).not.toContain("访问口令");
     expect(settingsSource).toContain("Local Gateway");
     expect(settingsSource).toContain("本地网关");
     expect(settingsSource).toContain("Local Storage");

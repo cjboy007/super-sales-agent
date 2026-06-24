@@ -149,7 +149,7 @@ describe("customer memory resolver and ingestor", () => {
     ]));
   });
 
-  it("records operator chat mentions as customer progress memory", () => {
+  it("keeps raw operator commands out of durable customer progress memory", () => {
     appendCustomerActivity("farreach", customerActivity());
     const runtime = createSalesRuntime();
 
@@ -167,13 +167,7 @@ describe("customer memory resolver and ingestor", () => {
       query: "shipping documents PI-MEM-003",
       customerId: "memory-buyer.example",
       limit: 10,
-    })).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        customerId: "memory-buyer.example",
-        title: expect.stringContaining("Operator note"),
-        tags: expect.arrayContaining(["operator-command", "customer-progress"]),
-      }),
-    ]));
+    })).toEqual([]);
   });
 
   it("loads customer memory before drafting an inbox reply", async () => {

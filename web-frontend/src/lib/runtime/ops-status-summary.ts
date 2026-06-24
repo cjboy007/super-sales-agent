@@ -60,8 +60,8 @@ function baseSummary(input: OpsStatusInput): Omit<OpsStatusSummary, "level" | "b
 function withNav(summary: Omit<OpsStatusSummary, "navLabel" | "zhNavLabel">): OpsStatusSummary {
   return {
     ...summary,
-    navLabel: summary.badge ? `Ops ${summary.badge}` : "Ops",
-    zhNavLabel: summary.badge ? `运维 ${summary.badge}` : "运维",
+    navLabel: summary.badge ? `Task Progress ${summary.badge}` : "Task Progress",
+    zhNavLabel: summary.badge ? `任务进度 ${summary.badge}` : "任务进度",
   };
 }
 
@@ -76,10 +76,10 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       ...counts,
       level: "unknown",
       badge: "",
-      summary: "SSA status checking",
-      zhSummary: "SSA 状态检查中",
-      detail: "Operations status will appear when the health check returns.",
-      zhDetail: "健康检查返回后会显示后台运行状态。",
+      summary: "Task status checking",
+      zhSummary: "任务状态检查中",
+      detail: "Task progress will appear when the health check returns.",
+      zhDetail: "健康检查返回后会显示任务进度。",
     });
   }
 
@@ -88,10 +88,10 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       ...counts,
       level: "critical",
       badge: "!",
-      summary: "Worker is offline",
-      zhSummary: "后台 Worker 离线",
-      detail: "Open Operations to recover the background worker.",
-      zhDetail: "打开运维页恢复后台 Worker。",
+      summary: "Automation is offline",
+      zhSummary: "自动任务离线",
+      detail: "Open Task Progress to recover automated work.",
+      zhDetail: "打开任务进度页恢复自动任务。",
     });
   }
 
@@ -102,8 +102,8 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       badge: "!",
       summary: `${counts.failed} failed ${plural(counts.failed, "task", "tasks")} needs review`,
       zhSummary: `${counts.failed} 项失败任务需要处理`,
-      detail: "Open Operations to review failed work and retry safely.",
-      zhDetail: "打开运维页复核失败任务并安全重试。",
+      detail: "Open Task Progress to review failed work and retry safely.",
+      zhDetail: "打开任务进度页复核失败任务并安全重试。",
     });
   }
 
@@ -114,8 +114,8 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       badge: "!",
       summary: `${counts.retryable} retryable ${plural(counts.retryable, "task", "tasks")} needs review`,
       zhSummary: `${counts.retryable} 项可重试任务需要处理`,
-      detail: "Open Operations to decide whether the work should run again.",
-      zhDetail: "打开运维页判断是否重新执行。",
+      detail: "Open Task Progress to decide whether the work should run again.",
+      zhDetail: "打开任务进度页判断是否重新执行。",
     });
   }
 
@@ -124,10 +124,10 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       ...counts,
       level: "attention",
       badge: "!",
-      summary: alerts[0] || "Worker health needs review",
-      zhSummary: "后台健康状态需复核",
-      detail: "Open Operations to inspect the worker health check.",
-      zhDetail: "打开运维页查看 Worker 健康检查。",
+      summary: alerts[0] || "Automation health needs review",
+      zhSummary: "自动任务状态需复核",
+      detail: "Open Task Progress to inspect the health check.",
+      zhDetail: "打开任务进度页查看健康检查。",
     });
   }
 
@@ -137,9 +137,9 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       level: "attention",
       badge: String(Math.min(counts.actionReviews, 9)),
       summary: `${counts.actionReviews} ${plural(counts.actionReviews, "action", "actions")} waiting for review`,
-      zhSummary: `${counts.actionReviews} 项动作等待审批`,
-      detail: "Customer-facing actions stay blocked until an operator reviews them.",
-      zhDetail: "客户可见动作会保持拦截，直到人工审批。",
+      zhSummary: `${counts.actionReviews} 项动作待确认`,
+      detail: "Customer-facing actions stay blocked until you confirm them.",
+      zhDetail: "客户可见动作会保持拦截，直到完成确认。",
     });
   }
 
@@ -148,10 +148,10 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
       ...counts,
       level: "running",
       badge: "●",
-      summary: `${activeTasks} background ${plural(activeTasks, "task", "tasks")} active`,
-      zhSummary: `${activeTasks} 项后台任务运行中`,
-      detail: "SSA is working in the background.",
-      zhDetail: "SSA 正在后台处理任务。",
+      summary: `${activeTasks} automated ${plural(activeTasks, "task", "tasks")} active`,
+      zhSummary: `${activeTasks} 项自动任务运行中`,
+      detail: "SSA is processing automated work.",
+      zhDetail: "SSA 正在处理自动任务。",
     });
   }
 
@@ -161,7 +161,7 @@ export function summarizeOpsStatus(input: OpsStatusInput = {}): OpsStatusSummary
     badge: "",
     summary: "SSA standing by",
     zhSummary: "SSA 待命中",
-    detail: "No background task needs attention.",
-    zhDetail: "当前没有需要处理的后台任务。",
+    detail: "No automated task needs attention.",
+    zhDetail: "当前没有需要处理的自动任务。",
   });
 }

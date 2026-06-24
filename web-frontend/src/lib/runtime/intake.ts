@@ -110,7 +110,7 @@ const EMPTY_ANALYSIS: IntakeAnalysis = {
   destination: "intake/review",
   confidence: 0,
   relatedParty: "Unknown",
-  summary: "Waiting for upload, pasted text, or operator context.",
+  summary: "Waiting for files, pasted text, or your notes.",
   evidence: [],
   matches: [],
   actions: [],
@@ -362,7 +362,7 @@ function analyzeRecord(runtime: SalesRuntime, record: IntakeRecord, latestMessag
   const confidence = Math.min(94, detected.confidence + matchLift);
   const evidence = [
     record.uploads.length ? `${record.uploads.length} uploaded file(s)` : "",
-    latestMessage ? "operator context supplied in chat" : "",
+    latestMessage ? "notes supplied in chat" : "",
     detected.itemType !== "Unclassified" ? `type signal: ${detected.itemType}` : "",
     bestMatch ? `strongest local match: ${bestMatch.title}` : "",
   ].filter(Boolean);
@@ -375,7 +375,7 @@ function analyzeRecord(runtime: SalesRuntime, record: IntakeRecord, latestMessag
     relatedParty,
     summary: detected.itemType === "Unclassified"
       ? "SSA has enough to preserve the item, but not enough to place it without review."
-      : `SSA reads this as ${detected.itemType} and would keep it in ${detected.destination} after approval.`,
+      : `SSA reads this as ${detected.itemType} and would keep it in ${detected.destination} after confirmation.`,
     evidence,
     matches,
     actions: [
@@ -388,7 +388,7 @@ function analyzeRecord(runtime: SalesRuntime, record: IntakeRecord, latestMessag
       {
         id: "link-context",
         label: relatedParty === "Unknown" ? "Hold for client matching" : `Link context to ${relatedParty}`,
-        target: relatedParty === "Unknown" ? "manual review queue" : "local client context",
+        target: relatedParty === "Unknown" ? "review workspace" : "local client context",
         status: relatedParty === "Unknown" ? "needs_review" : "approval_required",
       },
       {
@@ -431,7 +431,7 @@ function localAssistantMessage(analysis: IntakeAnalysis) {
     `I saved this intake draft and ran local triage. Current read: ${analysis.itemType} with ${confidence} confidence.`,
     `Suggested destination: ${analysis.destination}.${matchText}`,
     productDocText,
-    "I would keep this approval-gated until you confirm the client and placement.",
+    "I would keep this waiting for confirmation until you confirm the client and placement.",
   ].join(" ");
 }
 

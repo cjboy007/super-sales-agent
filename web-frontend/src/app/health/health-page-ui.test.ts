@@ -14,12 +14,20 @@ describe("health check page UI", () => {
     expect(pageSource).toContain("!json.beta?.readiness");
     expect(pageSource).toContain("scopedResponse = await apiFetch");
     expect(pageSource).toContain("Beta readiness");
-    expect(pageSource).toContain("Worker heartbeat");
+    expect(pageSource).toContain("Automation status");
     expect(pageSource).toContain("Mailbox sync");
-    expect(pageSource).toContain("Worker recovery");
-    expect(pageSource).toContain("Real actions gated");
+    expect(pageSource).toContain("Task recovery");
+    expect(pageSource).toContain("Confirmation controls");
     expect(pageSource).toContain("Model readiness");
     expect(pageSource).toContain("模型状态");
+    expect(pageSource).toContain("自动任务状态");
+    expect(pageSource).toContain("恢复能力");
+    expect(pageSource).toContain("确认控制");
+    expect(pageSource).not.toContain("Worker heartbeat");
+    expect(pageSource).not.toContain("Worker recovery");
+    expect(pageSource).not.toContain("Real actions gated");
+    expect(pageSource).not.toContain("后台 worker");
+    expect(pageSource).not.toContain("Worker 心跳");
   });
 
   it("shows clear next steps without backend route, command, or environment details", () => {
@@ -63,22 +71,26 @@ describe("health check page UI", () => {
     expect(existsSync(join(process.cwd(), "src/app/user-guide/page.tsx"))).toBe(true);
   });
 
-  it("shows external action authorization status as business metrics", () => {
+  it("shows customer action confirmation status as business metrics", () => {
     expect(pageSource).toContain("realActions");
     expect(pageSource).toContain("realActions?.summary");
     expect(pageSource).toContain("realActions?.counts.pendingReview");
     expect(pageSource).toContain("realActions?.counts.executed");
     expect(pageSource).toContain("realActions?.counts.retryable");
-    expect(pageSource).toContain("External action approvals");
-    expect(pageSource).toContain("外部动作授权");
+    expect(pageSource).toContain("Customer action confirmation");
+    expect(pageSource).toContain("客户动作确认");
   });
 
-  it("distinguishes local model, cloud model, and mock fallback on the health page", () => {
+  it("distinguishes local model, cloud model, and demo mode on the health page", () => {
     expect(pageSource).toContain("modelReadinessLabel");
     expect(pageSource).toContain("local_model_ready");
     expect(pageSource).toContain("cloud_model_ready");
     expect(pageSource).toContain("mock_fallback");
     expect(pageSource).toContain("mockFallbackActive");
+    expect(pageSource).toContain("Demo mode");
+    expect(pageSource).toContain("演示模式");
+    expect(pageSource).not.toContain("Mock fallback");
+    expect(pageSource).not.toContain("mock fallback");
   });
 
   it("is linked from Operations as the dedicated health page", () => {

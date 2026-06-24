@@ -77,13 +77,14 @@ describe("agent status page beta readiness UI", () => {
     expect(pageSource).not.toContain("fetch(\"/api/demo/email-crm");
   });
 
-  it("offers a business-facing worker recovery preparation action", () => {
+  it("offers a business-facing task recovery preparation action", () => {
     expect(pageSource).toContain("prepareWorkerRecovery");
     expect(pageSource).toContain("apiFetch(\"/api/worker-supervisor\"");
     expect(pageSource).toContain("method: \"POST\"");
-    expect(pageSource).toContain("Recovery setup is ready");
+    expect(pageSource).toContain("Task recovery setup is ready");
     expect(pageSource).toContain("Prepare recovery");
     expect(pageSource).toContain("准备恢复方案");
+    expect(pageSource).toContain("任务恢复方案已准备好");
     expect(pageSource).not.toContain("workspaceId: \"farreach\"");
     expect(pageSource).not.toContain("workerId: \"jaden-farreach-1\"");
     expect(pageSource).not.toContain("jaden-worker-supervisor.mjs");
@@ -92,27 +93,27 @@ describe("agent status page beta readiness UI", () => {
     expect(pageSource).not.toContain("pm2 ");
   });
 
-  it("renders worker recovery capabilities from health without raw command details", () => {
+  it("renders task recovery capabilities from health without raw command details", () => {
     expect(pageSource).toContain("workerRecovery");
     expect(pageSource).toContain("workerRecovery?.summary");
     expect(pageSource).toContain("workerRecovery?.nextStep");
     expect(pageSource).toContain("availableActions");
-    expect(pageSource).toContain("Worker Recovery");
+    expect(pageSource).toContain("Task Recovery");
     expect(pageSource).toContain("恢复能力");
     expect(pageSource).not.toContain("workerCommand");
     expect(pageSource).not.toContain("statusCommand");
     expect(pageSource).not.toContain("commands.");
   });
 
-  it("lets operators request worker controls without exposing host commands", () => {
+  it("lets operators request task controls without exposing host commands", () => {
     expect(pageSource).toContain("requestWorkerControl");
     expect(pageSource).toContain("action: \"request-control\"");
     expect(pageSource).toContain("control");
-    expect(pageSource).toContain("Worker control request is ready");
-    expect(pageSource).toContain("Start worker");
-    expect(pageSource).toContain("Stop worker");
-    expect(pageSource).toContain("Restart worker");
-    expect(pageSource).toContain("Check worker health");
+    expect(pageSource).toContain("Task control request is ready");
+    expect(pageSource).toContain("Start tasks");
+    expect(pageSource).toContain("Pause tasks");
+    expect(pageSource).toContain("Restart tasks");
+    expect(pageSource).toContain("Check task status");
     expect(pageSource).not.toContain("workspaceId: \"farreach\"");
     expect(pageSource).not.toContain("workerId: \"jaden-farreach-1\"");
     expect(pageSource).not.toContain("exec");
@@ -120,19 +121,21 @@ describe("agent status page beta readiness UI", () => {
     expect(pageSource).not.toContain("spawn");
   });
 
-  it("shows recent worker control request status without backend identifiers", () => {
+  it("shows recent task control request status without backend identifiers", () => {
     expect(pageSource).toContain("recentRequests");
-    expect(pageSource).toContain("Recent control requests");
-    expect(pageSource).toContain("最近控制请求");
+    expect(pageSource).toContain("Recent task requests");
+    expect(pageSource).toContain("最近任务请求");
     expect(pageSource).toContain("request.actionLabel");
     expect(pageSource).toContain("request.requestedAt");
+    expect(pageSource).toContain("No task control request has been recorded yet");
+    expect(pageSource).toContain("尚未记录任务控制请求");
     expect(pageSource).not.toContain("request.requestId");
     expect(pageSource).not.toContain("request.workerId");
     expect(pageSource).not.toContain("request.workspaceId");
     expect(pageSource).not.toContain("request.control");
   });
 
-  it("surfaces resident worker activity without exposing worker identifiers", () => {
+  it("surfaces automation activity without exposing worker identifiers", () => {
     expect(pageSource).toContain("activity?:");
     expect(pageSource).toContain("Last Activity");
     expect(pageSource).toContain("最后活动");
@@ -140,22 +143,29 @@ describe("agent status page beta readiness UI", () => {
     expect(pageSource).toContain("最近运行");
     expect(pageSource).toContain("worker?.activity?.lastActivitySummary");
     expect(pageSource).toContain("worker?.activity?.lastRunSummary");
+    expect(pageSource).toContain("任务信号正常");
+    expect(pageSource).toContain("No task signal");
+    expect(pageSource).toContain("当前没有任务告警");
     expect(pageSource).not.toContain("latest: {\\n      workerId");
     expect(pageSource).not.toContain("value={worker?.latest?.workerId");
   });
 
-  it("shows a business-facing external action approval queue with review controls", () => {
-    expect(pageSource).toContain("External Actions");
-    expect(pageSource).toContain("外部动作审核");
+  it("shows a business-facing customer action review queue with review controls", () => {
+    expect(pageSource).toContain("Customer Action Review");
+    expect(pageSource).toContain("客户动作复核");
     expect(pageSource).toContain("actionReviews");
     expect(pageSource).toContain("apiFetch(\"/api/runtime?action=side-effects&limit=10\"");
     expect(pageSource).toContain("reviewExternalAction");
     expect(pageSource).toContain("approve-side-effect");
     expect(pageSource).toContain("reject-side-effect");
     expect(pageSource).toContain("retry-side-effect");
-    expect(pageSource).toContain("Approve");
+    expect(pageSource).toContain("Confirm");
+    expect(pageSource).toContain("确认");
     expect(pageSource).toContain("Reject");
     expect(pageSource).toContain("Retry");
+    expect(pageSource).toContain("当前没有待复核的客户动作");
+    expect(pageSource).not.toContain("Approve");
+    expect(pageSource).not.toContain("批准");
     expect(pageSource).not.toContain("review.actionId}</");
     expect(pageSource).not.toContain("review.workspaceId");
     expect(pageSource).not.toContain("review.payload");

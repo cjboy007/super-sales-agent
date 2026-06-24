@@ -4,7 +4,7 @@ const SALES_PACKS: SalesPack[] = [
   {
     id: "email-reply",
     name: "Email Reply Pack",
-    description: "Classify inbound mail, draft replies, and keep send decisions behind approval gates.",
+    description: "Classify inbound mail, draft replies, and keep send decisions behind confirmation checks.",
     workflows: ["email.reply"],
     sideEffects: ["email.send"],
   },

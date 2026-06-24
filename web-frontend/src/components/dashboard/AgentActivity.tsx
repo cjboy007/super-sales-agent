@@ -22,7 +22,7 @@ export default function AgentActivity({ tasks, loading = false }: AgentActivityP
   return (
     <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-5">
       <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-        <span>🤖</span> Agent 活动
+        <span>🤖</span> AI 助手动态
       </h2>
 
       {loading ? (
@@ -37,7 +37,7 @@ export default function AgentActivity({ tasks, loading = false }: AgentActivityP
       ) : tasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="text-3xl mb-2">😴</span>
-          <p className="text-sm text-gray-500">Agent 暂无活动</p>
+          <p className="text-sm text-gray-500">AI 助手暂无动态</p>
         </div>
       ) : (
         <div className="space-y-4">

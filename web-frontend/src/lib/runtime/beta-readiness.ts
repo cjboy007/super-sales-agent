@@ -152,27 +152,27 @@ export function getBetaReadiness(input: {
     }),
     check({
       id: "resident-worker",
-      label: "Resident worker",
+      label: "Automation status",
       status: workerStatus === "ok" ? "ready" : workerStatus === "degraded" ? "needs_review" : "needs_setup",
       detail: workerStatus === "ok"
-        ? "A worker heartbeat is visible and the queue is healthy."
+        ? "Automation has checked in recently and the queue is healthy."
         : workerStatus === "degraded"
-          ? "The worker is visible, but failed or retryable work needs review."
-          : "No healthy resident worker heartbeat is visible yet.",
-      action: workerStatus === "ok" ? "Keep the supervisor running and monitor health." : "Start or repair the resident worker before external beta.",
+          ? "Automation is visible, but failed or retryable work needs review."
+          : "No healthy automation signal is visible yet.",
+      action: workerStatus === "ok" ? "Keep automation monitored." : "Start or repair automation before external beta.",
     }),
     check({
       id: "worker-supervisor",
-      label: "Worker recovery",
+      label: "Task recovery",
       status: supervisorStatus,
       detail: supervisorStatus === "ready"
-        ? "The resident worker has a reviewed recovery setup with restart, stop, start, and health controls."
+        ? "Automation has a reviewed recovery setup with restart, stop, start, and health controls."
         : supervisorStatus === "needs_review"
-          ? "A worker recovery setup exists, but it is incomplete or does not match this workspace."
-          : "No reviewed worker recovery setup is available yet.",
+          ? "A task recovery setup exists, but it is incomplete or does not match this workspace."
+          : "No reviewed task recovery setup is available yet.",
       action: supervisorStatus === "ready"
         ? "Keep the recovery setup installed and verify it after deployment changes."
-        : "Generate and install a worker recovery setup before inviting external testers.",
+        : "Generate and install a task recovery setup before inviting external testers.",
     }),
     check({
       id: "customer-data",
@@ -188,14 +188,14 @@ export function getBetaReadiness(input: {
       label: "Mailbox sync",
       status: mailboxStatus,
       detail: mailboxStatus === "ready"
-        ? input.mailbox?.summary || "Mailbox capture is configured and the worker has recently synced incoming mail into CRM."
+        ? input.mailbox?.summary || "Mailbox capture is configured and automation has recently synced incoming mail into CRM."
         : mailboxStatus === "needs_review"
-          ? input.mailbox?.summary || "Mailbox capture is configured, but no recent worker sync result is visible yet."
+          ? input.mailbox?.summary || "Mailbox capture is configured, but no recent automation sync result is visible yet."
           : input.mailbox?.summary || "Mailbox capture is not fully configured for incoming customer email.",
       action: mailboxStatus === "ready"
         ? input.mailbox?.nextStep || "Keep monitoring new inbound mail in the customer timeline."
         : mailboxStatus === "needs_review"
-          ? input.mailbox?.nextStep || "Run or repair the worker until a fresh inbound mail sync is visible."
+          ? input.mailbox?.nextStep || "Run or repair automation until a fresh inbound mail sync is visible."
           : input.mailbox?.nextStep || "Connect work email and enable automatic capture before external beta.",
     }),
     check({
@@ -221,24 +221,24 @@ export function getBetaReadiness(input: {
       label: "Real action safety",
       status: realActionFlagEnabled ? "needs_review" : "ready",
       detail: realActionFlagEnabled
-        ? "At least one real external action is enabled; confirm the adapter and approval flow before testers use it."
+        ? "At least one real customer action is enabled; confirm the adapter and confirmation flow before testers use it."
         : "Real external actions are blocked by default.",
-      action: realActionFlagEnabled ? "Review enabled real-action gates and approvals before beta." : "Keep real actions disabled until a controlled adapter test is approved.",
+      action: realActionFlagEnabled ? "Review enabled real-action controls before beta." : "Keep real actions disabled until a controlled adapter test is confirmed.",
     }),
     check({
       id: "real-action-authorization",
-      label: "External action authorization",
+      label: "Customer action confirmation",
       status: realActionStatus,
-      detail: input.realActions?.summary || "No completed approval and execution record is visible for real external actions yet.",
-      action: input.realActions?.nextStep || "Run one controlled approval test for email or CRM, then confirm the execution result is recorded.",
+      detail: input.realActions?.summary || "No completed confirmation and execution record is visible for real customer actions yet.",
+      action: input.realActions?.nextStep || "Run one controlled confirmation test for email or CRM, then confirm the execution result is recorded.",
     }),
     check({
       id: "operator-recovery",
-      label: "Operator recovery",
+      label: "Task recovery",
       status: failedWork === 0 ? "ready" : "needs_review",
       detail: failedWork === 0
         ? "No failed or retryable work is waiting for review."
-        : "Failed or retryable work is waiting for operator review.",
+        : "Failed or retryable work is waiting for review.",
       action: failedWork === 0 ? "Use the operations page for routine monitoring." : "Open operations and retry or resolve failed work.",
     }),
   ];

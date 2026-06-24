@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 describe("/api/beta-access/verify route", () => {
-  it("accepts a configured beta access pass and returns its workspace assignment", async () => {
+  it("accepts a configured Activation Code and returns its workspace assignment", async () => {
     const { POST } = await import("./route");
 
     const response = await POST(postToken("valid-beta-pass"));
@@ -64,7 +64,7 @@ describe("/api/beta-access/verify route", () => {
     expect(response.status).toBe(401);
     expect(json).toEqual({
       success: false,
-      error: "Access pass is invalid.",
+      error: "Activation Code is invalid.",
     });
     expect(serialized).not.toContain("valid-beta-pass");
     expect(serialized).not.toContain("Farreach trial");
@@ -92,7 +92,7 @@ describe("/api/beta-access/verify route", () => {
     expect(rejected.status).toBe(401);
     expect(rejectedJson).toEqual({
       success: false,
-      error: "Access pass is invalid.",
+      error: "Activation Code is invalid.",
     });
     expect(redemptionLog).not.toContain("shared-invite-pass");
     expect(redemptionLog).toContain("\"count\": 5");

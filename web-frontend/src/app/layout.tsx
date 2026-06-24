@@ -7,7 +7,7 @@ import { OpsStatusProvider } from "@/components/ui/OpsStatusProvider";
 
 export const metadata: Metadata = {
   title: "SSA",
-  description: "Super Sales Agent sales cockpit with gated AI workflows",
+  description: "Super Sales Agent business workbench with confirmation-based AI workflows",
   applicationName: "SSA",
   manifest: "/manifest.webmanifest",
   icons: {

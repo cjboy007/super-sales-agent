@@ -149,6 +149,18 @@ function labelForReadiness(status: BetaReadinessStatus | undefined, language: st
   return language === "zh" ? "检查中" : "Checking";
 }
 
+function taskStatusLabel(status: string | undefined, language: string): string {
+  if (!status) return language === "zh" ? "检查中" : "Checking";
+  const labels: Record<string, { en: string; zh: string }> = {
+    ok: { en: "Healthy", zh: "正常" },
+    degraded: { en: "Needs review", zh: "需复核" },
+    stale: { en: "Signal stale", zh: "信号过期" },
+    down: { en: "Offline", zh: "离线" },
+    checking: { en: "Checking", zh: "检查中" },
+  };
+  return labels[status]?.[language === "zh" ? "zh" : "en"] || status.replaceAll("_", " ");
+}
+
 function dateLabel(value: string | undefined): string {
   if (!value) return "-";
   const date = new Date(value);
@@ -176,7 +188,7 @@ function toneForModel(readiness: ModelReadiness["readiness"] | undefined): Battl
 function modelReadinessLabel(model: ModelReadiness | undefined, language: string): string {
   if (model?.readiness === "local_model_ready") return language === "zh" ? "本地模型" : "Local model";
   if (model?.readiness === "cloud_model_ready") return language === "zh" ? "云模型" : "Cloud model";
-  if (model?.readiness === "mock_fallback") return language === "zh" ? "Mock fallback" : "Mock fallback";
+  if (model?.readiness === "mock_fallback") return language === "zh" ? "演示模式" : "Demo mode";
   return language === "zh" ? "检查中" : "Checking";
 }
 
@@ -228,8 +240,8 @@ export default function HealthPage() {
       <BattlePageHeader
         title="Health Check"
         zhTitle="健康检查"
-        meta="Beta readiness / Worker heartbeat / Mailbox sync"
-        zhMeta="内测就绪 / Worker 心跳 / 邮箱同步"
+        meta="Beta readiness / automation status / mailbox sync"
+        zhMeta="内测就绪 / 自动任务状态 / 邮箱同步"
         active="/agent-status"
       >
         <Link href="/docs/PUBLIC_BETA_READINESS.md" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-600">
@@ -260,8 +272,8 @@ export default function HealthPage() {
             tone={toneForModel(model?.readiness)}
           />
           <StatCell
-            label={language === "zh" ? "Worker 心跳" : "Worker heartbeat"}
-            value={worker?.status || "-"}
+            label={language === "zh" ? "自动任务状态" : "Automation status"}
+            value={taskStatusLabel(worker?.status, language)}
             tone={toneForWorker(worker?.status)}
           />
           <StatCell
@@ -270,8 +282,8 @@ export default function HealthPage() {
             tone={toneForReadiness(mailbox?.status)}
           />
           <StatCell
-            label={language === "zh" ? "真实动作安全门" : "Real actions gated"}
-            value={safeActions ? (language === "zh" ? "已上锁" : "On") : (language === "zh" ? "需复核" : "Review")}
+            label={language === "zh" ? "确认控制" : "Confirmation controls"}
+            value={safeActions ? (language === "zh" ? "已开启" : "On") : (language === "zh" ? "需复核" : "Review")}
             tone={safeActions ? "emerald" : "red"}
           />
         </div>
@@ -290,7 +302,7 @@ export default function HealthPage() {
               <p className="mt-2 text-sm font-semibold text-slate-100">{modelReadinessLabel(model, language)}</p>
               <p className="mt-2 text-xs leading-5 text-slate-400">
                 {model?.mockFallbackActive
-                  ? (language === "zh" ? "当前没有真实模型配置，mock fallback 不代表真实模型可用。" : "No real model is configured. Mock fallback does not mean a real model is ready.")
+                  ? (language === "zh" ? "当前没有真实模型配置，演示模式不代表真实模型可用。" : "No real model is configured. Demo mode does not mean a real model is ready.")
                   : (language === "zh" ? "当前模型配置会用于真实 AI 任务。" : "The configured model will be used for real AI tasks.")}
               </p>
             </div>
@@ -378,23 +390,23 @@ export default function HealthPage() {
 
         <div className="grid gap-4 xl:grid-cols-2">
           <BattlePanel
-            title={language === "zh" ? "Worker 心跳" : "Worker heartbeat"}
+            title={language === "zh" ? "自动任务状态" : "Automation status"}
             meta={dateLabel(worker?.latest?.lastHeartbeatAt || health?.timestamp)}
             tone={toneForWorker(worker?.status)}
-            action={<BattleBadge tone={toneForWorker(worker?.status)}>{worker?.status || "checking"}</BattleBadge>}
+            action={<BattleBadge tone={toneForWorker(worker?.status)}>{taskStatusLabel(worker?.status || "checking", language)}</BattleBadge>}
           >
             <div className="space-y-4 p-4">
               <p className="text-sm leading-6 text-slate-300">
                 {worker?.status === "ok"
-                  ? (language === "zh" ? "后台 worker 最近已上报心跳，队列可见。" : "The resident worker checked in recently and the queue is visible.")
+                  ? (language === "zh" ? "自动任务最近已运行，队列可见。" : "Automation checked in recently and the queue is visible.")
                   : worker?.status === "degraded"
-                    ? (language === "zh" ? "后台 worker 可见，但有失败或待重试任务需要处理。" : "The resident worker is visible, with failed or retryable work to review.")
+                    ? (language === "zh" ? "自动任务可见，但有失败或待重试任务需要处理。" : "Automation is visible, with failed or retryable work to review.")
                     : worker?.status === "stale"
-                      ? (language === "zh" ? "后台 worker 心跳可能已过期，需要确认运行状态。" : "The worker heartbeat may be stale and should be checked.")
-                      : (language === "zh" ? "暂未看到后台 worker 心跳。" : "No resident worker heartbeat is visible yet.")}
+                      ? (language === "zh" ? "自动任务信号可能已过期，需要确认运行状态。" : "The automation signal may be stale and should be checked.")
+                      : (language === "zh" ? "暂未看到自动任务信号。" : "No automation signal is visible yet.")}
               </p>
               <div className="grid gap-3 sm:grid-cols-5">
-                <StatCell label={language === "zh" ? "排队" : "Queued"} value={queue.queued} tone="blue" />
+                <StatCell label={language === "zh" ? "待处理" : "Waiting"} value={queue.queued} tone="blue" />
                 <StatCell label={language === "zh" ? "运行中" : "Running"} value={queue.running} tone="purple" />
                 <StatCell label={language === "zh" ? "完成" : "Done"} value={queue.completed} tone="emerald" />
                 <StatCell label={language === "zh" ? "失败" : "Failed"} value={queue.failed} tone={queue.failed ? "red" : "neutral"} />
@@ -407,7 +419,7 @@ export default function HealthPage() {
                   </p>
                   <p className="mt-2 font-mono text-[11px] text-slate-500">{dateLabel(worker?.activity?.lastActivityAt)}</p>
                   <p className="mt-2 text-xs leading-5 text-slate-300">
-                    {worker?.activity?.lastActivitySummary || (language === "zh" ? "尚未记录后台业务活动。" : "No worker activity has been recorded yet.")}
+                    {worker?.activity?.lastActivitySummary || (language === "zh" ? "尚未记录自动任务业务活动。" : "No automation activity has been recorded yet.")}
                   </p>
                 </div>
                 <div className="rounded-md border border-slate-800 bg-slate-950/55 p-3">
@@ -428,7 +440,7 @@ export default function HealthPage() {
                 </div>
               ) : (
                 <p className="text-xs leading-5 text-slate-500">
-                  <BattleText en="No active worker alert is reported." zh="当前没有后台 worker 告警。" />
+                  <BattleText en="No active task alert is reported." zh="当前没有任务告警。" />
                 </p>
               )}
             </div>
@@ -445,7 +457,7 @@ export default function HealthPage() {
                 {mailbox?.summary || (language === "zh" ? "健康检查返回后会显示邮箱同步状态。" : "Mailbox sync status will appear after the health check returns.")}
               </p>
               <p className="rounded-md border border-slate-800 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-slate-300">
-                {mailbox?.nextStep || (language === "zh" ? "连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。" : "Connect email and start the resident worker so new mail enters customer timelines.")}
+                {mailbox?.nextStep || (language === "zh" ? "连接邮箱并启动自动任务后，新邮件会进入客户时间线。" : "Connect email and start automation so new mail enters customer timelines.")}
               </p>
               <div className="flex flex-wrap gap-2">
                 <BattleBadge tone={capabilityTone(mailbox?.configured)}>
@@ -464,17 +476,17 @@ export default function HealthPage() {
 
         <div className="grid gap-4 xl:grid-cols-2">
           <BattlePanel
-            title={language === "zh" ? "Worker 恢复" : "Worker recovery"}
+            title={language === "zh" ? "恢复能力" : "Task recovery"}
             meta={workerRecovery?.reviewed ? (language === "zh" ? "已复核" : "reviewed") : (language === "zh" ? "待准备" : "prepare")}
             tone={toneForReadiness(workerRecovery?.status)}
             action={<BattleBadge tone={toneForReadiness(workerRecovery?.status)}>{labelForReadiness(workerRecovery?.status, language)}</BattleBadge>}
           >
             <div className="space-y-4 p-4">
               <p className="text-sm leading-6 text-slate-300">
-                {workerRecovery?.summary || (language === "zh" ? "健康检查返回后会显示后台恢复能力。" : "Worker recovery status will appear after the health check returns.")}
+                {workerRecovery?.summary || (language === "zh" ? "健康检查返回后会显示自动任务恢复能力。" : "Task recovery status will appear after the health check returns.")}
               </p>
               <p className="rounded-md border border-slate-800 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-slate-300">
-                {workerRecovery?.nextStep || (language === "zh" ? "准备恢复方案后，运维页会显示启停、重启和健康检查能力。" : "Prepare recovery so Operations can show start, stop, restart, and health-check capability.")}
+                {workerRecovery?.nextStep || (language === "zh" ? "准备恢复方案后，任务进度页会显示启停、重启和健康检查能力。" : "Prepare recovery so Task Progress can show start, stop, restart, and health-check capability.")}
               </p>
               <div className="flex flex-wrap gap-2">
                 <BattleBadge tone={capabilityTone(workerRecovery?.capabilities.autoRestart)}>
@@ -491,10 +503,10 @@ export default function HealthPage() {
           </BattlePanel>
 
           <BattlePanel
-            title={language === "zh" ? "真实动作安全门" : "Real actions gated"}
-            meta={safeActions ? (language === "zh" ? "默认阻断" : "blocked by default") : (language === "zh" ? "需要复核" : "review needed")}
+            title={language === "zh" ? "确认控制" : "Confirmation controls"}
+            meta={safeActions ? (language === "zh" ? "默认需确认" : "review by default") : (language === "zh" ? "需要复核" : "review needed")}
             tone={safeActions ? "emerald" : "red"}
-            action={<BattleBadge tone={safeActions ? "emerald" : "red"}>{safeActions ? <BattleText en="Gated" zh="已上锁" /> : <BattleText en="Review" zh="复核" />}</BattleBadge>}
+            action={<BattleBadge tone={safeActions ? "emerald" : "red"}>{safeActions ? <BattleText en="Authorization on" zh="确认已开启" /> : <BattleText en="Review" zh="复核" />}</BattleBadge>}
           >
             <div className="grid gap-3 p-4 sm:grid-cols-3">
               <div className="rounded-md border border-slate-800 bg-slate-950/55 p-3">
@@ -502,7 +514,7 @@ export default function HealthPage() {
                   <BattleText en="Email sending" zh="真实发信" />
                 </p>
                 <p className="mt-2 text-xs leading-5 text-slate-400">
-                  <BattleText en="Blocked until explicit approval is recorded." zh="默认阻断，只有明确授权后才执行。" />
+                  <BattleText en="Held until explicit confirmation is recorded." zh="默认需确认，只有明确授权后才执行。" />
                 </p>
               </div>
               <div className="rounded-md border border-slate-800 bg-slate-950/55 p-3">
@@ -510,7 +522,7 @@ export default function HealthPage() {
                   <BattleText en="CRM updates" zh="CRM 写入" />
                 </p>
                 <p className="mt-2 text-xs leading-5 text-slate-400">
-                  <BattleText en="Each real change must pass the approval gate." zh="每次真实写入都需要通过授权门。" />
+                  <BattleText en="Each real change needs explicit authorization." zh="每次真实写入都需要明确授权。" />
                 </p>
               </div>
               <div className="rounded-md border border-slate-800 bg-slate-950/55 p-3">
@@ -518,24 +530,24 @@ export default function HealthPage() {
                   <BattleText en="Follow-up actions" zh="客户跟进" />
                 </p>
                 <p className="mt-2 text-xs leading-5 text-slate-400">
-                  <BattleText en="Retries stay controlled and visible to operations." zh="失败重试保持受控，并在运维页可见。" />
+                  <BattleText en="Retries stay controlled and visible in Task Progress." zh="失败重试保持受控，并在任务进度页可见。" />
                 </p>
               </div>
             </div>
           </BattlePanel>
 
           <BattlePanel
-            title={language === "zh" ? "外部动作授权" : "External action approvals"}
+            title={language === "zh" ? "客户动作确认" : "Customer action confirmation"}
             meta={realActions ? `${realActions.counts.executed} executed` : loading ? "checking" : "unavailable"}
             tone={toneForReadiness(realActions?.status)}
             action={<BattleBadge tone={toneForReadiness(realActions?.status)}>{labelForReadiness(realActions?.status, language)}</BattleBadge>}
           >
             <div className="space-y-4 p-4">
               <p className="text-sm leading-6 text-slate-300">
-                {realActions?.summary || (language === "zh" ? "健康检查返回后会显示外部动作授权状态。" : "External action approval status will appear after the health check returns.")}
+                {realActions?.summary || (language === "zh" ? "健康检查返回后会显示客户动作确认状态。" : "Customer action confirmation status will appear after the health check returns.")}
               </p>
               <p className="rounded-md border border-slate-800 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-slate-300">
-                {realActions?.nextStep || (language === "zh" ? "先完成一次受控审批演练，再邀请外部用户。" : "Run a controlled approval test before inviting external users.")}
+                {realActions?.nextStep || (language === "zh" ? "先完成一次受控确认演练，再邀请外部用户。" : "Run a controlled confirmation test before inviting external users.")}
               </p>
               <div className="grid gap-3 sm:grid-cols-3">
                 <StatCell

@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Worker recovery setup failed.";
+    const message = error instanceof Error ? error.message : "Task recovery setup failed.";
     return NextResponse.json({ success: false, error: message }, { status: 400 });
   }
 }

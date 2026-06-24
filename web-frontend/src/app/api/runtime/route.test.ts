@@ -262,6 +262,8 @@ describe("/api/runtime route", () => {
     expect(json.data).not.toHaveProperty("sideEffectKinds");
     expect(json.data).not.toHaveProperty("llmTasks");
     expect(json.data).not.toHaveProperty("dataContracts");
+    expect(json.data.nextSteps).toContain("Set an Activation Code before inviting external users.");
+    expect(serialized).not.toContain("beta access pass");
     expect(serialized).not.toContain("workflow");
     expect(serialized).not.toContain("provider");
     expect(serialized).not.toContain("dataRoot");

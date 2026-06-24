@@ -73,7 +73,7 @@ export function createQuickQuoteDefaults(): QuickQuoteData {
     currency: "USD",
     incoterms: "FOB Shenzhen",
     paymentTerms: "T/T 30% deposit, 70% before shipment",
-    leadTime: "15-25 days after deposit and sample approval",
+    leadTime: "15-25 days after deposit and sample confirmation",
     notes: "",
     charges: {
       freight: 0,

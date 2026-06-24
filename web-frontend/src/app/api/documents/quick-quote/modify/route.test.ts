@@ -60,8 +60,38 @@ describe("/api/documents/quick-quote/modify route", () => {
       },
     });
     expect(json.reply).toContain("35");
+    expect(json.commandThreadId).toMatch(/^thread-cmd-/);
+    expect(json.envelope).toMatchObject({
+      surface: "quick-quote",
+      mode: "object_edit",
+      target: {
+        type: "quote",
+        id: quote.quoteNo,
+      },
+    });
+    expect(json.validatedPlan).toMatchObject({
+      intent: "quick_quote_edit",
+      workflows: ["quotation.prepare"],
+      needsHumanReview: true,
+    });
     expect(JSON.stringify(json)).not.toContain("provider");
     expect(json).not.toHaveProperty("provider");
+
+    const threadDir = path.join(tempRoot, "companies", "demo-exporter", "operator-commands", "threads");
+    const threadFiles = fs.readdirSync(threadDir).filter((name) => name.endsWith(".json"));
+    expect(threadFiles).toHaveLength(1);
+    const thread = JSON.parse(fs.readFileSync(path.join(threadDir, threadFiles[0]), "utf-8"));
+    expect(thread).toMatchObject({
+      id: json.commandThreadId,
+      workspaceId: "demo-exporter",
+      envelope: {
+        surface: "quick-quote",
+        mode: "object_edit",
+      },
+      plan: {
+        intent: "quick_quote_edit",
+      },
+    });
   });
 
   it("rejects missing quick quote data", async () => {

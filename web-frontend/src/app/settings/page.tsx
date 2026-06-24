@@ -241,7 +241,7 @@ function ConfigInput({
 function modelReadinessLabel(readiness: ModelReadiness | undefined, language: "en" | "zh") {
   if (readiness === "local_model_ready") return language === "zh" ? "本地模型" : "Local model";
   if (readiness === "cloud_model_ready") return language === "zh" ? "云模型" : "Cloud model";
-  return language === "zh" ? "Mock fallback" : "Mock fallback";
+  return language === "zh" ? "演示模式" : "Demo mode";
 }
 
 export default function SettingsPage() {
@@ -411,14 +411,14 @@ export default function SettingsPage() {
   const saveBetaAccess = useCallback(() => {
     setBetaToken(accessTokenInput);
     setError(null);
-    setMessage(language === "zh" ? "访问口令已保存。" : "Access pass saved.");
+    setMessage(language === "zh" ? "会员激活码已保存。" : "Activation Code saved.");
   }, [accessTokenInput, language, setBetaToken]);
 
   const removeBetaAccess = useCallback(() => {
     clearBetaToken();
     setAccessTokenInput("");
     setError(null);
-    setMessage(language === "zh" ? "访问口令已清除。" : "Access pass cleared.");
+    setMessage(language === "zh" ? "会员激活码已清除。" : "Activation Code cleared.");
   }, [clearBetaToken, language]);
 
   const tabs: Array<{ key: TabKey; label: string }> = useMemo(() => [
@@ -463,14 +463,14 @@ export default function SettingsPage() {
 
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.55fr)]">
           <BattlePanel
-            title={language === "zh" ? "访问口令" : "Access Pass"}
-            meta={language === "zh" ? "LAN 访问也必须保留口令" : "LAN access still requires the pass"}
+            title={language === "zh" ? "会员激活码" : "Activation Code"}
+            meta={language === "zh" ? "LAN 访问也必须保留会员激活码" : "LAN access still requires the Activation Code"}
             tone={betaToken ? "emerald" : "amber"}
             action={<BattleBadge tone={betaToken ? "emerald" : "amber"}>{betaToken ? <BattleText en="Saved" zh="已保存" /> : <BattleText en="Needed" zh="待填写" />}</BattleBadge>}
           >
             <div className="grid gap-3 p-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
               <FieldLabel>
-                {language === "zh" ? "访问口令" : "Access Pass"}
+                {language === "zh" ? "会员激活码" : "Activation Code"}
                 <InputField
                   value={accessTokenInput}
                   type="password"
@@ -480,7 +480,7 @@ export default function SettingsPage() {
                 />
               </FieldLabel>
               <CommandButton type="button" variant="primary" onClick={saveBetaAccess} disabled={!accessTokenInput.trim()}>
-                <BattleText en="Save Access" zh="保存访问" />
+                <BattleText en="Save Code" zh="保存激活码" />
               </CommandButton>
               <CommandButton type="button" variant="ghost" onClick={removeBetaAccess} disabled={!betaToken && !accessTokenInput}>
                 <BattleText en="Clear" zh="清除" />
@@ -489,8 +489,8 @@ export default function SettingsPage() {
           </BattlePanel>
 
           <BattlePanel
-            title={language === "zh" ? "首次引导" : "First Run"}
-            meta={language === "zh" ? "可重新打开本地网关引导" : "reopen local gateway onboarding"}
+            title={language === "zh" ? "设置清单" : "Setup Checklist"}
+            meta={language === "zh" ? "快速开始、推荐配置和高级本地部署" : "quick start, recommended setup, advanced local"}
             tone="blue"
             action={
               <Link
@@ -502,8 +502,8 @@ export default function SettingsPage() {
             }
           >
             <div className="grid gap-2 p-3 text-xs leading-5 text-slate-400">
-              <p>{language === "zh" ? "引导会覆盖访问方式、模型、本地目录、测试上传和归纳。" : "The guide covers access mode, model, local folder, test upload, and synthesis."}</p>
-              <p>{dataProtected ? (language === "zh" ? "运行数据已与源码隔离。" : "Runtime data is isolated from source code.") : (language === "zh" ? "数据隔离状态需要确认。" : "Data isolation needs review.")}</p>
+              <p>{language === "zh" ? "清单不是进入产品的第二道门；你可以先用客户跟进，再回来配置模型、邮箱、搜索和本地部署自检。" : "This checklist is not a second gate. Start with Customer Follow-up, then return for model, mailbox, search, and local deployment checks."}</p>
+              <p>{dataProtected ? (language === "zh" ? "运行数据已与源码隔离。" : "Workspace data is isolated from source code.") : (language === "zh" ? "数据隔离状态需要确认。" : "Data isolation needs review.")}</p>
             </div>
           </BattlePanel>
         </div>
@@ -556,7 +556,7 @@ export default function SettingsPage() {
             title={language === "zh" ? "本地网关访问" : "Local Gateway Access"}
             meta={gateway ? `${gateway.accessMode.toUpperCase()} / ${gateway.bindHost}:${gateway.port}` : "checking"}
             tone={gateway?.accessMode === "lan" ? "amber" : "emerald"}
-            action={<BattleBadge tone={gateway?.tokenRequired ? "emerald" : "red"}>{gateway?.tokenRequired ? <BattleText en="Token on" zh="口令保护" /> : <BattleText en="No token" zh="无口令" />}</BattleBadge>}
+            action={<BattleBadge tone={gateway?.tokenRequired ? "emerald" : "red"}>{gateway?.tokenRequired ? <BattleText en="Code on" zh="激活码保护" /> : <BattleText en="No code" zh="无激活码" />}</BattleBadge>}
           >
             <div className="grid gap-3 p-3 lg:grid-cols-2">
               <FieldLabel>
@@ -583,7 +583,7 @@ export default function SettingsPage() {
                 <p className="mt-2 break-all font-mono text-sm text-slate-100">{gateway?.lanUrl || (language === "zh" ? "未开启" : "Not enabled")}</p>
               </div>
               <div className="rounded-md border border-amber-500/25 bg-amber-500/10 p-3 text-xs leading-5 text-amber-100 lg:col-span-2">
-                <p>{gateway?.warning || (language === "zh" ? "LAN 模式需要 Docker 绑定 0.0.0.0，并保留访问口令。" : "LAN mode requires Docker to bind 0.0.0.0 and keep token protection.")}</p>
+                <p>{gateway?.warning || (language === "zh" ? "LAN 模式需要 Docker 绑定 0.0.0.0，并保留会员激活码。" : "LAN mode requires Docker to bind 0.0.0.0 and keep Activation Code protection.")}</p>
                 <p className="mt-1">{gateway?.firewallHint || (language === "zh" ? "如果局域网设备访问不了，请检查系统防火墙。" : "If another device cannot connect, check the host firewall.")}</p>
               </div>
             </div>
@@ -680,7 +680,7 @@ export default function SettingsPage() {
               <FieldLabel>
                 Provider
                 <SelectField value={config.llmProvider} onChange={(event) => updateModelProvider(event.target.value)} className="mt-1 w-full">
-                  <option value="">{language === "zh" ? "未配置，使用 mock fallback" : "Not configured, use mock fallback"}</option>
+                  <option value="">{language === "zh" ? "未配置，使用演示模式" : "Not configured, use demo mode"}</option>
                   {LLM_PROVIDER_OPTIONS.map((option) => (
                     <option key={option.id} value={option.id}>{language === "zh" ? option.zhLabel : option.label}</option>
                   ))}
@@ -701,8 +701,8 @@ export default function SettingsPage() {
               </div>
               <div className="rounded-md border border-amber-500/25 bg-amber-500/10 p-3 text-xs leading-5 text-amber-100 md:col-span-2 xl:col-span-3">
                 {model?.mockFallbackActive
-                  ? (language === "zh" ? "当前没有真实模型配置，SSA 会使用 mock fallback 做占位归纳。" : "No real model is configured. SSA will use mock fallback for placeholder summaries.")
-                  : (language === "zh" ? "当前已配置真实模型；如果连接失败，运行时会明确提示 fallback。" : "A real model is configured. If it fails, the runtime reports fallback clearly.")}
+                  ? (language === "zh" ? "当前没有真实模型配置，SSA 会使用演示模式做占位归纳。" : "No real model is configured. SSA will use demo mode for placeholder summaries.")
+                  : (language === "zh" ? "当前已配置真实模型；如果连接失败，系统会明确提示已切换到演示结果。" : "A real model is configured. If it fails, the app clearly reports when demo results are used.")}
               </div>
             </div>
           </BattlePanel>
@@ -711,7 +711,7 @@ export default function SettingsPage() {
         {activeTab === "email" && (
           <BattlePanel
             title={language === "zh" ? "邮件连接设置" : "Email Connection Settings"}
-            meta={language === "zh" ? "客户发送默认锁定，必须人工批准" : "customer sends stay locked until approved"}
+            meta={language === "zh" ? "客户发送默认锁定，必须确认" : "customer sends stay locked until confirmed"}
             tone={mailboxTone}
           >
             <div className="grid gap-3 p-3 md:grid-cols-3">
@@ -725,7 +725,7 @@ export default function SettingsPage() {
               <ConfigInput label={language === "zh" ? "邮箱应用凭证" : "Mailbox App Credential"} value={config.mailboxCredential} onChange={(v) => updateConfig({ mailboxCredential: v })} mono />
               <label className="flex h-9 items-center gap-2 self-end rounded-md border border-slate-800 bg-slate-950 px-3 text-xs text-slate-300 transition hover:border-slate-600">
                 <input type="checkbox" checked={config.autoCapture} onChange={(event) => updateConfig({ autoCapture: event.target.checked })} />
-                {language === "zh" ? "保存草稿供审批" : "Save drafts for review"}
+                {language === "zh" ? "保存草稿供复核" : "Save drafts for review"}
               </label>
               <CommandButton type="button" variant="secondary" onClick={() => testConnection("imap")} disabled={Boolean(testing) || loading} loading={testing === "imap"}>
                 <BattleText en="Test inbox" zh="测试收件" />
@@ -738,7 +738,7 @@ export default function SettingsPage() {
         )}
 
         {activeTab === "search" && (
-          <BattlePanel title={language === "zh" ? "搜索与情报设置" : "Search & Intelligence Settings"} meta={language === "zh" ? "用于线索调研和市场情报" : "used for lead research and market intelligence"}>
+          <BattlePanel title={language === "zh" ? "搜索与洞察设置" : "Search & Insights Settings"} meta={language === "zh" ? "用于线索调研和市场洞察" : "used for lead research and market insights"}>
             <div className="grid gap-3 p-3 md:grid-cols-4">
               <ConfigInput label={language === "zh" ? "搜索服务" : "Search Service"} value={config.searchEngine} onChange={(v) => updateConfig({ searchEngine: v })} mono />
               <ConfigInput label={language === "zh" ? "Tavily 密钥" : "Tavily Key"} value={config.tavilyApiKey} onChange={(v) => updateConfig({ tavilyApiKey: v })} mono />

@@ -208,7 +208,7 @@ export default function DocumentsPage() {
     historyCount: historyDocs.length,
   };
   const commandSummary = [
-    language === "zh" ? "出货文件" : "Shipment Documents",
+    language === "zh" ? "单证中心" : "Document Center",
     `${language === "zh" ? "文件" : "Files"} ${docTypes.join("+")}`,
     `${language === "zh" ? "客户" : "Customer"} ${formData.customer.company_name || (language === "zh" ? "未填写" : "not set")}`,
     `${language === "zh" ? "金额" : "Amount"} ${formData.currency} ${totalAmount.toFixed(2)}`,
@@ -218,8 +218,8 @@ export default function DocumentsPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Shipment Documents"
-        zhTitle="出货文件"
+        title="Document Center"
+        zhTitle="单证中心"
         meta="CI / PL FROM SAVED PI / FILES ONLY"
         zhMeta="从已保存 PI 生成 CI / PL / 不会外发"
         active="/documents"
@@ -429,6 +429,13 @@ export default function DocumentsPage() {
           <div className="space-y-3">
             <PageCommandPanel
               page="documents"
+              surface="documents"
+              mode="page_assist"
+              target={{
+                type: "document",
+                id: selectedPiNo || formData.pi_info.pi_no || undefined,
+                label: formData.customer.company_name || formData.pi_info.pi_no || undefined,
+              }}
               summary={commandSummary}
               context={commandContext}
               placeholder="Ask Jaden to inspect CI/PL fields, prepare missing packing details, or check shipment terms"

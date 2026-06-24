@@ -23,6 +23,7 @@ import {
   JADENOS_ONBOARDING_ROUTE,
   type ConfigState,
   type JadenosOnboardingStep,
+  type OnboardingStepGroup,
   type OnboardingRuntimeState,
   getJadenosOnboardingSteps,
   getOnboardingReadiness,
@@ -143,6 +144,33 @@ function StatusBadge({ status }: { status: JadenosOnboardingStep["status"] }) {
   return <BattleBadge tone="amber"><BattleText en="Needed" zh="需要" /></BattleBadge>;
 }
 
+const GROUP_LABELS: Record<OnboardingStepGroup, { en: string; zh: string; meta: string; zhMeta: string }> = {
+  quickstart: {
+    en: "Quick start",
+    zh: "快速开始",
+    meta: "enter product first",
+    zhMeta: "先进入产品",
+  },
+  recommended: {
+    en: "Recommended",
+    zh: "推荐配置",
+    meta: "better real work",
+    zhMeta: "正式使用更完整",
+  },
+  advanced: {
+    en: "Advanced local",
+    zh: "高级本地部署",
+    meta: "gateway and file checks",
+    zhMeta: "网关与文件自检",
+  },
+  finish: {
+    en: "Save",
+    zh: "保存",
+    meta: "keep checklist state",
+    zhMeta: "保留清单状态",
+  },
+};
+
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
   const units = ["B", "KB", "MB", "GB"];
@@ -162,12 +190,12 @@ function ReadinessMeter({ completed, total }: { completed: number; total: number
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-[10px] uppercase tracking-wide text-slate-500">
-            <BattleText en="First run" zh="首次启动" />
+            <BattleText en="Setup checklist" zh="设置清单" />
           </p>
           <p className="mt-1 font-mono text-xl font-semibold text-slate-100">{completed}/{total}</p>
         </div>
-        <BattleBadge tone={completed === total ? "emerald" : "amber"}>
-          {completed === total ? <BattleText en="Ready" zh="就绪" /> : <BattleText en="Setup" zh="配置" />}
+        <BattleBadge tone={completed === total ? "emerald" : "neutral"}>
+          {completed === total ? <BattleText en="Done" zh="完成" /> : <BattleText en="Optional" zh="可选" />}
         </BattleBadge>
       </div>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
@@ -188,31 +216,51 @@ function StepList({
   onSelect: (index: number) => void;
   language: "en" | "zh";
 }) {
+  const grouped = steps.reduce<Array<{ group: OnboardingStepGroup; items: Array<{ step: JadenosOnboardingStep; index: number }> }>>((acc, step, index) => {
+    const existing = acc.find((item) => item.group === step.group);
+    if (existing) existing.items.push({ step, index });
+    else acc.push({ group: step.group, items: [{ step, index }] });
+    return acc;
+  }, []);
+
   return (
     <BattlePanel
-      title={language === "zh" ? "步骤" : "Steps"}
-      meta={language === "zh" ? "首次启动清单" : "first-run checklist"}
+      title={language === "zh" ? "设置清单" : "Setup Checklist"}
+      meta={language === "zh" ? "非强制，可随时返回" : "optional, return anytime"}
     >
-      <div className="divide-y divide-slate-800">
-        {steps.map((step, index) => (
-          <button
-            key={step.id}
-            type="button"
-            onClick={() => onSelect(index)}
-            className={cx(
-              "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:bg-slate-950",
-              index === activeIndex
-                ? "bg-emerald-500/10 text-slate-100"
-                : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
-            )}
-          >
-            <span className="min-w-0">
-              <span className="block truncate font-semibold">{language === "zh" ? step.zhTitle : step.title}</span>
-              <span className="block truncate text-[10px] text-slate-600">{step.command}</span>
-            </span>
-            <StatusBadge status={step.status} />
-          </button>
-        ))}
+      <div>
+        {grouped.map(({ group, items }) => {
+          const label = GROUP_LABELS[group];
+          return (
+            <div key={group} className="border-b border-slate-800 last:border-b-0">
+              <div className="bg-slate-950/70 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{language === "zh" ? label.zh : label.en}</p>
+                <p className="mt-0.5 text-[10px] text-slate-600">{language === "zh" ? label.zhMeta : label.meta}</p>
+              </div>
+              <div className="divide-y divide-slate-800">
+                {items.map(({ step, index }) => (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={() => onSelect(index)}
+                    className={cx(
+                      "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:bg-slate-950",
+                      index === activeIndex
+                        ? "bg-emerald-500/10 text-slate-100"
+                        : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                    )}
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">{language === "zh" ? step.zhTitle : step.title}</span>
+                      <span className="block truncate text-[10px] text-slate-600">{step.command}</span>
+                    </span>
+                    <StatusBadge status={step.status} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </BattlePanel>
   );
@@ -221,7 +269,7 @@ function StepList({
 function modelReadinessLabel(model: ModelHealth | null, language: "en" | "zh") {
   if (model?.readiness === "local_model_ready") return language === "zh" ? "本地模型已连接" : "Local model ready";
   if (model?.readiness === "cloud_model_ready") return language === "zh" ? "云模型已连接" : "Cloud model ready";
-  return language === "zh" ? "Mock fallback 生效" : "Mock fallback active";
+  return language === "zh" ? "演示模式生效" : "Demo mode active";
 }
 
 function StepBody({
@@ -275,11 +323,105 @@ function StepBody({
   loading: boolean;
   language: "en" | "zh";
 }) {
+  if (step.id === "start") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="rounded-md border border-emerald-500/25 bg-emerald-500/10 p-3 text-sm leading-6 text-emerald-50">
+          <BattleBadge tone="emerald"><BattleText en="Ready now" zh="现在可用" /></BattleBadge>
+          <p className="mt-3">
+            <BattleText
+              en="Access is separate from setup. You can enter the product now, then return here from Settings when you want to connect providers or run local deployment checks."
+              zh="访问和设置已经拆开。你现在就可以进入产品；之后需要连接服务或做本地部署自检时，再从设置回到这里。"
+            />
+          </p>
+        </div>
+        <div className="flex flex-col justify-center gap-2">
+          <Link
+            href="/leads"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-emerald-500/50 bg-emerald-500/20 px-4 text-xs font-semibold text-emerald-50 transition hover:border-emerald-300 hover:bg-emerald-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+          >
+            <BattleText en="Open Follow-up" zh="进入客户跟进" />
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+          >
+            <BattleText en="Open Workbench" zh="进入工作台" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (step.id === "customers") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-3">
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone="emerald"><BattleText en="Customer Follow-up" zh="客户跟进" /></BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            <BattleText en="Inspect existing accounts, contacts, orders, and activity timeline first." zh="先查看已有客户、联系人、订单和互动时间线。" />
+          </p>
+          <Link href="/leads" className="mt-3 inline-flex h-8 items-center rounded-md border border-emerald-500/50 bg-emerald-500/15 px-3 text-xs font-semibold text-emerald-100 transition hover:border-emerald-300 hover:bg-emerald-500/25">
+            <BattleText en="View follow-up" zh="查看客户跟进" />
+          </Link>
+        </div>
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone="blue"><BattleText en="Demo data" zh="演示数据" /></BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            <BattleText en="If the workspace is empty, Task Progress can load demo customers and a sample timeline." zh="如果工作区为空，可在任务进度页创建演示客户和样例时间线。" />
+          </p>
+          <Link href="/agent-status" className="mt-3 inline-flex h-8 items-center rounded-md border border-blue-500/50 bg-blue-500/15 px-3 text-xs font-semibold text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/25">
+            <BattleText en="Open Task Progress" zh="打开任务进度" />
+          </Link>
+        </div>
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
+          <BattleBadge tone="neutral"><BattleText en="Import later" zh="稍后导入" /></BattleBadge>
+          <p className="mt-2 text-xs leading-5 text-slate-300">
+            <BattleText en="Customer import and document intake can happen after you have seen the core workspace." zh="先看核心工作区，再做客户导入和资料导入也可以。" />
+          </p>
+          <Link href="/intake" className="mt-3 inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700">
+            <BattleText en="Open Data Import" zh="打开资料导入" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (step.id === "email") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs leading-5 text-slate-300">
+          <BattleBadge tone="blue"><BattleText en="Recommended later" zh="稍后推荐" /></BattleBadge>
+          <p className="mt-3">
+            <BattleText
+              en="Connect mailbox when you are ready for real inbound review and reply drafting. This is not required to enter Customer Follow-up or use demo data."
+              zh="准备处理真实来信和回复草稿时再连接邮箱。进入客户跟进或使用演示数据不需要先完成这一步。"
+            />
+          </p>
+        </div>
+        <div className="flex flex-col justify-center gap-2">
+          <Link
+            href="/settings"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-blue-500/40 bg-blue-500/15 px-4 text-xs font-semibold text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/70 active:translate-y-px"
+          >
+            <BattleText en="Open Email Settings" zh="打开邮箱设置" />
+          </Link>
+          <Link
+            href="/leads"
+            className="inline-flex h-9 items-center justify-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
+          >
+            <BattleText en="Skip to Follow-up" zh="先去客户跟进" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (step.id === "token") {
     return (
       <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
         <FieldLabel>
-          {language === "zh" ? "访问口令" : "Access Pass"}
+          {language === "zh" ? "会员激活码" : "Activation Code"}
           <InputField
             value={accessTokenInput}
             type="password"
@@ -289,15 +431,15 @@ function StepBody({
           />
         </FieldLabel>
         <CommandButton type="button" variant="primary" onClick={saveAccess} disabled={!accessTokenInput.trim()}>
-          <BattleText en="Save Access" zh="保存访问" />
+          <BattleText en="Save Code" zh="保存激活码" />
         </CommandButton>
         <CommandButton type="button" variant="ghost" onClick={clearAccess} disabled={!betaToken && !accessTokenInput}>
           <BattleText en="Clear" zh="清除" />
         </CommandButton>
         <div className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs leading-5 text-slate-300 lg:col-span-3">
           <BattleText
-            en="The browser stores the access pass and sends it to SSA with each protected request. LAN mode keeps the same protection."
-            zh="浏览器会保存访问口令，并在访问受保护页面/API 时交给 SSA。LAN 模式也继续使用同一套保护。"
+            en="The browser stores the Activation Code and sends it to SSA with each protected request. LAN mode keeps the same protection."
+            zh="浏览器会保存会员激活码，并在访问受保护页面/API 时交给 SSA。LAN 模式也继续使用同一套保护。"
           />
         </div>
       </div>
@@ -360,7 +502,7 @@ function StepBody({
             })}
             className="mt-1 w-full"
           >
-            <option value="">{language === "zh" ? "未配置，使用 Mock fallback" : "Not configured, use mock fallback"}</option>
+            <option value="">{language === "zh" ? "未配置，使用演示模式" : "Not configured, use demo mode"}</option>
             {LLM_PROVIDER_OPTIONS.map((option) => (
               <option key={option.id} value={option.id}>{language === "zh" ? option.zhLabel : option.label}</option>
             ))}
@@ -375,7 +517,7 @@ function StepBody({
           </BattleBadge>
           <p className="mt-2 text-xs leading-5 text-slate-300">
             {model?.mockFallbackActive
-              ? (language === "zh" ? "当前没有真实模型可用，SSA 只会用 Mock fallback 做占位响应。" : "No real model is available. SSA will only use mock fallback placeholder responses.")
+              ? (language === "zh" ? "当前没有真实模型可用，SSA 只会用演示模式做占位响应。" : "No real model is available. SSA will only use demo-mode placeholder responses.")
               : (language === "zh" ? `当前模型：${model?.model || config.defaultModel}` : `Current model: ${model?.model || config.defaultModel}`)}
           </p>
         </div>
@@ -386,12 +528,41 @@ function StepBody({
     );
   }
 
+  if (step.id === "search") {
+    return (
+      <div className="grid gap-3 p-3 lg:grid-cols-2">
+        <FieldLabel>
+          {language === "zh" ? "搜索引擎" : "Search Engine"}
+          <SelectField
+            value={config.searchEngine || "tavily"}
+            onChange={(event) => updateConfig({ searchEngine: event.target.value })}
+            className="mt-1 w-full"
+          >
+            <option value="tavily">Tavily</option>
+            <option value="none">{language === "zh" ? "暂不配置" : "Not configured yet"}</option>
+          </SelectField>
+        </FieldLabel>
+        <ConfigInput label={language === "zh" ? "Tavily API Key" : "Tavily API Key"} value={config.tavilyApiKey || ""} onChange={(value) => updateConfig({ tavilyApiKey: value })} mono type="password" placeholder={language === "zh" ? "需要真实搜索时再填写" : "Add when live search is needed"} />
+        <ConfigInput label={language === "zh" ? "Hunter API Key（邮箱验证）" : "Hunter API Key (email verification)"} value={config.hunterApiKey || ""} onChange={(value) => updateConfig({ hunterApiKey: value })} mono type="password" placeholder={language === "zh" ? "需要邮箱验证时再填写" : "Add when email verification is needed"} />
+        <div className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs leading-5 text-slate-300">
+          <BattleBadge tone="blue"><BattleText en="Recommended" zh="推荐配置" /></BattleBadge>
+          <p className="mt-2">
+            <BattleText
+              en="These keys improve live lead research and verification. You can keep exploring product screens without them."
+              zh="这些 Key 会增强真实线索搜索和邮箱验证。没有它们也可以继续体验产品页面。"
+            />
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (step.id === "storage") {
     return (
       <div className="grid gap-3 p-3">
         <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
           <p className="text-[10px] uppercase tracking-wide text-slate-500">{language === "zh" ? "数据目录" : "Data directory"}</p>
-          <p className="mt-2 break-all font-mono text-xs text-slate-200">{storage?.summary.dataRoot || (language === "zh" ? "保存访问口令后显示" : "Shown after access is saved")}</p>
+          <p className="mt-2 break-all font-mono text-xs text-slate-200">{storage?.summary.dataRoot || (language === "zh" ? "保存会员激活码后显示" : "Shown after the Activation Code is saved")}</p>
         </div>
         <div className="grid gap-2 md:grid-cols-3">
           {(storage?.summary.directories || []).map((directory) => (
@@ -441,7 +612,7 @@ function StepBody({
           <p className="mt-2 text-xs leading-5 text-slate-300">
             <BattleText
               en="Create a small sample text file in the browser and upload it through the same Intake gateway."
-              zh="可以直接在浏览器里生成一个小的示例文本文件，并通过同一个投递台网关上传。"
+              zh="可以直接在浏览器里生成一个小的示例文本文件，并通过同一个资料导入网关上传。"
             />
           </p>
           <CommandButton type="button" variant="secondary" onClick={uploadSampleTestFile} loading={uploading} disabled={uploading || loading} className="mt-3">
@@ -511,20 +682,20 @@ function StepBody({
         <BattleBadge tone="emerald"><BattleText en="Ready to enter" zh="可以进入" /></BattleBadge>
         <p className="mt-3">
           <BattleText
-            en="Finish saves the first-run state under the local SSA data folder. The guide will not reopen automatically unless you reset it from Settings."
-            zh="完成后，首次启动状态会写入本地 SSA 数据目录。之后不会反复弹出；需要时可从设置重新打开。"
+            en="Finish saves this setup checklist. It does not unlock the product because access already did that; use it only to keep your local setup state tidy."
+            zh="完成会保存这份设置清单。它不是解锁产品的第二道门；只是帮你保留本地设置状态。"
           />
         </p>
       </div>
       <div className="flex flex-col justify-center gap-2">
         <CommandButton type="button" variant="primary" onClick={markOnboardingComplete} loading={finishing} disabled={finishing}>
-          <BattleText en="Finish Onboarding" zh="完成引导" />
+          <BattleText en="Save Checklist" zh="保存清单" />
         </CommandButton>
         <Link
-          href="/settings"
+          href="/leads"
           className="inline-flex h-9 items-center justify-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
         >
-          <BattleText en="Open Settings" zh="打开设置" />
+          <BattleText en="Open Follow-up" zh="进入客户跟进" />
         </Link>
       </div>
     </div>
@@ -581,7 +752,7 @@ export default function JadenosOnboarding() {
       if (configResponse.ok && configJson.success) {
         setConfig((prev) => ({ ...prev, ...configJson.data }));
       } else if (configResponse.status === 401 || configResponse.status === 403) {
-        setError(language === "zh" ? "请先保存访问口令。" : "Save the access pass first.");
+        setError(language === "zh" ? "请先保存会员激活码。" : "Save the Activation Code first.");
       }
 
       const gatewayResponse = await apiFetch(LOCAL_GATEWAY_API, { cache: "no-store" });
@@ -646,7 +817,7 @@ export default function JadenosOnboarding() {
   const saveAccess = useCallback(() => {
     setBetaToken(accessTokenInput);
     setError(null);
-    setMessage(language === "zh" ? "访问口令已保存。" : "Access pass saved.");
+    setMessage(language === "zh" ? "会员激活码已保存。" : "Activation Code saved.");
     setActiveIndex((current) => Math.max(current, 1));
   }, [accessTokenInput, language, setBetaToken]);
 
@@ -656,7 +827,7 @@ export default function JadenosOnboarding() {
     setGateway(null);
     setStorage(null);
     setError(null);
-    setMessage(language === "zh" ? "访问口令已清除。" : "Access pass cleared.");
+    setMessage(language === "zh" ? "会员激活码已清除。" : "Activation Code cleared.");
   }, [clearBetaToken, language]);
 
   const testModel = useCallback(async () => {
@@ -701,7 +872,7 @@ export default function JadenosOnboarding() {
       setUploadReceipt(receipt);
       setCurrentIntakeId(receipt.id);
       setTestUploadCompleted(true);
-      setMessage(language === "zh" ? "测试文件已保存到本地投递台。" : "The test file has been saved in local Intake.");
+      setMessage(language === "zh" ? "测试文件已保存到本地资料导入。" : "The test file has been saved in local Data Import.");
       setActiveIndex((current) => Math.max(current, 5));
       void loadAll();
     } catch (err) {
@@ -774,8 +945,8 @@ export default function JadenosOnboarding() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || (language === "zh" ? "完成失败" : "Could not finish onboarding"));
       setOnboardingStatus(json.data);
-      setMessage(language === "zh" ? "首次引导已完成。" : "First-run onboarding is complete.");
-      router.push("/");
+      setMessage(language === "zh" ? "设置清单已保存。" : "Setup checklist saved.");
+      router.push("/leads");
     } catch (err) {
       setError(err instanceof Error ? err.message : (language === "zh" ? "完成失败" : "Could not finish onboarding"));
     } finally {
@@ -786,14 +957,14 @@ export default function JadenosOnboarding() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="SSA Local Gateway"
-        zhTitle="SSA 本地网关"
-        meta="Access / LAN / Model / Local files"
-        zhMeta="访问 / 局域网 / 模型 / 本地文件"
+        title="SSA Setup Checklist"
+        zhTitle="SSA 设置清单"
+        meta="Quick start / Recommended / Advanced local"
+        zhMeta="快速开始 / 推荐配置 / 高级本地部署"
         active={JADENOS_ONBOARDING_ROUTE}
       >
         <BattleBadge tone={loading ? "blue" : readiness.allReady ? "emerald" : "amber"} pulse={loading}>
-          {loading ? <BattleText en="LOAD" zh="加载" /> : readiness.allReady ? <BattleText en="READY" zh="就绪" /> : <BattleText en="SETUP" zh="设置" />}
+          {loading ? <BattleText en="LOAD" zh="加载" /> : <BattleText en="OPTIONAL" zh="可选" />}
         </BattleBadge>
         {onboardingStatus?.completed ? (
           <BattleBadge tone="emerald"><BattleText en="Completed" zh="已完成" /></BattleBadge>
@@ -827,8 +998,8 @@ export default function JadenosOnboarding() {
             <ReadinessMeter completed={readiness.completed} total={readiness.total} />
             <StepList steps={steps} activeIndex={activeIndex} onSelect={setActiveIndex} language={language} />
             <BattlePanel
-              title={language === "zh" ? "核心清单" : "Core checklist"}
-              meta={language === "zh" ? "本地网关首次启动" : "local gateway first run"}
+              title={language === "zh" ? "配置状态" : "Setup status"}
+              meta={language === "zh" ? "都不是进入产品的硬门槛" : "none blocks product entry"}
             >
               <div className="divide-y divide-slate-800">
                 {readiness.items.map((item) => (
@@ -836,7 +1007,7 @@ export default function JadenosOnboarding() {
                     <span className={cx(item.done ? "text-slate-200" : "text-slate-500")}>
                       {language === "zh" ? item.zhLabel : item.label}
                     </span>
-                    <StatusBadge status={item.done ? "done" : "missing"} />
+                    <StatusBadge status={item.done ? "done" : item.blocking ? "missing" : "optional"} />
                   </div>
                 ))}
               </div>
@@ -922,7 +1093,7 @@ export default function JadenosOnboarding() {
                     href="/intake"
                     className="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
                   >
-                    <BattleText en="Open Intake" zh="打开投递台" />
+                    <BattleText en="Open Data Import" zh="打开资料导入" />
                   </Link>
                 </div>
               </div>

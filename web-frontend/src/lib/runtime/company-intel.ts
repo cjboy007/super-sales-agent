@@ -551,7 +551,7 @@ export function buildCompanyIntelDossier(
     rating,
     recommended_next_actions: [
       "运行 company-intel 深度搜索，补齐官网、注册/财务、近况和来源 URL。",
-      "核实联系人角色和邮箱状态，再决定是否进入自动外联或人工复核。",
+      "核实联系人角色和邮箱状态，再决定是否进入外联或复核。",
       rating === "Hot" ? "优先准备开发信切入点。" : "先完成背调后再进入跟进队列。",
     ],
     source_list: [

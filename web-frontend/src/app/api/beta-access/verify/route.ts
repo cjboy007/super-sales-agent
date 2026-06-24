@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
   if (!auth.ok) {
     return NextResponse.json(
-      { success: false, error: "Access pass is invalid." },
+      { success: false, error: "Activation Code is invalid." },
       { status: 401 }
     );
   }

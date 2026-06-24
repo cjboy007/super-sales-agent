@@ -32,7 +32,7 @@ function cleanPublicText(value: string) {
 function publicActionTarget(action: IntakeAction) {
   if (action.id === "archive-original") return "Intake archive";
   if (action.id === "link-context") {
-    if (action.target === "manual review queue") return "Manual review queue";
+    if (action.target === "manual review queue" || action.target === "review workspace") return "Review workspace";
     if (action.target === "local client context") return "Customer context";
     return "Customer context";
   }

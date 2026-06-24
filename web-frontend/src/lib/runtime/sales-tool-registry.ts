@@ -154,7 +154,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
   sideEffectTool({
     id: "email.request_send",
     name: "Request email send",
-    description: "Create an approval-gated request to send a customer-facing email.",
+    description: "Create a confirmation request to send a customer-facing email.",
     inputSchema: objectSchema({
       workspaceId: WORKSPACE,
       emailId: { type: "string" },
@@ -170,7 +170,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
     requiredPermissions: ["workspace.read", "email.send.request"],
     sideEffectKind: "email.send",
     idempotencyStrategy: "Use workspaceId + source email id + normalized recipient + subject.",
-    failureRetryBehavior: "Retry through a side-effect decision retry record after approval, address verification, and adapter errors are visible.",
+    failureRetryBehavior: "Retry after confirmation, address verification, and adapter errors are visible.",
   }),
   sideEffectTool({
     id: "email.test_smtp",
@@ -333,7 +333,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
   sideEffectTool({
     id: "feishu.request_notify",
     name: "Request team notification",
-    description: "Request a gated Feishu/team notification for operator review.",
+    description: "Request a Feishu/team notification for review.",
     inputSchema: objectSchema({
       workspaceId: WORKSPACE,
       channel: { type: "string" },
@@ -347,7 +347,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
     requiredPermissions: ["workspace.read", "feishu.notify.request"],
     sideEffectKind: "feishu.notify",
     idempotencyStrategy: "Use workspaceId + channel + message hash.",
-    failureRetryBehavior: "Retry through a side-effect decision retry record after operator review.",
+    failureRetryBehavior: "Retry after review.",
   }),
   localTool({
     id: "follow_up.create_plan",
@@ -371,7 +371,7 @@ const SALES_TOOLS: SalesToolDefinition[] = [
   sideEffectTool({
     id: "order.record_milestone",
     name: "Record order milestone",
-    description: "Record payment, shipment, refund, or exception milestones through an approval-gated business action.",
+    description: "Record payment, shipment, refund, or exception milestones through a confirmed business action.",
     inputSchema: objectSchema({
       workspaceId: WORKSPACE,
       customerId: { type: "string" },
@@ -479,7 +479,7 @@ export function enforceSalesToolForSideEffect(input: SalesToolEnforcementInput):
     throw new Error(`Sales tool registry rejected ${tool.id}: side-effect kind mismatch.`);
   }
   if (!tool.approvalRequired || tool.approvalRequirement !== "operator_approval_required") {
-    throw new Error(`Sales tool registry rejected ${tool.id}: high-risk side-effect tools require operator approval.`);
+    throw new Error(`Sales tool registry rejected ${tool.id}: high-risk customer actions require confirmation.`);
   }
   if (!input.idempotencyKey) {
     throw new Error(`Sales tool registry rejected ${tool.id}: idempotency key is required.`);

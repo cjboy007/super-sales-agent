@@ -45,7 +45,7 @@ describe("real action readiness", () => {
         failed: 0,
         retryable: 0,
       },
-      nextStep: expect.stringContaining("controlled approval test"),
+      nextStep: expect.stringContaining("controlled confirmation test"),
     });
   });
 
@@ -98,7 +98,7 @@ describe("real action readiness", () => {
         failed: 1,
         retryable: 1,
       },
-      summary: expect.stringContaining("waiting for operator review"),
+      summary: expect.stringContaining("waiting for review"),
       nextStep: expect.stringContaining("Review failed"),
     });
     const serialized = JSON.stringify(summary);

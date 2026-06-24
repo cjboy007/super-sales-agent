@@ -61,23 +61,38 @@ describe("JadenOS onboarding flow", () => {
 
     expect(JADENOS_ONBOARDING_ROUTE).toBe("/jadenos/onboarding");
     expect(steps.map((step) => step.id)).toEqual([
+      "start",
+      "customers",
+      "model",
+      "email",
+      "search",
       "token",
       "access",
-      "model",
       "storage",
       "upload",
       "synthesize",
       "finish",
     ]);
-    expect(steps[0]).toMatchObject({ id: "token", command: "Save access pass" });
+    expect(steps[0]).toMatchObject({ id: "start", command: "Open product" });
+    expect(steps.find((step) => step.id === "token")).toMatchObject({
+      command: "Save activation code",
+      zhTitle: "保存会员激活码",
+      group: "advanced",
+    });
+    expect(visibleStepText).toContain("Activation Code");
+    expect(visibleStepText).toContain("会员激活码");
+    expect(visibleStepText).not.toContain("访问口令");
     expect(visibleStepText).not.toMatch(/\$\s/);
     expect(visibleStepText).toContain("LAN");
     expect(visibleStepText).toContain("local folder");
     expect(visibleStepText).toContain("test file");
     expect(visibleStepText).toContain("synthesis");
+    expect(visibleStepText).toContain("Quick start");
+    expect(visibleStepText).toContain("Recommended");
+    expect(visibleStepText).toContain("Advanced local");
   });
 
-  it("tracks local gateway readiness without counting optional sales connectors", () => {
+  it("tracks product-entry readiness separately from optional setup checks", () => {
     const ready = {
       ...baseConfig,
       llmProvider: "ollama",
@@ -87,13 +102,14 @@ describe("JadenOS onboarding flow", () => {
     const readiness = getOnboardingReadiness(ready, {
       tokenPresent: true,
       storageKnown: true,
-      testUploadCompleted: true,
-      synthesisTestCompleted: true,
+      testUploadCompleted: false,
+      synthesisTestCompleted: false,
     });
 
-    expect(readiness.completed).toBe(6);
-    expect(readiness.total).toBe(6);
+    expect(readiness.items.find((item) => item.id === "upload")?.blocking).toBe(false);
+    expect(readiness.items.find((item) => item.id === "synthesize")?.blocking).toBe(false);
     expect(readiness.allReady).toBe(true);
+    expect(readiness.canEnterProduct).toBe(true);
   });
 
   it("allows first-run completion with mock fallback while keeping model readiness separate", () => {
@@ -104,21 +120,25 @@ describe("JadenOS onboarding flow", () => {
     const readiness = getOnboardingReadiness(withoutModel, {
       tokenPresent: true,
       storageKnown: true,
-      testUploadCompleted: true,
-      synthesisTestCompleted: true,
+      testUploadCompleted: false,
+      synthesisTestCompleted: false,
     });
     const steps = getJadenosOnboardingSteps(withoutModel, {
       tokenPresent: true,
       storageKnown: true,
-      testUploadCompleted: true,
-      synthesisTestCompleted: true,
+      testUploadCompleted: false,
+      synthesisTestCompleted: false,
     });
 
     expect(readiness.items.find((item) => item.id === "model")?.done).toBe(false);
     expect(readiness.allReady).toBe(true);
     expect(steps.find((step) => step.id === "model")).toMatchObject({
-      status: "missing",
-      core: true,
+      status: "optional",
+      group: "recommended",
+    });
+    expect(steps.find((step) => step.id === "upload")).toMatchObject({
+      status: "optional",
+      group: "advanced",
     });
     expect(steps.find((step) => step.id === "finish")).toMatchObject({
       status: "done",

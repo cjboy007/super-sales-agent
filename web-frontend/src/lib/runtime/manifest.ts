@@ -39,7 +39,7 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
   return {
     id: "ssa-sales-os",
     name: "Super Sales Agent Sales OS",
-    positioning: "OpenClaw-shaped operating system primitives narrowed to B2B sales work.",
+    positioning: "B2B sales workbench primitives for customer development, review, and task progress.",
     runtimeBoundary: {
       standalone: true,
       requiresOpenClaw: false,
@@ -48,10 +48,10 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
       sideEffectsBlockedByDefault: true,
     },
     operatorSurfaces: [
-      "Battle Station cockpit",
-      "Focus approval mode",
-      "Secondary sales workstations",
-      "Runtime API",
+      "Workbench",
+      "Pending Review",
+      "Sales workspaces",
+      "Task Progress API",
     ],
     capabilities: [
       {
@@ -64,14 +64,14 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
       {
         id: "runtime-workflows",
         openclawEquivalent: "agent tasks / cron jobs",
-        ssaPrimitive: "Runtime jobs",
+        ssaPrimitive: "Background tasks",
         status: "implemented",
         notes: "Jobs are persisted in SSA-owned SQLite with worker lease metadata, bounded retries, and a standalone Jaden worker entrypoint.",
       },
       {
         id: "approval-gates",
         openclawEquivalent: "exec approvals",
-        ssaPrimitive: "Side-effect decisions and approval records",
+        ssaPrimitive: "Customer-facing action confirmations",
         status: "implemented",
         notes: "Real email, CRM, IMAP, Feishu, payment, bank, and document actions are blocked without explicit flags.",
       },
@@ -80,14 +80,14 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
         openclawEquivalent: "workspace memory / context",
         ssaPrimitive: "SSA-owned sales memory",
         status: "implemented",
-        notes: "Authoritative SSA records outrank Hermes/OpenClaw suggestions.",
+        notes: "Authoritative SSA records outrank imported or suggested context.",
       },
       {
         id: "operator-console",
         openclawEquivalent: "agent supervision UI",
-        ssaPrimitive: "Battle Station",
+        ssaPrimitive: "Workbench",
         status: "implemented",
-        notes: "Operators can scan risks, approvals, events, and next actions from the cockpit.",
+        notes: "Users can scan risks, pending reviews, events, and next actions from the workbench.",
       },
       {
         id: "llm-adapters",
@@ -103,15 +103,15 @@ export function getSalesRuntimeManifest(): SalesRuntimeManifest {
     llmTasks: LLM_TASKS,
     dataContracts: [
       "SSA_DATA_ROOT stores runtime state outside the repo.",
-      "Runtime events live under companies/<workspace>/events/events.json.",
-      "Runtime jobs live under runtime/ssa-runtime.db.",
+      "Task events live under companies/<workspace>/events/events.json.",
+      "Background tasks live under runtime/ssa-runtime.db.",
       "Side-effect decisions live under companies/<workspace>/approvals/side-effect-decisions.json.",
       "Sales memory lives under companies/<workspace>/memory/records.json.",
     ],
     nextGaps: [
-      "Sales tool registry for reusable actions such as quote, draft, classify, import, and approve.",
+      "Sales tool registry for reusable actions such as quote, draft, classify, import, and confirm.",
       "Policy engine for when LLM is required, optional, or forbidden.",
-      "Battle Station controls for runtime jobs, tool runs, and scheduled sales playbooks.",
+      "Workbench controls for background tasks, tool runs, and scheduled sales playbooks.",
     ],
   };
 }

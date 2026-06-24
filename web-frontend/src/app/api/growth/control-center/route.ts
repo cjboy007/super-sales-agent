@@ -28,13 +28,13 @@ const DECISION_ACTIONS: Array<{
 }> = [
   {
     action: "approve_once",
-    label: "Approve once",
-    effect: "Allow this reviewed action one time.",
+    label: "Confirm once",
+    effect: "Confirm this reviewed action one time.",
   },
   {
     action: "edit_then_approve",
-    label: "Edit then approve",
-    effect: "Operator edits the draft before approving.",
+    label: "Edit then confirm",
+    effect: "Operator edits the draft before confirming.",
   },
   {
     action: "reject",

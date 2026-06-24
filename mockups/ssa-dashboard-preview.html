@@ -1,0 +1,1250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSA 工作台 UI 预览</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --panel-soft: #f9fbfd;
+      --line: #dce4ec;
+      --line-strong: #c9d5e1;
+      --text: #152033;
+      --muted: #68778b;
+      --faint: #8c9aac;
+      --primary: #0f9f9a;
+      --primary-dark: #087a76;
+      --primary-soft: #e6f7f5;
+      --blue: #2563eb;
+      --blue-soft: #e8f0ff;
+      --amber: #d89013;
+      --amber-soft: #fff6df;
+      --red: #d84949;
+      --red-soft: #fff0f0;
+      --green: #12875f;
+      --green-soft: #e9f8f0;
+      --shadow: 0 10px 28px rgba(31, 45, 61, 0.06);
+      --radius: 8px;
+      --sidebar: 228px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      display: grid;
+      min-height: 100vh;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+    }
+
+    .sidebar {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      border-right: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 66px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid #b8c7d7;
+      border-radius: 7px;
+      background: #fff;
+      color: #0b7f7a;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 2px 6px rgba(15, 37, 62, 0.06);
+    }
+
+    .brand-title {
+      min-width: 0;
+    }
+
+    .brand-title strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .brand-title span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .nav {
+      display: grid;
+      gap: 4px;
+      padding: 14px 12px;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 38px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: transparent;
+      color: #405066;
+      padding: 0 11px;
+      text-align: left;
+      transition: 160ms ease;
+    }
+
+    .nav button:hover {
+      border-color: var(--line);
+      background: #fff;
+    }
+
+    .nav button.active {
+      border-color: #b7e3df;
+      background: var(--primary-soft);
+      color: #075e5b;
+      font-weight: 700;
+    }
+
+    .nav-icon {
+      display: grid;
+      width: 20px;
+      height: 20px;
+      place-items: center;
+      border-radius: 5px;
+      color: currentColor;
+    }
+
+    .nav-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    .workspace {
+      margin-top: auto;
+      padding: 14px 12px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .workspace-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 12px;
+    }
+
+    .workspace-card strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .workspace-card span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .main {
+      display: flex;
+      min-width: 0;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: grid;
+      min-height: 66px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      padding: 0 22px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.15;
+      font-weight: 750;
+    }
+
+    .page-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 34px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: #fff;
+      color: #304258;
+      padding: 0 13px;
+      font-size: 13px;
+      font-weight: 650;
+      transition: 160ms ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: #9fb0c0;
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .content {
+      display: grid;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .status-pill {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status-pill strong {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-pill .tag {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tag.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .tag.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .tag.dark {
+      background: #eef2f6;
+      color: #39495f;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(112px, 1fr));
+      gap: 8px;
+    }
+
+    .kpi {
+      position: relative;
+      min-height: 82px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 12px;
+    }
+
+    .kpi::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--line-strong);
+      content: "";
+    }
+
+    .kpi.active {
+      border-color: #9bdad6;
+      background: linear-gradient(135deg, #0c7d82, #0a5964);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi.active::before {
+      background: #6fe1d8;
+    }
+
+    .kpi.accent-green::before {
+      background: #54c79a;
+    }
+
+    .kpi.accent-blue::before {
+      background: #5a8df7;
+    }
+
+    .kpi.accent-amber::before {
+      background: #eca935;
+    }
+
+    .kpi.accent-purple::before {
+      background: #7b61ff;
+    }
+
+    .kpi.accent-red::before {
+      background: #e15757;
+    }
+
+    .kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .kpi.active span {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .kpi strong {
+      display: block;
+      margin-top: 9px;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 780;
+      letter-spacing: 0;
+    }
+
+    .kpi small {
+      display: block;
+      margin-top: 7px;
+      color: var(--faint);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .kpi.active small {
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.05fr) minmax(360px, 1.55fr) minmax(280px, 0.95fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .panel {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 1px 0 rgba(17, 24, 39, 0.02);
+    }
+
+    .grid > *,
+    .bottom-grid > *,
+    .side-stack > * {
+      min-width: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+    }
+
+    .panel-title {
+      min-width: 0;
+    }
+
+    .panel-title strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .panel-title span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .panel-body {
+      padding: 14px;
+    }
+
+    .mini-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .mini-tabs button {
+      height: 26px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--muted);
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .mini-tabs button.active {
+      border-color: #8fd8d2;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+
+    .chart {
+      position: relative;
+      height: 258px;
+      overflow: hidden;
+      border-radius: 7px;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 100% 52px,
+        linear-gradient(90deg, rgba(220, 228, 236, 0.55) 1px, transparent 1px) 0 0 / 76px 100%,
+        #fff;
+    }
+
+    .chart svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 18px;
+      height: 3px;
+      border-radius: 999px;
+    }
+
+    .map-wrap {
+      min-height: 268px;
+    }
+
+    .map {
+      position: relative;
+      height: 244px;
+      overflow: hidden;
+      border: 1px solid #dbe9ed;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #f2fbff, #fff7ed);
+    }
+
+    .map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-label {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(15, 159, 154, 0.2);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #304258;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 650;
+      box-shadow: 0 4px 16px rgba(15, 37, 62, 0.07);
+    }
+
+    .map-label::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      content: "";
+    }
+
+    .label-eu {
+      left: 51%;
+      top: 31%;
+    }
+
+    .label-au {
+      left: 76%;
+      top: 67%;
+    }
+
+    .label-us {
+      left: 18%;
+      top: 39%;
+    }
+
+    .map-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .map-actions button {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #f6fbfc;
+      color: #35465c;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .workflow-list,
+    .task-list,
+    .customer-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .workflow-item,
+    .task-item,
+    .customer-row {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-soft);
+      padding: 10px;
+    }
+
+    .workflow-item {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .flow-icon {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .workflow-item strong,
+    .task-item strong,
+    .customer-row strong {
+      display: block;
+      overflow: hidden;
+      color: #253349;
+      font-size: 13px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .workflow-item span,
+    .task-item span,
+    .customer-row span {
+      display: block;
+      margin-top: 4px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .progress {
+      height: 5px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef5;
+      margin-top: 8px;
+    }
+
+    .progress i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--primary);
+    }
+
+    .task-item {
+      position: relative;
+      min-width: 0;
+      padding-left: 38px;
+    }
+
+    .task-index {
+      position: absolute;
+      left: 10px;
+      top: 11px;
+      display: grid;
+      width: 20px;
+      height: 20px;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      border-radius: 999px;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .badge.live {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .badge.queue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .badge.wait {
+      background: var(--amber-soft);
+      color: #9b6507;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: minmax(340px, 1.25fr) minmax(260px, 0.85fr) minmax(280px, 0.9fr);
+      gap: 14px;
+    }
+
+    .customer-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .customer-meta {
+      display: flex;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr) 32px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .bar {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #edf2f7;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #4cb8b1, #e6a23c);
+    }
+
+    .funnel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .funnel-row {
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1fr) 34px;
+      gap: 9px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .command {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px;
+    }
+
+    .command label {
+      flex: 0 0 auto;
+      color: var(--primary-dark);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .command input {
+      min-width: 0;
+      flex: 1;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 0 11px;
+      color: var(--text);
+      outline: none;
+    }
+
+    .command input:focus {
+      border-color: #8fd8d2;
+      box-shadow: 0 0 0 3px rgba(15, 159, 154, 0.12);
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      transform: translateY(18px);
+      border: 1px solid #a8ded9;
+      border-radius: 8px;
+      background: #f0fbfa;
+      color: #075e5b;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: 180ms ease;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 1180px) {
+      :root {
+        --sidebar: 196px;
+      }
+
+      .kpis {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .grid,
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .side-stack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+        border-right: 0;
+      }
+
+      .nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .workspace {
+        display: none;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .top-actions {
+        flex-wrap: wrap;
+      }
+
+      .status-row,
+      .side-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="侧边导航">
+      <div class="brand">
+        <div class="brand-mark">SSA</div>
+        <div class="brand-title">
+          <strong>Super Sales Agent</strong>
+          <span>AI 外贸数字员工</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="active" type="button" data-nav="概览">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-4H4v4Z"/></svg>
+          </span>
+          概览
+        </button>
+        <button type="button" data-nav="潜客开发">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 4v16M4 12h16"/><path d="M6 6c4 1 8 1 12 0M6 18c4-1 8-1 12 0"/></svg>
+          </span>
+          潜客开发
+        </button>
+        <button type="button" data-nav="客户列表">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 11a4 4 0 1 0-8 0"/><path d="M4 21a8 8 0 0 1 16 0"/><path d="M18 7h3M19.5 5.5v3"/></svg>
+          </span>
+          客户列表
+        </button>
+        <button type="button" data-nav="收件箱">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
+          </span>
+          收件箱
+        </button>
+        <button type="button" data-nav="报价任务">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v5h5M9 13h8M9 17h5"/></svg>
+          </span>
+          报价任务
+        </button>
+        <button type="button" data-nav="AI 写邮件">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16v10H7l-3 4z"/><path d="M8 9h8M8 12h5"/></svg>
+          </span>
+          AI 写邮件
+        </button>
+        <button type="button" data-nav="系统设置">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M3 12h3M18 12h3M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+          </span>
+          系统设置
+        </button>
+      </nav>
+
+      <div class="workspace">
+        <div class="workspace-card">
+          <strong>lclighting</strong>
+          <span>有效期至 永久</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <h1>今日工作台</h1>
+          <p>2026-06-06 至 2026-06-12 · 授权正常 · 真实聚客模式</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn primary" type="button" data-action="启动搜索">启动搜索</button>
+          <button class="btn" type="button" data-action="查看任务队列">查看任务队列</button>
+          <button class="btn" type="button" data-action="刷新数据">刷新数据</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="status-row">
+          <div class="status-pill">
+            <span>本周运行窗口</span>
+            <strong>2026-06-06 - 2026-06-12</strong>
+          </div>
+          <div class="status-pill">
+            <span>授权状态</span>
+            <span class="tag green">已授权</span>
+          </div>
+          <div class="status-pill">
+            <span>系统模式</span>
+            <span class="tag dark">真实聚客</span>
+          </div>
+        </div>
+
+        <div class="kpis" aria-label="关键指标">
+          <article class="kpi active">
+            <span>线索总量</span>
+            <strong>49</strong>
+            <small>线索库总量 49</small>
+          </article>
+          <article class="kpi accent-green">
+            <span>高潜力</span>
+            <strong>47</strong>
+            <small>评分 80+</small>
+          </article>
+          <article class="kpi accent-green">
+            <span>今日开发</span>
+            <strong>0</strong>
+            <small>已触达客户</small>
+          </article>
+          <article class="kpi accent-blue">
+            <span>邮件成功</span>
+            <strong>21</strong>
+            <small>0 封待发 · 3 封失败</small>
+          </article>
+          <article class="kpi accent-amber">
+            <span>实时打开率</span>
+            <strong>11%</strong>
+            <small>2 / 19 封已打开</small>
+          </article>
+          <article class="kpi accent-purple">
+            <span>回复率</span>
+            <strong>5%</strong>
+            <small>1 / 19 封已回复</small>
+          </article>
+          <article class="kpi accent-red">
+            <span>待推进</span>
+            <strong>0</strong>
+            <small>今天待处理</small>
+          </article>
+        </div>
+
+        <div class="grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <strong>搜索到开发的转化趋势</strong>
+                <span>邮件投递 & 回复趋势</span>
+              </div>
+              <div class="mini-tabs">
+                <button class="active" type="button">近 7 天</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="legend">
+                <span><i style="background:#2563eb"></i>已发送</span>
+                <span><i style="background:#0f9f9a"></i>已打开</span>
+                <span><i style="background:#6b5fd2"></i>已回复</span>
+              </div>
+              <div class="chart" aria-label="趋势图">
+                <svg viewBox="0 0 520 258" preserveAspectRatio="none">
+                  <polyline points="42,210 118,188 194,194 270,162 346,174 422,140 488,154" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="42,222 118,205 194,210 270,184 346,198 422,174 488,182" fill="none" stroke="#0f9f9a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="42,238 118,228 194,232 270,214 346,222 422,207 488,214" fill="none" stroke="#6b5fd2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <g fill="#7a8798" font-size="12">
+                    <text x="38" y="248">06-06</text>
+                    <text x="114" y="248">06-07</text>
+                    <text x="190" y="248">06-08</text>
+                    <text x="266" y="248">06-09</text>
+                    <text x="342" y="248">06-10</text>
+                    <text x="418" y="248">06-11</text>
+                    <text x="482" y="248">今天</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <strong>全球客户地图</strong>
+                <span>全渠道信号</span>
+              </div>
+              <span class="badge live">Live Map</span>
+            </div>
+            <div class="panel-body map-wrap">
+              <div class="map" aria-label="客户地图">
+                <svg viewBox="0 0 640 244" preserveAspectRatio="none">
+                  <path d="M45 86 C88 48 140 58 170 88 C210 124 256 92 295 112 C340 136 384 84 432 92 C480 99 520 130 596 105" fill="none" stroke="#29a5a3" stroke-width="3" stroke-dasharray="8 9" opacity=".65"/>
+                  <path d="M70 152 C120 134 168 144 215 132 C278 115 335 144 390 133 C455 120 500 152 570 139" fill="none" stroke="#e59f39" stroke-width="3" stroke-dasharray="9 8" opacity=".7"/>
+                  <path d="M110 64 C158 42 225 52 290 68 C236 90 150 99 96 84 Z" fill="#8bd5ed" opacity=".75"/>
+                  <path d="M325 78 C370 44 452 43 510 76 C468 110 378 112 322 95 Z" fill="#f0b66d" opacity=".72"/>
+                  <path d="M198 127 C236 110 292 116 318 143 C278 168 228 164 194 148 Z" fill="#72d2a3" opacity=".7"/>
+                  <path d="M418 140 C468 124 530 136 568 168 C518 191 458 180 415 158 Z" fill="#e66f95" opacity=".72"/>
+                  <circle cx="144" cy="78" r="5" fill="#111827"/>
+                  <circle cx="386" cy="84" r="5" fill="#5b6cff"/>
+                  <circle cx="492" cy="104" r="5" fill="#111827"/>
+                  <circle cx="506" cy="159" r="5" fill="#b71851"/>
+                </svg>
+                <span class="map-label label-us">北美客户</span>
+                <span class="map-label label-eu">欧洲渠道</span>
+                <span class="map-label label-au">澳洲客户</span>
+              </div>
+              <div class="map-actions">
+                <button type="button">搜索引擎</button>
+                <button type="button">公司官网</button>
+                <button type="button">公开邮箱</button>
+                <button type="button">LinkedIn 公开页</button>
+              </div>
+            </div>
+          </section>
+
+          <div class="side-stack">
+            <section class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <strong>AI 工作流</strong>
+                  <span>最近活动</span>
+                </div>
+                <span class="badge live">Live</span>
+              </div>
+              <div class="panel-body workflow-list">
+                <article class="workflow-item">
+                  <div class="flow-icon">AI</div>
+                  <div>
+                    <strong>已完成 · 新西兰 搜客</strong>
+                    <span>10/10 线索 · 100%</span>
+                    <div class="progress"><i style="width:100%"></i></div>
+                  </div>
+                </article>
+                <article class="workflow-item">
+                  <div class="flow-icon">AI</div>
+                  <div>
+                    <strong>已完成 · Australia 搜客</strong>
+                    <span>12/12 线索 · 100%</span>
+                    <div class="progress"><i style="width:100%"></i></div>
+                  </div>
+                </article>
+                <article class="workflow-item">
+                  <div class="flow-icon">AI</div>
+                  <div>
+                    <strong>已完成 · Australia 搜客</strong>
+                    <span>12/12 线索 · 100%</span>
+                    <div class="progress"><i style="width:100%"></i></div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <strong>任务队列</strong>
+                  <span>正在运行的任务</span>
+                </div>
+                <span class="badge queue">Queue</span>
+              </div>
+              <div class="panel-body task-list">
+                <article class="task-item">
+                  <span class="task-index">1</span>
+                  <strong>新西兰 · “chandelier” OR “lighting”</strong>
+                  <span>新西兰 · 分页 · 10/10 线索</span>
+                  <div class="progress"><i style="width:100%; background:#e0a22d"></i></div>
+                </article>
+                <article class="task-item">
+                  <span class="task-index">2</span>
+                  <strong>Australia · “table lamp” wholesale</strong>
+                  <span>Australia · 拉波湾 · 12/12 线索</span>
+                  <div class="progress"><i style="width:100%; background:#e0a22d"></i></div>
+                </article>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="bottom-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <strong>今日优先客户</strong>
+                <span>高价值客户排序</span>
+              </div>
+              <span class="badge queue">AI Ranked</span>
+            </div>
+            <div class="panel-body customer-list">
+              <article class="customer-row">
+                <div>
+                  <strong>Hunza Lighting</strong>
+                  <span>新西兰 · 景观照明 · 打开 3 次</span>
+                </div>
+                <div class="customer-meta"><span>评分 92</span><span>待跟进</span></div>
+              </article>
+              <article class="customer-row">
+                <div>
+                  <strong>Aurora Projects</strong>
+                  <span>Australia · 商业项目 · 需要报价</span>
+                </div>
+                <div class="customer-meta"><span>评分 88</span><span>报价中</span></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <strong>来源分析</strong>
+                <span>潜在客户来源 TOP5</span>
+              </div>
+            </div>
+            <div class="panel-body bar-list">
+              <div class="bar-row"><span>搜索引擎</span><div class="bar"><i style="width:76%"></i></div><strong>20</strong></div>
+              <div class="bar-row"><span>官网邮箱</span><div class="bar"><i style="width:58%"></i></div><strong>15</strong></div>
+              <div class="bar-row"><span>地图客户</span><div class="bar"><i style="width:44%"></i></div><strong>11</strong></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <strong>开发漏斗</strong>
+                <span>客户阶段</span>
+              </div>
+            </div>
+            <div class="panel-body funnel">
+              <div class="funnel-row"><span>搜索入库</span><div class="bar"><i style="width:68%"></i></div><strong>20</strong></div>
+              <div class="funnel-row"><span>首次触达</span><div class="bar"><i style="width:84%"></i></div><strong>29</strong></div>
+              <div class="funnel-row"><span>邮件打开</span><div class="bar"><i style="width:38%"></i></div><strong>11%</strong></div>
+              <div class="funnel-row"><span>已回复</span><div class="bar"><i style="width:18%"></i></div><strong>5%</strong></div>
+            </div>
+          </section>
+        </div>
+
+        <form class="command" id="commandForm">
+          <label for="jadenCommand">SSA</label>
+          <input id="jadenCommand" name="command" placeholder="告诉 Jaden 要搜索、写信、比较或等待审批..." autocomplete="off" />
+          <button class="btn primary" type="submit">Ask Jaden</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">已更新预览状态</div>
+
+  <script>
+    const toast = document.querySelector("#toast");
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    document.querySelectorAll(".nav button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".nav button").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        showToast(`已切换到 ${button.dataset.nav}`);
+      });
+    });
+
+    document.querySelectorAll("[data-action]").forEach((button) => {
+      button.addEventListener("click", () => showToast(button.dataset.action));
+    });
+
+    document.querySelector("#commandForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = document.querySelector("#jadenCommand");
+      const value = input.value.trim();
+      showToast(value ? `已提交：${value}` : "请输入要交给 Jaden 的任务");
+      if (value) input.value = "";
+    });
+  </script>
+</body>
+</html>

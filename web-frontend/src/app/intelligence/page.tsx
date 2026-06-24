@@ -209,14 +209,14 @@ export default function IntelligencePage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Intelligence Board"
-        zhTitle="情报面板"
+        title="Market Insights"
+        zhTitle="市场洞察"
         meta={`AI SUMMARY / MARKET SIGNALS / ${formatTime(updatedAt)}`}
         zhMeta={`AI 摘要 / 市场信号 / ${formatTime(updatedAt)}`}
         active="/intelligence"
       >
         <BattleBadge tone={loading ? "blue" : "purple"} pulse={loading}>
-          {loading ? <BattleText en="SCAN" zh="扫描" /> : <BattleText en="INTEL" zh="情报" />}
+          {loading ? <BattleText en="SCAN" zh="扫描" /> : <BattleText en="INSIGHTS" zh="洞察" />}
         </BattleBadge>
         <CommandButton variant="ghost" onClick={load} disabled={loading || refreshing}><BattleText en="Reload" zh="重载" /></CommandButton>
         <CommandButton variant="secondary" onClick={refreshExternalIntel} disabled={loading || refreshing}>
@@ -226,7 +226,7 @@ export default function IntelligencePage() {
 
       <BattlePageBody className="space-y-3">
         <div className="grid gap-3 md:grid-cols-4">
-          <StatCell label={language === "zh" ? "情报摘要" : "Insights"} value={insights.length} tone="purple" />
+          <StatCell label={language === "zh" ? "洞察摘要" : "Insights"} value={insights.length} tone="purple" />
           <StatCell label={language === "zh" ? "市场信号" : "News Signals"} value={news.length} tone="blue" />
           <StatCell label={language === "zh" ? "竞品动态" : "Competitor Events"} value={competitors.length} tone="amber" />
           <StatCell label={language === "zh" ? "风险提醒" : "Alerts"} value={alerts.length} tone="red" />
@@ -236,12 +236,12 @@ export default function IntelligencePage() {
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_420px]">
           <BattlePanel
-            title={language === "zh" ? "AI 情报摘要" : "AI Insights"}
+            title={language === "zh" ? "AI 洞察摘要" : "AI Insights"}
             meta={language === "zh" ? "市场影响摘要" : "market impact summaries"}
           >
             {insights.length === 0 ? (
               <EmptyState
-                label={language === "zh" ? (loading ? "正在读取情报摘要" : "尚无市场信号。连接数据源或重新加载。") : (loading ? "loading insight feed" : "No market signals yet. Connect sources or reload.")}
+                label={language === "zh" ? (loading ? "正在读取洞察摘要" : "尚无市场信号。连接数据源或重新加载。") : (loading ? "loading insight feed" : "No market signals yet. Connect sources or reload.")}
                 action={loading ? undefined : (language === "zh" ? "前往设置连接数据源" : "Connect sources in Settings")}
                 actionHref={loading ? undefined : "/settings"}
               />
@@ -296,7 +296,7 @@ export default function IntelligencePage() {
             {news.length === 0 ? (
               <EmptyState
                 label={language === "zh" ? (loading ? "正在读取市场新闻" : "暂无市场新闻。连接搜索或重新加载缓存。") : (loading ? "loading news feed" : "No market news yet. Connect research sources or reload cached news.")}
-                action={loading ? undefined : (language === "zh" ? "刷新情报" : "Refresh intelligence")}
+                action={loading ? undefined : (language === "zh" ? "刷新洞察" : "Refresh insights")}
                 actionHref={loading ? undefined : "/intelligence"}
               />
             ) : (

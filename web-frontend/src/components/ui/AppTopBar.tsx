@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { cx } from "@/components/battle-station/theme";
 import { useTheme } from "./ThemeProvider";
-import { APP_NAV_ITEMS, type AppNavItem } from "./app-nav";
+import { APP_NAV_ITEMS, APP_PAGE_LABELS, type AppNavItem } from "./app-nav";
 import { useOpsStatus } from "./OpsStatusProvider";
 export { APP_NAV_ITEMS };
 
@@ -32,11 +32,11 @@ export default function AppTopBar({
   const [mobilePreferencesOpen, setMobilePreferencesOpen] = useState(false);
   const { theme, language, toggleTheme, setLanguage } = useTheme();
   const opsStatus = useOpsStatus();
-  const activeItem = navItems.find((item) => item.href === active) ?? navItems[0];
+  const activeItem = APP_PAGE_LABELS.find((item) => item.href === active)
+    ?? navItems.find((item) => item.href === active)
+    ?? navItems[0];
   const activeLabel = activeItem
-    ? activeItem?.href === "/agent-status"
-      ? language === "zh" ? opsStatus.zhNavLabel : opsStatus.navLabel
-      : language === "zh" ? activeItem.zhLabel ?? activeItem.label : activeItem.label
+    ? language === "zh" ? activeItem.zhLabel ?? activeItem.label : activeItem.label
     : language === "zh" ? "当前页面" : "Current";
   const modulesLabel = language === "zh" ? "模块" : "Modules";
   const preferencesLabel = language === "zh" ? "偏好" : "Preferences";
@@ -75,9 +75,7 @@ export default function AppTopBar({
         <nav className="mx-auto hidden min-w-0 max-w-full items-center gap-1 overflow-x-auto lg:flex">
           {navItems.map((item) => {
             const isOps = item.href === "/agent-status";
-            const label = isOps
-              ? language === "zh" ? opsStatus.zhNavLabel : opsStatus.navLabel
-              : language === "zh" ? item.zhLabel ?? item.label : item.label;
+            const label = language === "zh" ? item.zhLabel ?? item.label : item.label;
             return (
             <Link
               key={item.href}
@@ -220,9 +218,7 @@ export default function AppTopBar({
           >
             {navItems.map((item) => {
               const isOps = item.href === "/agent-status";
-              const label = isOps
-                ? language === "zh" ? opsStatus.zhNavLabel : opsStatus.navLabel
-                : language === "zh" ? item.zhLabel ?? item.label : item.label;
+              const label = language === "zh" ? item.zhLabel ?? item.label : item.label;
               return (
                 <Link
                   key={item.href}

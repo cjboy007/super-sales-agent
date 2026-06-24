@@ -90,7 +90,8 @@ describe("sales tool registry enforcement", () => {
       idempotencyKey: "farreach:runtime-email-request",
     });
     expect(decision.tool?.idempotencyStrategy).toContain("workspaceId");
-    expect(decision.tool?.failureRetryBehavior).toContain("side-effect decision");
+    expect(decision.tool?.failureRetryBehavior).toContain("Retry");
+    expect(decision.tool?.failureRetryBehavior).toContain("confirmation");
   });
 
   it("prevents execution records for legacy decisions that were not registry-enforced", () => {

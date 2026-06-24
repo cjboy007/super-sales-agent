@@ -32,6 +32,7 @@ import {
 } from "@/lib/inbox-i18n";
 import { useProject } from "@/lib/project";
 import type { InboundEmail, InboxStats, ReplyOption } from "@/types/inbox";
+import PageCommandPanel from "@/components/ui/PageCommandPanel";
 
 interface FullEmail {
   subject: string;
@@ -209,9 +210,9 @@ function ReplyDraftLightbox({
                   <BattleText en="Submit send request" zh="提交发送申请" />
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
-                  <BattleText
-                    en={`This will queue the draft for ${email.from_email}. Real delivery requires an approved server-side decision.`}
-                    zh={`将把这封草稿提交给 ${email.from_email}。真实外发必须有服务端审批记录。`}
+                <BattleText
+                    en={`This will queue the draft for ${email.from_email}. Real delivery requires a confirmed review record.`}
+                    zh={`将把这封草稿提交给 ${email.from_email}。真实外发必须有已确认的复核记录。`}
                   />
                 </p>
               </div>
@@ -302,6 +303,29 @@ export default function InboxPage() {
   }, [modalOptionId, selected]);
   const modalDraft = modalOption ? draftsByOptionId[modalOption.id] || null : null;
   const metricValue = (value: string | number) => accessIssue !== "none" ? "--" : value;
+  const commandContext = useMemo(() => ({
+    selectedEmail: selected ? {
+      id: selected.id,
+      fromName: selected.from_name,
+      fromEmail: selected.from_email,
+      subject: selected.subject,
+      status: selected.status,
+      receivedAt: selected.received_at,
+      analysis: selected.analysis,
+      replyOptions: (selected.options || []).map((option) => ({
+        id: option.id,
+        style: option.style,
+        title: localizedReplyTitle(option, "en"),
+        metrics: option.key_metrics,
+      })),
+    } : null,
+    inboxStats: stats,
+    selectedOptionId,
+    accessIssue,
+  }), [accessIssue, selected, selectedOptionId, stats]);
+  const commandSummary = selected
+    ? `${selected.from_name} / ${selected.subject} / ${selected.status} / ${(selected.options || []).length} reply option(s)`
+    : "No selected inbox email.";
 
   useEffect(() => {
     setSelectedOptionId(selected?.options?.[0]?.id || null);
@@ -376,7 +400,7 @@ export default function InboxPage() {
       setSendResult({
         tone: json.blocked ? "amber" : "emerald",
         message: json.blocked
-          ? language === "zh" ? "已提交待审批" : "submitted for approval"
+          ? language === "zh" ? "已提交待确认" : "submitted for review"
           : language === "zh" ? "已发送" : "sent",
       });
     } catch (err) {
@@ -392,10 +416,10 @@ export default function InboxPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Inbox Triage"
-        zhTitle="收件箱分诊"
-        meta="AI ASSISTED / HUMAN DECISION REQUIRED / CUSTOMER SENDS LOCKED"
-        zhMeta="AI 辅助 / 需要人工决策 / 客户发送已锁定"
+        title="Email Review"
+        zhTitle="邮件复核"
+        meta="AI ASSISTED / HUMAN CONFIRMATION REQUIRED / CUSTOMER SENDS LOCKED"
+        zhMeta="AI 辅助 / 需要确认 / 客户发送已锁定"
         active="/inbox"
       >
         <BattleBadge tone={loading ? "blue" : "amber"} pulse={loading}>
@@ -413,7 +437,7 @@ export default function InboxPage() {
         </div>
 
         <div className="grid min-h-[calc(100vh-190px)] gap-3 lg:grid-cols-[420px_minmax(0,1fr)]">
-          <BattlePanel title={language === "zh" ? "待处理邮件" : "Email Review List"} meta={language === "zh" ? "需要操作员决策的客户邮件" : "customer emails that need operator decision"}>
+          <BattlePanel title={language === "zh" ? "待处理邮件" : "Email Review List"} meta={language === "zh" ? "需要你判断的客户邮件" : "customer emails that need your decision"}>
             {accessIssue !== "none" ? (
               <EmptyState label={language === "zh" ? "解锁访问后可查看" : "unlock access to view emails"} />
             ) : error ? (
@@ -547,6 +571,22 @@ export default function InboxPage() {
             )}
           </BattlePanel>
         </div>
+        <PageCommandPanel
+          page="inbox"
+          surface="inbox"
+          mode="reply_draft"
+          target={selected
+            ? {
+              type: "email",
+              id: selected.id,
+              label: selected.subject,
+            }
+            : { type: "none" }}
+          summary={commandSummary}
+          context={commandContext}
+          placeholder="Ask Jaden to inspect the selected email, compare reply options, or prepare a send-review request"
+          zhPlaceholder="让 Jaden 检查当前邮件、对比回复方案，或准备发送复核请求"
+        />
       </BattlePageBody>
       <ReplyDraftLightbox
         language={language}

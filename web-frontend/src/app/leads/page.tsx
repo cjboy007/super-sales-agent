@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useProject } from "@/lib/project";
 import {
   BattleBadge,
@@ -323,7 +324,7 @@ function EmptyDetail({ label }: { label: string }) {
   return <p className="rounded-md border border-slate-800 bg-slate-950/70 px-3 py-3 text-xs leading-5 text-slate-500">{label}</p>;
 }
 
-function AccessPrompt({ issue, language }: { issue: CustomerAccessIssue; language: "en" | "zh" }) {
+function AccessPrompt({ issue, language, nextHref = ACCESS_PROMPT_HREF }: { issue: CustomerAccessIssue; language: "en" | "zh"; nextHref?: string }) {
   const denied = issue === "workspace_denied";
   return (
     <div className="px-4 py-10">
@@ -333,8 +334,8 @@ function AccessPrompt({ issue, language }: { issue: CustomerAccessIssue; languag
         </BattleBadge>
         <p className="mt-4 text-sm font-semibold text-amber-50">
           {denied
-            ? (language === "zh" ? "当前访问口令没有这个客户工作区的权限。" : "Your current access pass cannot open this customer workspace.")
-            : (language === "zh" ? "请先保存内测访问口令，再查看客户、订单和时间线。" : "Save your beta access pass before viewing customers, orders, and timelines.")}
+            ? (language === "zh" ? "当前会员激活码没有这个客户工作区的权限。" : "Your current Activation Code cannot open this customer workspace.")
+            : (language === "zh" ? "请先保存会员激活码，再查看客户、订单和时间线。" : "Save your Activation Code before viewing customers, orders, and timelines.")}
         </p>
         <p className="mt-2 text-xs leading-5 text-amber-100/80">
           {language === "zh"
@@ -343,7 +344,7 @@ function AccessPrompt({ issue, language }: { issue: CustomerAccessIssue; languag
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
           <Link
-            href={ACCESS_PROMPT_HREF}
+            href={nextHref}
             className="inline-flex h-9 items-center justify-center rounded-md border border-amber-300/40 bg-amber-300 px-4 text-xs font-semibold text-slate-950 transition hover:bg-amber-200"
           >
             {language === "zh" ? "打开内测访问" : "Open Beta Access"}
@@ -605,9 +606,11 @@ function CustomerDetail({
   );
 }
 
-export default function CustomersPage() {
+function CustomerWorkspacePage() {
   const { apiFetch, project, projectId } = useProject();
   const language = useBattleLanguage();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [directory, setDirectory] = useState<CustomerDirectory | null>(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<CustomerStatus | "All">("All");
@@ -625,6 +628,9 @@ export default function CustomersPage() {
   const stats = directory?.stats || { total: 0, prospect: 0, active: 0, dormant: 0, risk: 0, archived: 0, countries: 0 };
   const totalPages = directory?.totalPages || 1;
   const metricValue = (value: string | number) => accessIssue !== "none" ? "--" : value;
+  const isRecordsMode = pathname === "/customers" || searchParams.get("view") === "records";
+  const activeHref = isRecordsMode ? "/customers" : "/leads";
+  const accessPromptHref = `/beta-access?next=${encodeURIComponent(activeHref)}`;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -769,7 +775,7 @@ export default function CustomersPage() {
     error,
   };
   const commandSummary = [
-    language === "zh" ? "客户列表" : "Customers",
+    language === "zh" ? (isRecordsMode ? "客户档案" : "客户跟进") : (isRecordsMode ? "Customer Records" : "Customer Follow-up"),
     `${language === "zh" ? "筛选" : "Filter"} ${status} / ${country}`,
     `${language === "zh" ? "当前显示" : "Visible"} ${customers.length}`,
     `${language === "zh" ? "活跃客户" : "Active"} ${stats.active}`,
@@ -779,11 +785,11 @@ export default function CustomersPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Customers"
-        zhTitle="客户"
-        meta={`${project.name.toUpperCase()} / CUSTOMER LIST / PAGE ${page}`}
-        zhMeta={`${project.name.toUpperCase()} / 客户列表 / 第 ${page} 页`}
-        active="/leads"
+        title={isRecordsMode ? "Customer Records" : "Customer Follow-up"}
+        zhTitle={isRecordsMode ? "客户档案" : "客户跟进"}
+        meta={`${project.name.toUpperCase()} / ${isRecordsMode ? "CUSTOMER RECORDS" : "FOLLOW-UP"} / PAGE ${page}`}
+        zhMeta={`${project.name.toUpperCase()} / ${isRecordsMode ? "客户档案" : "客户跟进"} / 第 ${page} 页`}
+        active={activeHref}
       >
         <BattleBadge tone={loading ? "blue" : "emerald"} pulse={loading}>
           {loading ? <BattleText en="SYNC" zh="同步" /> : <BattleText en="LIVE" zh="实时" />}
@@ -800,7 +806,7 @@ export default function CustomersPage() {
         </div>
 
         <BattlePanel
-          title={language === "zh" ? "客户列表 / 客户详情" : "Customer List / Customer Detail"}
+          title={language === "zh" ? (isRecordsMode ? "客户档案 / 历史记录" : "客户跟进 / 客户详情") : (isRecordsMode ? "Customer Records / History" : "Follow-up List / Customer Detail")}
           meta={language === "zh" ? `${customers.length} 个可见客户 / 每页 ${PAGE_SIZE} 个` : `${customers.length} visible customers / ${PAGE_SIZE} per page`}
         >
           <div className="border-b border-slate-800 bg-slate-950/30 p-3">
@@ -842,7 +848,7 @@ export default function CustomersPage() {
           </div>
 
           {accessIssue !== "none" ? (
-            <AccessPrompt issue={accessIssue} language={language} />
+            <AccessPrompt issue={accessIssue} language={language} nextHref={accessPromptHref} />
           ) : error ? (
             <EmptyState label={error} />
           ) : customers.length === 0 ? (
@@ -942,13 +948,26 @@ export default function CustomersPage() {
         </div>
 
         <PageCommandPanel
-          page="customers"
+          page={isRecordsMode ? "customer-records" : "customer-follow-up"}
+          surface={isRecordsMode ? "customers" : "leads"}
+          mode="page_assist"
+          target={selectedCustomer
+            ? {
+              type: "customer",
+              id: selectedCustomer.id,
+              label: selectedCustomer.companyName,
+            }
+            : { type: "none" }}
           summary={commandSummary}
           context={commandContext}
-          placeholder="Ask Jaden to summarize a customer, prepare follow-up priorities, or compare recent orders"
-          zhPlaceholder="让 Jaden 总结客户、准备跟进优先级，或对比最近订单"
+          placeholder={isRecordsMode ? "Ask Jaden to summarize customer history, evidence, orders, or recent changes" : "Ask Jaden to summarize a customer, prepare follow-up priorities, or compare recent orders"}
+          zhPlaceholder={isRecordsMode ? "让 Jaden 总结客户历史、证据、订单或最近变化" : "让 Jaden 总结客户、准备跟进优先级，或对比最近订单"}
         />
       </BattlePageBody>
     </BattlePageShell>
   );
+}
+
+export default function CustomersPage() {
+  return <CustomerWorkspacePage />;
 }
