@@ -9,6 +9,9 @@ interface OperatorCommandBody {
   message?: string;
   context?: Record<string, unknown>;
   url?: string;
+  surface?: string;
+  mode?: string;
+  target?: Record<string, unknown>;
 }
 
 function titleForWorkflow(workflow: unknown): string {
@@ -46,12 +49,15 @@ export async function POST(request: NextRequest) {
   const workspaceId = auth.workspaceId;
 
   try {
-    const record = runtime.createOperatorCommand({
+    const record = await runtime.createStructuredOperatorCommand({
       workspaceId,
       page: body.page,
       message: body.message,
       context: body.context,
       url: body.url,
+      surface: body.surface,
+      mode: body.mode,
+      target: body.target,
     });
 
     return NextResponse.json({
@@ -60,6 +66,21 @@ export async function POST(request: NextRequest) {
         status: record.status,
         sideEffects: record.sideEffects,
         queuedTasks: record.jobIds?.length || (record.jobId ? 1 : 0),
+        commandThreadId: record.commandThreadId,
+        envelope: record.envelope ? {
+          surface: record.envelope.surface,
+          mode: record.envelope.mode,
+          target: record.envelope.target,
+        } : null,
+        validatedPlan: record.validatedPlan ? {
+          source: record.validatedPlan.source,
+          intent: record.validatedPlan.intent,
+          confidence: record.validatedPlan.confidence,
+          workflows: record.validatedPlan.validation.acceptedWorkflows,
+          rejectedWorkflows: record.validatedPlan.validation.rejectedWorkflows,
+          needsHumanReview: record.validatedPlan.needsHumanReview,
+          warnings: record.validatedPlan.validation.warnings,
+        } : null,
         plan: publicPlan(record.plan),
       },
     });

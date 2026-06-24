@@ -624,7 +624,7 @@ function costPriceMarginRefs(priceReferences: PriceReferenceWithRecord[], lines:
     });
   if (refs.length > 0) return refs;
   if (priceReferences.length === 0) return ["No matching local price memory or historical quotation reference found."];
-  return priceReferences.map((item) => `${item.reference.source}: local price reference requires human review.`);
+  return priceReferences.map((item) => `${item.reference.source}: local price reference requires review.`);
 }
 
 function assumptionsFor(
@@ -657,7 +657,7 @@ function humanEditsFor(missingInfo: string[], insufficient: boolean): string[] {
     return [
       "Add reliable prospect evidence before preparing any quote.",
       "Confirm inquiry product, quantity, specifications, destination, and buyer role.",
-      "Keep the result internal until a human reviews the prospecting packet.",
+      "Keep the result internal until the prospecting packet is reviewed.",
     ];
   }
   return unique([

@@ -170,10 +170,10 @@ export default function QuotationsPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Quotation Control"
-        zhTitle="报价控制台"
-        meta="QUOTE FILES / STATUS REVIEW / FILES ONLY"
-        zhMeta="报价文件 / 状态复核 / 只生成文件"
+        title="Quote Center"
+        zhTitle="报价中心"
+        meta="Quote files / status review / customer records"
+        zhMeta="报价文件 / 状态复核 / 客户记录"
         active="/quotations"
       >
         <BattleBadge tone={loading ? "blue" : "emerald"} pulse={loading}>

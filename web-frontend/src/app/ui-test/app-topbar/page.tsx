@@ -1,13 +1,13 @@
 import Link from "next/link";
 
 const navItems = [
-  { label: "Cockpit", href: "/" },
-  { label: "Leads", href: "/leads" },
-  { label: "Inbox", href: "/inbox" },
-  { label: "Emails", href: "/emails" },
-  { label: "Quotes", href: "/quotations" },
-  { label: "Ship Docs", href: "/documents" },
-  { label: "Intel", href: "/intelligence" },
+  { label: "Workbench", href: "/" },
+  { label: "Pending Review", href: "/reviews" },
+  { label: "Customer Follow-up", href: "/leads" },
+  { label: "Email Drafts", href: "/emails" },
+  { label: "Quote Center", href: "/quotations" },
+  { label: "Customer Records", href: "/customers" },
+  { label: "Task Progress", href: "/agent-status" },
   { label: "Settings", href: "/settings" },
 ];
 
@@ -78,7 +78,7 @@ export default function AppTopBarApprovalPage() {
             </Link>
             <div className="min-w-0">
               <h1 className="truncate text-xs font-semibold uppercase tracking-[0.18em] text-slate-100">Leads Radar</h1>
-              <p className="truncate font-mono text-[10px] text-slate-400">JadenOS / OpenClaw for salespeople</p>
+              <p className="truncate font-mono text-[10px] text-slate-400">SSA workspace for sales teams</p>
             </div>
           </div>
 
@@ -88,7 +88,7 @@ export default function AppTopBarApprovalPage() {
                 key={item.href}
                 href={item.href}
                 className={`rounded border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase transition ${
-                  item.label === "Leads"
+                  item.label === "Customer Follow-up"
                     ? "border-emerald-400/50 bg-emerald-400/15 text-emerald-100"
                     : "border-slate-600 bg-slate-900/45 text-slate-300 hover:border-slate-500 hover:text-white"
                 }`}
@@ -112,7 +112,7 @@ export default function AppTopBarApprovalPage() {
               key={item.href}
               href={item.href}
               className={`shrink-0 rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase ${
-                item.label === "Leads"
+                item.label === "Customer Follow-up"
                   ? "border-emerald-400/50 bg-emerald-400/15 text-emerald-100"
                   : "border-slate-600 bg-slate-900/45 text-slate-300"
               }`}
@@ -125,7 +125,7 @@ export default function AppTopBarApprovalPage() {
 
       <main className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="mb-3 rounded-md border border-sky-400/40 bg-sky-400/10 px-3 py-2 text-xs text-sky-100">
-          Approval sandbox: shared top bar, fixed center nav, brighter slate surfaces, stronger borders, lighter primary text.
+          Review sandbox: shared top bar, fixed center nav, brighter slate surfaces, stronger borders, lighter primary text.
         </div>
 
         <div className="grid gap-3 md:grid-cols-4">
@@ -177,21 +177,21 @@ export default function AppTopBarApprovalPage() {
           </Panel>
 
           <div className="space-y-3">
-            <Panel title="Ask OpenClaw About This Page" meta="uses current filters and visible records">
+            <Panel title="Ask Jaden About This Page" meta="uses current filters and visible records">
               <div className="space-y-3 p-3">
                 <div className="rounded-md border border-slate-600 bg-slate-900 px-3 py-2">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-300">What OpenClaw can see</p>
+                  <p className="text-[10px] uppercase tracking-wide text-slate-300">What Jaden can see</p>
                   <p className="mt-1 text-[10px] text-slate-300">
                     Lead List / High Priority / 4 visible / 24 hot / no search
                   </p>
                 </div>
                 <div className="min-h-24 rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-xs text-slate-300">
-                  Prioritize the hot leads and prepare a first outreach angle for the operator.
+                  Prioritize the hot leads and prepare a first outreach angle for review.
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-slate-400">Nothing is sent to customers</span>
                   <button className="h-7 rounded-md border border-emerald-400 bg-emerald-500 px-3 text-xs font-semibold text-slate-950">
-                    Ask OpenClaw
+                    Ask Jaden
                   </button>
                 </div>
               </div>

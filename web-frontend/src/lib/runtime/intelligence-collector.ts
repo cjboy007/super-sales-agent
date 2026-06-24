@@ -220,7 +220,7 @@ async function defaultFetcher(url: string, init?: RequestInit): Promise<string> 
       "user-agent",
       url.includes("news.google.com")
         ? "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124 Safari/537.36"
-        : "JadenOS-SSA-Intelligence/1.0"
+        : "SSA-Intelligence/1.0"
     );
   }
   const response = await fetch(url, { ...init, headers, cache: "no-store" });
@@ -733,7 +733,7 @@ function buildAlerts(copper: Awaited<ReturnType<typeof fetchCopper>> | null, exc
       message: `${failed.length} 个固定新闻源暂不可用：${failed.slice(0, 5).map((status) => status.source).join(", ")}。`,
       change: `-${failed.length} sources`,
       time: now.toISOString(),
-      source: "JadenOS intelligence collector",
+      source: "SSA intelligence collector",
     });
   }
   return { updatedAt: now.toISOString(), alerts };
@@ -770,7 +770,7 @@ function buildTrends(copper: Awaited<ReturnType<typeof fetchCopper>> | null, exc
     months: [now.toISOString().slice(0, 10)],
     values: [statuses.filter((status) => status.ok).length],
     unit: "sources_ok",
-    source: "JadenOS intelligence collector",
+    source: "SSA intelligence collector",
   });
   return { updatedAt: now.toISOString(), trends };
 }

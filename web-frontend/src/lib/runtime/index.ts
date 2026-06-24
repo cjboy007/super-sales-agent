@@ -38,6 +38,8 @@ export * from "./workflow";
 export * from "./workspace-cleanup";
 export * from "./worker-health";
 export * from "./jaden-planner";
+export * from "./jaden-command";
+export * from "./jaden-surface-routing";
 export * from "./jaden-worker";
 export * from "./operator-commands";
 export * from "./okki-webhook";

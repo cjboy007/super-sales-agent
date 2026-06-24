@@ -240,7 +240,7 @@ function gitCommitCustomerPackage(customerDir: string, piNo: string): QuickQuote
   const git = (args: string[]) => execFileSync("git", ["-C", customerDir, ...args], { encoding: "utf-8" }).trim();
   if (!fs.existsSync(path.join(customerDir, ".git"))) {
     execFileSync("git", ["init", customerDir], { encoding: "utf-8" });
-    git(["config", "user.name", "JadenOS"]);
+    git(["config", "user.name", "SSA"]);
     git(["config", "user.email", "jadenos@local"]);
   }
   git(["add", "."]);

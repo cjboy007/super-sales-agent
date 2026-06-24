@@ -292,18 +292,18 @@ function contentSummaryFor(actionType: OutboundApprovalActionType, draft: Person
     return `Review-only request for ${customer}: insufficient evidence / missing inquiry information; do not execute outbound.`;
   }
   if (actionType === "email_send") {
-    return `Request approval to send a customer-facing draft email to ${customer} using Phase 9 product fit and quotation context.`;
+    return `Submit a customer-facing draft email to ${customer} for confirmation using product fit and quotation context.`;
   }
   if (actionType === "crm_write") {
-    return `Request approval to write local draft prospecting and quotation context for ${customer} into CRM.`;
+    return `Submit local draft prospecting and quotation context for ${customer} before writing it into CRM.`;
   }
   if (actionType === "price_adjustment") {
-    return `Request approval to review price adjustment context for ${customer}; no discount is applied by this request.`;
+    return `Submit price adjustment context for ${customer}; no discount is applied by this request.`;
   }
   if (actionType === "pi_generate") {
-    return `Request approval to prepare PI generation for ${customer}; no PI or document is generated in Phase 10.`;
+    return `Submit PI generation context for ${customer}; no PI or document is generated in this step.`;
   }
-  return `Request approval to prepare quotation generation for ${customer}; no formal quote or document is generated in Phase 10.`;
+  return `Submit quotation generation context for ${customer}; no formal quote or document is generated in this step.`;
 }
 
 function productQuotationSummaryFor(draft: PersonalizedSalesDraft): string {
@@ -317,28 +317,28 @@ function productQuotationSummaryFor(draft: PersonalizedSalesDraft): string {
       return `${line.product}: ${price} / ${cost} / ${margin}`;
     })
     .join("; ");
-  return lineSummary || products || "Product and quotation details need human completion before any outbound action.";
+  return lineSummary || products || "Product and quotation details need completion before any outbound action.";
 }
 
 function expectedActionFor(actionType: OutboundApprovalActionType, customer: string): string {
-  if (actionType === "email_send") return `Request approval to send draft email to ${customer}; not executed.`;
-  if (actionType === "crm_write") return `Request approval to write CRM note for ${customer}; CRM not written.`;
-  if (actionType === "price_adjustment") return `Request approval to review price adjustment for ${customer}; no price changed.`;
-  if (actionType === "pi_generate") return `Request approval to generate PI for ${customer}; no PI generated.`;
-  return `Request approval to generate quotation for ${customer}; no formal quote generated.`;
+  if (actionType === "email_send") return `Submit draft email to ${customer} for confirmation; not executed.`;
+  if (actionType === "crm_write") return `Submit CRM note for ${customer} for confirmation; CRM not written.`;
+  if (actionType === "price_adjustment") return `Submit price adjustment for ${customer} for confirmation; no price changed.`;
+  if (actionType === "pi_generate") return `Submit PI generation for ${customer} for confirmation; no PI generated.`;
+  return `Submit quotation generation for ${customer} for confirmation; no formal quote generated.`;
 }
 
 function failureRetryStrategyFor(actionType: OutboundApprovalActionType): string {
   if (actionType === "email_send") {
-    return "Retry through side-effect decision retry only after operator review, address verification, and explicit email enablement.";
+    return "Retry only after review, address verification, and explicit email enablement.";
   }
   if (actionType === "crm_write") {
-    return "Retry through side-effect decision retry only after operator review and CRM adapter readiness confirmation.";
+    return "Retry only after review and CRM adapter readiness confirmation.";
   }
   if (actionType === "price_adjustment") {
-    return "Retry through side-effect decision retry only after operator confirms margin, authorization, and price policy.";
+    return "Retry only after margin, authorization, and price policy are confirmed.";
   }
-  return "Retry through side-effect decision retry only after operator review; document generation remains disabled until explicit enablement.";
+  return "Retry only after review; document generation remains disabled until explicit enablement.";
 }
 
 function makeRunIdempotencyKey(workspaceId: WorkspaceId, input: OutboundApprovalInput): string {

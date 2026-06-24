@@ -139,8 +139,8 @@ const STYLE_OUTLINES: Record<ReplyStyle, { en: string[]; zh: string[] }> = {
     zh: ["先确认客户诉求和关键限制。", "强调质量、认证和交付可靠性。", "给出可控让步，避免过度承诺。", "明确请客户确认下一步。"],
   },
   aggressive: {
-    en: ["Respond quickly and directly.", "Use stronger price, timing, or priority terms.", "Create a clear decision window.", "Keep approval gates on risky promises."],
-    zh: ["快速直接回应客户。", "用更强的价格、交期或优先排产条件推进。", "设置明确决策窗口。", "高风险承诺必须保留审批闸门。"],
+    en: ["Respond quickly and directly.", "Use stronger price, timing, or priority terms.", "Create a clear decision window.", "Keep confirmation checks on risky promises."],
+    zh: ["快速直接回应客户。", "用更强的价格、交期或优先排产条件推进。", "设置明确决策窗口。", "高风险承诺必须保留确认流程。"],
   },
   creative: {
     en: ["Reframe the deal away from simple price matching.", "Offer staged delivery, samples, or value-adds.", "Build trust through transparency.", "Position Farreach as a long-term partner."],

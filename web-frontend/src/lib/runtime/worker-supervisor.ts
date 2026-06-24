@@ -495,15 +495,15 @@ export function publicWorkerRecoverySummary(summary: WorkerSupervisorSummary): P
     reviewed: summary.reviewed > 0,
     capabilities: summary.capabilities,
     summary: summary.status === "ready"
-      ? "Worker recovery is prepared with restart and health controls."
+      ? "Task recovery is prepared with restart and health controls."
       : summary.status === "needs_review"
-        ? "Worker recovery setup exists but needs operator review before beta."
-        : "Worker recovery setup has not been prepared yet.",
+        ? "Task recovery setup exists but needs review before beta."
+        : "Task recovery setup has not been prepared yet.",
     nextStep: summary.status === "ready"
       ? "Keep the recovery setup installed and verify it after deployment changes."
       : summary.status === "needs_review"
         ? "Review the prepared recovery setup, then regenerate it if controls are missing."
-        : "Prepare worker recovery from Operations before inviting external testers.",
+        : "Prepare task recovery from Task Progress before inviting external testers.",
     availableActions,
     recentRequests: listWorkerControlRequests().map((request) => ({
       actionLabel: request.actionLabel,

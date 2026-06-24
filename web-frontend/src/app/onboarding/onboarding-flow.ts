@@ -3,15 +3,20 @@ import type { AppSettings } from "@/lib/config-store";
 export type ConfigState = AppSettings;
 
 export type OnboardingStepId =
+  | "start"
+  | "customers"
+  | "email"
   | "token"
   | "access"
   | "model"
+  | "search"
   | "storage"
   | "upload"
   | "synthesize"
   | "finish";
 
 export type StepStatus = "done" | "missing" | "optional";
+export type OnboardingStepGroup = "quickstart" | "recommended" | "advanced" | "finish";
 
 export interface JadenosOnboardingStep {
   id: OnboardingStepId;
@@ -22,13 +27,15 @@ export interface JadenosOnboardingStep {
   zhPrompt: string;
   status: StepStatus;
   core: boolean;
+  group: OnboardingStepGroup;
 }
 
 export interface ReadinessItem {
-  id: "token" | "access" | "model" | "storage" | "upload" | "synthesize";
+  id: "token" | "access" | "model" | "email" | "search" | "storage" | "upload" | "synthesize";
   label: string;
   zhLabel: string;
   done: boolean;
+  blocking: boolean;
 }
 
 export const JADENOS_ONBOARDING_ROUTE = "/jadenos/onboarding";
@@ -99,6 +106,15 @@ export function hasRealModelConfig(config: ConfigState) {
     || isConfiguredSecret(config.openrouterApiKey);
 }
 
+export function hasEmailConfig(config: ConfigState) {
+  return hasValue(config.email) && (hasValue(config.imapHost) || hasValue(config.smtpHost));
+}
+
+export function hasSearchConfig(config: ConfigState) {
+  if (config.searchEngine === "tavily") return isConfiguredSecret(config.tavilyApiKey);
+  return hasValue(config.searchEngine);
+}
+
 export function getReadinessItems(
   config: ConfigState,
   runtime: OnboardingRuntimeState = {}
@@ -106,39 +122,59 @@ export function getReadinessItems(
   return [
     {
       id: "token",
-      label: "Access pass",
-      zhLabel: "访问口令",
+      label: "Activation code",
+      zhLabel: "会员激活码",
       done: Boolean(runtime.tokenPresent),
+      blocking: false,
     },
     {
       id: "access",
       label: "Access mode",
       zhLabel: "访问模式",
       done: config.gatewayAccessMode === "local" || config.gatewayAccessMode === "lan",
+      blocking: false,
     },
     {
       id: "model",
       label: "Real model",
       zhLabel: "真实模型",
       done: hasRealModelConfig(config),
+      blocking: false,
+    },
+    {
+      id: "email",
+      label: "Mailbox",
+      zhLabel: "邮箱",
+      done: hasEmailConfig(config),
+      blocking: false,
+    },
+    {
+      id: "search",
+      label: "Search / verify",
+      zhLabel: "搜索/验证",
+      done: hasSearchConfig(config),
+      blocking: false,
     },
     {
       id: "storage",
       label: "Local folder",
       zhLabel: "本地目录",
       done: Boolean(runtime.storageKnown),
+      blocking: false,
     },
     {
       id: "upload",
       label: "Test file",
       zhLabel: "测试文件",
       done: Boolean(runtime.testUploadCompleted),
+      blocking: false,
     },
     {
       id: "synthesize",
       label: "Synthesis",
       zhLabel: "文件归纳",
       done: Boolean(runtime.synthesisTestCompleted),
+      blocking: false,
     },
   ];
 }
@@ -150,12 +186,13 @@ export function getOnboardingReadiness(
   const items = getReadinessItems(config, runtime);
   const completed = items.filter((item) => item.done).length;
   const total = items.length;
-  const blockingItems = items.filter((item) => item.id !== "model");
+  const blockingItems = items.filter((item) => item.blocking);
   return {
     items,
     completed,
     total,
     allReady: blockingItems.every((item) => item.done),
+    canEnterProduct: true,
   };
 }
 
@@ -167,17 +204,76 @@ export function getJadenosOnboardingSteps(
   const statusFor = (id: ReadinessItem["id"]) => (
     readiness.items.find((item) => item.id === id)?.done ? "done" : "missing"
   );
+  const optionalStatusFor = (id: ReadinessItem["id"]) => (
+    readiness.items.find((item) => item.id === id)?.done ? "done" : "optional"
+  );
 
   return [
     {
+      id: "start",
+      title: "Quick start",
+      zhTitle: "快速开始",
+      command: "Open product",
+      prompt: "You can enter SSA now. Start from Customer Follow-up, existing demo data, or the workbench, then return here when you want to tune setup.",
+      zhPrompt: "现在就可以进入 SSA。先从客户跟进、已有演示数据或工作台开始；需要调设置时再回到这里。",
+      status: "done",
+      core: false,
+      group: "quickstart",
+    },
+    {
+      id: "customers",
+      title: "Open follow-up, demo data, or import paths",
+      zhTitle: "查看客户跟进、演示数据或导入入口",
+      command: "Follow-up / Demo data / Import",
+      prompt: "Open Customer Follow-up to inspect existing accounts. If the workspace is empty, load demo data, import files through Data Import, or connect a mailbox later.",
+      zhPrompt: "打开客户跟进查看已有客户。如果工作区为空，可以加载演示数据，也可以通过资料导入添加文件，或稍后连接邮箱。",
+      status: "done",
+      core: false,
+      group: "quickstart",
+    },
+    {
+      id: "model",
+      title: "Connect a real model",
+      zhTitle: "连接真实模型",
+      command: "Configure model",
+      prompt: "Recommended for serious work. Demo mode is enough to explore the product first, so this is not a gate to entering SSA.",
+      zhPrompt: "正式使用前建议连接真实模型。先体验产品时可以使用演示模式，因此这不是进入 SSA 的门槛。",
+      status: optionalStatusFor("model"),
+      core: false,
+      group: "recommended",
+    },
+    {
+      id: "email",
+      title: "Connect mailbox or import customers",
+      zhTitle: "连接邮箱或导入客户",
+      command: "Mailbox / Import customers",
+      prompt: "Connect mailbox when you are ready for real inbound work. You can also keep using existing customers and import lists later.",
+      zhPrompt: "准备处理真实来信时再连接邮箱。也可以先用已有客户，稍后再导入客户列表。",
+      status: optionalStatusFor("email"),
+      core: false,
+      group: "recommended",
+    },
+    {
+      id: "search",
+      title: "Search and verification services",
+      zhTitle: "搜索与验证服务",
+      command: "Configure search",
+      prompt: "Add search or email-verification keys when you want lead research and address checks to use live providers.",
+      zhPrompt: "需要真实线索搜索和邮箱验证时，再补充搜索或验证服务的 Key。",
+      status: optionalStatusFor("search"),
+      core: false,
+      group: "recommended",
+    },
+    {
       id: "token",
-      title: "Save access pass",
-      zhTitle: "保存访问口令",
-      command: "Save access pass",
-      prompt: "Save the access pass in this browser. Local-only and LAN access both keep token protection.",
-      zhPrompt: "先在这个浏览器保存访问口令。仅本机和 LAN 局域网访问都保留口令保护。",
-      status: statusFor("token"),
-      core: true,
+      title: "Save Activation Code",
+      zhTitle: "保存会员激活码",
+      command: "Save activation code",
+      prompt: "Advanced local deployment can save an Activation Code in this browser. Trial users can keep using their phone session without adding one here.",
+      zhPrompt: "高级本地部署可在这个浏览器保存会员激活码。试用用户可以继续使用手机号会话，不必在这里再填一次。",
+      status: optionalStatusFor("token"),
+      core: false,
+      group: "advanced",
     },
     {
       id: "access",
@@ -187,17 +283,8 @@ export function getJadenosOnboardingSteps(
       prompt: "Use local-only on this computer, or enable LAN so devices on the same network can open SSA by host IP and port.",
       zhPrompt: "可选择仅本机使用，也可开启 LAN，让同一局域网设备通过本机 IP 和端口打开 SSA。",
       status: statusFor("access"),
-      core: true,
-    },
-    {
-      id: "model",
-      title: "Connect a real model",
-      zhTitle: "连接真实模型",
-      command: "Configure model",
-      prompt: "Choose a local model or China model service when ready. Mock fallback is allowed for first run, but it is not counted as a real model.",
-      zhPrompt: "你可以按自己的供应商选择本地模型或国内模型服务。首次启动可以先用 Mock fallback，但它不会被算作真实模型。",
-      status: statusFor("model"),
-      core: true,
+      core: false,
+      group: "advanced",
     },
     {
       id: "storage",
@@ -206,42 +293,42 @@ export function getJadenosOnboardingSteps(
       command: "Check local folder",
       prompt: "Review the local folder used by SSA. Browser preview and download go through the SSA gateway, not direct host file access.",
       zhPrompt: "查看 SSA 使用的本地目录。浏览器预览和下载都通过 SSA 网关完成，不直接读取宿主机文件。",
-      status: statusFor("storage"),
-      core: true,
+      status: optionalStatusFor("storage"),
+      core: false,
+      group: "advanced",
     },
     {
       id: "upload",
       title: "Upload a test file",
       zhTitle: "上传测试文件",
-      command: "Test Intake upload",
-      prompt: "Drop one test file into Intake so SSA saves it in the local folder and keeps the original.",
-      zhPrompt: "向投递台放入一个测试文件，让 SSA 保存到本地目录，并保留原始文件。",
-      status: statusFor("upload"),
-      core: true,
+      command: "Test data import",
+      prompt: "Optional deployment check. Upload a sample only when you want to verify local file saving before using real documents.",
+      zhPrompt: "这是可选部署自检。只有想先验证本地文件保存时，才需要上传示例文件。",
+      status: optionalStatusFor("upload"),
+      core: false,
+      group: "advanced",
     },
     {
       id: "synthesize",
       title: "Run synthesis once",
       zhTitle: "运行一次归纳",
       command: "Create synthesis",
-      prompt: "Ask SSA to summarize the uploaded test file and write the result back to local storage.",
-      zhPrompt: "让 SSA 归纳刚上传的测试文件，并把结果写回本地存储。",
-      status: statusFor("synthesize"),
-      core: true,
+      prompt: "Optional deployment check. Run synthesis after a test upload to prove read/write behavior, or skip it and start with customers.",
+      zhPrompt: "这是可选部署自检。上传测试文件后可运行一次归纳验证读写，也可以跳过并先从客户开始。",
+      status: optionalStatusFor("synthesize"),
+      core: false,
+      group: "advanced",
     },
     {
       id: "finish",
-      title: "Finish setup",
-      zhTitle: "完成设置",
-      command: "Review launch readiness",
-      prompt: readiness.allReady
-        ? "First-run setup is ready. Open Cockpit now, and connect a real model later from Settings if needed."
-        : "Some first-run items are still missing. You can keep going now or finish the missing items in Settings.",
-      zhPrompt: readiness.allReady
-        ? "首次启动设置已就绪。现在可以进入驾驶舱；真实模型之后可在设置里连接。"
-        : "还有首次启动项目未完成。你可以继续设置，也可以之后在设置里补齐。",
-      status: readiness.allReady ? "done" : "missing",
+      title: "Save setup checklist",
+      zhTitle: "保存设置清单",
+      command: "Save and enter",
+      prompt: "Save the checklist state when you are done reviewing. You can enter Customers at any time and return to Settings later.",
+      zhPrompt: "检查完后保存清单状态即可。你随时都可以进入客户页，后续再从设置回来补齐。",
+      status: readiness.allReady ? "done" : "optional",
       core: false,
+      group: "finish",
     },
   ];
 }

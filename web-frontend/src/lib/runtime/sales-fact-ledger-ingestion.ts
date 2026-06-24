@@ -628,7 +628,7 @@ function recommendedOperatorAction(input: {
   if (input.shipmentStatus === "conflict") return "Review conflicting shipment evidence before updating the customer timeline.";
   if (input.exceptionCount > 0) return "Review exception evidence and decide the next customer follow-up manually.";
   if (input.paymentStatus === "paid") return "Verify payment against bank or finance records before marking payment confirmed.";
-  if (input.paymentStatus === "overdue") return "Review overdue payment evidence and prepare a human-approved follow-up.";
+  if (input.paymentStatus === "overdue") return "Review overdue payment evidence and prepare a confirmed follow-up.";
   if (input.reviewRequired) return "Review unverified lifecycle evidence before taking customer-visible action.";
   return "No verified lifecycle action is ready; keep monitoring local evidence.";
 }

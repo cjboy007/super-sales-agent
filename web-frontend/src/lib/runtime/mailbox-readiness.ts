@@ -111,7 +111,7 @@ export function summarizeMailboxReadiness(
     );
   const status = !configured || !autoCapture ? "needs_setup" : recentlySynced ? "ready" : "needs_review";
   if (status === "needs_review") {
-    requiredActions.push("Run the resident worker until a new inbound mail sync is visible.");
+    requiredActions.push("Run automation until a new inbound mail sync is visible.");
   }
 
   return {
@@ -122,15 +122,15 @@ export function summarizeMailboxReadiness(
     summary: status === "ready"
       ? "Mailbox capture is connected and recent incoming mail has entered CRM."
       : status === "needs_review"
-        ? "Mailbox capture is connected, but the latest worker run has not shown a fresh incoming mail sync."
+        ? "Mailbox capture is connected, but the latest automation run has not shown a fresh incoming mail sync."
         : "Mailbox setup needs attention before incoming customer email can enter CRM.",
     nextStep: status === "ready"
       ? "Monitor new inbound mail in the customer timeline."
       : !configured
-        ? "Complete the mailbox connection in Settings, then run the resident worker again."
+        ? "Complete the mailbox connection in Settings, then run automation again."
         : !autoCapture
           ? "Enable automatic mailbox capture so inbound customer messages create CRM activity."
-          : "Start or repair the resident worker, then confirm new mail appears in the customer timeline.",
+          : "Start or repair automation, then confirm new mail appears in the customer timeline.",
     requiredActions,
   };
 }

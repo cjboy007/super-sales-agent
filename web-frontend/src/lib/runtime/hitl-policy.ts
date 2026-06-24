@@ -134,7 +134,7 @@ const DEFAULT_RULES: HitlPolicyMatrix = {
     decision: "auto",
     risk: "medium",
     requiresSideEffectGate: false,
-    reason: "Landing pages remain draft-only until a human publishes or exports them.",
+    reason: "Landing pages remain draft-only until you publish or export them.",
   },
   "video_script.draft": {
     actionKind: "video_script.draft",
@@ -155,42 +155,42 @@ const DEFAULT_RULES: HitlPolicyMatrix = {
     decision: "review",
     risk: "high",
     requiresSideEffectGate: true,
-    reason: "Customer-facing email sends require human review.",
+    reason: "Customer-facing email sends require confirmation.",
   },
   "crm.write": {
     actionKind: "crm.write",
     decision: "review",
     risk: "high",
     requiresSideEffectGate: true,
-    reason: "CRM writes modify customer records and require human review.",
+    reason: "CRM writes modify customer records and require confirmation.",
   },
   "quotation.generate": {
     actionKind: "quotation.generate",
     decision: "review",
     risk: "high",
     requiresSideEffectGate: true,
-    reason: "Commercial documents require human review before generation or export.",
+    reason: "Commercial documents require confirmation before generation or export.",
   },
   "pi.generate": {
     actionKind: "pi.generate",
     decision: "review",
     risk: "high",
     requiresSideEffectGate: true,
-    reason: "PI generation affects commercial commitments and requires human review.",
+    reason: "PI generation affects commercial commitments and requires confirmation.",
   },
   "price.discount": {
     actionKind: "price.discount",
     decision: "review",
     risk: "high",
     requiresSideEffectGate: true,
-    reason: "Discount changes affect margin and require human approval.",
+    reason: "Discount changes affect margin and require confirmation.",
   },
   "payment.bank": {
     actionKind: "payment.bank",
     decision: "blocked",
     risk: "critical",
     requiresSideEffectGate: true,
-    reason: "Bank and payment actions are blocked in the minimum HITL kernel.",
+    reason: "Bank and payment actions are blocked in this stage.",
   },
 };
 
@@ -246,7 +246,7 @@ export function summarizeHitlReadiness(
       autopilotReady: false,
       allowedModes: ["observe", "assist", "locked"],
       disabledModes: ["autopilot"],
-      summary: "Autopilot is visible for planning only; customer-facing actions still require review.",
+      summary: "Automatic execution is available for planning only; customer-facing actions still require confirmation.",
     },
     reviewQueue: {
       total: decisions.length,
@@ -308,7 +308,7 @@ function sideEffectCanRetry(decision: SideEffectDecision): boolean {
 function sanitizeText(value: unknown): string {
   const raw = typeof value === "string" && value.trim()
     ? value.trim()
-    : "External action is waiting for human review.";
+    : "Customer action is waiting for confirmation.";
   return raw
     .replace(/\/Users\/[^\s"'`]+/g, "local runtime")
     .replace(/[A-Za-z]:\\[^\s"'`]+/g, "local runtime")

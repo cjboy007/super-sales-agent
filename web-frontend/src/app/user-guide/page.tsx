@@ -15,8 +15,8 @@ const guideSections = [
   {
     title: "Start",
     zhTitle: "开始",
-    body: "Open Super Sales Agent, enter the beta access pass, then start from Customers or Onboarding. Health Check shows whether the workspace is ready and what needs attention.",
-    zhBody: "打开 Super Sales Agent，输入内测访问口令，然后从客户页或入门页开始。健康检查会显示工作台是否就绪，以及下一步需要处理什么。",
+    body: "Open Super Sales Agent, enter the Activation Code, then start from Workbench or Customer Follow-up. Task Progress shows whether the workspace is ready and what needs attention.",
+    zhBody: "打开 Super Sales Agent，输入会员激活码，然后从工作台或客户跟进开始。任务进度会显示工作台是否就绪，以及下一步需要处理什么。",
   },
   {
     title: "Demo Data",
@@ -37,10 +37,10 @@ const guideSections = [
     zhBody: "准备客户表时保留公司名、联系人、邮箱、国家、产品兴趣、备注和当前关系阶段。导入后检查重复客户。",
   },
   {
-    title: "View customers",
-    zhTitle: "查看客户",
-    body: "Open Customers to review contacts, rating, recent activity, orders, timeline, and next suggested action. Status changes include a business reason.",
-    zhBody: "打开客户页查看联系人、评级、最近动态、订单、时间线和下一步建议。客户状态变化会显示业务原因。",
+    title: "Customer follow-up",
+    zhTitle: "客户跟进",
+    body: "Open Customer Follow-up to review contacts, rating, recent activity, orders, timeline, and next suggested action. Status changes include a business reason.",
+    zhBody: "打开客户跟进查看联系人、评级、最近动态、订单、时间线和下一步建议。客户状态变化会显示业务原因。",
   },
   {
     title: "Orders",
@@ -49,20 +49,20 @@ const guideSections = [
     zhBody: "客户详情页集中展示报价、PI、付款、发货、售后、退款和异常。时间线说明发生了什么，以及为什么重要。",
   },
   {
-    title: "Approval",
-    zhTitle: "审批",
-    body: "Real external actions are blocked by default. A real email, CRM write, or customer follow-up must be reviewed and approved before execution.",
-    zhBody: "真实外部动作默认锁定。真实邮件、CRM 写入或客户跟进动作都需要先审批，再执行。",
+    title: "Review",
+    zhTitle: "确认",
+    body: "Real external actions are blocked by default. A real email, CRM write, or customer follow-up must be reviewed and confirmed before execution.",
+    zhBody: "真实外部动作默认锁定。真实邮件、CRM 写入或客户跟进动作都需要先复核确认，再执行。",
   },
 ];
 
 const checklist = [
   ["Health Check is ready", "健康检查显示就绪"],
-  ["Demo data opens in Customers", "演示数据可在客户页打开"],
+  ["Demo data opens in Customer Follow-up", "演示数据可在客户跟进打开"],
   ["Mailbox connection is tested", "邮箱连接已测试"],
   ["Customer import sample is reviewed", "客户导入样例已检查"],
   ["Customer detail shows contacts, orders, timeline, and next action", "客户详情显示联系人、订单、时间线和下一步动作"],
-  ["Real external actions stay blocked unless approved", "真实外部动作保持锁定，除非已审批"],
+  ["Real external actions stay blocked unless confirmed", "真实外部动作保持锁定，除非已确认"],
 ];
 
 export default function UserGuidePage() {
@@ -78,7 +78,7 @@ export default function UserGuidePage() {
           <BattleText en="Beta Access" zh="内测访问" />
         </Link>
         <Link href="/leads" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-emerald-600 bg-emerald-600 px-3 text-[13px] font-semibold text-white transition hover:bg-emerald-500">
-          <BattleText en="Open Customers" zh="打开客户" />
+          <BattleText en="Open Follow-up" zh="打开客户跟进" />
         </Link>
       </BattlePageHeader>
 
@@ -92,13 +92,13 @@ export default function UserGuidePage() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
             <BattleText
-              en="This guide is for beta users who want to try the sales CRM without help from a developer. Start with access, demo data, customers, mailbox, and approval review."
-              zh="这份指南给内测用户使用，不需要开发人员陪同。先完成访问，再看演示数据、客户、邮箱和审批流程。"
+              en="This guide is for beta users who want to try the sales CRM without help from a developer. Start with access, demo data, customer follow-up, mailbox, and review flow."
+              zh="这份指南给内测用户使用，不需要开发人员陪同。先完成访问，再看演示数据、客户跟进、邮箱和确认流程。"
             />
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href="/beta-access" className="inline-flex h-9 items-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-100 transition hover:border-slate-600">
-              <BattleText en="Enter Access Pass" zh="输入访问口令" />
+              <BattleText en="Enter Activation Code" zh="输入会员激活码" />
             </Link>
             <Link href="/jadenos/onboarding" className="inline-flex h-9 items-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-100 transition hover:border-slate-600">
               <BattleText en="Open Onboarding" zh="打开入门页" />
@@ -143,8 +143,8 @@ export default function UserGuidePage() {
               <div className="space-y-3 p-4">
                 <p className="text-xs leading-5 text-slate-400">
                   <BattleText
-                    en="If a page asks for access, enter the beta pass from the team. The app will remember it in this browser."
-                    zh="如果页面要求访问口令，请输入团队提供的内测口令。当前浏览器会记住这次访问。"
+                    en="If a page asks for access, enter the Activation Code from the team. The app will remember it in this browser."
+                    zh="如果页面要求访问，请输入团队提供的会员激活码。当前浏览器会记住这次访问。"
                   />
                 </p>
                 <Link href="/beta-access" className="block">

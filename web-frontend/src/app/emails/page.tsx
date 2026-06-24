@@ -118,7 +118,7 @@ export default function EmailsPage() {
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Failed to save request");
-      setSaveMessage(json.detail || (language === "zh" ? "已保存为待审批草稿，未发送给客户。" : "Saved for review. Nothing was sent to a customer."));
+      setSaveMessage(json.detail || (language === "zh" ? "已保存为待确认草稿，未发送给客户。" : "Saved for review. Nothing was sent to a customer."));
       setTo("");
       setSubject("");
       setBody("");
@@ -135,10 +135,10 @@ export default function EmailsPage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Outreach Operations"
-        zhTitle="开发信操作台"
-        meta={`${project.name.toUpperCase()} / SAFE MODE / CUSTOMER SENDS NEED APPROVAL`}
-        zhMeta={`${project.name.toUpperCase()} / 安全模式 / 发给客户前需要审批`}
+        title="Email Drafts"
+        zhTitle="邮件草稿"
+        meta={`${project.name.toUpperCase()} / SAFE MODE / CUSTOMER SENDS NEED REVIEW`}
+        zhMeta={`${project.name.toUpperCase()} / 安全模式 / 发给客户前需要确认`}
         active="/emails"
       >
         <BattleBadge tone={loading ? "blue" : "emerald"} pulse={loading}>
@@ -170,7 +170,7 @@ export default function EmailsPage() {
                     }`}
                   >
                     {language === "zh"
-                      ? tab === "sent" ? "已保存" : tab === "drafts" ? "草稿" : "待审批"
+                      ? tab === "sent" ? "已保存" : tab === "drafts" ? "草稿" : "待确认"
                       : tab === "sent" ? "saved" : tab}
                   </button>
                 ))}
@@ -217,7 +217,7 @@ export default function EmailsPage() {
                       <tr key={email.id} className="hover:bg-slate-800/35">
                         <td className="px-4 py-3 font-mono text-slate-400">{email.to}</td>
                         <td className="px-4 py-3 text-slate-200">{email.subject}</td>
-                        <td className="px-4 py-3"><BattleBadge tone="amber"><BattleText en="review" zh="待审批" /></BattleBadge></td>
+                        <td className="px-4 py-3"><BattleBadge tone="amber"><BattleText en="review" zh="待确认" /></BattleBadge></td>
                         <td className="px-4 py-3 font-mono text-slate-500">{formatDate(email.scheduledAt)}</td>
                       </tr>
                     ))}
@@ -228,14 +228,14 @@ export default function EmailsPage() {
           </BattlePanel>
 
           <BattlePanel
-            title={language === "zh" ? "新建待审批开发信" : "New Review Draft"}
+            title={language === "zh" ? "新建待确认开发信" : "New Review Draft"}
             meta={language === "zh" ? "保存草稿，不会直接发给客户" : "saves a draft; does not send to customers"}
           >
             <div className="space-y-3 p-3">
               <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] leading-5 text-amber-300">
                 <BattleText
-                  en="This page saves the email for review. Customer sends stay locked until an operator explicitly approves."
-                  zh="本页只把开发信保存为待审批草稿。操作员明确批准前，不会发给客户。"
+                  en="This page saves the email for review. Customer sends stay locked until you explicitly confirm."
+                  zh="本页只把开发信保存为待确认草稿。你明确确认前，不会发给客户。"
                 />
               </div>
               <InputField value={to} onChange={(event) => setTo(event.target.value)} placeholder="recipient@example.com" className="w-full" mono />
@@ -243,10 +243,10 @@ export default function EmailsPage() {
               <TextAreaField value={body} onChange={(event) => setBody(event.target.value)} placeholder={language === "zh" ? "开发信草稿" : "Draft body"} className="h-52 w-full" />
               <div className="flex items-center justify-between gap-3">
                 <p className="min-w-0 truncate text-[12px] text-slate-500">
-                  {saveMessage || (language === "zh" ? "准备保存待审批草稿" : "ready to save for review")}
+                  {saveMessage || (language === "zh" ? "准备保存待确认草稿" : "ready to save for review")}
                 </p>
                 <CommandButton variant="primary" disabled={!to || !subject || !body || saving} onClick={saveRequest}>
-                  {saving ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Save for Review" zh="保存待审批" />}
+                  {saving ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Save for Review" zh="保存待确认" />}
                 </CommandButton>
               </div>
             </div>

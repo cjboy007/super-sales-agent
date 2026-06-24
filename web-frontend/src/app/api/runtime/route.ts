@@ -304,7 +304,7 @@ function manifestView(runtime: ReturnType<typeof createSalesRuntime>) {
       "Settings",
     ],
     nextSteps: [
-      "Set a beta access pass before inviting external users.",
+      "Set an Activation Code before inviting external users.",
       "Connect a real mailbox for automatic customer timeline capture.",
     ],
   };

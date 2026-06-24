@@ -333,6 +333,9 @@ export interface OperatorCommandInput {
   message?: unknown;
   context?: unknown;
   url?: unknown;
+  surface?: unknown;
+  mode?: unknown;
+  target?: unknown;
 }
 
 export interface OperatorCommandRecord {
@@ -345,6 +348,65 @@ export interface OperatorCommandRecord {
   context: Record<string, unknown>;
   status: "queued_for_local_runtime";
   sideEffects: "blocked";
+  commandThreadId?: string;
+  envelope?: {
+    surface: string;
+    mode: string;
+    message: string;
+    workspaceId: WorkspaceId;
+    context: Record<string, unknown>;
+    target: {
+      type: string;
+      id?: string;
+      label?: string;
+    };
+    allowedWorkflows: RuntimeWorkflowType[];
+    allowedTools: string[];
+    allowedSideEffectKinds: SideEffectKind[];
+    safetyPolicy: {
+      externalContentIsEvidenceOnly: true;
+      sideEffectsRequireGate: true;
+      llmCannotExecuteActions: true;
+    };
+    memoryPolicy: {
+      taskThread: "always";
+      audit: "always";
+      durableSalesMemory: "confirmed_business_facts_only";
+      rawChatToDurableMemory: false;
+    };
+  };
+  validatedPlan?: {
+    source: string;
+    intent: string;
+    confidence: number;
+    workflows: RuntimeWorkflowType[];
+    tools: string[];
+    target: {
+      type: string;
+      id?: string;
+      label?: string;
+    };
+    needsHumanReview: boolean;
+    sideEffectKinds: SideEffectKind[];
+    memoryWrites: Array<{
+      kind?: MemoryWriteInput["kind"];
+      customerId?: string;
+      customerName?: string;
+      title: string;
+      body: string;
+      confidence?: number;
+    }>;
+    notes: string;
+    validation: {
+      acceptedWorkflows: RuntimeWorkflowType[];
+      rejectedWorkflows: string[];
+      acceptedTools: string[];
+      rejectedTools: string[];
+      acceptedSideEffectKinds: SideEffectKind[];
+      rejectedSideEffectKinds: string[];
+      warnings: string[];
+    };
+  };
   jobId?: string;
   jobIds?: string[];
   plan?: {

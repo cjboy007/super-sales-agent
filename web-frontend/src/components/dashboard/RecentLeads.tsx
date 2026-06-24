@@ -72,7 +72,7 @@ export default function RecentLeads({ leads, loading = false }: RecentLeadsProps
         <div className="flex flex-col items-center justify-center py-12 text-center px-5">
           <span className="text-4xl mb-3">🌱</span>
           <p className="text-sm font-medium text-gray-400">还没有线索</p>
-          <p className="text-xs text-gray-600 mt-1">导入 CSV 或让 Agent 自动发现潜在客户</p>
+          <p className="text-xs text-gray-600 mt-1">导入 CSV 或让 AI 助手发现潜在客户</p>
           <Link
             href="/leads"
             className="mt-4 text-xs px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"

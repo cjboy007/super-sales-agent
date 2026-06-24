@@ -10,24 +10,46 @@ describe("global app navigation", () => {
     expect(APP_NAV_ITEMS.map((item) => item.href)).not.toContain("/jadenos/onboarding");
   });
 
-  it("labels the email workspace as outreach in Chinese", () => {
+  it("labels the email workspace as drafts in Chinese", () => {
     expect(APP_NAV_ITEMS.find((item) => item.href === "/emails")).toMatchObject({
-      label: "Outreach",
-      zhLabel: "开发信",
+      label: "Email Drafts",
+      zhLabel: "邮件草稿",
     });
   });
 
-  it("uses customers as the primary account workspace label", () => {
+  it("keeps the primary navigation focused on the layered workbench IA", () => {
+    expect(APP_NAV_ITEMS.map((item) => item.href)).toEqual([
+      "/",
+      "/reviews",
+      "/growth",
+      "/leads",
+      "/emails",
+      "/quotations",
+      "/agent-status",
+      "/customers",
+      "/settings",
+    ]);
+    expect(APP_NAV_ITEMS.find((item) => item.href === "/reviews")).toMatchObject({
+      label: "Pending Review",
+      zhLabel: "待确认",
+    });
+    expect(APP_NAV_ITEMS.find((item) => item.href === "/customers")).toMatchObject({
+      label: "Customer Records",
+      zhLabel: "客户档案",
+    });
+  });
+
+  it("uses customer follow-up as the primary account workspace label", () => {
     expect(APP_NAV_ITEMS.find((item) => item.href === "/leads")).toMatchObject({
-      label: "Customers",
-      zhLabel: "客户",
+      label: "Customer Follow-up",
+      zhLabel: "客户跟进",
     });
   });
 
-  it("includes an operations entry for beta health checks", () => {
+  it("includes a task progress entry for beta health checks", () => {
     expect(APP_NAV_ITEMS.find((item) => item.href === "/agent-status")).toMatchObject({
-      label: "Ops",
-      zhLabel: "运维",
+      label: "Task Progress",
+      zhLabel: "任务进度",
     });
   });
 

@@ -67,7 +67,8 @@ import { runLlmTask } from "./llm";
 import { listLlmTaskPolicies, getLlmTaskPolicy } from "./llm-policy";
 import { getSalesRuntimeManifest } from "./manifest";
 import { rebuildMemoryIndex } from "./memory-index";
-import { createOperatorCommand } from "./operator-commands";
+import { createOperatorCommand, createStructuredOperatorCommand } from "./operator-commands";
+import { listJadenCommandThreads } from "./jaden-command";
 import { getSentLogSnapshot, runtimeEventsToAgentEvents } from "./activity-stream";
 import { createSalesMemory, type SalesMemory } from "./sales-memory";
 import { listSalesPacks } from "./sales-packs";
@@ -559,6 +560,19 @@ export class SalesRuntime {
 
   createOperatorCommand(input: OperatorCommandInput): OperatorCommandRecord {
     return createOperatorCommand(this, input);
+  }
+
+  async createStructuredOperatorCommand(input: OperatorCommandInput): Promise<OperatorCommandRecord> {
+    return createStructuredOperatorCommand(this, input);
+  }
+
+  listJadenCommandThreads(input: { workspaceId: WorkspaceId; threadId?: string | null; limit?: number }) {
+    const workspace = this.getWorkspace(input.workspaceId);
+    return listJadenCommandThreads({
+      ...input,
+      workspaceId: workspace.id,
+      jobs: this.workflows.listJobs(200),
+    });
   }
 
   recordEvent(type: string, workspaceId: WorkspaceId, payload: Record<string, unknown>): RuntimeEvent {

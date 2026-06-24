@@ -319,7 +319,7 @@ export function requestCrmWrite(runtime: SalesRuntime, input: CrmWriteInput): Cr
     customerName: payload.customerName,
     subject: payload.subject,
     status: decision.status,
-    sideEffects: "approval-gated",
+    sideEffects: "confirmation-required",
   });
 
   return {
@@ -354,7 +354,7 @@ export function executeCrmWrite(runtime: SalesRuntime, input: CrmWriteInput): Cr
     throw Object.assign(new Error(message), { status: 403 });
   }
   if (!crmFlagEnabled()) {
-    const message = "CRM write blocked. Set SSA_ENABLE_REAL_CRM_WRITE=true and retry after approval.";
+    const message = "CRM write blocked. Enable real CRM writing and retry after confirmation.";
     runtime.recordSideEffectFailed(decision.id, {
       error: message,
       canRetry: true,

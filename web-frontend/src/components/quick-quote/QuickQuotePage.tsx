@@ -10,6 +10,7 @@ import {
 } from "@/lib/quick-quote";
 import { useProject } from "@/lib/project";
 import type { CustomerSuggestion, PriceReference } from "@/lib/quick-quote-reference";
+import JadenTaskDrawer from "@/components/battle-station/JadenTaskDrawer";
 import {
   BattleBadge,
   BattleText,
@@ -142,6 +143,8 @@ export default function QuickQuotePage({
   const [quoteChatMessages, setQuoteChatMessages] = useState<QuoteChatMessage[]>([]);
   const [modifyingQuote, setModifyingQuote] = useState(false);
   const [modifyError, setModifyError] = useState("");
+  const [commandThreadId, setCommandThreadId] = useState<string | undefined>();
+  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
   const calculation = useMemo(() => calculateQuickQuote(quote), [quote]);
   const referenceProducts = useMemo(
     () => quote.lines
@@ -321,16 +324,28 @@ export default function QuickQuotePage({
     setQuoteChatInput("");
     setModifyError("");
     setModifyingQuote(true);
+    setTaskDrawerOpen(false);
 
     try {
       const response = await apiFetch("/api/documents/quick-quote/modify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quote, message }),
+        body: JSON.stringify({
+          quote,
+          message,
+          surface: "quick-quote",
+          mode: "object_edit",
+          target: {
+            type: "quote",
+            id: quote.quoteNo,
+            label: quote.customer || quote.quoteNo,
+          },
+        }),
       });
       const json = await response.json();
       if (!response.ok || !json.success) throw new Error(json.error || "Failed to modify quote");
       setQuote(json.updatedQuote as QuickQuoteData);
+      setCommandThreadId(typeof json.commandThreadId === "string" ? json.commandThreadId : undefined);
       setQuoteChatMessages((current) => [
         ...current,
         {
@@ -551,10 +566,10 @@ export default function QuickQuotePage({
                   {referenceError ? (
                     <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
                       <p className="font-mono text-[10px] text-amber-300">
-                        {language === "zh" ? "访问口令无效 — 汇率锁定" : "Access pass invalid — rates locked"}
+                        {language === "zh" ? "会员激活码无效 — 汇率锁定" : "Activation Code invalid — rates locked"}
                       </p>
                       <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
-                        {language === "zh" ? "保存访问口令" : "Save access pass"}
+                        {language === "zh" ? "保存会员激活码" : "Save Activation Code"}
                       </a>
                     </div>
                   ) : (
@@ -576,10 +591,10 @@ export default function QuickQuotePage({
                   {referenceError ? (
                     <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
                       <p className="font-mono text-[10px] text-amber-300">
-                        {language === "zh" ? "访问口令无效 — 历史价格锁定" : "Access pass invalid — history locked"}
+                        {language === "zh" ? "会员激活码无效 — 历史价格锁定" : "Activation Code invalid — history locked"}
                       </p>
                       <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
-                        {language === "zh" ? "保存访问口令" : "Save access pass"}
+                        {language === "zh" ? "保存会员激活码" : "Save Activation Code"}
                       </a>
                     </div>
                   ) : (
@@ -608,10 +623,10 @@ export default function QuickQuotePage({
                   {referenceError ? (
                     <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
                       <p className="font-mono text-[10px] text-amber-300">
-                        {language === "zh" ? "访问口令无效 — 参考价锁定" : "Access pass invalid — references locked"}
+                        {language === "zh" ? "会员激活码无效 — 参考价锁定" : "Activation Code invalid — references locked"}
                       </p>
                       <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
-                        {language === "zh" ? "保存访问口令" : "Save access pass"}
+                        {language === "zh" ? "保存会员激活码" : "Save Activation Code"}
                       </a>
                     </div>
                   ) : (
@@ -800,15 +815,27 @@ export default function QuickQuotePage({
                     className="min-h-20 w-full"
                   />
                   {modifyError && <p className="font-mono text-[10px] text-red-300">{modifyError}</p>}
-                  <CommandButton type="submit" variant="primary" className="w-full" disabled={modifyingQuote || !quoteChatInput.trim()}>
-                    {modifyingQuote ? <BattleText en="Updating" zh="修改中" /> : <BattleText en="Apply Edit" zh="执行修改" />}
-                  </CommandButton>
+                  <div className="flex gap-2">
+                    {commandThreadId && (
+                      <CommandButton type="button" variant="ghost" className="flex-1" onClick={() => setTaskDrawerOpen(true)}>
+                        {language === "zh" ? "查看任务" : "View task"}
+                      </CommandButton>
+                    )}
+                    <CommandButton type="submit" variant="primary" className="flex-1" disabled={modifyingQuote || !quoteChatInput.trim()}>
+                      {modifyingQuote ? <BattleText en="Updating" zh="修改中" /> : <BattleText en="Apply Edit" zh="执行修改" />}
+                    </CommandButton>
+                  </div>
                 </form>
               </div>
             </BattlePanel>
           </div>
         </div>
       </BattlePageBody>
+      <JadenTaskDrawer
+        open={taskDrawerOpen}
+        threadId={commandThreadId}
+        onClose={() => setTaskDrawerOpen(false)}
+      />
     </BattlePageShell>
   );
 }

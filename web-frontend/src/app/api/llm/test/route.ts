@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       data: {
         status,
         tested: false,
-        message: "No real model is configured. Mock fallback is active.",
+        message: "No real model is configured. Demo mode is active.",
       },
     });
   }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       tested: true,
       message: result.source === "provider"
         ? "Model connection works."
-        : "The configured model did not respond. Mock fallback answered instead.",
+        : "The configured model did not respond. Demo mode answered instead.",
       fallbackActive: result.source !== "provider",
       responsePreview: result.text.slice(0, 240),
     },

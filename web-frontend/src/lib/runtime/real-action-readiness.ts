@@ -58,21 +58,21 @@ function summaryForStatus(
 ): Pick<RealActionReadinessSummary, "summary" | "nextStep"> {
   if (status === "ready") {
     return {
-      summary: "Real external actions have a completed approval and execution record.",
+      summary: "Real customer actions have a completed confirmation and execution record.",
       nextStep: "Keep real actions disabled by default and continue reviewing each requested customer action.",
     };
   }
   if (status === "needs_review") {
     return {
-      summary: `${counts.pendingReview + counts.failed + counts.retryable} external action item(s) are waiting for operator review.`,
+      summary: `${counts.pendingReview + counts.failed + counts.retryable} customer action item(s) are waiting for review.`,
       nextStep: counts.failed > 0
-        ? "Review failed external actions in Operations, then retry only after approval and explicit enablement are confirmed."
-        : "Review pending external actions in Operations before inviting beta users.",
+        ? "Review failed customer actions in Task Progress, then retry only after confirmation and explicit enablement are confirmed."
+        : "Review pending customer actions in Task Progress before inviting beta users.",
     };
   }
   return {
-    summary: "No completed approval and execution record is visible for real external actions yet.",
-    nextStep: "Run one controlled approval test for email or CRM, then confirm the execution result is recorded.",
+    summary: "No completed confirmation and execution record is visible for real customer actions yet.",
+    nextStep: "Run one controlled confirmation test for email or CRM, then confirm the execution result is recorded.",
   };
 }
 

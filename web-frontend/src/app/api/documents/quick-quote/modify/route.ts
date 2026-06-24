@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import type { QuickQuoteData, QuickQuoteLine } from "@/lib/quick-quote";
 import { createSalesRuntime } from "@/lib/runtime";
 import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import {
+  createJadenCommandEnvelope,
+  createJadenCommandPlan,
+  writeJadenCommandThread,
+} from "@/lib/runtime/jaden-command";
 
 export const dynamic = "force-dynamic";
 
@@ -167,7 +172,7 @@ function hasPatch(patch: QuickQuotePatch): boolean {
 
 function buildPrompt(quote: QuickQuoteData, message: string) {
   return [
-    "You are Jaden inside JadenOS quick quote.",
+    "You are Jaden inside the SSA quote workspace.",
     "Update the current quick quote according to the user's instruction.",
     "Return JSON only with this shape:",
     "{\"reply\":\"short user-facing summary\",\"quotePatch\":{\"customer\":\"\",\"contact\":\"\",\"email\":\"\",\"country\":\"\",\"currency\":\"USD\",\"incoterms\":\"\",\"paymentTerms\":\"\",\"leadTime\":\"\",\"validUntil\":\"\",\"notes\":\"\",\"charges\":{\"freight\":0,\"packing\":0,\"discount\":0},\"lines\":[{\"id\":\"line-1\",\"description\":\"\",\"specification\":\"\",\"quantity\":0,\"unitCost\":0,\"supplier\":\"\",\"marginPercent\":25}]}}",
@@ -189,6 +194,10 @@ function patchSummary(patch: QuickQuotePatch, source: "llm" | "local") {
   if (patch.leadTime) changes.push("lead time");
   if (patch.incoterms) changes.push("incoterms");
   return `Jaden ${source === "llm" ? "applied" : "parsed"} ${changes.length ? changes.join(", ") : "the requested quote changes"}.`;
+}
+
+function commandId() {
+  return `cmd-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export async function POST(request: NextRequest) {
@@ -222,11 +231,65 @@ export async function POST(request: NextRequest) {
       }, { status: 422 });
     }
 
+    const id = commandId();
+    const envelope = createJadenCommandEnvelope({
+      workspaceId: project,
+      surface: "quick-quote",
+      mode: "object_edit",
+      message,
+      target: {
+        type: "quote",
+        id: body.quote.quoteNo,
+        label: body.quote.customer || body.quote.quoteNo,
+      },
+      context: {
+        feature: "quick_quote_modify",
+        quoteNo: body.quote.quoteNo,
+        customer: body.quote.customer,
+        source,
+        patch,
+      },
+    });
+    const validatedPlan = createJadenCommandPlan(envelope, {
+      intent: "quick_quote_edit",
+      confidence: source === "llm" ? 0.82 : 0.74,
+      workflows: ["quotation.prepare"],
+      tools: ["price.request_discount", "document.request_generation"],
+      target: envelope.target,
+      needsHumanReview: true,
+      sideEffectKinds: ["price.discount"],
+      memoryWrites: [],
+      notes: "Quick quote edit is applied only to the local draft. Customer-visible export or send remains gated.",
+    }, source === "llm" ? "llm-structured" : "jaden-planner");
+    const thread = writeJadenCommandThread({
+      workspaceId: project,
+      commandId: id,
+      envelope,
+      plan: validatedPlan,
+      queuedJobs: [],
+      createdAt: new Date().toISOString(),
+    });
+
     return NextResponse.json({
       success: true,
       source,
       reply: llmPatch?.reply || patchSummary(patch, source),
       updatedQuote: applyPatch(body.quote, patch),
+      commandThreadId: thread.id,
+      envelope: {
+        surface: envelope.surface,
+        mode: envelope.mode,
+        target: envelope.target,
+      },
+      validatedPlan: {
+        source: validatedPlan.source,
+        intent: validatedPlan.intent,
+        confidence: validatedPlan.confidence,
+        workflows: validatedPlan.validation.acceptedWorkflows,
+        rejectedWorkflows: validatedPlan.validation.rejectedWorkflows,
+        needsHumanReview: validatedPlan.needsHumanReview,
+        warnings: validatedPlan.validation.warnings,
+      },
     });
   } catch (error) {
     return NextResponse.json(

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useProject } from "@/lib/project";
+import JadenTaskDrawer from "@/components/battle-station/JadenTaskDrawer";
 import {
   BattleBadge,
   BattleText,
@@ -189,7 +190,7 @@ function localizedDestination(destination: string, language: "en" | "zh") {
     "documents/product-specs": "产品资料",
     "leads/imports": "线索导入",
     "mail/context": "客户沟通记录",
-    "intake/review": "待人工复核",
+    "intake/review": "待确认",
   };
   return labels[destination] || destination;
 }
@@ -203,7 +204,8 @@ function localizedSummary(analysis: IntakeAnalysis, language: "en" | "zh") {
   if (language !== "zh") return analysis.summary;
   if (
     analysis.summary === EMPTY_ANALYSIS.summary ||
-    analysis.summary === "Waiting for upload, pasted text, or operator context."
+    analysis.summary === "Waiting for upload, pasted text, or operator context." ||
+    analysis.summary === "Waiting for files, pasted text, or your notes."
   ) {
     return "等待文件或说明。";
   }
@@ -222,7 +224,7 @@ function localizedEvidence(item: string, language: "en" | "zh") {
   if (language !== "zh") return item;
   const uploadMatch = item.match(/^(\d+) uploaded file\(s\)$/);
   if (uploadMatch) return `${uploadMatch[1]} 个已上传文件`;
-  if (item === "operator context supplied in chat") return "已提供给 Jaden 的说明";
+  if (item === "operator context supplied in chat" || item === "notes supplied in chat") return "已提供给 Jaden 的说明";
   if (item.startsWith("type signal: ")) return `内容类型信号：${localizedItemType(item.replace("type signal: ", ""), language)}`;
   if (item.startsWith("strongest local match: ")) return `最强本地匹配：${item.replace("strongest local match: ", "")}`;
   return item;
@@ -230,7 +232,7 @@ function localizedEvidence(item: string, language: "en" | "zh") {
 
 function localizedActionStatus(status: IntakeAction["status"], language: "en" | "zh") {
   if (language !== "zh") return actionLabel(status);
-  if (status === "approval_required") return "需要审批";
+  if (status === "approval_required") return "需要确认";
   if (status === "needs_review") return "需要复核";
   return "可执行";
 }
@@ -257,7 +259,7 @@ function localizedActionLabel(action: IntakeAction, language: "en" | "zh") {
 function localizedActionTarget(action: IntakeAction, language: "en" | "zh") {
   const destination = action.target.split("/").slice(-2).join("/");
   if (language !== "zh") return localizedDestination(destination, language);
-  if (action.target === "manual review queue") return "人工复核队列";
+  if (action.target === "manual review queue" || action.target === "review workspace") return "待确认事项";
   if (action.target === "local client context") return "本地客户资料";
   return localizedDestination(destination, language);
 }
@@ -283,6 +285,8 @@ export default function IntakePage() {
   const [synthesisReceipt, setSynthesisReceipt] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [queuedReceipt, setQueuedReceipt] = useState("");
+  const [commandThreadId, setCommandThreadId] = useState<string | undefined>();
+  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
 
   const analysis = record?.analysis || EMPTY_ANALYSIS;
   const messages = record?.messages || [];
@@ -349,14 +353,22 @@ export default function IntakePage() {
     if (!record || queueing) return;
     setQueueing(true);
     setQueuedReceipt("");
+    setTaskDrawerOpen(false);
     try {
       const res = await apiFetch("/api/operator-command", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           page: "intake",
+          surface: "intake",
+          mode: "file_intake",
           message: `Review intake ${record.id}: ${analysis.itemType} -> ${analysis.destination}`,
           url: "/intake",
+          target: {
+            type: "file",
+            id: record.id,
+            label: analysis.relatedParty !== "Unknown" ? analysis.relatedParty : analysis.itemType,
+          },
           context: {
             intakeId: record.id,
             project: record.project,
@@ -369,6 +381,7 @@ export default function IntakePage() {
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Review queue rejected the item");
       const queuedTasks = Number(json.data?.queuedTasks || 0);
+      setCommandThreadId(typeof json.data?.commandThreadId === "string" ? json.data.commandThreadId : undefined);
       setQueuedReceipt(
         language === "zh"
           ? queuedTasks > 0
@@ -379,7 +392,7 @@ export default function IntakePage() {
             : "Saved for review."
       );
     } catch (err) {
-      setQueuedReceipt(err instanceof Error ? err.message : "Review queue rejected the item");
+      setQueuedReceipt(err instanceof Error ? err.message : "The review workspace could not accept this item.");
     } finally {
       setQueueing(false);
     }
@@ -439,16 +452,16 @@ export default function IntakePage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Throw Me Anything"
-        zhTitle="投递台"
-        meta={`DROP FILES, NOTES, RFQS / SSA SORTS FOR REVIEW / ${project.name.toUpperCase()}`}
-        zhMeta={`投递文件、备注、询盘 / SSA 整理后待复核 / ${project.name.toUpperCase()}`}
+        title="Data Import"
+        zhTitle="资料导入"
+        meta={`FILES, NOTES, RFQS / SSA SORTS FOR REVIEW / ${project.name.toUpperCase()}`}
+        zhMeta={`文件、备注、询盘 / SSA 整理后待复核 / ${project.name.toUpperCase()}`}
         active="/intake"
       >
         <BattleBadge tone={sending ? "blue" : confidenceTone(analysis.confidence)} pulse={sending}>
           {sending ? <BattleText en="ANALYZING" zh="分析中" /> : analysis.source === "llm" ? <BattleText en="AI ASSISTED" zh="AI 辅助" /> : <BattleText en="READY" zh="就绪" />}
         </BattleBadge>
-        <CommandButton variant="ghost" onClick={startNew}><BattleText en="New Intake" zh="新建投递" /></CommandButton>
+        <CommandButton variant="ghost" onClick={startNew}><BattleText en="New Import" zh="新建导入" /></CommandButton>
       </BattlePageHeader>
 
       <BattlePageBody className="space-y-3">
@@ -460,7 +473,7 @@ export default function IntakePage() {
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_430px]">
           <BattlePanel
-            title={language === "zh" ? "投递区" : "Drop Zone"}
+            title={language === "zh" ? "资料区" : "Import Area"}
             meta={contextSummary}
             action={<BattleBadge tone={record ? "emerald" : "neutral"}>{record ? <BattleText en="saved" zh="已保存" /> : <BattleText en="new" zh="新建" />}</BattleBadge>}
           >
@@ -568,7 +581,7 @@ export default function IntakePage() {
                     >
                       <div className="mb-1 flex items-center justify-between gap-3">
                         <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
-                          {chat.role === "user" ? <BattleText en="Operator" zh="操作员" /> : "Jaden"}
+                          {chat.role === "user" ? <BattleText en="You" zh="你" /> : "Jaden"}
                         </p>
                         <p className="font-mono text-[10px] text-slate-600">{formatTime(chat.createdAt)}</p>
                       </div>
@@ -580,7 +593,7 @@ export default function IntakePage() {
                   <div className="max-w-[88%] rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2">
                     <p className="font-mono text-[10px] uppercase tracking-wide text-blue-300">Jaden</p>
                     <p className="mt-1 text-xs text-slate-300">
-                      <BattleText en="Reviewing your instruction and saving the item..." zh="正在阅读你的说明并保存这条投递..." />
+                      <BattleText en="Reviewing your instruction and saving the item..." zh="正在阅读你的说明并保存这条资料..." />
                     </p>
                   </div>
                 )}
@@ -597,12 +610,12 @@ export default function IntakePage() {
                       submitIntake();
                     }
                   }}
-                  placeholder={language === "zh" ? "例如：这是德国客户的新 PI，匹配到正确报价，先不要移动文件。" : "Example: This is a revised PI from the German client. Match it to the right quote and hold for approval."}
+                  placeholder={language === "zh" ? "例如：这是德国客户的新 PI，匹配到正确报价，先不要移动文件。" : "Example: This is a revised PI from the German client. Match it to the right quote and hold for review."}
                   className="min-h-24 w-full resize-none"
                 />
                 <div className="mt-2 flex items-center justify-between gap-3">
                   <p className="truncate font-mono text-[10px] text-slate-500">
-                    <BattleText en="Files and changes stay inside SSA until you approve an action." zh="你批准动作前，文件和变更只保存在 SSA 内。" />
+                    <BattleText en="Files and changes stay inside SSA until you confirm an action." zh="你确认动作前，文件和变更只保存在 SSA 内。" />
                   </p>
                   <CommandButton
                     variant="primary"
@@ -671,6 +684,11 @@ export default function IntakePage() {
                       <CommandButton variant="ghost" disabled={!record || queueing} onClick={queueReview}>
                         {queueing ? <BattleText en="Saving" zh="保存中" /> : <BattleText en="Send for Review" zh="提交复核" />}
                       </CommandButton>
+                      {commandThreadId && (
+                        <CommandButton variant="ghost" onClick={() => setTaskDrawerOpen(true)}>
+                          {language === "zh" ? "查看任务" : "View task"}
+                        </CommandButton>
+                      )}
                     </div>
                   </div>
                   {analysis.actions.length === 0 ? (
@@ -774,6 +792,11 @@ export default function IntakePage() {
           </div>
         </div>
       </BattlePageBody>
+      <JadenTaskDrawer
+        open={taskDrawerOpen}
+        threadId={commandThreadId}
+        onClose={() => setTaskDrawerOpen(false)}
+      />
     </BattlePageShell>
   );
 }

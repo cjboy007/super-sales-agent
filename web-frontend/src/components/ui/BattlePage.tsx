@@ -327,20 +327,20 @@ export function AccessBanner({
           <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
           <BattleText
             en={denied ? "Access Denied" : "Access Required"}
-            zh={denied ? "权限不足" : "需要访问口令"}
+            zh={denied ? "权限不足" : "需要会员激活码"}
           />
         </span>
         <p className="min-w-0 flex-1 text-xs text-amber-100/85">
           <BattleText
-            en={denied ? "Your access pass does not cover this module." : "Save your beta access pass in Settings to unlock this module."}
-            zh={denied ? "当前访问口令不能打开此模块。" : "请在设置中保存访问口令以解锁此模块。"}
+            en={denied ? "Your Activation Code does not cover this module." : "Save your Activation Code in Settings to unlock this module."}
+            zh={denied ? "当前会员激活码不能打开此模块。" : "请在设置中保存会员激活码以解锁此模块。"}
           />
         </p>
         <a
           href={href}
           className="inline-flex h-7 shrink-0 items-center rounded-md border border-amber-300/40 bg-amber-300 px-3 text-[11px] font-semibold text-slate-950 transition hover:bg-amber-200"
         >
-          <BattleText en="Save Access Pass" zh="保存访问口令" />
+          <BattleText en="Save Activation Code" zh="保存会员激活码" />
         </a>
       </div>
     </div>
@@ -372,14 +372,14 @@ export function AccessRequiredState({
         </BattleBadge>
         <p className="mt-4 text-sm font-semibold text-amber-50">
           <BattleText
-            en={denied ? `Your current access pass cannot open ${title}.` : `Save your beta access pass before opening ${title}.`}
-            zh={denied ? `当前访问口令不能打开${zhTitle}。` : `请先保存内测访问口令，再打开${zhTitle}。`}
+            en={denied ? `Your current Activation Code cannot open ${title}.` : `Save your Activation Code before opening ${title}.`}
+            zh={denied ? `当前会员激活码不能打开${zhTitle}。` : `请先保存会员激活码，再打开${zhTitle}。`}
           />
         </p>
         <p className="mt-2 text-xs leading-5 text-amber-100/80">
           <BattleText
-            en="Customer data is hidden for safety until access is confirmed. After access is saved, you can continue with customers, orders, and timelines."
-            zh="访问确认前，客户数据会为安全而隐藏。保存访问口令后，可以继续查看客户、订单和时间线。"
+            en="Customer data is hidden for safety until access is confirmed. After the Activation Code is saved, you can continue with customers, orders, and timelines."
+            zh="访问确认前，客户数据会为安全而隐藏。保存会员激活码后，可以继续查看客户、订单和时间线。"
           />
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
@@ -421,8 +421,8 @@ export function LoadFailedState({
         </p>
         <p className="mt-2 text-xs leading-5 text-red-100/75">
           <BattleText
-            en="Your data is protected while the page recovers. Retry the request or check Operations if the problem continues."
-            zh="页面恢复前会继续保护业务数据。请重试；如果仍失败，再到运维页检查。"
+            en="Your data is protected while the page recovers. Retry the request or check Task Progress if the problem continues."
+            zh="页面恢复前会继续保护业务数据。请重试；如果仍失败，再到任务进度页检查。"
           />
         </p>
         {onRetry ? (

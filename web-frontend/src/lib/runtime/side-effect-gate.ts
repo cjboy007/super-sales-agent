@@ -85,7 +85,7 @@ function assertDecisionRegistryEnforced(decision: SideEffectDecision) {
     throw new Error(`Sales tool registry enforcement required before recording ${decision.kind} execution.`);
   }
   if (!tool.approvalRequired || tool.approvalRequirement !== "operator_approval_required") {
-    throw new Error(`Sales tool registry rejected ${tool.id}: high-risk side-effect tools require operator approval.`);
+    throw new Error(`Sales tool registry rejected ${tool.id}: high-risk customer actions require confirmation.`);
   }
   if (decision.tool.approvalRequired !== true || decision.tool.approvalRequirement !== "operator_approval_required") {
     throw new Error(`Sales tool registry enforcement required before recording ${decision.kind} execution.`);

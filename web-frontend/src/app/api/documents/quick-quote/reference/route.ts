@@ -50,7 +50,7 @@ async function getExchangeRateReference(currency: string): Promise<ExchangeRateR
   try {
     const response = await fetch(`https://api.frankfurter.dev/v1/latest?from=USD&to=${RATE_CURRENCIES.join(",")}`, {
       cache: "no-store",
-      headers: { "user-agent": "JadenOS-QuickQuote/1.0" },
+      headers: { "user-agent": "SSA-QuickQuote/1.0" },
     });
     if (!response.ok) throw new Error(`provider returned ${response.status}`);
     const json = await response.json() as { date?: string; rates?: Record<string, number> };

@@ -46,8 +46,8 @@ function stateLabel(value: string, language: "en" | "zh") {
     "ai-generating": { en: "Drafting", zh: "起草中" },
     "human-review": { en: "Review draft", zh: "复核草稿" },
     "approval-sending": { en: "Submitting request", zh: "提交申请中" },
-    "captured-local": { en: "Saved for review", zh: "已保存待审批" },
-    "approved-sent": { en: "Approved", zh: "已批准" },
+    "captured-local": { en: "Saved for review", zh: "已保存待确认" },
+    "approved-sent": { en: "Reviewed", zh: "已确认" },
     "draft-saved": { en: "Draft saved", zh: "草稿已保存" },
     "rejected-by-wilson": { en: "Rejected", zh: "已拒绝" },
     error: { en: "Error", zh: "错误" },
@@ -203,7 +203,7 @@ export default function InboxFocusPage({ params }: PageProps) {
   if (loading) {
     return (
       <BattlePageShell>
-        <BattlePageHeader title="Inbox Focus" zhTitle="收件箱聚焦" meta="loading approval case" zhMeta="正在加载审批案例" active="/inbox" />
+        <BattlePageHeader title="Email Review" zhTitle="邮件复核" meta="loading review case" zhMeta="正在加载邮件复核事项" active="/inbox" />
         <BattlePageBody><EmptyState label="loading email" /></BattlePageBody>
       </BattlePageShell>
     );
@@ -212,7 +212,7 @@ export default function InboxFocusPage({ params }: PageProps) {
   if (!email || error) {
     return (
       <BattlePageShell>
-        <BattlePageHeader title="Inbox Focus" zhTitle="收件箱聚焦" meta="case unavailable" zhMeta="案例不可用" active="/inbox" />
+        <BattlePageHeader title="Email Review" zhTitle="邮件复核" meta="case unavailable" zhMeta="邮件复核事项不可用" active="/inbox" />
         <BattlePageBody><EmptyState label={error || "email not found"} /></BattlePageBody>
       </BattlePageShell>
     );
@@ -221,16 +221,16 @@ export default function InboxFocusPage({ params }: PageProps) {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title="Approval Focus Mode"
-        zhTitle="审批聚焦模式"
-        meta={language === "zh" ? `${email.from_email} / 发给客户前必须审批` : `${email.from_email} / approval required before customer send`}
-        zhMeta={`${email.from_email} / 发给客户前必须审批`}
+        title="Email Draft Review"
+        zhTitle="邮件草稿复核"
+        meta={language === "zh" ? `${email.from_email} / 发给客户前需要确认` : `${email.from_email} / review required before customer send`}
+        zhMeta={`${email.from_email} / 发给客户前需要确认`}
         active="/inbox"
       >
         <BattleBadge tone={state.includes("error") ? "red" : state.includes("approved") || state.includes("captured") ? "emerald" : "amber"} pulse={state === "ai-generating" || state === "approval-sending"}>
           {stateLabel(state, language)}
         </BattleBadge>
-        <CommandButton variant="ghost" onClick={() => router.push("/inbox")}><BattleText en="Back" zh="返回" /></CommandButton>
+        <CommandButton variant="ghost" onClick={() => router.push("/inbox")}><BattleText en="Back to drafts" zh="返回邮件草稿" /></CommandButton>
       </BattlePageHeader>
 
       <BattlePageBody className="grid gap-3 lg:grid-cols-[minmax(280px,0.9fr)_minmax(320px,1fr)_minmax(320px,1fr)]">
@@ -301,7 +301,7 @@ export default function InboxFocusPage({ params }: PageProps) {
 
         <BattlePanel
           title={language === "zh" ? "可编辑草稿" : "Editable Draft"}
-          meta={language === "zh" ? "操作员批准前不会发给客户" : "will not reach a customer until an operator approves"}
+          meta={language === "zh" ? "你确认前不会发给客户" : "will not reach a customer until you confirm"}
         >
           <div className="flex h-full min-h-[calc(100vh-125px)] flex-col p-3">
             {!selectedOption ? (
@@ -330,13 +330,13 @@ export default function InboxFocusPage({ params }: PageProps) {
                 />
                 <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
                   <BattleText
-                    en="This draft will only reach a customer after a server-side approval decision and the real-send switch are both present."
-                    zh="这封草稿只有同时具备服务端审批记录和真实发送开关时，才会外发给客户。"
+                    en="This draft will only reach a customer after a server-side review decision and the real-send switch are both present."
+                    zh="这封草稿只有同时具备服务端确认记录和真实发送开关时，才会外发给客户。"
                   />
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <CommandButton variant="primary" disabled={sending} onClick={approveSend}>
-                    {sending ? <BattleText en="Submitting" zh="提交中" /> : <BattleText en="Submit Request" zh="提交申请" />}
+                    {sending ? <BattleText en="Submitting" zh="提交中" /> : <BattleText en="Submit for Review" zh="提交复核" />}
                   </CommandButton>
                   <CommandButton variant="secondary" onClick={() => setState("draft-saved")}><BattleText en="Save Draft" zh="保存草稿" /></CommandButton>
                   <CommandButton variant="ghost" onClick={regenerateSelected}><BattleText en="Regenerate" zh="重新生成" /></CommandButton>

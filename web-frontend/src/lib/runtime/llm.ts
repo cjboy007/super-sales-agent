@@ -47,7 +47,7 @@ function recommend(input: string): string {
   const compact = summarize(input, 420);
   return [
     "I reviewed the local intake signals and kept this inside SSA.",
-    "Recommended next step: preserve the original, link it to the best matching customer or document context, and require operator approval before any placement or external update.",
+    "Recommended next step: preserve the original, link it to the best matching customer or document context, and require confirmation before any placement or external update.",
     `Working context: ${compact}`,
   ].join(" ");
 }
