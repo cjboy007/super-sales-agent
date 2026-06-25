@@ -647,9 +647,9 @@ export const battleStationI18n: Record<
         taskUnit: "tasks",
       },
       quickCommand: {
-        placeholder: "Tell Jaden what to inspect, draft, compare, or hold for review...",
-        queue: "Ask Jaden",
-        queued: "saved:",
+        placeholder: "Ask Jaden about customers, quotes, inbox, or next steps...",
+        queue: "Send",
+        queued: "last:",
       },
       focus: {
         back: "Back to Workbench",
@@ -761,9 +761,9 @@ export const battleStationI18n: Record<
         taskUnit: "项",
       },
       quickCommand: {
-        placeholder: "告诉 Jaden 要检查、起草、对比，或整理待确认事项...",
-        queue: "提交给 Jaden",
-        queued: "已保存:",
+        placeholder: "向 Jaden 提问客户、报价、邮件或下一步...",
+        queue: "发送",
+        queued: "上一条:",
       },
       focus: {
         back: "返回工作台",

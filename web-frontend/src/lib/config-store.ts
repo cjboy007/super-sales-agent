@@ -1,7 +1,11 @@
 import fs from "fs";
 import { ensureSsaDataPath } from "./ssa-data-paths";
 
-const CONFIG_PATH = ensureSsaDataPath("config.json");
+// Resolve per-call so SSA_DATA_ROOT is honored at read/write time, not frozen
+// at module import. ensureSsaDataPath also makes the parent dir (needed for writes).
+function configPath(): string {
+  return ensureSsaDataPath("config.json");
+}
 
 // ─── Config schema matching settings page ────────────────────────────────────
 
@@ -135,7 +139,7 @@ interface StoredConfig {
 
 export function readSettings(): AppSettings {
   try {
-    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+    const raw = fs.readFileSync(configPath(), "utf-8");
     const stored: StoredConfig = JSON.parse(raw);
 
     const result: Record<string, unknown> = { ...DEFAULT_SETTINGS };
@@ -180,7 +184,7 @@ export function writeSettings(settings: AppSettings): void {
 
   stored._encrypted = SENSITIVE_FIELDS as unknown as string[];
 
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(stored, null, 2), "utf-8");
+  fs.writeFileSync(configPath(), JSON.stringify(stored, null, 2), "utf-8");
 }
 
 /** Return settings with sensitive fields masked (for API responses) */

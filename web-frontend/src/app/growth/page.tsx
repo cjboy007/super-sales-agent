@@ -1193,7 +1193,7 @@ export default function GrowthPage() {
           >
             <div className="grid gap-2 p-3">
               {candidatePackets.slice(0, 4).map((packet) => (
-                <div key={packet.id} className="rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3">
+                <div key={packet.id} className="min-w-0 rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-slate-100">{packet.candidate.companyName}</p>
@@ -1210,15 +1210,15 @@ export default function GrowthPage() {
                       </BattleBadge>
                     </div>
                   </div>
-                  <div className="mt-3 grid gap-2 lg:grid-cols-2">
-                    <div className="rounded border border-slate-800 bg-slate-900/50 px-3 py-2">
+                  <div className="mt-3 grid min-w-0 gap-2 lg:grid-cols-2">
+                    <div className="min-w-0 rounded border border-slate-800 bg-slate-900/50 px-3 py-2">
                       <p className="font-mono text-[11px] font-semibold uppercase text-slate-500">
                         {language === "zh" ? "切入角度" : "Opening Angle"}
                       </p>
                       <p className="mt-1 text-xs font-semibold text-slate-200">{packet.openingAngle.headline}</p>
                       <p className="mt-1 text-[11px] leading-4 text-slate-500">{packet.openingAngle.rationale}</p>
                     </div>
-                    <div className="rounded border border-slate-800 bg-slate-900/50 px-3 py-2">
+                    <div className="min-w-0 rounded border border-slate-800 bg-slate-900/50 px-3 py-2">
                       <p className="font-mono text-[11px] font-semibold uppercase text-slate-500">
                         {language === "zh" ? "下一步" : "Next Step"}
                       </p>
@@ -1248,8 +1248,8 @@ export default function GrowthPage() {
           meta={language === "zh" ? "证据状态与客户可见动作边界" : "evidence state and customer-facing boundaries"}
           tone={primaryPacket?.riskFlags?.includes("insufficient_evidence") ? "red" : "amber"}
         >
-          <div className="grid gap-2 p-3 md:grid-cols-[minmax(240px,0.8fr)_minmax(320px,1.2fr)]">
-            <div className="rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3">
+          <div className="grid min-w-0 gap-2 p-3 md:grid-cols-[minmax(240px,0.8fr)_minmax(320px,1.2fr)]">
+            <div className="min-w-0 rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3">
               <p className="font-mono text-[11px] font-semibold uppercase text-slate-500">
                 {language === "zh" ? "风险提醒" : "Risk Notes"}
               </p>
@@ -1261,13 +1261,13 @@ export default function GrowthPage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3">
+            <div className="min-w-0 rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3">
               <p className="font-mono text-[11px] font-semibold uppercase text-slate-500">
                 {language === "zh" ? "证据可信度" : "Evidence / Confidence"}
               </p>
               <div className="mt-2 grid gap-2">
                 {(primaryPacket?.evidence || []).slice(0, 3).map((item) => (
-                  <div key={`${item.kind}:${item.label}`} className="flex items-center justify-between gap-3 rounded border border-slate-800 bg-slate-900/50 px-2 py-1.5">
+                  <div key={`${item.kind}:${item.label}`} className="flex min-w-0 items-center justify-between gap-3 rounded border border-slate-800 bg-slate-900/50 px-2 py-1.5">
                     <p className="min-w-0 truncate text-[11px] text-slate-300">{item.label}: {item.summary}</p>
                     <span className="shrink-0 font-mono text-[11px] text-slate-500">{Math.round(item.confidence * 100)}%</span>
                   </div>

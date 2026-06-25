@@ -44,7 +44,22 @@ describe("cockpit reform UI", () => {
     expect(battleStationDataSource).not.toContain('label: "Drafts", href: "/emails"');
   });
 
-  it("wires the bottom Jaden input into the shared command pipeline", () => {
+  it("routes the bottom Jaden input through conversational assistant replies first", () => {
+    expect(pageSource).toContain('const submitChat = useCallback');
+    expect(pageSource).toContain('/api/assistant/query');
+    expect(pageSource).toContain('question: trimmed');
+    expect(pageSource).toContain('setChatMessages');
+    expect(pageSource).toContain('role: "assistant"');
+    expect(pageSource).toContain('onSubmit={submitChat}');
+    expect(pageSource).not.toContain('onSubmit={submitCommand}');
+    expect(pageSource).not.toMatch(/const submitCommand = useCallback[\s\S]*?\/api\/operator-command/);
+    expect(quickCommandSource).toContain("messages.map");
+    expect(quickCommandSource).toContain('message.role === "assistant"');
+    expect(quickCommandSource).toContain('aria-live="polite"');
+  });
+
+  it("keeps mission setup as an explicit chat action instead of the default send path", () => {
+    expect(pageSource).toContain('const createTaskFromChat = useCallback');
     expect(pageSource).toContain('/api/operator-command');
     expect(pageSource).toContain('surface: "battle-station"');
     expect(pageSource).toContain('mode: "global_command"');
@@ -52,9 +67,9 @@ describe("cockpit reform UI", () => {
     expect(pageSource).toContain('queuedTasks');
     expect(pageSource).toContain('commandThreadId');
     expect(pageSource).toContain('<JadenTaskDrawer');
-    expect(pageSource).toContain('setCommandStatus("sending")');
-    expect(pageSource).toContain('setCommandStatus("queued")');
-    expect(pageSource).not.toMatch(/const submitCommand = useCallback\(\(\) => \{\s*const trimmed = command\.trim\(\);\s*if \(!trimmed\) return;\s*setLastCommand\(trimmed\);\s*setCommand\(""\);\s*\}/);
+    expect(pageSource).toContain('onCreateTask={createTaskFromChat}');
+    expect(quickCommandSource).toContain("onCreateTask");
+    expect(quickCommandSource).toContain("taskAvailable");
   });
 
   it("shows Jaden task-thread visibility without a full Codex-style chat page", () => {

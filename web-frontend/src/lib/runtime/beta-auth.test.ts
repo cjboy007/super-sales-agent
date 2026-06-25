@@ -181,6 +181,7 @@ describe("beta auth", () => {
   it("loads server-side beta tokens from the runtime data root for packaged beta deployments", async () => {
     delete process.env.SSA_BETA_AUTH_TOKEN;
     delete process.env.SSA_BETA_AUTH_TOKENS;
+    process.env.SSA_LOCAL_GATEWAY = "true";
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-beta-auth-config-test-"));
     process.env.SSA_DATA_ROOT = tempRoot;
     fs.mkdirSync(path.join(tempRoot, "security"), { recursive: true });
@@ -253,6 +254,60 @@ describe("beta auth", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.workspaceId).toBe("farreach");
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  });
+
+  it("ignores stale browser beta tokens for local open development when beta auth is not configured", () => {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-beta-auth-stale-local-token-test-"));
+    process.env.SSA_DATA_ROOT = tempRoot;
+    delete process.env.SSA_LOCAL_GATEWAY;
+    delete process.env.SSA_DEPLOYMENT_MODE;
+    delete process.env.SSA_BETA_AUTH_REQUIRED;
+    delete process.env.SSA_BETA_AUTH_TOKEN;
+    delete process.env.SSA_BETA_AUTH_TOKENS;
+
+    const result = requireResolvedWorkspaceAccess(new NextRequest("http://localhost/api/assistant/query?project=demo-exporter", {
+      method: "POST",
+      headers: { Cookie: "ssa-beta-token=old-invalid-token" },
+      body: JSON.stringify({ question: "What is the current priority?" }),
+    }), { question: "What is the current priority?" });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.workspaceId).toBe("demo-exporter");
+      expect(result.session.tokenId).toBe("local-token-ignored");
+      expect(result.session.workspaces).toEqual(["*"]);
+    }
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  });
+
+  it("keeps loopback localhost open when only file-based beta tokens exist and the browser has a stale token", () => {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-beta-auth-local-file-token-test-"));
+    process.env.SSA_DATA_ROOT = tempRoot;
+    delete process.env.SSA_LOCAL_GATEWAY;
+    delete process.env.SSA_DEPLOYMENT_MODE;
+    delete process.env.SSA_BETA_AUTH_REQUIRED;
+    delete process.env.SSA_BETA_AUTH_TOKEN;
+    delete process.env.SSA_BETA_AUTH_TOKENS;
+    fs.mkdirSync(path.join(tempRoot, "security"), { recursive: true });
+    fs.writeFileSync(path.join(tempRoot, "security", "beta-auth.json"), JSON.stringify({
+      tokens: [
+        { name: "local-operator", token: "valid-file-token", workspaces: ["*"] },
+      ],
+    }), "utf-8");
+
+    const result = requireResolvedWorkspaceAccess(new NextRequest("http://127.0.0.1:3003/api/assistant/query?project=demo-exporter", {
+      method: "POST",
+      headers: { Cookie: "ssa-beta-token=old-invalid-token" },
+      body: JSON.stringify({ question: "What is the current priority?" }),
+    }), { question: "What is the current priority?" });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.workspaceId).toBe("demo-exporter");
+      expect(result.session.tokenId).toBe("local-token-ignored");
+      expect(result.session.workspaces).toEqual(["*"]);
+    }
     fs.rmSync(tempRoot, { recursive: true, force: true });
   });
 

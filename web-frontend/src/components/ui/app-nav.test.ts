@@ -20,6 +20,7 @@ describe("global app navigation", () => {
   it("keeps the primary navigation focused on the layered workbench IA", () => {
     expect(APP_NAV_ITEMS.map((item) => item.href)).toEqual([
       "/",
+      "/intake",
       "/reviews",
       "/growth",
       "/leads",
@@ -29,6 +30,10 @@ describe("global app navigation", () => {
       "/customers",
       "/settings",
     ]);
+    expect(APP_NAV_ITEMS.find((item) => item.href === "/intake")).toMatchObject({
+      label: "Data Import",
+      zhLabel: "资料导入",
+    });
     expect(APP_NAV_ITEMS.find((item) => item.href === "/reviews")).toMatchObject({
       label: "Pending Review",
       zhLabel: "待确认",

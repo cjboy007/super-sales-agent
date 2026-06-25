@@ -161,6 +161,22 @@ function localMemoryEvidence(hit: MemoryHit): AssistantLocalEvidence {
   };
 }
 
+const GREETING_PATTERN = /^(hi+|hey+|hello+|hiya|howdy|yo|sup|morning|good\s*(morning|afternoon|evening|day)|嗨+|你好+|您好|哈喽|哈啰|早|早上好|早安|下午好|晚上好|在吗|在不在|有人吗)[\s!！。.~,，]*$/iu;
+
+function isGreeting(question: string): boolean {
+  const trimmed = question.trim();
+  if (!trimmed || trimmed.length > 24) return false;
+  return GREETING_PATTERN.test(trimmed);
+}
+
+function greetingAnswer(question: string): string {
+  const zh = /[一-鿿]/.test(question);
+  return zh
+    ? "你好，我是 SSA 销售助理。我基于本地的客户、报价、邮件和产品资料帮你查证据、起草内容、做总结或背调。直接说要处理哪个客户或问题就行。"
+    : "Hi — I'm the SSA sales assistant. I work from your local customer, quote, email, and product context to find evidence, draft replies, summarize, or run background research. Tell me which customer or task to dig into.";
+}
+
+
 function localIndexEvidence(workspaceId: WorkspaceId, question: string): AssistantLocalEvidence[] {
   try {
     return searchMemoryIndex(workspaceId, question, 8).map((hit) => ({
@@ -346,8 +362,15 @@ function answerFromEvidence(
   question: string,
   local: AssistantLocalEvidence[],
   web: AssistantWebEvidence[],
-  llmText?: string
+  llmText?: string,
+  llmSource?: LlmResult["source"]
 ): string {
+  // When a real model synthesized the answer, lead with that clean prose.
+  // The raw evidence stays available in the structured `evidence` field for the UI.
+  if (llmSource === "provider" && llmText && llmText.trim()) {
+    return compact(llmText, 900);
+  }
+
   const localLine = local.length
     ? `本地知识库证据：${local.slice(0, 3).map((item) => `${item.title}: ${compact(item.detail, 220)}`).join(" | ")}`
     : "";
@@ -384,6 +407,35 @@ export async function runAssistantQuery(
   const workspace = host.getWorkspace(input.workspaceId);
   const question = compact(input.question, 4000);
   if (!question) throw new Error("Assistant question is required.");
+
+  if (isGreeting(question)) {
+    return {
+      answer: greetingAnswer(question),
+      confidence: 0.9,
+      intent: {
+        taskType: "general",
+        needsWeb: false,
+        sideEffectRisk: false,
+        sideEffectKinds: [],
+        reason: "The message is a greeting, so no evidence lookup is needed.",
+      },
+      routing: {
+        localFirst: true,
+        usedLocal: false,
+        localEvidenceStatus: "miss",
+        usedLlm: false,
+        usedWeb: false,
+        webSearchStatus: "skipped",
+      },
+      evidence: { local: [], web: [] },
+      safety: {
+        blockedSideEffect: false,
+        requiredApproval: false,
+        sideEffectKinds: [],
+      },
+      warnings: [],
+    };
+  }
 
   const intent = classifyQuestion(question);
   const memoryHits = host.searchMemory({
@@ -461,7 +513,7 @@ export async function runAssistantQuery(
   }
 
   return {
-    answer: answerFromEvidence(question, localEvidence, webEvidence, llm?.text),
+    answer: answerFromEvidence(question, localEvidence, webEvidence, llm?.text, llm?.source),
     confidence: confidenceFor(localEvidence, webEvidence, false),
     intent,
     routing: {

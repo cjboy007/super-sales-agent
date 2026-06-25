@@ -87,6 +87,13 @@ describe("lead development page reform UI", () => {
     expect(pageSource).not.toContain("email sent");
   });
 
+  it("lets candidate cards shrink inside narrow mobile grids", () => {
+    expect(pageSource).toContain('className="min-w-0 rounded-md border border-slate-800 bg-slate-950/45 px-3 py-3"');
+    expect(pageSource).toContain('className="mt-3 grid min-w-0 gap-2 lg:grid-cols-2"');
+    expect(pageSource).toContain('className="grid min-w-0 gap-2 p-3 md:grid-cols-[minmax(240px,0.8fr)_minmax(320px,1.2fr)]"');
+    expect(pageSource).toContain('className="flex min-w-0 items-center justify-between gap-3 rounded border border-slate-800 bg-slate-900/50 px-2 py-1.5"');
+  });
+
   it("renders quotation draft operations as draft-only", () => {
     for (const label of [
       "Quotation Drafts",

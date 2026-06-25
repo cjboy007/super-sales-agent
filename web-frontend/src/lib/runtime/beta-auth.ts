@@ -123,6 +123,23 @@ function bearerToken(request?: NextRequest): string {
   return request.cookies.get("ssa-beta-token")?.value.trim() || "";
 }
 
+function explicitEnvTokensConfigured(): boolean {
+  return Boolean(process.env.SSA_BETA_AUTH_TOKENS?.trim() || process.env.SSA_BETA_AUTH_TOKEN?.trim());
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return normalized === "localhost" || normalized === "127.0.0.1" || normalized === "::1" || normalized === "[::1]";
+}
+
+function shouldAllowOpenLoopback(request?: NextRequest): boolean {
+  if (!request) return false;
+  if (isBetaAuthRequiredForRuntime()) return false;
+  if (trialAccessEnabledForRuntime()) return false;
+  if (explicitEnvTokensConfigured()) return false;
+  return isLoopbackHost(request.nextUrl.hostname);
+}
+
 function trialSessionToken(request?: NextRequest): string {
   if (!request) return "";
   return request.cookies.get(TRIAL_SESSION_COOKIE)?.value.trim() || "";
@@ -232,6 +249,16 @@ function tokenFingerprint(token: string): string {
 }
 
 export function requireBetaAuth(request?: NextRequest): AuthResult {
+  if (shouldAllowOpenLoopback(request)) {
+    return {
+      ok: true,
+      session: {
+        tokenId: bearerToken(request) ? "local-token-ignored" : "local-open",
+        workspaces: ["*"],
+      },
+    };
+  }
+
   const token = bearerToken(request);
   if (token) return validateBetaToken(token);
 

@@ -6,6 +6,7 @@ export interface AppNavItem {
 
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Workbench", zhLabel: "工作台", href: "/" },
+  { label: "Data Import", zhLabel: "资料导入", href: "/intake" },
   { label: "Pending Review", zhLabel: "待确认", href: "/reviews" },
   { label: "Lead Development", zhLabel: "线索开发", href: "/growth" },
   { label: "Customer Follow-up", zhLabel: "客户跟进", href: "/leads" },
@@ -18,7 +19,6 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
 
 export const APP_PAGE_LABELS: AppNavItem[] = [
   ...APP_NAV_ITEMS,
-  { label: "Data Import", zhLabel: "资料导入", href: "/intake" },
   { label: "Email Review", zhLabel: "邮件复核", href: "/inbox" },
   { label: "Document Center", zhLabel: "单证中心", href: "/documents" },
   { label: "Market Insights", zhLabel: "市场洞察", href: "/intelligence" },

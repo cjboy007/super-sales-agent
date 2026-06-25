@@ -53,6 +53,12 @@ interface AgentSummary {
   approvalGated: number;
 }
 
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+}
+
 const BACKGROUND_PROGRESS_COPY = {
   en: {
     "lead-research": {
@@ -494,8 +500,10 @@ export default function BattleStationPage() {
   const [focusDealId, setFocusDealId] = useState<string | null>(null);
   const [stats, setStats] = useState(SAMPLE_STATS);
   const [command, setCommand] = useState("");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [lastCommand, setLastCommand] = useState("");
-  const [commandStatus, setCommandStatus] = useState<"idle" | "sending" | "queued" | "error">("idle");
+  const [commandStatus, setCommandStatus] = useState<"idle" | "sending" | "answered" | "error">("idle");
+  const [taskStatus, setTaskStatus] = useState<"idle" | "sending" | "queued" | "error">("idle");
   const [commandReceipt, setCommandReceipt] = useState("");
   const [commandThreadId, setCommandThreadId] = useState<string | undefined>();
   const [taskDrawerOpen, setTaskDrawerOpen] = useState(false);
@@ -769,11 +777,97 @@ export default function BattleStationPage() {
     [station.timelineEvents]
   );
 
-  const submitCommand = useCallback(async () => {
-    const trimmed = command.trim();
+  const submitChat = useCallback(async (inputValue?: string) => {
+    const trimmed = (inputValue ?? command).trim();
     if (!trimmed || commandStatus === "sending") return;
 
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      text: trimmed,
+    };
+
+    setChatMessages((current) => [...current, userMessage]);
+    setLastCommand(trimmed);
+    setCommand("");
     setCommandStatus("sending");
+    setTaskDrawerOpen(false);
+
+    try {
+      const response = await apiFetch("/api/assistant/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: trimmed,
+          customerId: selectedDeal?.id,
+          customerName: selectedDeal?.account,
+          context: {
+            surface: "battle-station",
+            selectedDeal,
+            selectedDealId,
+            visibleApprovals: displayApprovals.slice(0, 5),
+            activeAgents: visibleAgents,
+            recentEvents: recentKeyEvents,
+            stats,
+            runningTaskCount,
+            recentEventCount: recentEvents,
+          },
+        }),
+      });
+      const json = await response.json().catch(() => null);
+
+      if (!response.ok || json?.success === false) {
+        throw new Error(json?.error || json?.message || "Assistant reply failed");
+      }
+
+      const data = json?.data || {};
+      const answer = typeof data?.answer === "string" && data.answer.trim()
+        ? data.answer.trim()
+        : (language === "zh" ? "我还没有足够证据回答这个问题。" : "I do not have enough evidence to answer that yet.");
+
+      setChatMessages((current) => [
+        ...current,
+        {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          text: answer,
+        },
+      ]);
+      setCommandStatus("answered");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Assistant reply failed";
+      setChatMessages((current) => [
+        ...current,
+        {
+          id: `assistant-error-${Date.now()}`,
+          role: "assistant",
+          text: language === "zh" ? `暂时无法回复：${message}` : `I could not get a reply: ${message}`,
+        },
+      ]);
+      setCommandStatus("error");
+    }
+  }, [
+    apiFetch,
+    command,
+    commandStatus,
+    displayApprovals,
+    language,
+    recentEvents,
+    recentKeyEvents,
+    runningTaskCount,
+    selectedDeal,
+    selectedDealId,
+    stats,
+    visibleAgents,
+  ]);
+
+  const createTaskFromChat = useCallback(async (inputValue?: string) => {
+    const trimmed = (inputValue ?? command).trim();
+    const latestChatRequest = [...chatMessages].reverse().find((message) => message.role === "user")?.text.trim() || "";
+    const sourceMessage = trimmed || latestChatRequest;
+    if (!sourceMessage || taskStatus === "sending") return;
+
+    setTaskStatus("sending");
     setCommandReceipt("");
     setTaskDrawerOpen(false);
 
@@ -789,7 +883,7 @@ export default function BattleStationPage() {
           page: "battle-station",
           surface: "battle-station",
           mode: "global_command",
-          message: trimmed,
+          message: sourceMessage,
           target: target,
           context: {
             selectedDeal,
@@ -797,6 +891,7 @@ export default function BattleStationPage() {
             visibleApprovals: displayApprovals.slice(0, 5),
             activeAgents: visibleAgents,
             recentEvents: recentKeyEvents,
+            chatMessages: chatMessages.slice(-8),
             stats,
             runningTaskCount,
             recentEventCount: recentEvents,
@@ -806,7 +901,7 @@ export default function BattleStationPage() {
       const json = await response.json().catch(() => null);
 
       if (!response.ok || json?.success === false) {
-        throw new Error(json?.error || json?.message || "Command failed");
+        throw new Error(json?.error || json?.message || "Task setup failed");
       }
 
       const data = json?.data || {};
@@ -815,29 +910,35 @@ export default function BattleStationPage() {
         ? data.validatedPlan.workflows.join(", ")
         : "";
       const receipt = queuedTasks > 0
-        ? `${queuedTasks} task${queuedTasks === 1 ? "" : "s"} queued${workflows ? `: ${workflows}` : ""}`
-        : (data?.validatedPlan?.needsHumanReview ? "Plan needs review" : "Command planned");
+        ? (language === "zh"
+          ? `已创建 ${queuedTasks} 项任务${workflows ? `：${workflows}` : ""}`
+          : `${queuedTasks} task${queuedTasks === 1 ? "" : "s"} created${workflows ? `: ${workflows}` : ""}`)
+        : (data?.validatedPlan?.needsHumanReview
+          ? (language === "zh" ? "任务计划需要复核" : "Task plan needs review")
+          : (language === "zh" ? "任务计划已创建" : "Task plan created"));
 
-      setLastCommand(trimmed);
+      setLastCommand(sourceMessage);
       setCommand("");
-      setCommandStatus("queued");
+      setTaskStatus("queued");
       setCommandReceipt(receipt);
       setCommandThreadId(typeof data?.commandThreadId === "string" ? data.commandThreadId : undefined);
     } catch (error) {
-      setCommandStatus("error");
-      setCommandReceipt(error instanceof Error ? error.message : "Command failed");
+      setTaskStatus("error");
+      setCommandReceipt(error instanceof Error ? error.message : "Task setup failed");
     }
   }, [
     apiFetch,
+    chatMessages,
     command,
-    commandStatus,
     displayApprovals,
+    language,
     recentEvents,
     recentKeyEvents,
     runningTaskCount,
     selectedDeal,
     selectedDealId,
     stats,
+    taskStatus,
     visibleAgents,
   ]);
 
@@ -1067,12 +1168,15 @@ export default function BattleStationPage() {
         copy={copy.quickCommand}
         moduleLinks={station.moduleLinks}
         command={command}
+        messages={chatMessages}
         lastCommand={lastCommand}
         status={commandStatus}
+        taskStatus={taskStatus}
         receipt={commandReceipt}
         tasksAvailable={Boolean(commandThreadId)}
         onCommandChange={setCommand}
-        onSubmit={submitCommand}
+        onSubmit={submitChat}
+        onCreateTask={createTaskFromChat}
         onOpenTasks={() => setTaskDrawerOpen(true)}
       />
       <JadenTaskDrawer
