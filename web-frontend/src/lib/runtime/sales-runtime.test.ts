@@ -289,7 +289,7 @@ describe("SalesRuntime", () => {
     process.env.OPENAI_API_KEY = "auto-openai-key";
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify({
-        model: "deepseek-v4-pro",
+        model: "deepseek-v4-flash",
         choices: [{ message: { content: "Auto DeepSeek summary" } }],
       }), {
         status: 200,
@@ -309,7 +309,7 @@ describe("SalesRuntime", () => {
     expect(result.text).toBe("Auto DeepSeek summary");
     expect(fetchMock).toHaveBeenCalledWith("https://api.deepseek.com/chat/completions", expect.any(Object));
     const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
-    expect(body.model).toBe("deepseek-v4-pro");
+    expect(body.model).toBe("deepseek-v4-flash");
   });
 
   it("blocks and audits email side effects by default", () => {

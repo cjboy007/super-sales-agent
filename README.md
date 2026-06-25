@@ -246,7 +246,7 @@ export SSA_DATA_ROOT="$HOME/.ssa/data"
 ```bash
 export SSA_LLM_PROVIDER=deepseek
 export DEEPSEEK_API_KEY=your_key
-export SSA_LLM_MODEL=deepseek-v4-pro
+export SSA_LLM_MODEL=deepseek-v4-flash
 export HUNTER_API_KEY=your_hunter_key
 ```
 
@@ -255,7 +255,7 @@ OpenRouter is also supported:
 ```bash
 export SSA_LLM_PROVIDER=openrouter
 export OPENROUTER_API_KEY=your_key
-export SSA_LLM_MODEL=deepseek/deepseek-v4-pro
+export SSA_LLM_MODEL=deepseek/deepseek-v4-flash
 ```
 
 OpenAI remains available as a fallback:
@@ -384,7 +384,7 @@ See [docs/PUBLIC_BETA_READINESS.md](./docs/PUBLIC_BETA_READINESS.md).
 export SSA_DATA_ROOT="$HOME/.ssa/data"
 export SSA_LLM_PROVIDER=deepseek
 export DEEPSEEK_API_KEY=your_key
-export SSA_LLM_MODEL=deepseek-v4-pro
+export SSA_LLM_MODEL=deepseek-v4-flash
 ```
 
 外部副作用开关默认不设置：

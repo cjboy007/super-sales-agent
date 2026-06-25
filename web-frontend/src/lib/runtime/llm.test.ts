@@ -114,6 +114,22 @@ describe("LLM provider resolution", () => {
     });
   });
 
+  it("uses DeepSeek Flash as the hosted default when only the server key is configured", async () => {
+    process.env.DEEPSEEK_API_KEY = "deepseek-hosted-trial-key";
+    const { getLlmRuntimeStatus } = await import("./llm");
+
+    expect(getLlmRuntimeStatus()).toMatchObject({
+      provider: "deepseek",
+      mode: "cloud",
+      readiness: "cloud_model_ready",
+      configured: true,
+      source: "provider",
+      model: "deepseek-v4-flash",
+      endpoint: "https://api.deepseek.com/chat/completions",
+      requiresApiKey: true,
+    });
+  });
+
   it("uses Coding Plan API base URLs only for explicit Coding Plan providers", async () => {
     writeRawConfig({
       llmProvider: "dashscope-coding-plan",

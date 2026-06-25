@@ -173,7 +173,7 @@ The web runtime is DeepSeek-first:
 ```bash
 export SSA_LLM_PROVIDER=deepseek
 export DEEPSEEK_API_KEY="sk-..."
-export SSA_LLM_MODEL=deepseek-v4-pro
+export SSA_LLM_MODEL=deepseek-v4-flash
 ```
 
 OpenRouter is also supported:
@@ -181,7 +181,7 @@ OpenRouter is also supported:
 ```bash
 export SSA_LLM_PROVIDER=openrouter
 export OPENROUTER_API_KEY="sk-or-..."
-export SSA_LLM_MODEL=deepseek/deepseek-v4-pro
+export SSA_LLM_MODEL=deepseek/deepseek-v4-flash
 ```
 
 OpenAI remains available as a fallback by setting `SSA_LLM_PROVIDER=openai`,
