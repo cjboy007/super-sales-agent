@@ -125,7 +125,7 @@ interface ProviderConfig {
   requiresApiKey: boolean;
 }
 
-const DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-pro";
+const DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-flash";
 const LLM_PROMPT_VERSION = "jadenos.llm.v1";
 
 function directDeepSeekModel(model: string | undefined): string {

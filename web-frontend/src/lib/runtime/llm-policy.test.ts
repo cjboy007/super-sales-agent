@@ -74,7 +74,7 @@ describe("LLM task policy", () => {
     process.env.DEEPSEEK_API_KEY = "test-deepseek-key";
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify({
-        model: "deepseek-v4-pro",
+        model: "deepseek-v4-flash",
         choices: [{ message: { content: "Provider response" } }],
       }), {
         status: 200,
@@ -86,7 +86,7 @@ describe("LLM task policy", () => {
     expect(getLlmRuntimeStatus()).toMatchObject({
       provider: "deepseek",
       source: "provider",
-      model: "deepseek-v4-pro",
+      model: "deepseek-v4-flash",
     });
 
     const result = await runLlmTask({
@@ -97,7 +97,7 @@ describe("LLM task policy", () => {
 
     expect(result.source).toBe("provider");
     expect(fetchMock).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
-      body: expect.stringContaining("\"model\":\"deepseek-v4-pro\""),
+      body: expect.stringContaining("\"model\":\"deepseek-v4-flash\""),
     }));
   });
 });

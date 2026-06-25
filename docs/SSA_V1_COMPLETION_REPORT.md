@@ -121,7 +121,7 @@
 - 是否允许自动化
 - 模型不得声称或执行外部动作
 
-同时修正 DeepSeek 自动识别: 只配置 DeepSeek API key 且未显式指定 DeepSeek 模型时，使用 `deepseek-v4-pro`，不会因其他 provider 的默认模型而落回 mock 或串用错误模型。
+同时修正 DeepSeek 自动识别: 只配置 DeepSeek API key 且未显式指定 DeepSeek 模型时，使用当前 hosted 默认 `deepseek-v4-flash`，不会因其他 provider 的默认模型而落回 mock 或串用错误模型。
 
 ### Phase 6 - 验证与边界
 
