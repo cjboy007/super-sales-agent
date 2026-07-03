@@ -615,7 +615,7 @@ Wilson Yang
 Sales Manager
 Farreach Electronic Co., Ltd.
 Tel: +86-756-8679200
-Email: sale-9@farreach-electronic.com`,
+Email: sales@example.com`,
       attachments: ["CE_Certificate_DP14.pdf", "RoHS_Test_Report.pdf", "Product_Datasheet_DP_USBC.pdf"],
     },
     aggressive: {
@@ -645,7 +645,7 @@ Wilson Yang
 Sales Manager
 Farreach Electronic Co., Ltd.
 Tel: +86-756-8679200
-Email: sale-9@farreach-electronic.com`,
+Email: sales@example.com`,
       attachments: ["CE_Certificate_DP14.pdf", "RoHS_Test_Report.pdf"],
     },
     creative: {
@@ -680,7 +680,7 @@ Wilson Yang
 Sales Manager
 Farreach Electronic Co., Ltd.
 Tel: +86-756-8679200
-Email: sale-9@farreach-electronic.com`,
+Email: sales@example.com`,
       attachments: ["CE_Certificate_DP14.pdf", "RoHS_Test_Report.pdf", "Company_Profile_2026.pdf", "Vietnam_Factory_Overview.pdf"],
     },
   },
@@ -712,7 +712,7 @@ Wilson Yang
 Sales Manager
 Farreach Electronic Co., Ltd.
 Tel: +86-756-8679200
-Email: sale-9@farreach-electronic.com`,
+Email: sales@example.com`,
       attachments: ["CE_Certificate.pdf", "Product_Datasheet.pdf"],
     },
     aggressive: {
@@ -735,7 +735,7 @@ Wilson Yang
 Sales Manager
 Farreach Electronic Co., Ltd.
 Tel: +86-756-8679200
-Email: sale-9@farreach-electronic.com`,
+Email: sales@example.com`,
       attachments: ["CE_Certificate.pdf"],
     },
     creative: {
@@ -755,7 +755,7 @@ Wilson Yang
 Sales Manager
 Farreach Electronic Co., Ltd.
 Tel: +86-756-8679200
-Email: sale-9@farreach-electronic.com`,
+Email: sales@example.com`,
       attachments: ["CE_Certificate.pdf", "Company_Profile_2026.pdf"],
     },
   };

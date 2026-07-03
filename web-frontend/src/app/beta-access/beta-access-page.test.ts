@@ -12,7 +12,7 @@ describe("beta access page", () => {
     expect(source).toContain("手机号");
     expect(source).toContain("短信验证码");
     expect(source).toContain("进入 14 天体验");
-    expect(source).toContain("1xxxxxxxxxx");
+    expect(source).toContain("13800138000");
     expect(source).toContain("User guide");
     expect(source).toContain("使用指南");
     expect(source).toContain("/user-guide");

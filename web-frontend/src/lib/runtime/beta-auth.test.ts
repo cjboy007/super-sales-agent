@@ -320,10 +320,10 @@ describe("beta auth", () => {
     delete process.env.SSA_BETA_AUTH_TOKENS;
     const { requestTrialSmsCode, verifyTrialSmsCode } = await import("./trial-auth");
 
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
     const store = JSON.parse(fs.readFileSync(path.join(tempRoot, "security", "trial-access.json"), "utf-8"));
     const code = store.challenges[0].mockCode;
-    const verified = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code, ip: "203.0.113.10" });
+    const verified = await verifyTrialSmsCode({ phone: "13800138000", code, ip: "203.0.113.10" });
     expect(verified.ok).toBe(true);
     if (!verified.ok) return;
 
@@ -350,9 +350,9 @@ describe("beta auth", () => {
     delete process.env.SSA_BETA_AUTH_TOKENS;
     const { requestTrialSmsCode, verifyTrialSmsCode } = await import("./trial-auth");
 
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
     const store = JSON.parse(fs.readFileSync(path.join(tempRoot, "security", "trial-access.json"), "utf-8"));
-    const verified = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: store.challenges[0].mockCode, ip: "203.0.113.10" });
+    const verified = await verifyTrialSmsCode({ phone: "13800138000", code: store.challenges[0].mockCode, ip: "203.0.113.10" });
     expect(verified.ok).toBe(true);
     if (!verified.ok) return;
 

@@ -20,7 +20,7 @@ async function main() {
     
     const info = await transporter.sendMail({
       from: 'sales@heropumps.com.cn',
-      to: 'sale-9@farreach-electronic.com',
+      to: 'sales@example.com',
       subject: 'Hero Pumps 测试邮件',
       text: '这是来自 Hero Pumps 阿里邮箱的测试邮件。\n\n如果收到此邮件，说明 SMTP 配置正常。\n\n---\nJaden Yeung\nHero Pump Co., Ltd'
     });

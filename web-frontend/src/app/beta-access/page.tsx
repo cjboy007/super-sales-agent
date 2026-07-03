@@ -147,7 +147,7 @@ function BetaAccessForm() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--battle-muted)]">Super Sales Agent</p>
           <h1 className="mt-3 text-2xl font-semibold tracking-normal text-[var(--battle-foreground)]">内测访问</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--battle-muted)]">
-            已有会员激活码可以直接进入。没有会员激活码，可以用手机号验证进入 14 天体验；到期后请联系 1xxxxxxxxxx 开通本地部署。
+            已有会员激活码可以直接进入。没有会员激活码，可以用手机号验证进入 14 天体验；到期后请联系 13800138000 开通本地部署。
           </p>
           <p className="mt-3 text-xs leading-5 text-[var(--battle-muted)]">
             登录后直接从工作台、客户跟进或演示数据开始，模型和本地部署设置可以稍后再处理。
@@ -210,7 +210,7 @@ function BetaAccessForm() {
                 className="h-11 w-full rounded-md border border-[var(--battle-border)] bg-slate-950 px-3 text-sm outline-none transition focus:border-[var(--battle-accent)]"
                 autoComplete="tel"
                 inputMode="tel"
-                placeholder="1xxxxxxxxxx"
+                placeholder="13800138000"
               />
             </label>
 

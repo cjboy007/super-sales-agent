@@ -1,0 +1,13 @@
+{
+  "primary": {
+    "id": "primary-usd-account",
+    "beneficiary": "Example Export Company Ltd.",
+    "beneficiary_address": "123 Example Road, Example City",
+    "bank_name": "Example Bank",
+    "account_no": "0000000000",
+    "swift_code": "EXAMPLE00",
+    "bank_address": "1 Bank Street, Example City",
+    "currency": "USD",
+    "active": true
+  }
+}

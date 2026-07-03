@@ -39,7 +39,7 @@ beforeEach(() => {
   process.env.SSA_TRIAL_ACCESS_ENABLED = "true";
   process.env.SSA_TRIAL_SMS_PROVIDER = "mock";
   process.env.SSA_TRIAL_DAYS = "14";
-  process.env.SSA_TRIAL_EXPIRED_CONTACT_PHONE = "1xxxxxxxxxx";
+  process.env.SSA_TRIAL_EXPIRED_CONTACT_PHONE = "13800138000";
 });
 
 afterEach(() => {
@@ -61,14 +61,14 @@ describe("/api/trial-access", () => {
   it("sends a phone code without leaking it in the response", async () => {
     const { POST } = await import("./send-code/route");
 
-    const response = await POST(post("http://localhost/api/trial-access/send-code", { phone: "1xxxxxxxxxx" }));
+    const response = await POST(post("http://localhost/api/trial-access/send-code", { phone: "13800138000" }));
     const json = await response.json();
 
     expect(response.status).toBe(200);
     expect(json).toEqual({
       success: true,
       data: {
-        phone: "1xxxxxxxxxx",
+        phone: "13800138000",
         expiresInSeconds: 300,
       },
     });
@@ -79,9 +79,9 @@ describe("/api/trial-access", () => {
     const sendRoute = await import("./send-code/route");
     const verifyRoute = await import("./verify-code/route");
 
-    await sendRoute.POST(post("http://localhost/api/trial-access/send-code", { phone: "1xxxxxxxxxx" }));
+    await sendRoute.POST(post("http://localhost/api/trial-access/send-code", { phone: "13800138000" }));
     const response = await verifyRoute.POST(post("http://localhost/api/trial-access/verify-code", {
-      phone: "1xxxxxxxxxx",
+      phone: "13800138000",
       code: storedCode(),
     }));
     const json = await response.json();
@@ -92,9 +92,9 @@ describe("/api/trial-access", () => {
       success: true,
       data: {
         access: "granted",
-        phone: "136****2402",
+        phone: "138****8000",
         trialExpiresAt: "2026-06-30T00:00:00.000Z",
-        contactPhone: "1xxxxxxxxxx",
+        contactPhone: "13800138000",
         workspaces: ["farreach"],
         defaultWorkspace: "farreach",
       },

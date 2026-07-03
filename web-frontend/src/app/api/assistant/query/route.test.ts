@@ -55,9 +55,9 @@ async function createTrialCookie(): Promise<string> {
   process.env.SSA_TRIAL_ACCESS_ENABLED = "true";
   process.env.SSA_TRIAL_SMS_PROVIDER = "mock";
   const { requestTrialSmsCode, verifyTrialSmsCode } = await import("@/lib/runtime/trial-auth");
-  await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+  await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
   const store = JSON.parse(fs.readFileSync(path.join(tempRoot, "security", "trial-access.json"), "utf-8"));
-  const verified = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: store.challenges[0].mockCode, ip: "203.0.113.10" });
+  const verified = await verifyTrialSmsCode({ phone: "13800138000", code: store.challenges[0].mockCode, ip: "203.0.113.10" });
   if (!verified.ok) throw new Error("trial setup failed");
   return `ssa-trial-session=${verified.sessionToken}`;
 }
@@ -134,7 +134,7 @@ describe("/api/assistant/query route", () => {
     expect(secondJson).toMatchObject({
       success: false,
       reason: "quota_exceeded",
-      contactPhone: "1xxxxxxxxxx",
+      contactPhone: "13800138000",
     });
   });
 });

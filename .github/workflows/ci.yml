@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web-frontend/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web-frontend
+        run: npm ci
+
+      - name: Check repository boundary
+        run: scripts/check-repo-boundary.sh
+
+      - name: Run web tests
+        working-directory: web-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          SSA_LLM_PROVIDER: mock
+        run: npm test
+
+      - name: Run worker tests
+        working-directory: web-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          SSA_LLM_PROVIDER: mock
+        run: npm run test:workers
+
+      - name: Build web app
+        working-directory: web-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          SSA_LLM_PROVIDER: mock
+        run: npm run build

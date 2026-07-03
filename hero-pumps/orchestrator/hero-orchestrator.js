@@ -5,7 +5,7 @@
  * Hero Pumps Orchestrator (已废弃)
  * 
  * 废弃原因：
- * - 使用 Farreach smtp.js CLI 发件，导致发件人错误（sale-9@farreach-electronic.com）
+ * - 使用 example smtp.js CLI 发件，导致发件人错误（sales@example.com）
  * - HTML 邮件中 \n 不渲染为换行
  * - 冷启动和 follow-up 邮件全部用错配置
  * 
@@ -200,7 +200,7 @@ class EmailSender {
         approvalId: process.env.SSA_RUNTIME_APPROVAL_ID,
       });
 
-      // ⭐ 修复：用 nodemailer 直发，不再调用 Farreach smtp.js CLI
+      // ⭐ 修复：用 nodemailer 直发，不再调用 example smtp.js CLI
       const htmlBody = body
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')

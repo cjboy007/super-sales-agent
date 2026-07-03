@@ -164,7 +164,7 @@ new → cold_email_sent → follow_up_1 → follow_up_2 → follow_up_3 → cold
 | 规则 | 说明 |
 |------|------|
 | 禁止群发 | 每封单独发送，不用 BCC |
-| 禁止伪造发件人 | 必须用 sales@heropumps.com |
+| 禁止伪造发件人 | 必须用 sales@example.com |
 | 退信率 > 5% | 立即停止，检查邮箱质量 |
 | 投诉率 > 1% | 立即停止，审查内容 |
 | 每日发送量 | 冷启动 5 封，稳定期 10 封，最大不超过 30 |

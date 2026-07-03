@@ -56,7 +56,7 @@ bash farreach/scripts/inbox-monitor-scan.sh
 bash hero-pumps/scripts/inbox-monitor-scan.sh
 ```
 
-The monitor can run in local-file mode or read-only Himalaya mode. Project wrappers default to Himalaya accounts `farreach` and `heropumps`; set `SSA_INBOX_SOURCE=local` to force local-file mode. The worker writes dedupe state under `~/.ssa/data/companies/<workspace>/inbox/` and records SSA runtime events under `~/.ssa/data/companies/<workspace>/events/`.
+The monitor can run in local-file mode or read-only Himalaya mode. Project wrappers default to Himalaya accounts `acme` and `example`; set `SSA_INBOX_SOURCE=local` to force local-file mode. The worker writes dedupe state under `~/.ssa/data/companies/<workspace>/inbox/` and records SSA runtime events under `~/.ssa/data/companies/<workspace>/events/`.
 
 ### JadenOS Background Worker
 

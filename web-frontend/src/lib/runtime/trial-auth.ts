@@ -151,7 +151,7 @@ export function trialReadOnlyForRuntime(): boolean {
 }
 
 export function trialContactPhone(): string {
-  return process.env.SSA_TRIAL_EXPIRED_CONTACT_PHONE?.trim() || "1xxxxxxxxxx";
+  return process.env.SSA_TRIAL_EXPIRED_CONTACT_PHONE?.trim() || "13800138000";
 }
 
 function trialWorkspaceId(): string {

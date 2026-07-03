@@ -38,7 +38,7 @@ beforeEach(() => {
   process.env.SSA_TRIAL_SMS_PHONE_DAILY_LIMIT = "3";
   process.env.SSA_TRIAL_SMS_IP_DAILY_LIMIT = "4";
   process.env.SSA_TRIAL_HEAVY_DAILY_LIMIT = "2";
-  process.env.SSA_TRIAL_EXPIRED_CONTACT_PHONE = "1xxxxxxxxxx";
+  process.env.SSA_TRIAL_EXPIRED_CONTACT_PHONE = "13800138000";
   delete process.env.ALIYUN_PNVS_ACCESS_KEY_ID;
   delete process.env.ALIYUN_PNVS_ACCESS_KEY_SECRET;
   delete process.env.ALIYUN_PNVS_SIGN_NAME;
@@ -92,21 +92,21 @@ describe("trial auth", () => {
   it("sends a mainland China mobile verification code and opens one 14-day trial", async () => {
     const { requestTrialSmsCode, verifyTrialSmsCode, validateTrialSessionToken } = await import("./trial-auth");
 
-    const sent = await requestTrialSmsCode({ phone: "+861xxxxxxxxxx", ip: "203.0.113.10" });
-    expect(sent).toMatchObject({ ok: true, phone: "1xxxxxxxxxx", expiresInSeconds: 300 });
+    const sent = await requestTrialSmsCode({ phone: "+8613800138000", ip: "203.0.113.10" });
+    expect(sent).toMatchObject({ ok: true, phone: "13800138000", expiresInSeconds: 300 });
 
     const verified = await verifyTrialSmsCode({
-      phone: "1xxxxxxxxxx",
-      code: storedCodeFor("1xxxxxxxxxx"),
+      phone: "13800138000",
+      code: storedCodeFor("13800138000"),
       ip: "203.0.113.10",
     });
 
     expect(verified.ok).toBe(true);
     if (verified.ok) {
-      expect(verified.session.phone).toBe("1xxxxxxxxxx");
+      expect(verified.session.phone).toBe("13800138000");
       expect(verified.session.trialStartedAt).toBe("2026-06-16T00:00:00.000Z");
       expect(verified.session.trialExpiresAt).toBe("2026-06-30T00:00:00.000Z");
-      expect(verified.session.contactPhone).toBe("1xxxxxxxxxx");
+      expect(verified.session.contactPhone).toBe("13800138000");
       expect(validateTrialSessionToken(verified.sessionToken).ok).toBe(true);
     }
   });
@@ -114,11 +114,11 @@ describe("trial auth", () => {
   it("does not refresh the two-week trial when the same phone verifies again", async () => {
     const { requestTrialSmsCode, verifyTrialSmsCode } = await import("./trial-auth");
 
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
-    const first = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: storedCodeFor("1xxxxxxxxxx"), ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
+    const first = await verifyTrialSmsCode({ phone: "13800138000", code: storedCodeFor("13800138000"), ip: "203.0.113.10" });
     vi.setSystemTime(new Date("2026-06-20T00:00:00.000Z"));
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
-    const second = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: storedCodeFor("1xxxxxxxxxx"), ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
+    const second = await verifyTrialSmsCode({ phone: "13800138000", code: storedCodeFor("13800138000"), ip: "203.0.113.10" });
 
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(true);
@@ -154,12 +154,12 @@ describe("trial auth", () => {
     vi.stubGlobal("fetch", fetchMock);
     const { requestTrialSmsCode, verifyTrialSmsCode } = await import("./trial-auth");
 
-    const sent = await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
-    const verified = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: "654321", ip: "203.0.113.10" });
+    const sent = await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
+    const verified = await verifyTrialSmsCode({ phone: "13800138000", code: "654321", ip: "203.0.113.10" });
     const sendBody = String(fetchMock.mock.calls[0][1]?.body);
     const verifyBody = String(fetchMock.mock.calls[1][1]?.body);
 
-    expect(sent).toMatchObject({ ok: true, phone: "1xxxxxxxxxx" });
+    expect(sent).toMatchObject({ ok: true, phone: "13800138000" });
     expect(verified.ok).toBe(true);
     expect(sendBody).toContain("Action=SendSmsVerifyCode");
     expect(sendBody).toContain("OutId=");
@@ -171,33 +171,33 @@ describe("trial auth", () => {
   it("rejects expired trials and returns the local deployment contact phone", async () => {
     const { requestTrialSmsCode, verifyTrialSmsCode, validateTrialSessionToken } = await import("./trial-auth");
 
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
-    const first = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: storedCodeFor("1xxxxxxxxxx"), ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
+    const first = await verifyTrialSmsCode({ phone: "13800138000", code: storedCodeFor("13800138000"), ip: "203.0.113.10" });
     expect(first.ok).toBe(true);
     if (!first.ok) return;
 
     vi.setSystemTime(new Date("2026-07-01T00:00:00.000Z"));
     const session = validateTrialSessionToken(first.sessionToken);
-    const sendAgain = await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    const sendAgain = await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
 
     expect(session.ok).toBe(false);
     if (!session.ok) {
       expect(session.reason).toBe("trial_expired");
-      expect(session.contactPhone).toBe("1xxxxxxxxxx");
+      expect(session.contactPhone).toBe("13800138000");
     }
-    expect(sendAgain).toMatchObject({ ok: false, reason: "trial_expired", contactPhone: "1xxxxxxxxxx" });
+    expect(sendAgain).toMatchObject({ ok: false, reason: "trial_expired", contactPhone: "13800138000" });
   });
 
   it("protects a small server with phone cooldown, IP SMS cap, and active trial caps", async () => {
     const { requestTrialSmsCode, verifyTrialSmsCode } = await import("./trial-auth");
 
-    const firstSend = await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
-    const cooldown = await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    const firstSend = await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
+    const cooldown = await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
     expect(firstSend.ok).toBe(true);
     expect(cooldown).toMatchObject({ ok: false, reason: "sms_cooldown" });
 
     vi.setSystemTime(new Date("2026-06-16T00:02:00.000Z"));
-    await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: storedCodeFor("1xxxxxxxxxx"), ip: "203.0.113.10" });
+    await verifyTrialSmsCode({ phone: "13800138000", code: storedCodeFor("13800138000"), ip: "203.0.113.10" });
 
     await requestTrialSmsCode({ phone: "13700000001", ip: "203.0.113.10" });
     await verifyTrialSmsCode({ phone: "13700000001", code: storedCodeFor("13700000001"), ip: "203.0.113.10" });
@@ -209,13 +209,13 @@ describe("trial auth", () => {
   it("enforces daily SMS caps per phone and per IP", async () => {
     const { requestTrialSmsCode } = await import("./trial-auth");
 
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
     vi.setSystemTime(new Date("2026-06-16T00:02:00.000Z"));
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
     vi.setSystemTime(new Date("2026-06-16T00:04:00.000Z"));
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
     vi.setSystemTime(new Date("2026-06-16T00:06:00.000Z"));
-    const phoneLimited = await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
+    const phoneLimited = await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
 
     const tempRootForIp = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-trial-auth-ip-limit-test-"));
     fs.rmSync(tempRoot, { recursive: true, force: true });
@@ -234,8 +234,8 @@ describe("trial auth", () => {
   it("limits heavy trial operations per phone per day", async () => {
     const { requestTrialSmsCode, verifyTrialSmsCode, consumeTrialQuota } = await import("./trial-auth");
 
-    await requestTrialSmsCode({ phone: "1xxxxxxxxxx", ip: "203.0.113.10" });
-    const verified = await verifyTrialSmsCode({ phone: "1xxxxxxxxxx", code: storedCodeFor("1xxxxxxxxxx"), ip: "203.0.113.10" });
+    await requestTrialSmsCode({ phone: "13800138000", ip: "203.0.113.10" });
+    const verified = await verifyTrialSmsCode({ phone: "13800138000", code: storedCodeFor("13800138000"), ip: "203.0.113.10" });
     expect(verified.ok).toBe(true);
     if (!verified.ok) return;
 

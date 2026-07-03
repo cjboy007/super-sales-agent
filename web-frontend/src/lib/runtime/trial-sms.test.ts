@@ -64,7 +64,7 @@ describe("trial SMS provider", () => {
     vi.stubGlobal("fetch", fetchMock);
     const { sendTrialSmsVerificationCode } = await import("./trial-sms");
 
-    const result = await sendTrialSmsVerificationCode("1xxxxxxxxxx", "123456");
+    const result = await sendTrialSmsVerificationCode("13800138000", "123456");
     const url = String(fetchMock.mock.calls[0][0]);
     const init = fetchMock.mock.calls[0][1] as RequestInit;
     const body = String(init.body);
@@ -74,7 +74,7 @@ describe("trial SMS provider", () => {
     expect(init.method).toBe("POST");
     expect(init.headers).toEqual({ "content-type": "application/x-www-form-urlencoded" });
     expect(body).toContain("Action=SendSms");
-    expect(body).toContain("PhoneNumbers=1xxxxxxxxxx");
+    expect(body).toContain("PhoneNumbers=13800138000");
     expect(body).toContain("SignName=SuperSalesAgent");
     expect(body).toContain("TemplateCode=SMS_123456");
     expect(body).toContain("TemplateParam=");
@@ -101,7 +101,7 @@ describe("trial SMS provider", () => {
     vi.stubGlobal("fetch", fetchMock);
     const { sendTrialSmsVerificationCode } = await import("./trial-sms");
 
-    const result = await sendTrialSmsVerificationCode("1xxxxxxxxxx", "123456", {
+    const result = await sendTrialSmsVerificationCode("13800138000", "123456", {
       outId: "trial-out-1",
       ttlSeconds: 300,
       cooldownSeconds: 60,
@@ -114,7 +114,7 @@ describe("trial SMS provider", () => {
     expect(url).toBe("https://dypnsapi.aliyuncs.com/");
     expect(init.method).toBe("POST");
     expect(body).toContain("Action=SendSmsVerifyCode");
-    expect(body).toContain("PhoneNumber=1xxxxxxxxxx");
+    expect(body).toContain("PhoneNumber=13800138000");
     expect(body).toContain("SignName=%E9%80%9F%E9%80%9A%E4%BA%92%E8%81%94%E9%AA%8C%E8%AF%81%E7%A0%81");
     expect(body).toContain("TemplateCode=100001");
     expect(body).toContain("SchemeName=SuperSalesAgent");
@@ -142,7 +142,7 @@ describe("trial SMS provider", () => {
     vi.stubGlobal("fetch", fetchMock);
     const { verifyTrialSmsVerificationCode } = await import("./trial-sms");
 
-    const result = await verifyTrialSmsVerificationCode("1xxxxxxxxxx", "123456", { outId: "trial-out-1" });
+    const result = await verifyTrialSmsVerificationCode("13800138000", "123456", { outId: "trial-out-1" });
     const url = String(fetchMock.mock.calls[0][0]);
     const init = fetchMock.mock.calls[0][1] as RequestInit;
     const body = String(init.body);
@@ -151,7 +151,7 @@ describe("trial SMS provider", () => {
     expect(url).toBe("https://dypnsapi.aliyuncs.com/");
     expect(init.method).toBe("POST");
     expect(body).toContain("Action=CheckSmsVerifyCode");
-    expect(body).toContain("PhoneNumber=1xxxxxxxxxx");
+    expect(body).toContain("PhoneNumber=13800138000");
     expect(body).toContain("VerifyCode=123456");
     expect(body).toContain("OutId=trial-out-1");
     expect(body).toContain("Signature=");
