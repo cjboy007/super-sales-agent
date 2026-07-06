@@ -1,6 +1,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
@@ -24,8 +25,8 @@ afterEach(() => {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(token?: string): Request {
-  return new Request("http://localhost/api/events", {
+function request(token?: string): NextRequest {
+  return new NextRequest("http://localhost/api/events", {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 }
@@ -63,7 +64,7 @@ describe("/api/events route", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(request());
     const chunk = await readFirstChunk(response);
 
     expect(chunk).toContain("event: agent-update");
@@ -100,7 +101,7 @@ describe("/api/events route", () => {
     );
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(request());
     const chunk = await readFirstChunk(response);
 
     expect(chunk).toContain("event: email-progress");

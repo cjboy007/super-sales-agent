@@ -23,6 +23,11 @@ function worker(inboxSynced = 0, overrides: Partial<WorkerHealthSummary> = {}): 
     },
     alerts: [],
     workers: [],
+    activity: {
+      lastRunSummary: "idle",
+      lastActivitySummary: "idle",
+      hasRecentActivity: false,
+    },
     latest: {
       workerId: "mailbox-worker",
       workspaceId: "farreach",
@@ -45,6 +50,9 @@ function worker(inboxSynced = 0, overrides: Partial<WorkerHealthSummary> = {}): 
         retried: 0,
         exhausted: 0,
         inboxSynced,
+        crmActivities: 0,
+        orderActivities: 0,
+        customersUpdated: 0,
         lifecycleStatuses: 0,
         processedJobIds: [],
       },

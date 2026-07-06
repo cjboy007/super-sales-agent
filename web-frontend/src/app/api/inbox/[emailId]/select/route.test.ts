@@ -33,7 +33,7 @@ describe("/api/inbox/[emailId]/select route", () => {
 
     const response = await POST(request("http://localhost/api/inbox/email-001/select?project=farreach", {
       style: "steady",
-    }), { params: { emailId: "email-001" } });
+    }), { params: Promise.resolve({ emailId: "email-001" }) });
     const json = await response.json();
 
     expect(json).toMatchObject({
@@ -52,13 +52,13 @@ describe("/api/inbox/[emailId]/select route", () => {
 
     const missingEmail = await POST(request("http://localhost/api/inbox/missing/select?project=farreach", {
       style: "steady",
-    }), { params: { emailId: "missing" } });
+    }), { params: Promise.resolve({ emailId: "missing" }) });
     expect(missingEmail.status).toBe(404);
     expect(await missingEmail.json()).toEqual({ success: false, error: "Email not found" });
 
     const missingOption = await POST(request("http://localhost/api/inbox/email-001/select?project=farreach", {
       style: "not-a-style",
-    }), { params: { emailId: "email-001" } });
+    }), { params: Promise.resolve({ emailId: "email-001" }) });
     expect(missingOption.status).toBe(404);
     expect(await missingOption.json()).toEqual({ success: false, error: "Option not found" });
   });
@@ -68,10 +68,10 @@ describe("/api/inbox/[emailId]/select route", () => {
 
     const first = await POST(request("http://localhost/api/inbox/email-001/select?project=farreach", {
       style: "steady",
-    }), { params: { emailId: "email-001" } });
+    }), { params: Promise.resolve({ emailId: "email-001" }) });
     const second = await POST(request("http://localhost/api/inbox/email-001/select?project=farreach", {
       style: "steady",
-    }), { params: { emailId: "email-001" } });
+    }), { params: Promise.resolve({ emailId: "email-001" }) });
     const firstJson = await first.json();
     const secondJson = await second.json();
 

@@ -26,7 +26,8 @@ describe("public action responses", () => {
   });
 
   it("keeps background-check queue counts out of public CRM sync summaries", () => {
-    const publicResult = withPublicAction({
+    const rawResult = {
+      sideEffect: undefined,
       success: true,
       crm: {
         workspaceId: "farreach",
@@ -37,7 +38,8 @@ describe("public action responses", () => {
         companyIntelQueued: 3,
         lifecycleStatuses: 1,
       },
-    });
+    };
+    const publicResult = withPublicAction(rawResult);
 
     expect(publicResult.crm).toEqual({
       received: 1,

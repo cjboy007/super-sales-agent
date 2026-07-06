@@ -33,6 +33,7 @@ function quote(overrides: Partial<Quotation>): Quotation {
     fileName: "QT-20260501-001.html",
     fileType: "html",
     mainProducts: "—",
+    files: [],
     ...overrides,
   };
 }

@@ -45,7 +45,7 @@ describe("/api/customers/context route", () => {
       kind: "episode",
       title: "Lead import",
       body: `Loaded 1 lead rows from ${tempRoot}/companies/new-salesperson/leads/crm-export.csv.`,
-      source: { type: "system", label: "Lead Import" },
+      source: { type: "system", id: "lead-import" },
       authority: "imported",
       confidence: 0.9,
       metadata: {},

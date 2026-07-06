@@ -58,7 +58,7 @@ describe("/api/inbox/[emailId] route", () => {
     const { GET } = await import("./route");
 
     const response = await GET(request("http://localhost/api/inbox/email-001?project=farreach"), {
-      params: { emailId: "email-001" },
+      params: Promise.resolve({ emailId: "email-001" }),
     });
     const json = await response.json();
 
@@ -80,7 +80,7 @@ describe("/api/inbox/[emailId] route", () => {
     const { GET } = await import("./route");
 
     const response = await GET(request("http://localhost/api/inbox/email-001?project=farreach"), {
-      params: { emailId: "email-001" },
+      params: Promise.resolve({ emailId: "email-001" }),
     });
     const json = await response.json();
 
@@ -119,7 +119,7 @@ describe("/api/inbox/[emailId] route", () => {
     const { GET } = await import("./route");
 
     const response = await GET(request("http://localhost/api/inbox/bridge-email-1?project=farreach"), {
-      params: { emailId: "bridge-email-1" },
+      params: Promise.resolve({ emailId: "bridge-email-1" }),
     });
     const json = await response.json();
 

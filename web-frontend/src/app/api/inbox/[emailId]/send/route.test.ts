@@ -91,7 +91,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       to: "buyer@example.com",
       subject: "Quote follow-up",
       body: "Following up on the quote.",
-    }), { params: { emailId: "msg-1" } });
+    }), { params: Promise.resolve({ emailId: "msg-1" }) });
     const json = await response.json();
 
     expect(json).toMatchObject({
@@ -121,7 +121,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       to: "buyer@example.com",
       subject: "Approval needed",
       body: "Draft reply.",
-    }), { params: { emailId: "msg-2" } });
+    }), { params: Promise.resolve({ emailId: "msg-2" }) });
     const json = await response.json();
 
     expect(json.blocked).toBe(true);
@@ -155,7 +155,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       body: "Approved content.",
       html: true,
       decisionId: decision.id,
-    }), { params: { emailId: "msg-3" } });
+    }), { params: Promise.resolve({ emailId: "msg-3" }) });
     const json = await response.json();
 
     expect(fetchMock).toHaveBeenCalledOnce();
@@ -213,7 +213,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       subject: "Bridge fail reply",
       body: "Approved content.",
       decisionId: decision.id,
-    }), { params: { emailId: "msg-bridge-fail" } });
+    }), { params: Promise.resolve({ emailId: "msg-bridge-fail" }) });
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -264,7 +264,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       subject: "Retry bridge reply",
       body: "Approved content.",
       decisionId: decision.id,
-    }), { params: { emailId: "msg-retry" } });
+    }), { params: Promise.resolve({ emailId: "msg-retry" }) });
     const json = await response.json();
 
     expect(fetchMock).toHaveBeenCalledOnce();
@@ -318,7 +318,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       subject: "Bridge HTTP fail reply",
       body: "Approved content.",
       decisionId: decision.id,
-    }), { params: { emailId: "msg-bridge-http-fail" } });
+    }), { params: Promise.resolve({ emailId: "msg-bridge-http-fail" }) });
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -410,7 +410,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       subject: "Late enabled reply",
       body: "Approved content.",
       decisionId: decision.id,
-    }), { params: { emailId: "msg-late-flag" } });
+    }), { params: Promise.resolve({ emailId: "msg-late-flag" }) });
     const json = await response.json();
 
     expect(fetchMock).toHaveBeenCalledOnce();
@@ -442,7 +442,7 @@ describe("/api/inbox/[emailId]/send route", () => {
         approved: true,
         approvedBy: "Forged browser payload",
       },
-    }), { params: { emailId: "msg-approval" } });
+    }), { params: Promise.resolve({ emailId: "msg-approval" }) });
     const json = await response.json();
 
     expect(fetchMock).not.toHaveBeenCalled();
@@ -477,7 +477,7 @@ describe("/api/inbox/[emailId]/send route", () => {
       subject: "Approved reply",
       body: "Approved content.",
       decisionId: decision.id,
-    }), { params: { emailId: "msg-4" } });
+    }), { params: Promise.resolve({ emailId: "msg-4" }) });
     const json = await response.json();
 
     expect(fetchMock).not.toHaveBeenCalled();

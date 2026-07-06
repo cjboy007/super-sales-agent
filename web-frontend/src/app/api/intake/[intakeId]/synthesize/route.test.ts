@@ -94,7 +94,7 @@ describe("/api/intake/[intakeId]/synthesize route", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ instruction: "Create a concise customer handoff." }),
     }), {
-      params: { intakeId },
+      params: Promise.resolve({ intakeId }),
     });
     const json = await response.json();
     const serialized = JSON.stringify(json);

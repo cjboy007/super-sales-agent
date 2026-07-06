@@ -128,7 +128,7 @@ describe("/api/growth/quotation-drafts routes", () => {
         notes: "Imports replacement pumps.",
         localPath: "/Users/wilson/private/leads.csv",
         envName: "SSA_ENABLE_REAL_EMAIL_SEND",
-      }],
+      } as Record<string, unknown>],
     });
     const draftRoute = await import("./draft/route");
     const listRoute = await import("./route");

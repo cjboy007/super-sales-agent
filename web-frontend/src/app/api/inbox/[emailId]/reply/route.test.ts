@@ -51,7 +51,7 @@ describe("/api/inbox/[emailId]/reply route", () => {
 
     const response = await POST(request("http://localhost/api/inbox/email-001/reply?project=farreach", {
       language: "en",
-    }), { params: { emailId: "email-001" } });
+    }), { params: Promise.resolve({ emailId: "email-001" }) });
     const json = await response.json();
 
     expect(json).toMatchObject({
@@ -77,7 +77,7 @@ describe("/api/inbox/[emailId]/reply route", () => {
       subject: "RFQ for pumps",
       body: "Can you quote 100 pumps?",
       language: "en",
-    }), { params: { emailId: "new-message" } });
+    }), { params: Promise.resolve({ emailId: "new-message" }) });
     const json = await response.json();
 
     expect(json).toMatchObject({
@@ -113,7 +113,7 @@ describe("/api/inbox/[emailId]/reply route", () => {
       from: "Hans Müller",
       subject: "Bridge subject",
       body: "Bridge body",
-    }), { params: { emailId: "email-001" } });
+    }), { params: Promise.resolve({ emailId: "email-001" }) });
     const json = await response.json();
 
     expect(fetchMock).toHaveBeenCalledOnce();
