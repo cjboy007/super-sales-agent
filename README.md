@@ -1,29 +1,29 @@
 # Super Sales Agent — 超级业务员系统
 
-**开源的审批门控销售执行系统（Apache-2.0）** — 统一客户事实、销售草稿、报价准备、客户跟进、订单信号和 side-effect approval。定位是 human-in-the-loop 销售操作台：AI 负责起草、分析、聚合和建议，人负责审批每一个真实客户可见动作。它不是无人值守的自动外联机器人。
+**一个开源的 AI 外贸业务员助手（Apache-2.0）。**
 
-克隆即用：无激活码、无注册、无云端依赖，本地跑 `npm run dev` 即可，自带演示数据和 mock LLM。
+它帮你做外贸业务员每天最花时间的那些事：看邮件、认客户、写回复、算报价、催跟进、盯订单。AI 把草稿和建议准备好，**每一件会让客户真正看到的事，都由你亲自点头才会发生**——它是你的助理，不是替你上岗的机器人。
 
-## Current Capability Boundary
+装好就能用：不需要激活码、不需要注册账号、不依赖任何云服务，本地 `npm run dev` 跑起来就有完整的演示数据可以玩。
 
-SSA v1 的目标不是承诺“全自动成交”, 而是提供一个可运行、可测试、可审计、可逐步放行的销售执行闭环。
+## 它能帮你做什么
 
-当前已支持:
+- **读邮件**：自动扫描收件箱，分辨哪封是询盘、哪封是订单进展、哪封有异常，整理进对应客户的档案里。
+- **记客户**：每个客户一条完整的时间线——聊过什么、报过什么价、下过什么单，随时能翻。
+- **写回复**：根据这个客户的历史和你的产品资料起草回信，你改一改、点个批准，才会真正发出去。
+- **算报价**：按产品成本、历史价格和客户情况帮你拟报价单，标出毛利、假设条件和还缺什么信息。
+- **找新客户**：给潜在客户打适配分、建议开发信的切入角度——但开发信永远只进审批队列，不会擅自发。
+- **盯订单**：从往来邮件里聚合付款、出货、售后、异常信号，提醒你下一步该做什么。
 
-- 本地 inbox monitor、客户时间线、sales memory、customer detail 和 worker queue。
-- `/growth` HITL 增长操作台: prospecting dry-run、product fit、quotation draft、outbound approval request、decision learning、scheduler metrics。
-- quotation / PI / email / CRM / payment / bank / price discount 等高风险动作的 side-effect gate。
-- 三条核心销售闭环的 dry-run/mock drill: 新邮件到回复审批、RFQ 到报价/PI 审批请求、PI/order 到付款/出货/异常建议。
+## 它不会做什么（默认全部关闭）
 
-当前不应声称或默认执行:
+- 不会自动给真实客户发邮件。
+- 不会自动改你的 CRM。
+- 不会自动生成正式报价单、PI、PDF、Excel。
+- 不会碰价格、付款、银行相关的任何操作。
+- 没有"无人值守自动跑单"模式。
 
-- 不自动发送真实客户邮件。
-- 不自动写外部 CRM。
-- 不自动生成正式 quotation、PI、PDF 或 Excel。
-- 不自动改价格、确认付款、读取银行或执行付款相关动作。
-- 不启用无人值守 autopilot。
-
-任何真实客户可见动作都必须同时满足: operator review、side-effect decision approval、对应 `SSA_ENABLE_REAL_*` runtime flag、执行/失败记录、workspace scope 校验。
+每一个真实动作都要过五道关：你亲自复核、系统留下审批记录、对应的开关被显式打开、执行结果留痕、权限范围校验。默认状态下五道关全关着，克隆下来就是一个安全的沙盒。
 
 Status details: [docs/SSA_V1_ACCEPTANCE_AUDIT.md](./docs/SSA_V1_ACCEPTANCE_AUDIT.md)
 
@@ -179,37 +179,33 @@ Hermes, OpenClaw, and other operator tools should write company material into th
 
 ## 核心功能
 
-### 📧 邮件与客户时间线
-- 本地 mailbox scan / read-only inbox monitor。
-- 意图识别、RFQ/订单/异常信号提取和客户时间线写入。
-- 基于客户事实和 memory 生成回复草稿。
-- 真实发送必须走 side-effect approval gate、收件人校验和显式 runtime flag。
+### 📧 邮件与客户档案
+- 自动扫描收件箱（只读，不动你的邮件），认出每封邮件是询盘、订单进展还是异常情况。
+- 把邮件往来自动记进对应客户的时间线，越用越了解你的客户。
+- 根据客户历史和产品资料起草回信；真正发出去之前，必须经过你的审批。
 
-### 💰 报价与 PI 准备
-- 基于产品资料、price memory、历史 quotation / PI 和客户上下文生成 draft-only quotation lines。
-- 输出成本、售价、毛利参考、assumptions、missing info checklist 和 evidence refs。
-- 正式 quotation、PI、PDF、Excel 生成默认关闭, 必须人工确认并审批。
+### 💰 报价准备
+- 根据产品资料、历史价格和客户情况帮你拟报价，附成本、售价和毛利参考。
+- 会老实告诉你哪些数字是假设的、还缺什么信息，不会瞎编。
+- 正式报价单、PI、PDF、Excel 默认不生成，需要你确认后才输出。
 
-### 🎯 客户开发与跟进
-- `/growth` 支持 prospecting dry-run、ICP score、opening angle 和下一步建议。
-- 支持 outbound approval request, 只创建审批请求, 不直接外联。
-- decision learning 记录人工修改、拒绝原因和 policy suggestion, 不自动放宽高风险动作。
+### 🎯 找客户、做跟进
+- 给潜在客户打适配分，建议开发信从什么角度切入、下一步该做什么。
+- 想发的开发信只会进审批队列排队，你批了才算数。
+- 系统会记住你每次怎么改、为什么拒，慢慢学你的口味——但不会因此自作主张。
 
-### 📦 订单、付款与异常信号
-- 从客户活动中聚合 PI/order、payment、shipment、refund、after-sales 和 exception 信号。
-- 为 operator 生成下一步建议和待审批 milestone request。
-- 付款、银行、价格调整保持最高风险边界, 默认 blocked。
+### 📦 订单与异常盯梢
+- 从邮件往来里自动拼出订单进展：付款到没到、货发没发、有没有售后问题。
+- 有异常会提醒你，并给出下一步建议。
+- 付款、银行、改价这类高危操作永远锁死，界面上都不给自动执行的入口。
 
 ### 📊 销售仪表板
-- 销售数据可视化
-- 客户转化漏斗
-- 业绩统计
-- 实时数据更新
+- 今日待办、客户动态、邮件进度一屏看完。
+- 内置销售助手对话：随口问"XX 客户上次报的什么价"，它翻档案答你。
 
-### 🤖 Worker 与运营恢复
-- Jaden worker 处理本地队列、heartbeat、失败任务和 retryable work。
-- `/agent-status` 展示 worker health、side-effect review queue、失败任务和恢复操作。
-- Phase 12 scheduler 当前是 dry-run tick, 不是生产级无人值守 outbound worker。
+### 🤖 后台任务
+- 后台 worker 静默处理收件箱同步、客户档案更新、失败重试。
+- 任务进度页能看到它在忙什么、卡在哪、怎么恢复。
 
 ---
 
