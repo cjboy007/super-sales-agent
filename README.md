@@ -1,6 +1,8 @@
 # Super Sales Agent — 超级业务员系统
 
-**审批门控的销售执行系统** — 统一客户事实、销售草稿、报价准备、客户跟进、订单信号和 side-effect approval。当前定位是 controlled beta / HITL 操作台, 不是无人值守的真实外联销售员。
+**开源的审批门控销售执行系统（Apache-2.0）** — 统一客户事实、销售草稿、报价准备、客户跟进、订单信号和 side-effect approval。定位是 human-in-the-loop 销售操作台：AI 负责起草、分析、聚合和建议，人负责审批每一个真实客户可见动作。它不是无人值守的自动外联机器人。
+
+克隆即用：无激活码、无注册、无云端依赖，本地跑 `npm run dev` 即可，自带演示数据和 mock LLM。
 
 ## Current Capability Boundary
 
@@ -211,6 +213,26 @@ Hermes, OpenClaw, and other operator tools should write company material into th
 
 ---
 
+## 页面功能地图
+
+| 页面 | 名称 | 功能 |
+|------|------|------|
+| `/` | 工作台 | 销售驾驶舱：今日待办、客户动态、邮件进度、内置销售助手对话（基于本地客户/报价/邮件上下文回答问题、起草内容、发起后台研究） |
+| `/intake` | 资料导入 | 上传产品资料、报价单、客户名单等文件，AI 解析提取产品/价格/客户事实并写入本地记忆 |
+| `/reviews` | 待确认 | 人工审批队列：所有真实副作用（发邮件、写 CRM、改价、生成正式单证）在这里等待放行或拒绝 |
+| `/growth` | 线索开发 | HITL 增长操作台：prospecting dry-run、ICP 适配评分、开发信角度建议、outbound 审批请求、决策学习 |
+| `/leads` | 客户 | 客户列表与跟进：客户档案、活动时间线、销售记忆、生命周期状态 |
+| `/emails` | 邮件草稿 | AI 生成的回复/跟进草稿，人工编辑后提交审批 |
+| `/inbox` | 邮件复核 | 收件箱视图：意图识别（RFQ/订单/异常）、逐封复核、生成回复 |
+| `/quotations` | 报价中心 | 报价与 PI 准备：draft-only 报价行、成本/售价/毛利参考、快速报价工具 |
+| `/documents` | 单证中心 | 贸易单证（QT/PI/CI/PL）生成与管理，正式输出需审批 |
+| `/intelligence` | 市场洞察 | 客户公司背调、新闻信号、市场与竞品情报聚合 |
+| `/agent-status` | 任务进度 | 后台 worker 健康状态、任务队列、失败恢复、副作用审计 |
+| `/health` | 健康检查 | 部署就绪面板：LLM 连通、邮箱配置、worker 心跳、数据目录 |
+| `/settings` | 设置 | 本地存储、模型供应商、邮件账户、搜索配置 |
+
+---
+
 ## 快速开始
 
 ### 前置条件
@@ -288,7 +310,7 @@ cd ..
 scripts/check-repo-boundary.sh
 ```
 
-真实 IMAP、SMTP、OKKI、飞书、支付、银行等外部副作用默认关闭。必须有 Wilson 明确授权并设置对应 `SSA_ENABLE_REAL_*` 开关后，适配器才允许执行真实外部调用。
+真实 IMAP、SMTP、OKKI、飞书、支付、银行等外部副作用默认关闭。必须由操作者（deployment owner）明确授权并设置对应 `SSA_ENABLE_REAL_*` 开关后，适配器才允许执行真实外部调用。
 
 ### Runtime File Boundary
 
@@ -387,17 +409,18 @@ export DEEPSEEK_API_KEY=your_key
 export SSA_LLM_MODEL=deepseek-v4-flash
 ```
 
-外部副作用开关默认不设置：
-```bash
-export SSA_ENABLE_REAL_IMAP=true
-export SSA_ENABLE_REAL_EMAIL_SEND=true
-export SSA_ENABLE_REAL_CRM_WRITE=true
-export SSA_ENABLE_REAL_FEISHU=true
-export SSA_ENABLE_REAL_PAYMENT=true
-export SSA_ENABLE_REAL_BANK=true
-```
+外部副作用开关默认不设置（即全部关闭）。只有在对应适配器经过审查、且确实需要真实外部调用时，才逐个显式开启：
 
-只有在明确需要真实外部调用时才设置这些变量。真实客户邮件发送还必须带有已批准的服务端 side-effect 决策记录 ID；浏览器请求体里的人工审批标记不能作为放行依据。
+```bash
+# 默认全部 false / 不设置。按需逐个开启，不要批量打开。
+export SSA_ENABLE_REAL_IMAP=false
+export SSA_ENABLE_REAL_EMAIL_SEND=false
+export SSA_ENABLE_REAL_CRM_WRITE=false
+export SSA_ENABLE_REAL_FEISHU=false
+export SSA_ENABLE_REAL_PAYMENT=false
+export SSA_ENABLE_REAL_BANK=false
+```
+真实客户邮件发送还必须带有已批准的服务端 side-effect 决策记录 ID；浏览器请求体里的人工审批标记不能作为放行依据。
 真实冷邮件发送还需要 Hunter 邮箱核验通过；`SSA_ALLOW_UNVERIFIED_EMAIL_SEND=true`
 仅作为人工明确接受风险时的紧急覆盖，不应作为 public beta 默认配置。
 
@@ -414,10 +437,10 @@ bash hero-pumps/scripts/inbox-monitor-scan.sh
 ## 开发文档
 
 - [架构设计](./docs/ARCHITECTURE.md)
-- [Skill 开发规范](./docs/SKILL_DEVELOPMENT.md)
-- [Revolution 使用指南](./docs/REVOLUTION_GUIDE.md)
-- [OKKI 集成文档](./docs/OKKI_INTEGRATION.md)
-- [邮件配置指南](./docs/EMAIL_SETUP.md)
+- [部署指南](./docs/PUBLIC_BETA_READINESS.md)
+- [运行时边界](./docs/SSA_RUNTIME_BOUNDARY.md)
+- [助手路由设计](./docs/ASSISTANT_ROUTER.md)
+- [v1 验收审计](./docs/SSA_V1_ACCEPTANCE_AUDIT.md)
 
 ---
 
@@ -451,7 +474,9 @@ bash hero-pumps/scripts/inbox-monitor-scan.sh
 
 ## 许可证
 
-MIT License
+Apache License 2.0 — 详见 [LICENSE](./LICENSE)。
+
+本仓库自带的客户、报价、邮件示例数据均为合成数据（synthetic），不包含真实客户信息。
 
 ---
 
