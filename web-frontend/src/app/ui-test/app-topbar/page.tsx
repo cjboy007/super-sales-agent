@@ -3,10 +3,9 @@ import Link from "next/link";
 const navItems = [
   { label: "Workbench", href: "/" },
   { label: "Pending Review", href: "/reviews" },
-  { label: "Customer Follow-up", href: "/leads" },
+  { label: "Customers", href: "/leads" },
   { label: "Email Drafts", href: "/emails" },
   { label: "Quote Center", href: "/quotations" },
-  { label: "Customer Records", href: "/customers" },
   { label: "Task Progress", href: "/agent-status" },
   { label: "Settings", href: "/settings" },
 ];
@@ -88,7 +87,7 @@ export default function AppTopBarApprovalPage() {
                 key={item.href}
                 href={item.href}
                 className={`rounded border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase transition ${
-                  item.label === "Customer Follow-up"
+                  item.label === "Customers"
                     ? "border-emerald-400/50 bg-emerald-400/15 text-emerald-100"
                     : "border-slate-600 bg-slate-900/45 text-slate-300 hover:border-slate-500 hover:text-white"
                 }`}
@@ -112,7 +111,7 @@ export default function AppTopBarApprovalPage() {
               key={item.href}
               href={item.href}
               className={`shrink-0 rounded border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase ${
-                item.label === "Customer Follow-up"
+                item.label === "Customers"
                   ? "border-emerald-400/50 bg-emerald-400/15 text-emerald-100"
                   : "border-slate-600 bg-slate-900/45 text-slate-300"
               }`}

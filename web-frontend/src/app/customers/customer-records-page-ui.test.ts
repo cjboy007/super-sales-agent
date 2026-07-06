@@ -6,13 +6,18 @@ const customersSource = readFileSync(join(process.cwd(), "src/app/customers/page
 const leadsSource = readFileSync(join(process.cwd(), "src/app/leads/page.tsx"), "utf8");
 
 describe("customer records page UI", () => {
-  it("adds customer records as a separate navigation destination without duplicating the customer workspace", () => {
+  it("keeps the old customer records route as a compatibility redirect into Customers", () => {
     expect(customersSource).toContain("redirect");
-    expect(customersSource).toContain("/leads?view=records");
-    expect(leadsSource).toContain('searchParams.get("view") === "records"');
-    expect(leadsSource).toContain("Customer Records");
-    expect(leadsSource).toContain("客户档案");
-    expect(leadsSource).toContain("Customer Follow-up");
-    expect(leadsSource).toContain("客户跟进");
+    expect(customersSource).toContain("/leads");
+    expect(customersSource).not.toContain("/leads?view=records");
+    expect(leadsSource).toContain('title="Customers"');
+    expect(leadsSource).toContain('zhTitle="客户"');
+    expect(leadsSource).toContain("Customer List / Customer Detail");
+    expect(leadsSource).toContain("客户列表 / 客户详情");
+    expect(leadsSource).not.toContain("Customer Records");
+    expect(leadsSource).not.toContain("客户档案");
+    expect(leadsSource).not.toContain("Customer Follow-up");
+    expect(leadsSource).not.toContain("客户跟进");
+    expect(leadsSource).not.toContain('searchParams.get("view")');
   });
 });

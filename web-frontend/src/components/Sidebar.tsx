@@ -9,11 +9,10 @@ const ALL_MENU_ITEMS = [
   { name: "工作台", icon: "📊", href: "/" },
   { name: "待确认", icon: "✓", href: "/reviews", badge: true },
   { name: "线索开发", icon: "↗", href: "/growth" },
-  { name: "客户跟进", icon: "👥", href: "/leads" },
+  { name: "客户", icon: "👥", href: "/leads" },
   { name: "邮件草稿", icon: "📧", href: "/emails" },
   { name: "报价中心", icon: "📋", href: "/quotations" },
   { name: "任务进度", icon: "🤖", href: "/agent-status" },
-  { name: "客户档案", icon: "▤", href: "/customers" },
   { name: "设置", icon: "⚙️", href: "/settings" },
 ];
 

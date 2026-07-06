@@ -27,7 +27,6 @@ describe("global app navigation", () => {
       "/emails",
       "/quotations",
       "/agent-status",
-      "/customers",
       "/settings",
     ]);
     expect(APP_NAV_ITEMS.find((item) => item.href === "/intake")).toMatchObject({
@@ -38,17 +37,14 @@ describe("global app navigation", () => {
       label: "Pending Review",
       zhLabel: "待确认",
     });
-    expect(APP_NAV_ITEMS.find((item) => item.href === "/customers")).toMatchObject({
-      label: "Customer Records",
-      zhLabel: "客户档案",
-    });
   });
 
-  it("uses customer follow-up as the primary account workspace label", () => {
+  it("uses one customer module as the primary account workspace label", () => {
     expect(APP_NAV_ITEMS.find((item) => item.href === "/leads")).toMatchObject({
-      label: "Customer Follow-up",
-      zhLabel: "客户跟进",
+      label: "Customers",
+      zhLabel: "客户",
     });
+    expect(APP_NAV_ITEMS.map((item) => item.href)).not.toContain("/customers");
   });
 
   it("includes a task progress entry for beta health checks", () => {

@@ -320,7 +320,7 @@ export default function PendingReviewPage() {
                 { href: "/inbox", en: "Email review", zh: "邮件复核", metaEn: "Review reply suggestions", metaZh: "复核回复建议" },
                 { href: "/emails", en: "Email drafts", zh: "邮件草稿", metaEn: "Edit saved drafts", metaZh: "编辑已保存草稿" },
                 { href: "/quotations", en: "Quote center", zh: "报价中心", metaEn: "Review quotes and PI files", metaZh: "复核报价和 PI 文件" },
-                { href: "/customers", en: "Customer records", zh: "客户档案", metaEn: "Check timeline and evidence", metaZh: "查看时间线和证据" },
+                { href: "/leads", en: "Customers", zh: "客户", metaEn: "Open customer list, timeline, and actions", metaZh: "查看客户列表、时间线和动作" },
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="rounded-md border border-slate-800 bg-slate-950/55 px-3 py-3 transition hover:border-slate-600 hover:bg-slate-900">
                   <span className="block text-sm font-semibold text-slate-100">{language === "zh" ? item.zh : item.en}</span>

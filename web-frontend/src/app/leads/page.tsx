@@ -2,7 +2,6 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 import { useProject } from "@/lib/project";
 import {
   BattleBadge,
@@ -609,8 +608,6 @@ function CustomerDetail({
 function CustomerWorkspacePage() {
   const { apiFetch, project, projectId } = useProject();
   const language = useBattleLanguage();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [directory, setDirectory] = useState<CustomerDirectory | null>(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<CustomerStatus | "All">("All");
@@ -628,9 +625,7 @@ function CustomerWorkspacePage() {
   const stats = directory?.stats || { total: 0, prospect: 0, active: 0, dormant: 0, risk: 0, archived: 0, countries: 0 };
   const totalPages = directory?.totalPages || 1;
   const metricValue = (value: string | number) => accessIssue !== "none" ? "--" : value;
-  const isRecordsMode = pathname === "/customers" || searchParams.get("view") === "records";
-  const activeHref = isRecordsMode ? "/customers" : "/leads";
-  const accessPromptHref = `/beta-access?next=${encodeURIComponent(activeHref)}`;
+  const accessPromptHref = "/beta-access?next=/leads";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -775,7 +770,7 @@ function CustomerWorkspacePage() {
     error,
   };
   const commandSummary = [
-    language === "zh" ? (isRecordsMode ? "客户档案" : "客户跟进") : (isRecordsMode ? "Customer Records" : "Customer Follow-up"),
+    language === "zh" ? "客户" : "Customers",
     `${language === "zh" ? "筛选" : "Filter"} ${status} / ${country}`,
     `${language === "zh" ? "当前显示" : "Visible"} ${customers.length}`,
     `${language === "zh" ? "活跃客户" : "Active"} ${stats.active}`,
@@ -785,11 +780,11 @@ function CustomerWorkspacePage() {
   return (
     <BattlePageShell>
       <BattlePageHeader
-        title={isRecordsMode ? "Customer Records" : "Customer Follow-up"}
-        zhTitle={isRecordsMode ? "客户档案" : "客户跟进"}
-        meta={`${project.name.toUpperCase()} / ${isRecordsMode ? "CUSTOMER RECORDS" : "FOLLOW-UP"} / PAGE ${page}`}
-        zhMeta={`${project.name.toUpperCase()} / ${isRecordsMode ? "客户档案" : "客户跟进"} / 第 ${page} 页`}
-        active={activeHref}
+        title="Customers"
+        zhTitle="客户"
+        meta={`${project.name.toUpperCase()} / CUSTOMERS / PAGE ${page}`}
+        zhMeta={`${project.name.toUpperCase()} / 客户 / 第 ${page} 页`}
+        active="/leads"
       >
         <BattleBadge tone={loading ? "blue" : "emerald"} pulse={loading}>
           {loading ? <BattleText en="SYNC" zh="同步" /> : <BattleText en="LIVE" zh="实时" />}
@@ -806,7 +801,7 @@ function CustomerWorkspacePage() {
         </div>
 
         <BattlePanel
-          title={language === "zh" ? (isRecordsMode ? "客户档案 / 历史记录" : "客户跟进 / 客户详情") : (isRecordsMode ? "Customer Records / History" : "Follow-up List / Customer Detail")}
+          title={language === "zh" ? "客户列表 / 客户详情" : "Customer List / Customer Detail"}
           meta={language === "zh" ? `${customers.length} 个可见客户 / 每页 ${PAGE_SIZE} 个` : `${customers.length} visible customers / ${PAGE_SIZE} per page`}
         >
           <div className="border-b border-slate-800 bg-slate-950/30 p-3">
@@ -948,8 +943,8 @@ function CustomerWorkspacePage() {
         </div>
 
         <PageCommandPanel
-          page={isRecordsMode ? "customer-records" : "customer-follow-up"}
-          surface={isRecordsMode ? "customers" : "leads"}
+          page="customers"
+          surface="customers"
           mode="page_assist"
           target={selectedCustomer
             ? {
@@ -960,8 +955,8 @@ function CustomerWorkspacePage() {
             : { type: "none" }}
           summary={commandSummary}
           context={commandContext}
-          placeholder={isRecordsMode ? "Ask Jaden to summarize customer history, evidence, orders, or recent changes" : "Ask Jaden to summarize a customer, prepare follow-up priorities, or compare recent orders"}
-          zhPlaceholder={isRecordsMode ? "让 Jaden 总结客户历史、证据、订单或最近变化" : "让 Jaden 总结客户、准备跟进优先级，或对比最近订单"}
+          placeholder="Ask Jaden to summarize a customer, timeline, orders, or next action"
+          zhPlaceholder="让 Jaden 总结客户、时间线、订单或下一步动作"
         />
       </BattlePageBody>
     </BattlePageShell>

@@ -559,10 +559,9 @@ export const focusCases: Record<string, FocusCase> = {
 
 export const moduleLinks = [
   { label: "Pending Review", zhLabel: "待确认", href: "/reviews", hotkey: "R" },
-  { label: "Customer Follow-up", zhLabel: "客户跟进", href: "/leads", hotkey: "L" },
+  { label: "Customers", zhLabel: "客户", href: "/leads", hotkey: "C" },
   { label: "Email Drafts", zhLabel: "邮件草稿", href: "/emails", hotkey: "E" },
   { label: "Quote Center", zhLabel: "报价中心", href: "/quotations", hotkey: "Q" },
-  { label: "Customer Records", zhLabel: "客户档案", href: "/customers", hotkey: "C" },
   { label: "Market Insights", zhLabel: "市场洞察", href: "/intelligence", hotkey: "N" },
   { label: "Settings", zhLabel: "设置", href: "/settings", hotkey: "," },
 ];
@@ -1174,10 +1173,9 @@ export const battleStationI18n: Record<
     },
     moduleLinks: [
       { label: "Pending Review", zhLabel: "待确认", href: "/reviews", hotkey: "R" },
-      { label: "Customer Follow-up", zhLabel: "客户跟进", href: "/leads", hotkey: "L" },
+      { label: "Customers", zhLabel: "客户", href: "/leads", hotkey: "C" },
       { label: "Email Drafts", zhLabel: "邮件草稿", href: "/emails", hotkey: "E" },
       { label: "Quote Center", zhLabel: "报价中心", href: "/quotations", hotkey: "Q" },
-      { label: "Customer Records", zhLabel: "客户档案", href: "/customers", hotkey: "C" },
       { label: "Market Insights", zhLabel: "市场洞察", href: "/intelligence", hotkey: "N" },
       { label: "Settings", zhLabel: "设置", href: "/settings", hotkey: "," },
     ],

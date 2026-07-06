@@ -36,10 +36,10 @@ describe("cockpit reform UI", () => {
 
   it("uses full business labels for the Ask Jaden quick links", () => {
     expect(battleStationDataSource).toContain('label: "Pending Review", zhLabel: "待确认"');
-    expect(battleStationDataSource).toContain('label: "Customer Follow-up", zhLabel: "客户跟进"');
+    expect(battleStationDataSource).toContain('label: "Customers", zhLabel: "客户"');
     expect(battleStationDataSource).toContain('label: "Email Drafts", zhLabel: "邮件草稿"');
     expect(battleStationDataSource).toContain('label: "Quote Center", zhLabel: "报价中心"');
-    expect(battleStationDataSource).toContain('label: "Customer Records", zhLabel: "客户档案"');
+    expect(battleStationDataSource).not.toContain('label: "Customer Records", zhLabel: "客户档案"');
     expect(battleStationDataSource).not.toContain('label: "Review", href: "/reviews"');
     expect(battleStationDataSource).not.toContain('label: "Drafts", href: "/emails"');
   });
@@ -100,13 +100,10 @@ describe("cockpit reform UI", () => {
       zhLabel: "任务进度",
     });
     expect(APP_NAV_ITEMS.find((item) => item.href === "/leads")).toMatchObject({
-      label: "Customer Follow-up",
-      zhLabel: "客户跟进",
+      label: "Customers",
+      zhLabel: "客户",
     });
-    expect(APP_NAV_ITEMS.find((item) => item.href === "/customers")).toMatchObject({
-      label: "Customer Records",
-      zhLabel: "客户档案",
-    });
+    expect(APP_NAV_ITEMS.map((item) => item.href)).not.toContain("/customers");
   });
 
   it("keeps user-facing Chinese copy away from geeky or overly internal terms", () => {
