@@ -29,3 +29,34 @@ SSA is designed to fail closed for risky actions. These must remain blocked unle
 - Any action that changes price, order, shipment, or payment state.
 
 Secrets and runtime data must stay outside the repository under a local data root or production secret manager.
+
+## Credential Storage
+
+Real credentials never belong in project files. Store them in one of:
+
+- Runtime environment variables (production: platform secret manager).
+- The runtime data root: `SSA_DATA_ROOT/config.json` (default `~/.ssa/data/`).
+- Per-company profile files under `~/.config/super-sales-agent/profiles/<profile>.env`,
+  selected with `SSA_PROFILE=<profile>` or `EMAIL_PROFILE=<profile>`:
+
+```env
+SMTP_HOST=smtp.example.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=sales@example.com
+SMTP_PASS=replace-with-provider-app-password
+SMTP_FROM=sales@example.com
+
+IMAP_HOST=imap.example.com
+IMAP_PORT=993
+IMAP_TLS=true
+IMAP_USER=sales@example.com
+IMAP_PASS=replace-with-provider-app-password
+```
+
+Profile files should be readable only by the current user:
+
+```bash
+chmod 700 ~/.config/super-sales-agent ~/.config/super-sales-agent/profiles
+chmod 600 ~/.config/super-sales-agent/profiles/*.env
+```
