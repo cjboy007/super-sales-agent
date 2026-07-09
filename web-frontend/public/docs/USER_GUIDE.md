@@ -1,6 +1,6 @@
-# Super Sales Agent Beta User Guide
+# Super Sales Agent User Guide
 
-This guide is for beta users who want to try the sales CRM without help from a
+This guide is for users who want to try the sales CRM without help from a
 developer. It focuses on the normal product flow: start, connect a mailbox,
 import customers, review customer records, and approve any real external action.
 
@@ -88,7 +88,7 @@ remain visible for recovery instead of running silently.
 
 ## Daily check
 
-Before inviting a beta user, confirm these items:
+Before inviting a user, confirm these items:
 
 - Health Check shows the workspace is ready or gives clear next steps.
 - Demo data can be created and opened in Customers.

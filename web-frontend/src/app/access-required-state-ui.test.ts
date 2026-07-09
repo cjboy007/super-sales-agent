@@ -10,12 +10,12 @@ describe("shared access-required product state", () => {
   it("provides a reusable business-facing access prompt for protected work pages", () => {
     expect(battlePageSource).toContain("AccessRequiredState");
     expect(battlePageSource).toContain("LoadFailedState");
-    expect(battlePageSource).toContain("Beta Access Required");
-    expect(battlePageSource).toContain("Open Beta Access");
+    expect(battlePageSource).toContain("Request failed");
+    expect(battlePageSource).toContain("Open Settings");
     expect(battlePageSource).toContain("User guide");
     expect(battlePageSource).toContain("使用指南");
     expect(battlePageSource).toContain("/user-guide");
-    expect(battlePageSource).toContain("data is hidden for safety");
+    expect(battlePageSource).toContain("Check local settings");
     expect(battlePageSource).not.toContain("Beta access token is required");
     expect(battlePageSource).not.toContain("Workspace access is not allowed");
     expect(battlePageSource).not.toContain("jobId");

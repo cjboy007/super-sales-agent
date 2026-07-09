@@ -4,7 +4,7 @@ set -euo pipefail
 apps_dir="${SSA_APPS_DIR:-/home/ssa-deploy/apps}"
 current_link="${SSA_CURRENT_LINK:-$apps_dir/super-sales-agent-current}"
 pm2_app="${SSA_PM2_APP:-ssa-closed-alpha-web}"
-health_url="${SSA_HEALTH_URL:-http://127.0.0.1:3210/beta-access}"
+health_url="${SSA_HEALTH_URL:-http://127.0.0.1:3210/health}"
 release_tarball="${SSA_RELEASE_TARBALL:?SSA_RELEASE_TARBALL is required}"
 release_name="${SSA_RELEASE_NAME:-ssa-$(date -u +%Y%m%d%H%M%S)-github}"
 release_dir="$apps_dir/$release_name"

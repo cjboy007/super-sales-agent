@@ -124,7 +124,7 @@ interface CustomerDirectory {
 const PAGE_SIZE = 20;
 const EMPTY_CUSTOMERS: Customer[] = [];
 const DETAIL_TABS: CustomerDetailTab[] = ["overview", "orders", "activity"];
-const ACCESS_PROMPT_HREF = "/beta-access?next=/leads";
+const ACCESS_PROMPT_HREF = "/settings";
 
 function statusTone(status: CustomerStatus): BattleTone {
   if (status === "Active Customer") return "emerald";
@@ -329,12 +329,12 @@ function AccessPrompt({ issue, language, nextHref = ACCESS_PROMPT_HREF }: { issu
     <div className="px-4 py-10">
       <div className="mx-auto max-w-xl rounded-md border border-amber-500/30 bg-amber-500/10 px-5 py-6 text-center">
         <BattleBadge tone="amber">
-          {denied ? <BattleText en="Workspace Access" zh="工作区权限" /> : <BattleText en="Beta Access Required" zh="需要内测访问" />}
+          {denied ? <BattleText en="Workspace Access" zh="工作区权限" /> : <BattleText en="Workspace Unavailable" zh="工作区暂不可用" />}
         </BattleBadge>
         <p className="mt-4 text-sm font-semibold text-amber-50">
           {denied
-            ? (language === "zh" ? "当前会员激活码没有这个客户工作区的权限。" : "Your current Activation Code cannot open this customer workspace.")
-            : (language === "zh" ? "请先保存会员激活码，再查看客户、订单和时间线。" : "Save your Activation Code before viewing customers, orders, and timelines.")}
+            ? (language === "zh" ? "当前工作区无法打开这个客户视图。" : "The current workspace cannot open this customer view.")
+            : (language === "zh" ? "客户、订单和时间线暂时无法加载。" : "Customers, orders, and timelines could not load.")}
         </p>
         <p className="mt-2 text-xs leading-5 text-amber-100/80">
           {language === "zh"
@@ -346,7 +346,7 @@ function AccessPrompt({ issue, language, nextHref = ACCESS_PROMPT_HREF }: { issu
             href={nextHref}
             className="inline-flex h-9 items-center justify-center rounded-md border border-amber-300/40 bg-amber-300 px-4 text-xs font-semibold text-slate-950 transition hover:bg-amber-200"
           >
-            {language === "zh" ? "打开内测访问" : "Open Beta Access"}
+            {language === "zh" ? "打开设置" : "Open Settings"}
           </Link>
           <Link
             href="/user-guide"
@@ -625,7 +625,7 @@ function CustomerWorkspacePage() {
   const stats = directory?.stats || { total: 0, prospect: 0, active: 0, dormant: 0, risk: 0, archived: 0, countries: 0 };
   const totalPages = directory?.totalPages || 1;
   const metricValue = (value: string | number) => accessIssue !== "none" ? "--" : value;
-  const accessPromptHref = "/beta-access?next=/leads";
+  const accessPromptHref = "/settings";
 
   const load = useCallback(async () => {
     setLoading(true);

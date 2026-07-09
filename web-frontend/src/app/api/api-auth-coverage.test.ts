@@ -7,9 +7,8 @@ const API_ROOT = path.join(process.cwd(), "src", "app", "api");
 const AUTH_MARKERS = [
   "requireResolvedWorkspaceAccess",
   "requireWorkspaceAccess",
-  "requireBetaAuth",
-  "requireAdminBetaAuth",
-  "redeemBetaToken",
+  "requireAdminWorkspaceAccess",
+  "requireWorkspaceSession",
   "verifyTrialSmsCode",
   "requestTrialSmsCode",
   "handleOkkiWebhook",
@@ -17,7 +16,6 @@ const AUTH_MARKERS = [
 
 const EXPLICIT_PUBLIC_ROUTES = new Set([
   "health/route.ts",
-  "beta-access/verify/route.ts",
   "trial-access/send-code/route.ts",
   "trial-access/verify-code/route.ts",
   "webhooks/okki/route.ts",
@@ -31,8 +29,8 @@ function routeFiles(dir: string): string[] {
   });
 }
 
-describe("API auth coverage", () => {
-  it("requires every API route to use auth or be listed as an explicit public/signed exception", () => {
+describe("API workspace coverage", () => {
+  it("requires every API route to resolve workspace context or be listed as an explicit public/signed exception", () => {
     const missingAuth = routeFiles(API_ROOT)
       .map((file) => path.relative(API_ROOT, file))
       .filter((route) => {

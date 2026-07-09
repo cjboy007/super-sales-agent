@@ -566,11 +566,8 @@ export default function QuickQuotePage({
                   {referenceError ? (
                     <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
                       <p className="font-mono text-[10px] text-amber-300">
-                        {language === "zh" ? "会员激活码无效 — 汇率锁定" : "Activation Code invalid — rates locked"}
+                        {language === "zh" ? "汇率参考暂不可用" : "Rate reference unavailable"}
                       </p>
-                      <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
-                        {language === "zh" ? "保存会员激活码" : "Save Activation Code"}
-                      </a>
                     </div>
                   ) : (
                     <>
@@ -591,11 +588,8 @@ export default function QuickQuotePage({
                   {referenceError ? (
                     <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
                       <p className="font-mono text-[10px] text-amber-300">
-                        {language === "zh" ? "会员激活码无效 — 历史价格锁定" : "Activation Code invalid — history locked"}
+                        {language === "zh" ? "历史价格暂不可用" : "Price history unavailable"}
                       </p>
-                      <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
-                        {language === "zh" ? "保存会员激活码" : "Save Activation Code"}
-                      </a>
                     </div>
                   ) : (
                     <div className="mt-2 space-y-2">
@@ -623,11 +617,8 @@ export default function QuickQuotePage({
                   {referenceError ? (
                     <div className="mt-2 rounded border border-amber-500/20 bg-amber-500/5 px-2 py-2">
                       <p className="font-mono text-[10px] text-amber-300">
-                        {language === "zh" ? "会员激活码无效 — 参考价锁定" : "Activation Code invalid — references locked"}
+                        {language === "zh" ? "参考价暂不可用" : "Reference prices unavailable"}
                       </p>
-                      <a href="/beta-access?next=/documents/quick-quote" className="mt-1 inline-block font-mono text-[10px] text-amber-200 underline decoration-amber-400/40 hover:text-amber-100">
-                        {language === "zh" ? "保存会员激活码" : "Save Activation Code"}
-                      </a>
                     </div>
                   ) : (
                     <div className="mt-2 space-y-2">

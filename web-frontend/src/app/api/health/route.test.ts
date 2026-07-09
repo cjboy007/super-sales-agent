@@ -5,8 +5,6 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
-const originalAuthRequired = process.env.SSA_BETA_AUTH_REQUIRED;
 const originalSecretsDir = process.env.SSA_SECRETS_DIR;
 const originalProfile = process.env.SSA_PROFILE;
 const originalEmailProfile = process.env.EMAIL_PROFILE;
@@ -62,18 +60,16 @@ function writeSupervisorManifest(overrides: Record<string, unknown> = {}) {
   );
 }
 
-function request(url: string, token?: string): NextRequest {
-  return new NextRequest(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+function request(url: string): NextRequest {
+  return new NextRequest(url);
 }
 
 function defaultRequest(): NextRequest {
   return request("http://localhost/api/health");
 }
 
-function workspaceRequest(token?: string, workspaceId = "farreach"): NextRequest {
-  return request(`http://localhost/api/health?project=${workspaceId}`, token);
+function workspaceRequest(workspaceId = "farreach"): NextRequest {
+  return request(`http://localhost/api/health?project=${workspaceId}`);
 }
 
 beforeEach(() => {
@@ -82,7 +78,6 @@ beforeEach(() => {
   process.env.SSA_DATA_ROOT = tempRoot;
   process.env.SSA_SECRETS_DIR = path.join(tempRoot, "isolated-profiles");
   process.env.SSA_ALLOW_DEMO_ON_PROTECTED_WORKSPACES = "true";
-  delete process.env.SSA_BETA_AUTH_TOKENS;
   delete process.env.SSA_PROFILE;
   delete process.env.EMAIL_PROFILE;
   delete process.env.SSA_PROFILE_PATH;
@@ -91,12 +86,6 @@ beforeEach(() => {
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
-
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
-  if (originalAuthRequired === undefined) delete process.env.SSA_BETA_AUTH_REQUIRED;
-  else process.env.SSA_BETA_AUTH_REQUIRED = originalAuthRequired;
 
   if (originalSecretsDir === undefined) delete process.env.SSA_SECRETS_DIR;
   else process.env.SSA_SECRETS_DIR = originalSecretsDir;
@@ -128,25 +117,22 @@ describe("/api/health route", () => {
     expect(new Date(json.timestamp).toString()).not.toBe("Invalid Date");
   });
 
-  it("requires workspace access for explicit project health details when beta auth is configured", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "alpha-a-token", workspaces: ["alpha-a"] },
-    ]);
+  it("returns explicit project health details without activation auth", async () => {
     const { GET } = await import("./route");
 
-    const missing = await GET(request("http://localhost/api/health?project=alpha-a"));
-    const crossWorkspace = await GET(new NextRequest("http://localhost/api/health?project=alpha-b", {
-      headers: { Authorization: "Bearer alpha-a-token" },
-    }));
+    const alphaA = await GET(request("http://localhost/api/health?project=alpha-a"));
+    const alphaB = await GET(request("http://localhost/api/health?project=alpha-b"));
+    const alphaAJson = await alphaA.json();
 
-    expect(missing.status).toBe(401);
-    expect(crossWorkspace.status).toBe(403);
+    expect(alphaA.status).toBe(200);
+    expect(alphaB.status).toBe(200);
+    expect(alphaAJson.beta).toMatchObject({
+      authConfigured: false,
+      sideEffectsBlockedByDefault: true,
+    });
   });
 
-  it("returns only global health without workspace readiness when beta auth is configured and no workspace is authorized", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
+  it("returns readiness details on default health without workspace auth", async () => {
     const { GET } = await import("./route");
 
     const response = await GET(defaultRequest());
@@ -154,16 +140,16 @@ describe("/api/health route", () => {
 
     expect(response.status).toBe(200);
     expect(json.beta).toMatchObject({
-      authConfigured: true,
+      authConfigured: false,
       sideEffectsBlockedByDefault: true,
     });
-    expect(json.beta).not.toHaveProperty("mailbox");
-    expect(json.beta).not.toHaveProperty("realActions");
-    expect(json.beta).not.toHaveProperty("workerRecovery");
-    expect(json.beta).not.toHaveProperty("readiness");
+    expect(json.beta).toHaveProperty("mailbox");
+    expect(json.beta).toHaveProperty("realActions");
+    expect(json.beta).toHaveProperty("workerRecovery");
+    expect(json.beta).toHaveProperty("readiness");
   });
 
-  it("includes worker readiness and queue health for beta operations", async () => {
+  it("includes worker readiness and queue health for operations", async () => {
     const { recordWorkerStatus } = await import("@/lib/runtime/worker-health");
     recordWorkerStatus({
       workerId: "health-api-worker",
@@ -242,18 +228,15 @@ describe("/api/health route", () => {
     expect(serialized).not.toContain("job-1");
   });
 
-  it("reports beta readiness signals without exposing runtime paths or customer-page internals", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
+  it("reports readiness signals without exposing runtime paths or customer-page internals", async () => {
     const { GET } = await import("./route");
 
-    const response = await GET(workspaceRequest("admin-token"));
+    const response = await GET(workspaceRequest());
     const json = await response.json();
 
     expect(response.status).toBe(200);
     expect(json.beta).toMatchObject({
-      authConfigured: true,
+      authConfigured: false,
       sideEffectsBlockedByDefault: true,
     });
     const serialized = JSON.stringify(json);
@@ -265,35 +248,27 @@ describe("/api/health route", () => {
     expect(serialized).not.toContain("channel_audit");
   });
 
-  it("flags file-based beta tokens as incomplete until page access protection is enabled", async () => {
-    delete process.env.SSA_BETA_AUTH_TOKENS;
-    delete process.env.SSA_BETA_AUTH_REQUIRED;
-    fs.mkdirSync(path.join(tempRoot, "security"), { recursive: true });
-    fs.writeFileSync(path.join(tempRoot, "security", "beta-auth.json"), JSON.stringify({
-      tokens: [
-        { name: "farreach-beta", token: "file-token", workspaces: ["farreach"] },
-      ],
-    }), "utf-8");
+  it("reports open product access as ready", async () => {
     const { GET } = await import("./route");
 
-    const response = await GET(workspaceRequest("file-token"));
+    const response = await GET(workspaceRequest());
     const json = await response.json();
 
     expect(response.status).toBe(200);
-    expect(json.beta.authConfigured).toBe(true);
+    expect(json.beta.authConfigured).toBe(false);
     expect(json.beta.pageAccessProtected).toBe(false);
     expect(json.beta.readiness.checks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: "access-control",
-        status: "needs_setup",
-        detail: expect.stringContaining("server-side token"),
-        action: expect.stringContaining("page access protection"),
+        status: "ready",
+        label: "Open product access",
+        detail: expect.stringContaining("without in-app activation"),
+        action: expect.stringContaining("network"),
       }),
     ]));
-    expect(JSON.stringify(json.beta.readiness)).not.toContain("SSA_BETA_AUTH_REQUIRED");
   });
 
-  it("returns a non-technical beta readiness checklist when external beta setup is incomplete", async () => {
+  it("returns a non-technical readiness checklist when setup is incomplete", async () => {
     const { GET } = await import("./route");
 
     const response = await GET(defaultRequest());
@@ -310,8 +285,8 @@ describe("/api/health route", () => {
     expect(json.beta.readiness.checks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: "access-control",
-        status: "needs_setup",
-        label: expect.stringContaining("Beta access"),
+        status: "ready",
+        label: expect.stringContaining("Open product access"),
       }),
       expect.objectContaining({
         id: "resident-worker",
@@ -358,7 +333,6 @@ describe("/api/health route", () => {
 
     const serialized = JSON.stringify(json.beta.readiness);
     expect(serialized).not.toContain(tempRoot);
-    expect(serialized).not.toContain("SSA_BETA_AUTH");
     expect(serialized).not.toContain("SSA_ENABLE_REAL");
     expect(serialized).not.toContain("jobId");
     expect(serialized).not.toContain("workflow");
@@ -370,10 +344,7 @@ describe("/api/health route", () => {
     expect(serialized).not.toContain("POST");
   });
 
-  it("does not mark a healthy worker as beta-ready until supervisor recovery is configured", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
+  it("does not mark a healthy worker as ready until supervisor recovery is configured", async () => {
     const { createSalesRuntime, seedDemoWorkspace } = await import("@/lib/runtime");
     const { recordWorkerStatus } = await import("@/lib/runtime/worker-health");
     const runtime = createSalesRuntime();
@@ -395,7 +366,7 @@ describe("/api/health route", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET(workspaceRequest("admin-token"));
+    const response = await GET(workspaceRequest());
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -610,9 +581,6 @@ describe("/api/health route", () => {
   });
 
   it("separates seeded customer activity from real mailbox sync readiness", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
     writeSupervisorManifest();
     const { createSalesRuntime, seedDemoWorkspace } = await import("@/lib/runtime");
     const { recordWorkerStatus } = await import("@/lib/runtime/worker-health");
@@ -649,7 +617,7 @@ describe("/api/health route", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET(workspaceRequest("admin-token"));
+    const response = await GET(workspaceRequest());
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -692,10 +660,7 @@ describe("/api/health route", () => {
     expect(mailboxSerialized).not.toContain(tempRoot);
   });
 
-  it("marks beta readiness ready when auth, worker, demo data, customer activity, and order timeline are present", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
+  it("marks readiness ready when worker, demo data, customer activity, and order timeline are present", async () => {
     writeSupervisorManifest();
     writeRuntimeConfig();
     const { createSalesRuntime, seedDemoWorkspace } = await import("@/lib/runtime");
@@ -749,7 +714,7 @@ describe("/api/health route", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET(workspaceRequest("admin-token"));
+    const response = await GET(workspaceRequest());
     const json = await response.json();
 
     expect(response.status).toBe(200);

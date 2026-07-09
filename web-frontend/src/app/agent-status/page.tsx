@@ -77,8 +77,6 @@ interface HealthPayload {
     alerts: string[];
   };
   beta?: {
-    authConfigured: boolean;
-    pageAccessProtected?: boolean;
     sideEffectsBlockedByDefault: boolean;
     mailbox?: {
       status: BetaReadinessStatus;
@@ -433,8 +431,8 @@ export default function AgentStatusPage() {
       <BattlePageHeader
         title="Task Progress"
         zhTitle="任务进度"
-        meta="Beta readiness / automation health / safety checks"
-        zhMeta="内测就绪 / 自动任务健康 / 安全确认"
+        meta="Operational readiness / automation health / safety checks"
+        zhMeta="运行就绪 / 自动任务健康 / 安全确认"
         active="/agent-status"
       >
         <a
@@ -463,7 +461,7 @@ export default function AgentStatusPage() {
         ) : null}
 
         <BattlePanel
-          title={language === "zh" ? "内测准备" : "Beta Readiness"}
+          title={language === "zh" ? "就绪检查" : "Readiness"}
           meta={readiness ? `${readiness.ready}/${readiness.total}` : "-"}
           tone={toneForReadiness(readiness?.status)}
           action={<BattleBadge tone={toneForReadiness(readiness?.status)}>{readinessLabel(readiness?.status, language)}</BattleBadge>}
@@ -481,7 +479,7 @@ export default function AgentStatusPage() {
             ))}
             {!readiness?.checks?.length ? (
               <p className="text-sm text-slate-400">
-                <BattleText en="Readiness checks will appear after the health check returns." zh="健康检查返回后会显示内测准备项。" />
+                <BattleText en="Readiness checks will appear after the health check returns." zh="健康检查返回后会显示就绪检查项。" />
               </p>
             ) : null}
           </div>
@@ -648,11 +646,8 @@ export default function AgentStatusPage() {
                 <BattleBadge tone={health?.beta?.sideEffectsBlockedByDefault ? "emerald" : "red"}>
                   <BattleText en="Authorization on" zh="授权确认已开启" />
                 </BattleBadge>
-                <BattleBadge tone={health?.beta?.authConfigured ? "emerald" : "amber"}>
-                  {health?.beta?.authConfigured ? <BattleText en="Beta auth on" zh="内测鉴权已开" /> : <BattleText en="Local open mode" zh="本地开放模式" />}
-                </BattleBadge>
-                <BattleBadge tone={health?.beta?.pageAccessProtected ? "emerald" : "amber"}>
-                  {health?.beta?.pageAccessProtected ? <BattleText en="Access page protected" zh="访问页已保护" /> : <BattleText en="Access page open" zh="访问页未保护" />}
+                <BattleBadge tone="emerald">
+                  <BattleText en="Open access" zh="开放访问" />
                 </BattleBadge>
               </div>
               <CommandButton type="button" variant="secondary" onClick={() => void prepareWorkerRecovery()} disabled={recoveryPreparing}>

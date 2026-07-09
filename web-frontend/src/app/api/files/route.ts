@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime, runtimeFilePathFromToken } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { allowRuntimeFilePathFallback } from "@/lib/runtime/local-gateway";
 
 export const dynamic = "force-dynamic";

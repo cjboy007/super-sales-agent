@@ -11,10 +11,6 @@ export function isLocalGatewayMode(): boolean {
   return envFlag(process.env.SSA_LOCAL_GATEWAY) || mode === "local-gateway" || mode === "gateway" || mode === "docker";
 }
 
-export function isBetaAuthRequiredForRuntime(): boolean {
-  return isLocalGatewayMode() || envFlag(process.env.SSA_BETA_AUTH_REQUIRED);
-}
-
 export function allowRuntimeFilePathFallback(): boolean {
   return !isLocalGatewayMode() || envFlag(process.env.SSA_ALLOW_FILE_PATH_FALLBACK);
 }

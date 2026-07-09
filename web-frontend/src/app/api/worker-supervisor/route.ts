@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdminBetaAuth, requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireAdminWorkspaceAccess, requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { prepareWorkerSupervisor, requestWorkerControl } from "@/lib/runtime/worker-supervisor";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const auth = requireAdminBetaAuth(request);
+  const auth = requireAdminWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;

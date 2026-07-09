@@ -5,7 +5,6 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 const originalLocalGateway = process.env.SSA_LOCAL_GATEWAY;
 let tempRoot = "";
 
@@ -13,15 +12,11 @@ beforeEach(() => {
   vi.resetModules();
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-files-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  delete process.env.SSA_BETA_AUTH_TOKENS;
 });
 
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
-
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
 
   if (originalLocalGateway === undefined) delete process.env.SSA_LOCAL_GATEWAY;
   else process.env.SSA_LOCAL_GATEWAY = originalLocalGateway;
@@ -29,12 +24,10 @@ afterEach(() => {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function requestFor(filePath: string, options: { project?: string; token?: string; download?: boolean } = {}): NextRequest {
+function requestFor(filePath: string, options: { project?: string; download?: boolean } = {}): NextRequest {
   const project = options.project ? `&project=${encodeURIComponent(options.project)}` : "";
   const download = options.download ? "&download=true" : "";
-  return new NextRequest(`http://localhost/api/files?path=${encodeURIComponent(filePath)}${project}${download}`, {
-    headers: options.token ? { Authorization: `Bearer ${options.token}` } : undefined,
-  });
+  return new NextRequest(`http://localhost/api/files?path=${encodeURIComponent(filePath)}${project}${download}`);
 }
 
 describe("/api/files route", () => {
@@ -72,9 +65,6 @@ describe("/api/files route", () => {
 
   it("requires opaque file tokens instead of absolute path fallback in local gateway mode", async () => {
     process.env.SSA_LOCAL_GATEWAY = "true";
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "gateway-auth", workspaces: ["farreach"] },
-    ]);
     const filePath = path.join(tempRoot, "companies", "farreach", "documents", "path-fallback.txt");
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, "path fallback", "utf-8");
@@ -82,7 +72,6 @@ describe("/api/files route", () => {
 
     const response = await GET(requestFor(filePath, {
       project: "farreach",
-      token: "gateway-auth",
     }));
     const json = await response.json();
 
@@ -92,9 +81,6 @@ describe("/api/files route", () => {
 
   it("serves registered file tokens in local gateway mode", async () => {
     process.env.SSA_LOCAL_GATEWAY = "true";
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "gateway-auth", workspaces: ["farreach"] },
-    ]);
     const { runtimeFileToken } = await import("@/lib/runtime");
     const filePath = path.join(tempRoot, "companies", "farreach", "documents", "gateway-token.txt");
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -102,9 +88,7 @@ describe("/api/files route", () => {
     const { GET } = await import("./route");
 
     const token = runtimeFileToken(filePath, "farreach");
-    const response = await GET(new NextRequest(`http://localhost/api/files?token=${encodeURIComponent(token)}&project=farreach`, {
-      headers: { Authorization: "Bearer gateway-auth" },
-    }));
+    const response = await GET(new NextRequest(`http://localhost/api/files?token=${encodeURIComponent(token)}&project=farreach`));
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("gateway token");
@@ -132,7 +116,7 @@ describe("/api/files route", () => {
     fs.writeFileSync(filePath, "hero quote", "utf-8");
     const { GET } = await import("./route");
 
-    const response = await GET(requestFor(filePath, { project: "farreach", token: "farreach-token" }));
+    const response = await GET(requestFor(filePath, { project: "farreach" }));
     const json = await response.json();
 
     expect(response.status).toBe(403);
@@ -144,7 +128,7 @@ describe("/api/files route", () => {
     fs.writeFileSync(configPath, JSON.stringify({ openaiApiKey: "encoded-secret" }), "utf-8");
     const { GET } = await import("./route");
 
-    const response = await GET(requestFor(configPath, { project: "farreach", token: "farreach-token" }));
+    const response = await GET(requestFor(configPath, { project: "farreach" }));
     const json = await response.json();
 
     expect(response.status).toBe(403);
@@ -161,7 +145,7 @@ describe("/api/files route", () => {
     const { GET } = await import("./route");
 
     for (const internalPath of [tokenRegistryPath, decisionsPath]) {
-      const response = await GET(requestFor(internalPath, { project: "farreach", token: "farreach-token" }));
+      const response = await GET(requestFor(internalPath, { project: "farreach" }));
       const json = await response.json();
       const serialized = JSON.stringify(json);
 

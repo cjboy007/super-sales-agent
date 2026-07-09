@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { computeGrowthMetrics } from "@/lib/runtime";
 
 export const dynamic = "force-dynamic";

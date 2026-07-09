@@ -15,8 +15,8 @@ const guideSections = [
   {
     title: "Start",
     zhTitle: "开始",
-    body: "Open Super Sales Agent, enter the Activation Code, then start from Workbench or Customer Follow-up. Task Progress shows whether the workspace is ready and what needs attention.",
-    zhBody: "打开 Super Sales Agent，输入会员激活码，然后从工作台或客户跟进开始。任务进度会显示工作台是否就绪，以及下一步需要处理什么。",
+    body: "Open Super Sales Agent, then start from Workbench or Customer Follow-up. Task Progress shows whether the workspace is ready and what needs attention.",
+    zhBody: "打开 Super Sales Agent，然后从工作台或客户跟进开始。任务进度会显示工作台是否就绪，以及下一步需要处理什么。",
   },
   {
     title: "Demo Data",
@@ -71,11 +71,11 @@ export default function UserGuidePage() {
       <BattlePageHeader
         title="User Guide"
         zhTitle="使用指南"
-        meta="Closed alpha first-run path"
-        zhMeta="内测首次使用路径"
+        meta="Open-source first-run path"
+        zhMeta="开源首次使用路径"
       >
-        <Link href="/beta-access" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-600">
-          <BattleText en="Beta Access" zh="内测访问" />
+        <Link href="/" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-600">
+          <BattleText en="Workbench" zh="工作台" />
         </Link>
         <Link href="/leads" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-emerald-600 bg-emerald-600 px-3 text-[13px] font-semibold text-white transition hover:bg-emerald-500">
           <BattleText en="Open Follow-up" zh="打开客户跟进" />
@@ -85,20 +85,20 @@ export default function UserGuidePage() {
       <BattlePageBody className="space-y-4">
         <section className="rounded-md border border-slate-800 bg-slate-900/45 p-5">
           <BattleBadge tone="emerald">
-            <BattleText en="Closed Alpha" zh="内测" />
+            <BattleText en="Open Source" zh="开源版" />
           </BattleBadge>
           <h1 className="mt-4 text-2xl font-semibold tracking-normal text-slate-100">
             <BattleText en="How to use Super Sales Agent" zh="如何使用 Super Sales Agent" />
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
             <BattleText
-              en="This guide is for beta users who want to try the sales CRM without help from a developer. Start with access, demo data, customer follow-up, mailbox, and review flow."
-              zh="这份指南给内测用户使用，不需要开发人员陪同。先完成访问，再看演示数据、客户跟进、邮箱和确认流程。"
+              en="This guide is for users who want to try the sales CRM without help from a developer. Start with demo data, customer follow-up, mailbox, and review flow."
+              zh="这份指南给想直接体验销售 CRM 的用户使用，不需要开发人员陪同。先看演示数据、客户跟进、邮箱和确认流程。"
             />
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            <Link href="/beta-access" className="inline-flex h-9 items-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-100 transition hover:border-slate-600">
-              <BattleText en="Enter Activation Code" zh="输入会员激活码" />
+            <Link href="/" className="inline-flex h-9 items-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-100 transition hover:border-slate-600">
+              <BattleText en="Open the app" zh="打开应用" />
             </Link>
             <Link href="/jadenos/onboarding" className="inline-flex h-9 items-center rounded-md border border-slate-700 bg-slate-800 px-4 text-xs font-semibold text-slate-100 transition hover:border-slate-600">
               <BattleText en="Open Onboarding" zh="打开入门页" />
@@ -139,17 +139,17 @@ export default function UserGuidePage() {
               </div>
             </BattlePanel>
 
-            <BattlePanel title="Need Access?" meta="closed alpha" tone="neutral">
+            <BattlePanel title="Need Setup?" meta="local settings" tone="neutral">
               <div className="space-y-3 p-4">
                 <p className="text-xs leading-5 text-slate-400">
                   <BattleText
-                    en="If a page asks for access, enter the Activation Code from the team. The app will remember it in this browser."
-                    zh="如果页面要求访问，请输入团队提供的会员激活码。当前浏览器会记住这次访问。"
+                    en="The app opens directly. If a page fails to load, check Settings, model configuration, mailbox setup, and runtime health."
+                    zh="应用会直接打开。如果页面加载失败，请检查设置、模型配置、邮箱设置和运行状态。"
                   />
                 </p>
-                <Link href="/beta-access" className="block">
+                <Link href="/settings" className="block">
                   <CommandButton type="button" variant="primary" className="w-full">
-                    <BattleText en="Open Beta Access" zh="打开内测访问" />
+                    <BattleText en="Open Settings" zh="打开设置" />
                   </CommandButton>
                 </Link>
               </div>

@@ -90,8 +90,6 @@ interface HealthPayload {
     alerts: string[];
   };
   beta?: {
-    authConfigured: boolean;
-    pageAccessProtected?: boolean;
     sideEffectsBlockedByDefault: boolean;
     model?: ModelReadiness;
     mailbox?: {
@@ -240,12 +238,12 @@ export default function HealthPage() {
       <BattlePageHeader
         title="Health Check"
         zhTitle="健康检查"
-        meta="Beta readiness / automation status / mailbox sync"
-        zhMeta="内测就绪 / 自动任务状态 / 邮箱同步"
+        meta="Operational readiness / automation status / mailbox sync"
+        zhMeta="运行就绪 / 自动任务状态 / 邮箱同步"
         active="/agent-status"
       >
-        <Link href="/docs/PUBLIC_BETA_READINESS.md" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-600">
-          <BattleText en="Beta guide" zh="内测指南" />
+        <Link href="/docs/DEPLOYMENT_READINESS.md" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-600">
+          <BattleText en="Readiness guide" zh="就绪指南" />
         </Link>
         <Link href="/user-guide" className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-600">
           <BattleText en="User guide" zh="使用指南" />
@@ -262,7 +260,7 @@ export default function HealthPage() {
 
         <div className="grid gap-3 md:grid-cols-5">
           <StatCell
-            label={language === "zh" ? "内测准备" : "Beta readiness"}
+            label={language === "zh" ? "就绪检查" : "Readiness"}
             value={readiness ? `${readiness.ready}/${readiness.total}` : "-"}
             tone={toneForReadiness(readiness?.status)}
           />
@@ -339,7 +337,7 @@ export default function HealthPage() {
         </BattlePanel>
 
         <BattlePanel
-          title={language === "zh" ? "内测准备" : "Beta readiness"}
+          title={language === "zh" ? "就绪检查" : "Readiness"}
           meta={readiness ? `${readiness.ready}/${readiness.total} ready` : loading ? "checking" : "unavailable"}
           tone={toneForReadiness(readiness?.status)}
           action={<BattleBadge tone={toneForReadiness(readiness?.status)}>{labelForReadiness(readiness?.status, language)}</BattleBadge>}
@@ -357,7 +355,7 @@ export default function HealthPage() {
             ))}
             {!readiness?.checks?.length ? (
               <p className="text-sm text-slate-400">
-                <BattleText en="Readiness checks will appear after the health check returns." zh="健康检查返回后会显示内测准备项。" />
+                <BattleText en="Readiness checks will appear after the health check returns." zh="健康检查返回后会显示就绪检查项。" />
               </p>
             ) : null}
           </div>

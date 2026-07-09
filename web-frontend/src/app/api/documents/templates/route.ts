@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveDocumentTemplateSamples } from "@/lib/runtime/document-templates";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 

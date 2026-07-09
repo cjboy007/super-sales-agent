@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { subscribe, getRecentEvents, seedSentLogEvents } from "@/lib/events";
 import { createSalesRuntime } from "@/lib/runtime";
 import { publicAgentEvent } from "@/lib/runtime/activity-stream";
-import { requireBetaAuth, type BetaAuthSession } from "@/lib/runtime/beta-auth";
+import { requireWorkspaceSession, type WorkspaceAccessSession } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 
@@ -12,11 +12,11 @@ function sseMessage(event: string, data: unknown): string {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
-function scopedWorkspaces(session: BetaAuthSession): string[] {
+function scopedWorkspaces(session: WorkspaceAccessSession): string[] {
   return session.workspaces.includes("*") ? [] : session.workspaces;
 }
 
-function canSeeEvent(session: BetaAuthSession, event: { data?: unknown }): boolean {
+function canSeeEvent(session: WorkspaceAccessSession, event: { data?: unknown }): boolean {
   const workspaces = scopedWorkspaces(session);
   if (workspaces.length === 0) return true;
   const data = event.data && typeof event.data === "object" ? event.data as Record<string, unknown> : {};
@@ -30,7 +30,7 @@ function removeEventScope<T extends { data?: unknown }>(event: T): T {
   return { ...event, data } as T;
 }
 
-function getActivitySnapshot(session: BetaAuthSession, limit = 20) {
+function getActivitySnapshot(session: WorkspaceAccessSession, limit = 20) {
   const runtime = createSalesRuntime();
   const workspaces = scopedWorkspaces(session);
   const runtimeEvents = workspaces.length
@@ -51,7 +51,7 @@ function getActivitySnapshot(session: BetaAuthSession, limit = 20) {
     .map(removeEventScope);
 }
 
-function getSentLogSnapshot(session: BetaAuthSession, limit = 10) {
+function getSentLogSnapshot(session: WorkspaceAccessSession, limit = 10) {
   const runtime = createSalesRuntime();
   const workspaces = scopedWorkspaces(session);
   return workspaces.length
@@ -61,7 +61,7 @@ function getSentLogSnapshot(session: BetaAuthSession, limit = 10) {
     : runtime.getSentLogSnapshot(limit);
 }
 
-function seedScopedSentLogEvents(session: BetaAuthSession) {
+function seedScopedSentLogEvents(session: WorkspaceAccessSession) {
   const workspaces = scopedWorkspaces(session);
   if (workspaces.length === 0) {
     seedSentLogEvents();
@@ -71,7 +71,7 @@ function seedScopedSentLogEvents(session: BetaAuthSession) {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = requireBetaAuth(request);
+  const auth = requireWorkspaceSession(request);
   if (!auth.ok) return auth.response;
 
   let unsubscribe = () => {};

@@ -67,7 +67,7 @@ function summaryForStatus(
       summary: `${counts.pendingReview + counts.failed + counts.retryable} customer action item(s) are waiting for review.`,
       nextStep: counts.failed > 0
         ? "Review failed customer actions in Task Progress, then retry only after confirmation and explicit enablement are confirmed."
-        : "Review pending customer actions in Task Progress before inviting beta users.",
+        : "Review pending customer actions in Task Progress before shared use.",
     };
   }
   return {

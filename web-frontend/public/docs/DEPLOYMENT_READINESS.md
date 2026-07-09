@@ -20,7 +20,7 @@ export SSA_DATA_ROOT=/var/www/ssa/shared/data   # or any writable path
 cd web-frontend && npm install && npm run dev
 ```
 
-No activation code, phone verification, or beta token is required.
+No in-app activation gate is required.
 The app opens directly to the onboarding wizard on first run.
 
 ## LLM Provider Setup

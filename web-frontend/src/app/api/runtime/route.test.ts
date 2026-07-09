@@ -8,7 +8,6 @@ import { GET, POST } from "./route";
 const originalDataRoot = process.env.SSA_DATA_ROOT;
 const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
 const originalCrmFlag = process.env.SSA_ENABLE_REAL_CRM_WRITE;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 const originalLlmProvider = process.env.SSA_LLM_PROVIDER;
 const originalOpenAiApiKey = process.env.OPENAI_API_KEY;
 const originalOpenRouterApiKey = process.env.OPENROUTER_API_KEY;
@@ -19,7 +18,6 @@ beforeEach(() => {
   process.env.SSA_DATA_ROOT = tempRoot;
   delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
-  delete process.env.SSA_BETA_AUTH_TOKENS;
   process.env.SSA_LLM_PROVIDER = "mock";
   delete process.env.OPENAI_API_KEY;
   delete process.env.OPENROUTER_API_KEY;
@@ -35,9 +33,6 @@ afterEach(() => {
   if (originalCrmFlag === undefined) delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
   else process.env.SSA_ENABLE_REAL_CRM_WRITE = originalCrmFlag;
 
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
   if (originalLlmProvider === undefined) delete process.env.SSA_LLM_PROVIDER;
   else process.env.SSA_LLM_PROVIDER = originalLlmProvider;
 
@@ -50,20 +45,15 @@ afterEach(() => {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(url: string, init?: { method?: string; body?: BodyInit | null; token?: string }): NextRequest {
+function request(url: string, init?: { method?: string; body?: BodyInit | null }): NextRequest {
   return new NextRequest(url, {
     method: init?.method,
     body: init?.body,
-    headers: init?.token ? { Authorization: `Bearer ${init.token}` } : undefined,
   });
 }
 
 describe("/api/runtime route", () => {
-  it("requires a scoped beta token for runtime mutations when beta auth is configured", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "demo-token", workspaces: ["public-probe"] },
-    ]);
-
+  it("registers runtime workspaces without activation auth", async () => {
     const response = await POST(request("http://localhost/api/runtime", {
       method: "POST",
       body: JSON.stringify({
@@ -71,50 +61,29 @@ describe("/api/runtime route", () => {
         workspace: { id: "public-probe", name: "Public Probe" },
       }),
     }));
-    expect(response.status).toBe(401);
+    const json = await response.json();
 
-    const authedResponse = await POST(request("http://localhost/api/runtime", {
-      method: "POST",
-      token: "demo-token",
-      body: JSON.stringify({
-        action: "register-workspace",
-        workspace: { id: "public-probe", name: "Public Probe" },
-      }),
-    }));
-    const json = await authedResponse.json();
-
-    expect(authedResponse.status).toBe(200);
+    expect(response.status).toBe(200);
     expect(json.success).toBe(true);
     expect(json.data).toMatchObject({ id: "public-probe", name: "Public Probe" });
   });
 
-  it("returns only token-scoped workspace choices, including unregistered closed-alpha workspaces", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "alpha-a-token", workspaces: ["alpha-a"] },
-    ]);
-
-    const response = await GET(request("http://localhost/api/runtime?action=workspaces", {
-      token: "alpha-a-token",
-    }));
+  it("returns all runtime workspace choices without token scoping", async () => {
+    const response = await GET(request("http://localhost/api/runtime?action=workspaces"));
     const json = await response.json();
 
     expect(response.status).toBe(200);
-    expect(json.data.map((workspace: { id: string }) => workspace.id)).toEqual(["alpha-a"]);
+    expect(json.data.map((workspace: { id: string }) => workspace.id)).toEqual(["farreach", "hero-pumps"]);
     expect(json.data[0]).toMatchObject({
-      id: "alpha-a",
-      name: "alpha-a",
+      id: "farreach",
+      name: "Farreach",
       capabilities: expect.any(Object),
     });
     expect(json.data[0]).not.toHaveProperty("data");
     expect(json.data[0]).not.toHaveProperty("identity");
-    expect(JSON.stringify(json.data)).not.toContain("farreach");
-    expect(JSON.stringify(json.data)).not.toContain("hero-pumps");
   });
 
-  it("blocks scoped tokens from approving another workspace side effect", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "farreach-token", workspaces: ["farreach"] },
-    ]);
+  it("approves side-effect decisions without activation tokens", async () => {
     const { createSalesRuntime } = await import("@/lib/runtime");
     const runtime = createSalesRuntime();
     const decision = runtime.requestSideEffect({
@@ -126,7 +95,6 @@ describe("/api/runtime route", () => {
 
     const response = await POST(request("http://localhost/api/runtime", {
       method: "POST",
-      token: "farreach-token",
       body: JSON.stringify({
         action: "approve-side-effect",
         input: { decisionId: decision.id },
@@ -134,14 +102,16 @@ describe("/api/runtime route", () => {
     }));
     const json = await response.json();
 
-    expect(response.status).toBe(403);
-    expect(json.success).toBe(false);
+    expect(response.status).toBe(200);
+    expect(json.data).toMatchObject({
+      actionId: decision.id,
+      title: "Customer email send",
+      status: "approved",
+      blocked: false,
+    });
   });
 
-  it("allows wildcard beta tokens to approve side-effect decisions", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
+  it("returns a public side-effect action view after approval", async () => {
     const { createSalesRuntime } = await import("@/lib/runtime");
     const runtime = createSalesRuntime();
     const decision = runtime.requestSideEffect({
@@ -153,7 +123,6 @@ describe("/api/runtime route", () => {
 
     const response = await POST(request("http://localhost/api/runtime", {
       method: "POST",
-      token: "admin-token",
       body: JSON.stringify({
         action: "approve-side-effect",
         input: { decisionId: decision.id },
@@ -262,7 +231,7 @@ describe("/api/runtime route", () => {
     expect(json.data).not.toHaveProperty("sideEffectKinds");
     expect(json.data).not.toHaveProperty("llmTasks");
     expect(json.data).not.toHaveProperty("dataContracts");
-    expect(json.data.nextSteps).toContain("Set an Activation Code before inviting external users.");
+    expect(json.data.nextSteps).toContain("Keep local deployments on localhost unless you intentionally expose them through a secured network or reverse proxy.");
     expect(serialized).not.toContain("beta access pass");
     expect(serialized).not.toContain("workflow");
     expect(serialized).not.toContain("provider");

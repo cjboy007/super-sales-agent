@@ -9,7 +9,7 @@ import {
   type MemorySource,
   type MemoryTimelineSummary,
 } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 

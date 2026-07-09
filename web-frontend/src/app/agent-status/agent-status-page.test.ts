@@ -4,11 +4,11 @@ import { describe, expect, it } from "vitest";
 
 const pageSource = readFileSync(join(process.cwd(), "src/app/agent-status/page.tsx"), "utf8");
 
-describe("agent status page beta readiness UI", () => {
-  it("renders a business-facing beta readiness checklist", () => {
+describe("agent status page readiness UI", () => {
+  it("renders a business-facing readiness checklist", () => {
     expect(pageSource).toContain("readiness?.checks");
-    expect(pageSource).toContain("Beta Readiness");
-    expect(pageSource).toContain("内测准备");
+    expect(pageSource).toContain("Readiness");
+    expect(pageSource).toContain("就绪检查");
     expect(pageSource).toContain("check.action");
   });
 
@@ -48,11 +48,13 @@ describe("agent status page beta readiness UI", () => {
     expect(pageSource).not.toContain("emailPassword");
   });
 
-  it("shows whether external beta page access is protected", () => {
-    expect(pageSource).toContain("pageAccessProtected");
-    expect(pageSource).toContain("Access page protected");
-    expect(pageSource).toContain("访问页已保护");
-    expect(pageSource).toContain("访问页未保护");
+  it("shows open product access instead of an activation page gate", () => {
+    expect(pageSource).toContain("Open access");
+    expect(pageSource).toContain("开放访问");
+    expect(pageSource).not.toContain("pageAccessProtected");
+    expect(pageSource).not.toContain("Access page protected");
+    expect(pageSource).not.toContain("访问页已保护");
+    expect(pageSource).not.toContain("访问页未保护");
   });
 
   it("does not show raw environment variables or internal runtime terms in readiness copy", () => {
@@ -64,7 +66,7 @@ describe("agent status page beta readiness UI", () => {
     expect(pageSource).not.toContain("channel_audit");
   });
 
-  it("uses the beta-aware API client for protected operations page requests", () => {
+  it("uses the project-aware API client for operations page requests", () => {
     expect(pageSource).toContain("useProject");
     expect(pageSource).toContain("apiFetch");
     expect(pageSource).toContain("apiFetch(\"/api/health\"");

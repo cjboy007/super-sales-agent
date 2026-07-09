@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { getLocalGatewayStatus } from "@/lib/runtime/local-gateway-status";
 import { getLocalOnboardingStatus, markLocalOnboardingComplete, resetLocalOnboarding } from "@/lib/runtime/local-onboarding";
 

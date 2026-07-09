@@ -5,24 +5,20 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 let tempRoot = "";
 
-function jsonRequest(method: "POST" | "PUT", body: Record<string, unknown>, token?: string): NextRequest {
+function jsonRequest(method: "POST" | "PUT", body: Record<string, unknown>): NextRequest {
   return new NextRequest("http://localhost/api/config", {
     method,
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(body),
   });
 }
 
-function getRequest(token?: string): NextRequest {
-  return new NextRequest("http://localhost/api/config", {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+function getRequest(): NextRequest {
+  return new NextRequest("http://localhost/api/config");
 }
 
 function readRuntimeEvents(): Array<{ type: string; payload: Record<string, unknown> }> {
@@ -34,34 +30,26 @@ beforeEach(() => {
   vi.resetModules();
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-config-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  delete process.env.SSA_BETA_AUTH_TOKENS;
 });
 
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
 
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
 describe("/api/config route", () => {
-  it("requires an admin beta token for settings when beta auth is configured", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "settings-token", workspaces: ["farreach"] },
-      { token: "admin-token", workspaces: ["*"] },
-    ]);
+  it("opens settings without activation tokens", async () => {
     const route = await import("./route");
 
     const getResponse = await route.GET(getRequest());
-    const scopedResponse = await route.GET(getRequest("settings-token"));
-    const postResponse = await route.POST(jsonRequest("POST", { defaultModel: "mock" }, "admin-token"));
+    const postResponse = await route.POST(jsonRequest("POST", { defaultModel: "mock" }));
+    const getJson = await getResponse.json();
     const postJson = await postResponse.json();
 
-    expect(getResponse.status).toBe(401);
-    expect(scopedResponse.status).toBe(403);
+    expect(getResponse.status).toBe(200);
+    expect(getJson.success).toBe(true);
     expect(postResponse.status).toBe(200);
     expect(postJson.success).toBe(true);
     expect(postJson.data.defaultModel).toBe("mock");

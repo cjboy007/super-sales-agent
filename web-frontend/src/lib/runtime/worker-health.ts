@@ -198,10 +198,10 @@ export function summarizeWorkerHealth(
   let status: WorkerHealthStatus = "ok";
   if (!latest) {
     status = "down";
-    alerts.push("No resident worker heartbeat is visible. Start the worker before external beta.");
+    alerts.push("No resident worker heartbeat is visible. Start the worker before shared use.");
   } else if (latest.status === "stopped") {
     status = "down";
-    alerts.push("Resident worker is stopped. Start the worker before external beta.");
+    alerts.push("Resident worker is stopped. Start the worker before shared use.");
   } else if (queue.failed > 0 || alerts.length > 0 || latest.status === "failed" || latest.status === "degraded") {
     status = "degraded";
   } else {

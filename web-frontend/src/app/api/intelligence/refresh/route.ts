@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 
@@ -46,9 +46,7 @@ export async function POST(request: NextRequest) {
         newsCount: 0,
         competitorCount: 0,
         cached: false,
-        message: message.includes("Beta access")
-          ? "Market intelligence could not be refreshed because access is not available."
-          : "Market intelligence could not be refreshed. Existing saved intelligence was kept.",
+        message: "Market intelligence could not be refreshed. Existing saved intelligence was kept.",
       },
     }, { status: 500 });
   }

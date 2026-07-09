@@ -12,7 +12,6 @@ vi.mock("child_process", async (importOriginal) => ({
 }));
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 const originalLocalGateway = process.env.SSA_LOCAL_GATEWAY;
 let tempRoot = "";
 
@@ -27,19 +26,15 @@ afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
 
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
   if (originalLocalGateway === undefined) delete process.env.SSA_LOCAL_GATEWAY;
   else process.env.SSA_LOCAL_GATEWAY = originalLocalGateway;
 
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function requestFor(filePath: string, project = "farreach", token?: string): NextRequest {
+function requestFor(filePath: string, project = "farreach"): NextRequest {
   return new NextRequest(`http://localhost/api/files/open?project=${encodeURIComponent(project)}`, {
     method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     body: JSON.stringify({ path: filePath }),
   });
 }
@@ -93,15 +88,12 @@ describe("/api/files/open route", () => {
       }
     );
     process.env.SSA_LOCAL_GATEWAY = "true";
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "gateway-auth", workspaces: ["farreach"] },
-    ]);
     const filePath = path.join(tempRoot, "companies", "farreach", "quotations", "QT-20260512-002.html");
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, "quote", "utf-8");
     const { POST } = await import("./route");
 
-    const response = await POST(requestFor(filePath, "farreach", "gateway-auth"));
+    const response = await POST(requestFor(filePath, "farreach"));
     const json = await response.json();
 
     expect(response.status).toBe(409);

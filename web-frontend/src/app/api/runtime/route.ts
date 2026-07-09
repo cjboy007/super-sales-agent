@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   filterWorkspaceScoped,
   hasWorkspaceAccess,
-  type BetaAuthSession,
-  requireBetaAuth,
+  type WorkspaceAccessSession,
+  requireWorkspaceSession,
   requireResolvedWorkspaceAccess,
   requireWorkspaceAccess,
-} from "@/lib/runtime/beta-auth";
+} from "@/lib/runtime/workspace-access";
 import { publicActionView } from "../public-action";
 import { createSalesRuntime, RUNTIME_WORKFLOWS, type RuntimeJob, type RuntimeWorkflowType, type WorkspaceInput } from "@/lib/runtime";
 import type { RuntimeEvent, SalesPack, SideEffectDecision, SideEffectKind, WorkspaceAdapter } from "@/lib/runtime/types";
@@ -304,13 +304,13 @@ function manifestView(runtime: ReturnType<typeof createSalesRuntime>) {
       "Settings",
     ],
     nextSteps: [
-      "Set an Activation Code before inviting external users.",
+      "Keep local deployments on localhost unless you intentionally expose them through a secured network or reverse proxy.",
       "Connect a real mailbox for automatic customer timeline capture.",
     ],
   };
 }
 
-function scopedRuntimeSnapshot(runtime: ReturnType<typeof createSalesRuntime>, session: BetaAuthSession) {
+function scopedRuntimeSnapshot(runtime: ReturnType<typeof createSalesRuntime>, session: WorkspaceAccessSession) {
   const snapshot = runtime.snapshot();
   const allowed = session.workspaces.includes("*") ? null : new Set(session.workspaces);
   const scopedSideEffects = allowed
@@ -329,7 +329,7 @@ function scopedRuntimeSnapshot(runtime: ReturnType<typeof createSalesRuntime>, s
 
 export async function GET(request: NextRequest) {
   const runtime = createSalesRuntime();
-  const auth = requireBetaAuth(request);
+  const auth = requireWorkspaceSession(request);
   if (!auth.ok) return auth.response;
   const action = request.nextUrl.searchParams.get("action") || "snapshot";
 
@@ -415,7 +415,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.action === "retry-job") {
-      const auth = requireBetaAuth(request);
+      const auth = requireWorkspaceSession(request);
       if (!auth.ok) return auth.response;
       const operationId = typeof body.input?.operationId === "string" ? body.input.operationId : "";
       const jobId = operationId ? jobIdFromOperationId(operationId) : null;
@@ -477,7 +477,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.action === "approve-side-effect" || body.action === "reject-side-effect" || body.action === "retry-side-effect") {
-      const auth = requireBetaAuth(request);
+      const auth = requireWorkspaceSession(request);
       if (!auth.ok) return auth.response;
       const decisionId = typeof body.input?.decisionId === "string" ? body.input.decisionId : "";
       if (!decisionId) {

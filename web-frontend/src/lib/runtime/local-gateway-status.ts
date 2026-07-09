@@ -1,6 +1,5 @@
 import { networkInterfaces } from "node:os";
 import { readSettings } from "../config-store";
-import { isBetaAuthRequiredForRuntime } from "./local-gateway";
 
 export type LocalGatewayAccessMode = "local" | "lan";
 
@@ -9,7 +8,7 @@ export interface LocalGatewayStatus {
   bindHost: string;
   publicHost: string;
   port: string;
-  tokenRequired: boolean;
+  tokenRequired: false;
   localUrl: string;
   lanUrl: string | null;
   warning: string;
@@ -99,11 +98,11 @@ export function getLocalGatewayStatus(): LocalGatewayStatus {
     bindHost: accessMode === "lan" && !bindHost ? "0.0.0.0" : bindHost,
     publicHost: accessMode === "lan" ? publicHost : "127.0.0.1",
     port,
-    tokenRequired: isBetaAuthRequiredForRuntime(),
+    tokenRequired: false,
     localUrl,
     lanUrl,
     warning: accessMode === "lan"
-      ? "LAN access is enabled. Keep the token private and do not expose this port to the public internet."
+      ? "LAN access is enabled. Do not expose this port to the public internet."
       : "LAN access is off. This gateway is reachable from this computer only.",
     firewallHint: accessMode === "lan"
       ? "If another device on the same LAN cannot connect, check the host firewall and make sure the selected port is allowed on private networks."

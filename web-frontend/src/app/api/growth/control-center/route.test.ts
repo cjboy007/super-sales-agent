@@ -5,7 +5,6 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
 const originalCrmFlag = process.env.SSA_ENABLE_REAL_CRM_WRITE;
 let tempRoot = "";
@@ -13,9 +12,6 @@ let tempRoot = "";
 beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-growth-control-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-    { token: "hero-token", workspaces: ["hero-pumps"] },
-  ]);
   delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
 });
@@ -23,9 +19,6 @@ beforeEach(() => {
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
-
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
 
   if (originalEmailFlag === undefined) delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   else process.env.SSA_ENABLE_REAL_EMAIL_SEND = originalEmailFlag;
@@ -36,25 +29,24 @@ afterEach(() => {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(url: string, token = "hero-token"): NextRequest {
-  return new NextRequest(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+function request(url: string): NextRequest {
+  return new NextRequest(url);
 }
 
 describe("/api/growth/control-center route", () => {
-  it("enforces workspace-scoped beta access", async () => {
+  it("returns control-center data for explicitly selected workspaces without activation auth", async () => {
     const { GET } = await import("./route");
 
-    const denied = await GET(request("http://localhost/api/growth/control-center?project=farreach"));
-    expect(denied.status).toBe(403);
+    const farreach = await GET(request("http://localhost/api/growth/control-center?project=farreach"));
+    const farreachJson = await farreach.json();
+    const hero = await GET(request("http://localhost/api/growth/control-center?project=hero-pumps"));
+    const heroJson = await hero.json();
 
-    const allowed = await GET(request("http://localhost/api/growth/control-center?project=hero-pumps"));
-    const json = await allowed.json();
-
-    expect(allowed.status).toBe(200);
-    expect(json.success).toBe(true);
-    expect(json.data.workspaceId).toBe("hero-pumps");
+    expect(farreach.status).toBe(200);
+    expect(farreachJson.data.workspaceId).toBe("farreach");
+    expect(hero.status).toBe(200);
+    expect(heroJson.success).toBe(true);
+    expect(heroJson.data.workspaceId).toBe("hero-pumps");
   });
 
   it("returns sanitized control-center data without executing side effects", async () => {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { runDemoEmailCrmDrill } from "@/lib/runtime/demo-data";
 
 export const dynamic = "force-dynamic";

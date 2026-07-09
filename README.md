@@ -335,7 +335,7 @@ Keep real email, CRM, Feishu, payment, bank, and document side effects unset or
 `false` unless the exact adapter has been reviewed and approved through the
 side-effect gate.
 
-For public beta, send customer email from the SSA web review flow. Older
+For shared deployments, send customer email from the SSA web review flow. Older
 orchestrator and batch-send scripts are guarded, but they are not the preferred
 operator surface.
 
@@ -347,7 +347,7 @@ npm run build
 PORT=3000 HOSTNAME=0.0.0.0 npm run start:standalone
 ```
 
-See [docs/PUBLIC_BETA_READINESS.md](./docs/PUBLIC_BETA_READINESS.md).
+See [docs/DEPLOYMENT_READINESS.md](./docs/DEPLOYMENT_READINESS.md).
 
 ---
 
@@ -435,7 +435,7 @@ bash hero-pumps/scripts/inbox-monitor-scan.sh
 ## 开发文档
 
 - [架构设计](./docs/ARCHITECTURE.md)
-- [部署指南](./docs/PUBLIC_BETA_READINESS.md)
+- [部署指南](./docs/DEPLOYMENT_READINESS.md)
 - [运行时边界](./docs/SSA_RUNTIME_BOUNDARY.md)
 - [助手路由设计](./docs/ASSISTANT_ROUTER.md)
 - [v1 验收审计](./docs/SSA_V1_ACCEPTANCE_AUDIT.md)

@@ -5,30 +5,23 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 let tempRoot = "";
 
 beforeEach(() => {
   vi.resetModules();
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-events-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  delete process.env.SSA_BETA_AUTH_TOKENS;
 });
 
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
 
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(token?: string): NextRequest {
-  return new NextRequest("http://localhost/api/events", {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+function request(): NextRequest {
+  return new NextRequest("http://localhost/api/events");
 }
 
 async function readFirstChunk(response: Response): Promise<string> {
@@ -113,11 +106,7 @@ describe("/api/events route", () => {
     expect(chunk).not.toContain("/Users/");
   });
 
-  it("limits the activity stream to workspaces allowed by the beta token", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "farreach-token", workspaces: ["farreach"] },
-    ]);
-
+  it("serves activity from all workspaces under open access", async () => {
     const { createSalesRuntime } = await import("@/lib/runtime");
     const runtime = createSalesRuntime();
     runtime.createOperatorCommand({
@@ -145,23 +134,17 @@ describe("/api/events route", () => {
     );
 
     const { GET } = await import("./route");
-    const response = await GET(request("farreach-token"));
+    const response = await GET(request());
     const chunk = await readInitialChunks(response, 2);
 
     expect(response.status).toBe(200);
     expect(chunk).toContain("leads");
     expect(chunk).toContain("Farreach follow-up");
-    expect(chunk).not.toContain("pump-dashboard");
-    expect(chunk).not.toContain("Hero follow-up");
-    expect(chunk).not.toContain("hero@example.com");
-    expect(chunk).not.toContain("hero-pumps");
+    expect(chunk).toContain("pump-dashboard");
+    expect(chunk).not.toContain("workspaceId");
   });
 
-  it("does not leak seeded sent-log activity to another scoped beta workspace", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "hero-token", workspaces: ["hero-pumps"] },
-    ]);
-
+  it("includes seeded sent-log activity without activation tokens", async () => {
     fs.mkdirSync(path.join(tempRoot, "companies", "farreach", "mail"), { recursive: true });
     fs.writeFileSync(
       path.join(tempRoot, "companies", "farreach", "mail", "sent-log.json"),
@@ -177,13 +160,14 @@ describe("/api/events route", () => {
     );
 
     const { GET } = await import("./route");
-    const response = await GET(request("hero-token"));
+    const response = await GET(request());
     const chunk = await readInitialChunks(response, 1);
 
     expect(response.status).toBe(200);
-    expect(chunk).toContain("event: agent-update");
-    expect(chunk).not.toContain("Farreach private follow-up");
-    expect(chunk).not.toContain("farreach-private@example.com");
-    expect(chunk).not.toContain("Farreach Private Buyer");
+    expect(chunk).toContain("event: email-progress");
+    expect(chunk).toContain("Farreach private follow-up");
+    expect(chunk).toContain("farreach-private@example.com");
+    expect(chunk).toContain("Farreach Private Buyer");
+    expect(chunk).not.toContain("workspaceId");
   });
 });

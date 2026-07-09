@@ -71,7 +71,6 @@ interface GatewayStatus {
   bindHost: string;
   publicHost: string;
   port: string;
-  tokenRequired: boolean;
   localUrl: string;
   lanUrl: string | null;
   warning: string;
@@ -247,10 +246,9 @@ function modelReadinessLabel(readiness: ModelReadiness | undefined, language: "e
 export default function SettingsPage() {
   const language = useBattleLanguage();
   const { uiSize, setUiSize } = useTheme();
-  const { apiFetch, betaToken, setBetaToken, clearBetaToken } = useProject();
+  const { apiFetch } = useProject();
   const [activeTab, setActiveTab] = useState<TabKey>("local-gateway");
   const [config, setConfig] = useState<ConfigState>(DEFAULT_CONFIG);
-  const [accessTokenInput, setAccessTokenInput] = useState("");
   const [gateway, setGateway] = useState<GatewayStatus | null>(null);
   const [storage, setStorage] = useState<LocalStorageState | null>(null);
   const [storagePath, setStoragePath] = useState("documents");
@@ -325,10 +323,6 @@ export default function SettingsPage() {
       cancelled = true;
     };
   }, [apiFetch]);
-
-  useEffect(() => {
-    setAccessTokenInput(betaToken);
-  }, [betaToken]);
 
   const updateConfig = useCallback((partial: Partial<ConfigState>) => {
     setConfig((prev) => ({ ...prev, ...partial }));
@@ -408,19 +402,6 @@ export default function SettingsPage() {
     }
   }, [apiFetch, language, loadHealth]);
 
-  const saveBetaAccess = useCallback(() => {
-    setBetaToken(accessTokenInput);
-    setError(null);
-    setMessage(language === "zh" ? "会员激活码已保存。" : "Activation Code saved.");
-  }, [accessTokenInput, language, setBetaToken]);
-
-  const removeBetaAccess = useCallback(() => {
-    clearBetaToken();
-    setAccessTokenInput("");
-    setError(null);
-    setMessage(language === "zh" ? "会员激活码已清除。" : "Activation Code cleared.");
-  }, [clearBetaToken, language]);
-
   const tabs: Array<{ key: TabKey; label: string }> = useMemo(() => [
     { key: "local-gateway", label: language === "zh" ? "本地网关" : "Local Gateway" },
     { key: "local-storage", label: language === "zh" ? "本地存储" : "Local Storage" },
@@ -461,33 +442,7 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.55fr)]">
-          <BattlePanel
-            title={language === "zh" ? "会员激活码" : "Activation Code"}
-            meta={language === "zh" ? "LAN 访问也必须保留会员激活码" : "LAN access still requires the Activation Code"}
-            tone={betaToken ? "emerald" : "amber"}
-            action={<BattleBadge tone={betaToken ? "emerald" : "amber"}>{betaToken ? <BattleText en="Saved" zh="已保存" /> : <BattleText en="Needed" zh="待填写" />}</BattleBadge>}
-          >
-            <div className="grid gap-3 p-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
-              <FieldLabel>
-                {language === "zh" ? "会员激活码" : "Activation Code"}
-                <InputField
-                  value={accessTokenInput}
-                  type="password"
-                  autoComplete="off"
-                  onChange={(event) => setAccessTokenInput(event.target.value)}
-                  className="mt-1 w-full"
-                />
-              </FieldLabel>
-              <CommandButton type="button" variant="primary" onClick={saveBetaAccess} disabled={!accessTokenInput.trim()}>
-                <BattleText en="Save Code" zh="保存激活码" />
-              </CommandButton>
-              <CommandButton type="button" variant="ghost" onClick={removeBetaAccess} disabled={!betaToken && !accessTokenInput}>
-                <BattleText en="Clear" zh="清除" />
-              </CommandButton>
-            </div>
-          </BattlePanel>
-
+        <div className="grid gap-3">
           <BattlePanel
             title={language === "zh" ? "设置清单" : "Setup Checklist"}
             meta={language === "zh" ? "快速开始、推荐配置和高级本地部署" : "quick start, recommended setup, advanced local"}
@@ -556,7 +511,7 @@ export default function SettingsPage() {
             title={language === "zh" ? "本地网关访问" : "Local Gateway Access"}
             meta={gateway ? `${gateway.accessMode.toUpperCase()} / ${gateway.bindHost}:${gateway.port}` : "checking"}
             tone={gateway?.accessMode === "lan" ? "amber" : "emerald"}
-            action={<BattleBadge tone={gateway?.tokenRequired ? "emerald" : "red"}>{gateway?.tokenRequired ? <BattleText en="Code on" zh="激活码保护" /> : <BattleText en="No code" zh="无激活码" />}</BattleBadge>}
+            action={<BattleBadge tone={gateway?.accessMode === "lan" ? "amber" : "emerald"}>{gateway?.accessMode === "lan" ? <BattleText en="LAN" zh="局域网" /> : <BattleText en="Local" zh="仅本机" />}</BattleBadge>}
           >
             <div className="grid gap-3 p-3 lg:grid-cols-2">
               <FieldLabel>
@@ -583,7 +538,7 @@ export default function SettingsPage() {
                 <p className="mt-2 break-all font-mono text-sm text-slate-100">{gateway?.lanUrl || (language === "zh" ? "未开启" : "Not enabled")}</p>
               </div>
               <div className="rounded-md border border-amber-500/25 bg-amber-500/10 p-3 text-xs leading-5 text-amber-100 lg:col-span-2">
-                <p>{gateway?.warning || (language === "zh" ? "LAN 模式需要 Docker 绑定 0.0.0.0，并保留会员激活码。" : "LAN mode requires Docker to bind 0.0.0.0 and keep Activation Code protection.")}</p>
+                <p>{gateway?.warning || (language === "zh" ? "LAN 模式需要 Docker 绑定 0.0.0.0；不要把端口暴露到公网。" : "LAN mode requires Docker to bind 0.0.0.0; do not expose this port to the public internet.")}</p>
                 <p className="mt-1">{gateway?.firewallHint || (language === "zh" ? "如果局域网设备访问不了，请检查系统防火墙。" : "If another device cannot connect, check the host firewall.")}</p>
               </div>
             </div>

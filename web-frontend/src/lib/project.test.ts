@@ -6,10 +6,13 @@ const projectSource = readFileSync(join(process.cwd(), "src/lib/project.tsx"), "
 const settingsSource = readFileSync(join(process.cwd(), "src/app/settings/page.tsx"), "utf8");
 const sidebarSource = readFileSync(join(process.cwd(), "src/components/Sidebar.tsx"), "utf8");
 
-describe("beta access UI plumbing", () => {
-  it("stores a beta access token and attaches it to API requests", () => {
-    expect(projectSource).toContain("ssa-beta-token");
-    expect(projectSource).toContain("Authorization");
+describe("open workspace UI plumbing", () => {
+  it("does not store activation tokens or attach auth headers to API requests", () => {
+    expect(projectSource).not.toContain("ssa-beta-token");
+    expect(projectSource).not.toContain("betaToken");
+    expect(projectSource).not.toContain("setBetaToken");
+    expect(projectSource).not.toContain("applyBetaAccessSession");
+    expect(projectSource).not.toContain("Authorization");
     expect(projectSource).toContain("authHeaders");
     expect(projectSource).toContain("apiFetch");
   });
@@ -18,7 +21,6 @@ describe("beta access UI plumbing", () => {
     expect(projectSource).not.toContain("export type ProjectId = \"farreach\" | \"hero-pumps\"");
     expect(projectSource).toContain("/api/runtime?action=workspaces");
     expect(projectSource).toContain("allowedWorkspaces");
-    expect(projectSource).toContain("applyBetaAccessSession");
     expect(projectSource).toContain("useState<ProjectConfig[]>([])");
     expect(sidebarSource).not.toContain("Object.values(PROJECTS)");
     expect(sidebarSource).toContain("allowedWorkspaces");
@@ -32,8 +34,9 @@ describe("beta access UI plumbing", () => {
   });
 
   it("exposes local gateway access and storage sections in settings", () => {
-    expect(settingsSource).toContain("Activation Code");
-    expect(settingsSource).toContain("会员激活码");
+    expect(settingsSource).not.toContain("Activation Code");
+    expect(settingsSource).not.toContain("会员激活码");
+    expect(settingsSource).not.toContain("Save Code");
     expect(settingsSource).not.toContain("Access Pass");
     expect(settingsSource).not.toContain("访问口令");
     expect(settingsSource).toContain("Local Gateway");
@@ -42,7 +45,7 @@ describe("beta access UI plumbing", () => {
     expect(settingsSource).toContain("本地存储");
     expect(settingsSource).toContain("/api/local-storage");
     expect(settingsSource).toContain("dataRoot");
-    expect(settingsSource).toContain("setBetaToken");
+    expect(settingsSource).not.toContain("setBetaToken");
     expect(settingsSource).not.toContain("jobId");
     expect(settingsSource).not.toContain("channel_audit");
     expect(settingsSource).not.toContain("runtimeBoundary");

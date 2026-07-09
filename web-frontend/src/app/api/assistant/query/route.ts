@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime, type AssistantQueryResult } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { consumeTrialQuota, type TrialAccessSession } from "@/lib/runtime/trial-auth";
 
 export const dynamic = "force-dynamic";

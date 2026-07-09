@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { QuickQuoteData, QuickQuoteLine } from "@/lib/quick-quote";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import {
   createJadenCommandEnvelope,
   createJadenCommandPlan,

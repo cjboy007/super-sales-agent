@@ -1,6 +1,6 @@
 # SSA v1 Roadmap
 
-> 北极星文档。定义把 Super Sales Agent 从「controlled beta sales cockpit +
+> 北极星文档。定义把 Super Sales Agent 从「open-source sales cockpit +
 > gated local workflows」推进到「可验证、可恢复、可授权的销售执行系统 v1」的目标、
 > 阶段与验收。
 >
@@ -25,7 +25,7 @@ v1 = 下面「验收标准」10 条全部通过。不做哲学包装:不追求�
 - sales memory
 - customer timeline
 - inbox / quotation / documents / intelligence / agent-status 等页面
-- beta auth、worker health、real-action readiness 等基础设施
+- workspace context、worker health、real-action readiness 等基础设施
 
 ## 当前核心缺口
 
@@ -60,7 +60,7 @@ v1 = 下面「验收标准」10 条全部通过。不做哲学包装:不追求�
 ## Phase 0 — 真实状态审计
 
 **做什么**
-- 阅读 README、docs/PUBLIC_BETA_READINESS.md、docs/SSA_RUNTIME_BOUNDARY.md、
+- 阅读 README、docs/DEPLOYMENT_READINESS.md、docs/SSA_RUNTIME_BOUNDARY.md、
   runtime manifest、workflow、sales-runtime、side-effect gate、Jaden worker、
   customer timeline、documents、inbox、LLM adapter 相关代码。
 - 对照当前代码,不要只相信文档。
@@ -292,14 +292,14 @@ HITL,不得真实外联。
 |---|------|-----------|
 | 1 | Repo boundary clean | 1 |
 | 2 | 无新增 secrets/runtime/generated artifacts 进 repo | 1 |
-| 3 | 所有非公开 API route 有 beta/workspace/admin auth guard | 1 |
+| 3 | 所有非公开 API route 有 workspace context guard | 1 |
 | 4 | 真实外部动作默认 blocked | 1 |
 | 5 | 每个真实动作都有 side-effect decision、approval、execution/failure record | 3 |
 | 6 | 三条核心销售闭环可演示、可测试、可追踪 | 4 |
 | 7 | Worker 可恢复,失败任务可在 agent-status/operations 中看到并重试 | 4 |
 | 8 | Customer detail 显示客户/联系人/背景/邮件/报价/PI-order/付款-出货-异常/下一步建议 | 2,4 |
 | 9 | LLM 状态清楚区分 real provider 与 mock fallback | 5 |
-| 10 | 文档更新到 README / PUBLIC_BETA_READINESS / SSA_RUNTIME_BOUNDARY 或对应 runtime docs | 6 |
+| 10 | 文档更新到 README / DEPLOYMENT_READINESS / SSA_RUNTIME_BOUNDARY 或对应 runtime docs | 6 |
 
 ---
 

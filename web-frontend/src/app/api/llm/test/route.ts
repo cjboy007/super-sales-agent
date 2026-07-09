@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdminBetaAuth } from "@/lib/runtime/beta-auth";
+import { requireAdminWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { getLlmRuntimeStatus, runLlmTask } from "@/lib/runtime/llm";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const auth = requireAdminBetaAuth(request);
+  const auth = requireAdminWorkspaceAccess(request);
   if (!auth.ok) return auth.response;
 
   const status = getLlmRuntimeStatus();

@@ -65,7 +65,7 @@ Evidence:
 - `screenshots-cli/05-leads-mobile.png`
 - `screenshots-cli/06-quotations-mobile.png`
 
-`Customers` shows a helpful beta access card with `Open Beta Access`. `Quotations` only shows `Beta access token is required.` in a large empty area. `Inbox` shows `Failed to load inbox` with no recovery action.
+`Customers` shows a helpful setup card with `Open Settings`. `Quotations` only shows `Workspace data is unavailable.` in a large empty area. `Inbox` shows `Failed to load inbox` with no recovery action.
 
 Impact:
 

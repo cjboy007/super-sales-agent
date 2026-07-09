@@ -1,4 +1,3 @@
-import { betaAuthIsConfiguredForRuntime } from "./beta-auth";
 import { buildCustomerDirectory } from "./customers";
 import { readCustomerActivities } from "./customer-activity";
 import type { MailboxReadinessSummary } from "./mailbox-readiness";
@@ -105,9 +104,6 @@ export function getBetaReadiness(input: {
   now?: string;
 }): BetaReadinessSummary {
   const workspaceId = input.workspaceId || "farreach";
-  const authConfigured = betaAuthIsConfiguredForRuntime();
-  const pageAccessProtected = input.pageAccessProtected ?? authConfigured;
-  const accessControlReady = authConfigured && pageAccessProtected;
   const workerStatus = input.worker.status;
   const supervisorStatus = input.supervisor?.status || "needs_setup";
   const mailboxStatus = input.mailbox?.status || "needs_setup";
@@ -130,18 +126,10 @@ export function getBetaReadiness(input: {
   const checks: BetaReadinessCheck[] = [
     check({
       id: "access-control",
-      label: "Beta access control",
-      status: accessControlReady ? "ready" : "needs_setup",
-      detail: accessControlReady
-        ? "External beta access is protected by a server-side access token."
-        : authConfigured
-          ? "A server-side token exists, but page access protection is not enabled yet."
-          : "Local open mode is fine for development, but external beta needs an access token before sharing.",
-      action: accessControlReady
-        ? "Keep token access scoped to the intended workspaces."
-        : authConfigured
-          ? "Enable page access protection before inviting external users."
-          : "Set a beta access token before inviting external users.",
+      label: "Open product access",
+      status: "ready",
+      detail: "SSA opens directly without in-app activation or page-level access gates.",
+      action: "Secure deployments at the network, host, or reverse-proxy layer when sharing beyond localhost.",
     }),
     check({
       id: "first-run-guidance",
@@ -159,7 +147,7 @@ export function getBetaReadiness(input: {
         : workerStatus === "degraded"
           ? "Automation is visible, but failed or retryable work needs review."
           : "No healthy automation signal is visible yet.",
-      action: workerStatus === "ok" ? "Keep automation monitored." : "Start or repair automation before external beta.",
+      action: workerStatus === "ok" ? "Keep automation monitored." : "Start or repair automation before shared use.",
     }),
     check({
       id: "worker-supervisor",
@@ -196,7 +184,7 @@ export function getBetaReadiness(input: {
         ? input.mailbox?.nextStep || "Keep monitoring new inbound mail in the customer timeline."
         : mailboxStatus === "needs_review"
           ? input.mailbox?.nextStep || "Run or repair automation until a fresh inbound mail sync is visible."
-          : input.mailbox?.nextStep || "Connect work email and enable automatic capture before external beta.",
+          : input.mailbox?.nextStep || "Connect work email and enable automatic capture before sharing the workspace.",
     }),
     check({
       id: "customer-activity",
@@ -223,7 +211,7 @@ export function getBetaReadiness(input: {
       detail: realActionFlagEnabled
         ? "At least one real customer action is enabled; confirm the adapter and confirmation flow before testers use it."
         : "Real external actions are blocked by default.",
-      action: realActionFlagEnabled ? "Review enabled real-action controls before beta." : "Keep real actions disabled until a controlled adapter test is confirmed.",
+      action: realActionFlagEnabled ? "Review enabled real-action controls before shared use." : "Keep real actions disabled until a controlled adapter test is confirmed.",
     }),
     check({
       id: "real-action-authorization",

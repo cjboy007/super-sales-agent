@@ -5,7 +5,6 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
 const originalCrmFlag = process.env.SSA_ENABLE_REAL_CRM_WRITE;
 const originalDocumentFlag = process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
@@ -14,9 +13,6 @@ let tempRoot = "";
 beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-growth-scheduler-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-    { token: "hero-token", workspaces: ["hero-pumps"] },
-  ]);
   delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
   delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
@@ -25,9 +21,6 @@ beforeEach(() => {
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
-
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
 
   if (originalEmailFlag === undefined) delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   else process.env.SSA_ENABLE_REAL_EMAIL_SEND = originalEmailFlag;
@@ -41,12 +34,11 @@ afterEach(() => {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(url: string, init: { method?: string; body?: unknown; token?: string } = {}): NextRequest {
+function request(url: string, init: { method?: string; body?: unknown } = {}): NextRequest {
   return new NextRequest(url, {
     method: init.method,
     body: init.body ? JSON.stringify(init.body) : undefined,
     headers: {
-      Authorization: `Bearer ${init.token || "hero-token"}`,
       ...(init.body ? { "content-type": "application/json" } : {}),
     },
   });
@@ -88,22 +80,21 @@ function seedPriceMemory() {
 }
 
 describe("/api/growth/scheduler and /api/growth/metrics routes", () => {
-  it("enforces workspace-scoped auth for scheduler and metrics", async () => {
+  it("returns scheduler and metrics state for explicitly selected workspaces without activation auth", async () => {
     const schedulerRoute = await import("./route");
-    const runRoute = await import("./run/route");
     const metricsRoute = await import("../metrics/route");
 
-    expect((await schedulerRoute.GET(request("http://localhost/api/growth/scheduler?project=farreach"))).status).toBe(403);
-    expect((await runRoute.POST(request("http://localhost/api/growth/scheduler/run?project=farreach", {
-      method: "POST",
-      body: { idempotencyKey: "blocked" },
-    }))).status).toBe(403);
-    expect((await metricsRoute.GET(request("http://localhost/api/growth/metrics?project=farreach"))).status).toBe(403);
+    const farreach = await schedulerRoute.GET(request("http://localhost/api/growth/scheduler?project=farreach"));
+    const farreachJson = await farreach.json();
+    const farreachMetrics = await metricsRoute.GET(request("http://localhost/api/growth/metrics?project=farreach"));
 
-    const allowed = await schedulerRoute.GET(request("http://localhost/api/growth/scheduler?project=hero-pumps"));
-    const json = await allowed.json();
-    expect(allowed.status).toBe(200);
-    expect(json).toMatchObject({
+    const hero = await schedulerRoute.GET(request("http://localhost/api/growth/scheduler?project=hero-pumps"));
+    const heroJson = await hero.json();
+    expect(farreach.status).toBe(200);
+    expect(farreachJson.data.workspaceId).toBe("farreach");
+    expect(farreachMetrics.status).toBe(200);
+    expect(hero.status).toBe(200);
+    expect(heroJson).toMatchObject({
       success: true,
       data: {
         workspaceId: "hero-pumps",

@@ -66,7 +66,6 @@ describe("JadenOS onboarding flow", () => {
       "model",
       "email",
       "search",
-      "token",
       "access",
       "storage",
       "upload",
@@ -74,13 +73,8 @@ describe("JadenOS onboarding flow", () => {
       "finish",
     ]);
     expect(steps[0]).toMatchObject({ id: "start", command: "Open product" });
-    expect(steps.find((step) => step.id === "token")).toMatchObject({
-      command: "Save activation code",
-      zhTitle: "保存会员激活码",
-      group: "advanced",
-    });
-    expect(visibleStepText).toContain("Activation Code");
-    expect(visibleStepText).toContain("会员激活码");
+    expect(visibleStepText).not.toContain("Activation Code");
+    expect(visibleStepText).not.toContain("会员激活码");
     expect(visibleStepText).not.toContain("访问口令");
     expect(visibleStepText).not.toMatch(/\$\s/);
     expect(visibleStepText).toContain("LAN");
@@ -89,7 +83,6 @@ describe("JadenOS onboarding flow", () => {
     expect(visibleStepText).toContain("synthesis");
     expect(visibleStepText).toContain("Quick start");
     expect(visibleStepText).toContain("Recommended");
-    expect(visibleStepText).toContain("Advanced local");
   });
 
   it("tracks product-entry readiness separately from optional setup checks", () => {
@@ -100,7 +93,6 @@ describe("JadenOS onboarding flow", () => {
     };
 
     const readiness = getOnboardingReadiness(ready, {
-      tokenPresent: true,
       storageKnown: true,
       testUploadCompleted: false,
       synthesisTestCompleted: false,
@@ -118,13 +110,11 @@ describe("JadenOS onboarding flow", () => {
     };
 
     const readiness = getOnboardingReadiness(withoutModel, {
-      tokenPresent: true,
       storageKnown: true,
       testUploadCompleted: false,
       synthesisTestCompleted: false,
     });
     const steps = getJadenosOnboardingSteps(withoutModel, {
-      tokenPresent: true,
       storageKnown: true,
       testUploadCompleted: false,
       synthesisTestCompleted: false,

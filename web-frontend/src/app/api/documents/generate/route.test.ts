@@ -14,7 +14,6 @@ vi.mock("child_process", async (importOriginal) => ({
 const originalDataRoot = process.env.SSA_DATA_ROOT;
 const originalTradeDocsDir = process.env.TRADE_DOCS_DIR;
 const originalDocumentFlag = process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 
 let tempRoot = "";
 let tradeDocsDir = "";
@@ -71,7 +70,6 @@ beforeEach(() => {
   process.env.SSA_DATA_ROOT = tempRoot;
   process.env.TRADE_DOCS_DIR = tradeDocsDir;
   delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
-  delete process.env.SSA_BETA_AUTH_TOKENS;
 });
 
 afterEach(() => {
@@ -84,9 +82,6 @@ afterEach(() => {
   if (originalDocumentFlag === undefined) delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
   else process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION = originalDocumentFlag;
 
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
@@ -97,10 +92,8 @@ function request(url: string, body: Record<string, unknown>): NextRequest {
   });
 }
 
-function getRequest(url: string, token?: string): NextRequest {
-  return new NextRequest(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+function getRequest(url: string): NextRequest {
+  return new NextRequest(url);
 }
 
 function expectNoInternalActionFields(value: unknown) {

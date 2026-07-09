@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { getLocalStorageSummary, listLocalStorageEntries } from "@/lib/runtime/local-storage";
 
 export const dynamic = "force-dynamic";

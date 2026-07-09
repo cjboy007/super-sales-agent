@@ -19,8 +19,9 @@ describe("JadenOS onboarding page UI", () => {
     expect(pageSource).toContain("Open Follow-up");
     expect(pageSource).toContain("Demo data");
     expect(pageSource).toContain("item.blocking ? \"missing\" : \"optional\"");
-    expect(pageSource).toContain("Activation Code");
-    expect(pageSource).toContain("会员激活码");
+    expect(pageSource).not.toContain("Activation Code");
+    expect(pageSource).not.toContain("会员激活码");
+    expect(pageSource).not.toContain("Save Code");
     expect(pageSource).not.toContain("Access Pass");
     expect(pageSource).not.toContain("访问口令");
     expect(pageSource).toContain("Local only");
@@ -34,7 +35,7 @@ describe("JadenOS onboarding page UI", () => {
     expect(pageSource).not.toContain("channel_audit");
   });
 
-  it("keeps the beta setup guide business-facing instead of terminal-oriented", () => {
+  it("keeps the setup guide business-facing instead of terminal-oriented", () => {
     expect(pageSource).not.toContain("OPENCLAW");
     expect(pageSource).not.toContain("OpenClaw");
     expect(pageSource).not.toContain("TERMINAL SETUP");
@@ -45,14 +46,14 @@ describe("JadenOS onboarding page UI", () => {
     expect(pageSource).not.toContain("upload docs --");
   });
 
-  it("links to the beta guide so external users can find setup and deployment docs", () => {
-    expect(pageSource).toContain("Beta guide");
-    expect(pageSource).toContain("内测指南");
-    expect(pageSource).toContain("/docs/PUBLIC_BETA_READINESS.md");
-    expect(existsSync(join(process.cwd(), "public/docs/PUBLIC_BETA_READINESS.md"))).toBe(true);
+  it("links to the readiness guide so external users can find setup and deployment docs", () => {
+    expect(pageSource).toContain("Readiness guide");
+    expect(pageSource).toContain("就绪指南");
+    expect(pageSource).toContain("/docs/DEPLOYMENT_READINESS.md");
+    expect(existsSync(join(process.cwd(), "public/docs/DEPLOYMENT_READINESS.md"))).toBe(true);
   });
 
-  it("links to a business-facing user guide for first-time beta users", () => {
+  it("links to a business-facing user guide for first-time users", () => {
     expect(pageSource).toContain("User guide");
     expect(pageSource).toContain("使用指南");
     expect(pageSource).toContain("/user-guide");

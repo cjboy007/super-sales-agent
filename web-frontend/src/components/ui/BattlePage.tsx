@@ -318,7 +318,7 @@ export function AccessBanner({
   next: string;
 }) {
   const denied = issue === "workspace_denied";
-  const href = `/beta-access?next=${encodeURIComponent(next)}`;
+  const href = `/settings?next=${encodeURIComponent(next)}`;
 
   return (
     <div className="mx-4 mt-4 rounded-md border border-amber-500/25 bg-amber-500/8 px-4 py-3">
@@ -326,21 +326,21 @@ export function AccessBanner({
         <span className="inline-flex h-6 items-center gap-1.5 rounded bg-amber-500/15 px-2 font-mono text-[10px] font-semibold uppercase text-amber-300 ring-1 ring-amber-500/25">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
           <BattleText
-            en={denied ? "Access Denied" : "Access Required"}
-            zh={denied ? "权限不足" : "需要会员激活码"}
+            en={denied ? "Workspace unavailable" : "Load failed"}
+            zh={denied ? "工作区不可用" : "加载失败"}
           />
         </span>
         <p className="min-w-0 flex-1 text-xs text-amber-100/85">
           <BattleText
-            en={denied ? "Your Activation Code does not cover this module." : "Save your Activation Code in Settings to unlock this module."}
-            zh={denied ? "当前会员激活码不能打开此模块。" : "请在设置中保存会员激活码以解锁此模块。"}
+            en={denied ? "The selected workspace cannot provide this module." : "The request could not finish. Check Settings or try again."}
+            zh={denied ? "当前工作区不能提供此模块。" : "请求未能完成。请检查设置或重试。"}
           />
         </p>
         <a
           href={href}
           className="inline-flex h-7 shrink-0 items-center rounded-md border border-amber-300/40 bg-amber-300 px-3 text-[11px] font-semibold text-slate-950 transition hover:bg-amber-200"
         >
-          <BattleText en="Save Activation Code" zh="保存会员激活码" />
+          <BattleText en="Open Settings" zh="打开设置" />
         </a>
       </div>
     </div>
@@ -362,24 +362,24 @@ export function AccessRequiredState({
   zhTitle: string;
 }) {
   const denied = issue === "workspace_denied";
-  const href = `/beta-access?next=${encodeURIComponent(next)}`;
+  const href = `/settings?next=${encodeURIComponent(next)}`;
 
   return (
     <div className="px-4 py-10">
       <div className="mx-auto max-w-xl rounded-md border border-amber-500/30 bg-amber-500/10 px-5 py-6 text-center">
         <BattleBadge tone="amber">
-          {denied ? <BattleText en="Workspace Access" zh="工作区权限" /> : <BattleText en="Beta Access Required" zh="需要内测访问" />}
+          {denied ? <BattleText en="Workspace unavailable" zh="工作区不可用" /> : <BattleText en="Request failed" zh="请求失败" />}
         </BattleBadge>
         <p className="mt-4 text-sm font-semibold text-amber-50">
           <BattleText
-            en={denied ? `Your current Activation Code cannot open ${title}.` : `Save your Activation Code before opening ${title}.`}
-            zh={denied ? `当前会员激活码不能打开${zhTitle}。` : `请先保存会员激活码，再打开${zhTitle}。`}
+            en={denied ? `The current workspace cannot open ${title}.` : `${title} could not load.`}
+            zh={denied ? `当前工作区不能打开${zhTitle}。` : `${zhTitle}未能加载。`}
           />
         </p>
         <p className="mt-2 text-xs leading-5 text-amber-100/80">
           <BattleText
-            en="Customer data is hidden for safety until access is confirmed. After the Activation Code is saved, you can continue with customers, orders, and timelines."
-            zh="访问确认前，客户数据会为安全而隐藏。保存会员激活码后，可以继续查看客户、订单和时间线。"
+            en="Check local settings, workspace selection, and runtime health, then try again."
+            zh="请检查本地设置、工作区选择和运行状态，然后重试。"
           />
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
@@ -387,7 +387,7 @@ export function AccessRequiredState({
             href={href}
             className="inline-flex h-9 items-center justify-center rounded-md border border-amber-300/40 bg-amber-300 px-4 text-xs font-semibold text-slate-950 transition hover:bg-amber-200"
           >
-            <BattleText en="Open Beta Access" zh="打开内测访问" />
+            <BattleText en="Open Settings" zh="打开设置" />
           </a>
           <a
             href="/user-guide"

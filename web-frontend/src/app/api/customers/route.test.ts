@@ -5,13 +5,10 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 let tempRoot = "";
 
-function request(url: string, token?: string): NextRequest {
-  return new NextRequest(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+function request(url: string): NextRequest {
+  return new NextRequest(url);
 }
 
 function writeJson(filePath: string, data: unknown) {
@@ -29,17 +26,11 @@ afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
 
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
-
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
 describe("/api/customers route", () => {
-  it("uses a one-workspace alpha token as the default customer workspace", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "alpha-a-token", workspaces: ["alpha-a"] },
-    ]);
+  it("uses the explicit project as the customer workspace", async () => {
     const projectRoot = path.join(tempRoot, "companies", "alpha-a");
     writeJson(path.join(projectRoot, "customers", "accounts.json"), [
       {
@@ -58,7 +49,7 @@ describe("/api/customers route", () => {
     ]);
 
     const { GET } = await import("./route");
-    const response = await GET(request("http://localhost/api/customers", "alpha-a-token"));
+    const response = await GET(request("http://localhost/api/customers?project=alpha-a"));
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -68,35 +59,73 @@ describe("/api/customers route", () => {
     expect(JSON.stringify(json)).not.toContain("farreach");
   });
 
-  it("blocks a scoped alpha token from writing another workspace customer status", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "alpha-a-token", workspaces: ["alpha-a"] },
+  it("writes the requested workspace customer status without activation auth", async () => {
+    const projectRoot = path.join(tempRoot, "companies", "alpha-b");
+    writeJson(path.join(projectRoot, "customers", "accounts.json"), [
+      {
+        id: "alpha-b-buyer.example",
+        companyName: "Alpha B Buyer",
+        country: "USA",
+        website: "https://alpha-b-buyer.example",
+        domain: "alpha-b-buyer.example",
+        industry: "Cable distributor",
+        status: "Prospect",
+        sources: [],
+        intelligence: { status: "queued" },
+        createdAt: "2026-06-04T08:00:00.000Z",
+        updatedAt: "2026-06-04T08:00:00.000Z",
+      },
     ]);
-
     const { POST } = await import("./route");
     const response = await POST(new NextRequest("http://localhost/api/customers?project=alpha-b", {
       method: "POST",
-      headers: { Authorization: "Bearer alpha-a-token" },
       body: JSON.stringify({
         action: "set-status-override",
         customerId: "alpha-b-buyer.example",
         status: "Risk",
-        reason: "Should not write across workspaces.",
+        reason: "Manual review in the selected workspace.",
       }),
     }));
+    const json = await response.json();
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(200);
+    expect(json).toMatchObject({
+      success: true,
+      data: {
+        customerId: "alpha-b-buyer.example",
+        status: "Risk",
+        manualOverride: true,
+      },
+    });
+    expect(fs.existsSync(path.join(tempRoot, "companies", "alpha-b", "customers", "accounts.json"))).toBe(true);
   });
 
-  it("requires wildcard alpha tokens to choose a workspace for customer data", async () => {
-    process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-      { token: "admin-token", workspaces: ["*"] },
+  it("uses farreach as the default customer workspace when project is omitted", async () => {
+    const projectRoot = path.join(tempRoot, "companies", "farreach");
+    writeJson(path.join(projectRoot, "customers", "accounts.json"), [
+      {
+        id: "default-buyer.example",
+        companyName: "Default Buyer",
+        country: "USA",
+        website: "https://default-buyer.example",
+        domain: "default-buyer.example",
+        industry: "Cable distributor",
+        status: "Prospect",
+        sources: [],
+        intelligence: { status: "queued" },
+        createdAt: "2026-06-04T08:00:00.000Z",
+        updatedAt: "2026-06-04T08:00:00.000Z",
+      },
     ]);
 
     const { GET } = await import("./route");
-    const response = await GET(request("http://localhost/api/customers", "admin-token"));
+    const response = await GET(request("http://localhost/api/customers"));
+    const json = await response.json();
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(200);
+    expect(json.data.customers).toEqual([
+      expect.objectContaining({ id: "default-buyer.example", companyName: "Default Buyer" }),
+    ]);
   });
 
   it("sets and clears a manual customer lifecycle override with timeline evidence", async () => {

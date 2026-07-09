@@ -16,11 +16,10 @@ describe("customer page business-facing UI", () => {
     expect(pageSource).not.toContain("customer.orders[0]?.id");
   });
 
-  it("turns beta API authorization failures into a customer-facing access prompt", () => {
+  it("turns API authorization failures into a customer-facing recovery prompt", () => {
     expect(pageSource).toContain("res.status === 401");
-    expect(pageSource).toContain("/beta-access?next=/leads");
-    expect(pageSource).toContain("Beta Access Required");
-    expect(pageSource).toContain("需要内测访问");
+    expect(pageSource).toContain("/settings");
+    expect(pageSource).toContain("客户、订单和时间线暂时无法加载");
     expect(pageSource).toContain("User guide");
     expect(pageSource).toContain("使用指南");
     expect(pageSource).toContain("/user-guide");
@@ -52,7 +51,7 @@ describe("customer page business-facing UI", () => {
     expect(pageSource).toContain("fulfillmentStatus");
   });
 
-  it("gives first-time beta users a self-serve way to create demo customers or start setup", () => {
+  it("gives first-time users a self-serve way to create demo customers or start setup", () => {
     expect(pageSource).toContain("/api/demo/seed");
     expect(pageSource).toContain("Create demo customers");
     expect(pageSource).toContain("创建演示客户");

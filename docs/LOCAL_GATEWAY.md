@@ -42,15 +42,11 @@ SSA_PUBLIC_HOST=<本机局域网 IP> docker compose up --build
 
 不要把这个端口暴露到公网。SSA 不会自动修改系统防火墙；如果同一局域网设备无法访问，请检查主机防火墙是否允许该端口的私有网络入站连接。
 
-## 认证 token
+## 访问安全
 
-容器启动时会检查：
+SSA 开源版不再内置激活码或访问码。默认 compose 只绑定 `127.0.0.1`，适合单机本地使用。
 
-```text
-~/.ssa/data/security/beta-auth.json
-```
-
-如果没有 token，入口脚本会生成一个本地 token 文件，并在容器日志里打印本地访问地址和 access token。已有 token 文件时，入口脚本会把 token 投射到 `SSA_BETA_AUTH_TOKENS`，让页面中间件和 API 使用同一套认证来源。LAN 模式也必须使用 token。
+如果开启 LAN 模式，请只在可信私有网络内使用，不要把端口暴露到公网。需要公网或多人访问时，应在反向代理、VPN、主机防火墙或部署平台层增加认证与访问控制。
 
 ## 模型配置
 

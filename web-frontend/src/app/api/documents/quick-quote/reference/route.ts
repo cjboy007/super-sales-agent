@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildQuickQuoteReference } from "@/lib/quick-quote-reference";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { findPriceReferences } from "@/lib/runtime/price-memory";
 
 export const dynamic = "force-dynamic";

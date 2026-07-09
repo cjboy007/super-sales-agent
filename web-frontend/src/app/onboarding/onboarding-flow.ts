@@ -6,7 +6,6 @@ export type OnboardingStepId =
   | "start"
   | "customers"
   | "email"
-  | "token"
   | "access"
   | "model"
   | "search"
@@ -31,7 +30,7 @@ export interface JadenosOnboardingStep {
 }
 
 export interface ReadinessItem {
-  id: "token" | "access" | "model" | "email" | "search" | "storage" | "upload" | "synthesize";
+  id: "access" | "model" | "email" | "search" | "storage" | "upload" | "synthesize";
   label: string;
   zhLabel: string;
   done: boolean;
@@ -41,7 +40,6 @@ export interface ReadinessItem {
 export const JADENOS_ONBOARDING_ROUTE = "/jadenos/onboarding";
 
 export interface OnboardingRuntimeState {
-  tokenPresent?: boolean;
   storageKnown?: boolean;
   testUploadCompleted?: boolean;
   synthesisTestCompleted?: boolean;
@@ -120,13 +118,6 @@ export function getReadinessItems(
   runtime: OnboardingRuntimeState = {}
 ): ReadinessItem[] {
   return [
-    {
-      id: "token",
-      label: "Activation code",
-      zhLabel: "会员激活码",
-      done: Boolean(runtime.tokenPresent),
-      blocking: false,
-    },
     {
       id: "access",
       label: "Access mode",
@@ -263,17 +254,6 @@ export function getJadenosOnboardingSteps(
       status: optionalStatusFor("search"),
       core: false,
       group: "recommended",
-    },
-    {
-      id: "token",
-      title: "Save Activation Code",
-      zhTitle: "保存会员激活码",
-      command: "Save activation code",
-      prompt: "Advanced local deployment can save an Activation Code in this browser. Trial users can keep using their phone session without adding one here.",
-      zhPrompt: "高级本地部署可在这个浏览器保存会员激活码。试用用户可以继续使用手机号会话，不必在这里再填一次。",
-      status: optionalStatusFor("token"),
-      core: false,
-      group: "advanced",
     },
     {
       id: "access",

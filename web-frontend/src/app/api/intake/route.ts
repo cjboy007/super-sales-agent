@@ -7,7 +7,7 @@ import {
   type IntakeUploadProcessing,
   type ProductDocReaderSummary,
 } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 

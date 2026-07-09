@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 describe("local gateway LAN status", () => {
-  it("defaults to local-only access with token protection", async () => {
+  it("defaults to local-only access without activation-token protection", async () => {
     delete process.env.SSA_BIND_HOST;
     delete process.env.SSA_PUBLIC_HOST;
     delete process.env.SSA_PUBLIC_PORT;
@@ -33,7 +33,7 @@ describe("local gateway LAN status", () => {
       bindHost: "127.0.0.1",
       publicHost: "127.0.0.1",
       port: "3001",
-      tokenRequired: true,
+      tokenRequired: false,
       localUrl: "http://127.0.0.1:3001",
       lanUrl: null,
     });
@@ -54,7 +54,7 @@ describe("local gateway LAN status", () => {
       bindHost: "0.0.0.0",
       publicHost: "192.168.1.20",
       port: "3100",
-      tokenRequired: true,
+      tokenRequired: false,
       localUrl: "http://127.0.0.1:3100",
       lanUrl: "http://192.168.1.20:3100",
     });

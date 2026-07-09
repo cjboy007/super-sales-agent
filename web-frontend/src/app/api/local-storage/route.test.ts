@@ -5,44 +5,34 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 let tempRoot = "";
 
 beforeEach(() => {
   vi.resetModules();
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-local-storage-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-    { token: "storage-admin", workspaces: ["*"] },
-  ]);
 });
 
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(url: string, token?: string) {
-  return new NextRequest(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+function request(url: string) {
+  return new NextRequest(url);
 }
 
 describe("/api/local-storage route", () => {
-  it("requires access and returns storage summary/listing through the gateway", async () => {
+  it("returns storage summary/listing through the gateway without activation tokens", async () => {
     const filePath = path.join(tempRoot, "companies", "farreach", "documents", "syntheses", "summary.md");
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, "local synthesis", "utf-8");
     const { GET } = await import("./route");
 
-    const unauthorized = await GET(request("http://localhost/api/local-storage?project=farreach"));
-    const response = await GET(request("http://localhost/api/local-storage?project=farreach&path=documents/syntheses", "storage-admin"));
+    const response = await GET(request("http://localhost/api/local-storage?project=farreach&path=documents/syntheses"));
     const json = await response.json();
 
-    expect(unauthorized.status).toBe(401);
     expect(response.status).toBe(200);
     expect(json.success).toBe(true);
     expect(json.data.summary.workspaceId).toBe("farreach");

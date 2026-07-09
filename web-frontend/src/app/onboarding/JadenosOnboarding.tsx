@@ -38,7 +38,6 @@ interface GatewayStatus {
   bindHost: string;
   publicHost: string;
   port: string;
-  tokenRequired: boolean;
   localUrl: string;
   lanUrl: string | null;
   warning: string;
@@ -276,11 +275,6 @@ function StepBody({
   step,
   config,
   updateConfig,
-  accessTokenInput,
-  setAccessTokenInput,
-  saveAccess,
-  clearAccess,
-  betaToken,
   gateway,
   storage,
   model,
@@ -301,11 +295,6 @@ function StepBody({
   step: JadenosOnboardingStep;
   config: ConfigState;
   updateConfig: (partial: Partial<ConfigState>) => void;
-  accessTokenInput: string;
-  setAccessTokenInput: (value: string) => void;
-  saveAccess: () => void;
-  clearAccess: () => void;
-  betaToken: string;
   gateway: GatewayStatus | null;
   storage: LocalStorageState | null;
   model: ModelHealth | null;
@@ -412,35 +401,6 @@ function StepBody({
           >
             <BattleText en="Skip to Follow-up" zh="先去客户跟进" />
           </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (step.id === "token") {
-    return (
-      <div className="grid gap-3 p-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
-        <FieldLabel>
-          {language === "zh" ? "会员激活码" : "Activation Code"}
-          <InputField
-            value={accessTokenInput}
-            type="password"
-            autoComplete="off"
-            onChange={(event) => setAccessTokenInput(event.target.value)}
-            className="mt-1 w-full"
-          />
-        </FieldLabel>
-        <CommandButton type="button" variant="primary" onClick={saveAccess} disabled={!accessTokenInput.trim()}>
-          <BattleText en="Save Code" zh="保存激活码" />
-        </CommandButton>
-        <CommandButton type="button" variant="ghost" onClick={clearAccess} disabled={!betaToken && !accessTokenInput}>
-          <BattleText en="Clear" zh="清除" />
-        </CommandButton>
-        <div className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs leading-5 text-slate-300 lg:col-span-3">
-          <BattleText
-            en="The browser stores the Activation Code and sends it to SSA with each protected request. LAN mode keeps the same protection."
-            zh="浏览器会保存会员激活码，并在访问受保护页面/API 时交给 SSA。LAN 模式也继续使用同一套保护。"
-          />
         </div>
       </div>
     );
@@ -562,7 +522,7 @@ function StepBody({
       <div className="grid gap-3 p-3">
         <div className="rounded-md border border-slate-800 bg-slate-950 p-3">
           <p className="text-[10px] uppercase tracking-wide text-slate-500">{language === "zh" ? "数据目录" : "Data directory"}</p>
-          <p className="mt-2 break-all font-mono text-xs text-slate-200">{storage?.summary.dataRoot || (language === "zh" ? "保存会员激活码后显示" : "Shown after the Activation Code is saved")}</p>
+          <p className="mt-2 break-all font-mono text-xs text-slate-200">{storage?.summary.dataRoot || (language === "zh" ? "加载后显示" : "Shown after loading")}</p>
         </div>
         <div className="grid gap-2 md:grid-cols-3">
           {(storage?.summary.directories || []).map((directory) => (
@@ -705,15 +665,9 @@ function StepBody({
 export default function JadenosOnboarding() {
   const router = useRouter();
   const language = useBattleLanguage();
-  const {
-    apiFetch,
-    betaToken,
-    setBetaToken,
-    clearBetaToken,
-  } = useProject();
+  const { apiFetch } = useProject();
   const [config, setConfig] = useState<ConfigState>(DEFAULT_CONFIG);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [accessTokenInput, setAccessTokenInput] = useState("");
   const [gateway, setGateway] = useState<GatewayStatus | null>(null);
   const [onboardingStatus, setOnboardingStatus] = useState<LocalOnboardingStatus | null>(null);
   const [storage, setStorage] = useState<LocalStorageState | null>(null);
@@ -733,11 +687,10 @@ export default function JadenosOnboarding() {
   const [error, setError] = useState<string | null>(null);
 
   const runtimeState: OnboardingRuntimeState = useMemo(() => ({
-    tokenPresent: Boolean(betaToken),
     storageKnown: Boolean(storage?.summary.dataRoot),
     testUploadCompleted,
     synthesisTestCompleted,
-  }), [betaToken, storage?.summary.dataRoot, testUploadCompleted, synthesisTestCompleted]);
+  }), [storage?.summary.dataRoot, testUploadCompleted, synthesisTestCompleted]);
 
   const readiness = useMemo(() => getOnboardingReadiness(config, runtimeState), [config, runtimeState]);
   const steps = useMemo(() => getJadenosOnboardingSteps(config, runtimeState), [config, runtimeState]);
@@ -751,8 +704,6 @@ export default function JadenosOnboarding() {
       const configJson = await configResponse.json().catch(() => ({}));
       if (configResponse.ok && configJson.success) {
         setConfig((prev) => ({ ...prev, ...configJson.data }));
-      } else if (configResponse.status === 401 || configResponse.status === 403) {
-        setError(language === "zh" ? "请先保存会员激活码。" : "Save the Activation Code first.");
       }
 
       const gatewayResponse = await apiFetch(LOCAL_GATEWAY_API, { cache: "no-store" });
@@ -777,10 +728,6 @@ export default function JadenosOnboarding() {
       setLoading(false);
     }
   }, [apiFetch, language]);
-
-  useEffect(() => {
-    setAccessTokenInput(betaToken);
-  }, [betaToken]);
 
   useEffect(() => {
     void loadAll();
@@ -813,22 +760,6 @@ export default function JadenosOnboarding() {
       setSaving(false);
     }
   }, [apiFetch, config, language, loadAll]);
-
-  const saveAccess = useCallback(() => {
-    setBetaToken(accessTokenInput);
-    setError(null);
-    setMessage(language === "zh" ? "会员激活码已保存。" : "Activation Code saved.");
-    setActiveIndex((current) => Math.max(current, 1));
-  }, [accessTokenInput, language, setBetaToken]);
-
-  const clearAccess = useCallback(() => {
-    clearBetaToken();
-    setAccessTokenInput("");
-    setGateway(null);
-    setStorage(null);
-    setError(null);
-    setMessage(language === "zh" ? "会员激活码已清除。" : "Activation Code cleared.");
-  }, [clearBetaToken, language]);
 
   const testModel = useCallback(async () => {
     const saved = await saveConfig();
@@ -970,10 +901,10 @@ export default function JadenosOnboarding() {
           <BattleBadge tone="emerald"><BattleText en="Completed" zh="已完成" /></BattleBadge>
         ) : null}
         <Link
-          href="/docs/PUBLIC_BETA_READINESS.md"
+          href="/docs/DEPLOYMENT_READINESS.md"
           className="inline-flex h-[var(--ui-button-height)] items-center rounded-md border border-slate-700 bg-slate-800 px-3 text-[13px] font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 active:translate-y-px"
         >
-          <BattleText en="Beta guide" zh="内测指南" />
+          <BattleText en="Readiness guide" zh="就绪指南" />
         </Link>
         <Link
           href="/user-guide"
@@ -1027,11 +958,6 @@ export default function JadenosOnboarding() {
                 step={activeStep}
                 config={config}
                 updateConfig={updateConfig}
-                accessTokenInput={accessTokenInput}
-                setAccessTokenInput={setAccessTokenInput}
-                saveAccess={saveAccess}
-                clearAccess={clearAccess}
-                betaToken={betaToken}
                 gateway={gateway}
                 storage={storage}
                 model={model}
@@ -1063,8 +989,7 @@ export default function JadenosOnboarding() {
                     type="button"
                     variant={activeStep.status === "missing" && activeStep.core ? "primary" : "secondary"}
                     onClick={() => {
-                      if (activeStep.id === "token") saveAccess();
-                      else if (activeStep.id === "model") void testModel();
+                      if (activeStep.id === "model") void testModel();
                       else void saveConfig();
                       setActiveIndex((current) => Math.min(current + 1, steps.length - 1));
                     }}

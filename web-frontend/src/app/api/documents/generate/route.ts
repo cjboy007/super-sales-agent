@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime, type GeneratedTradeDocument, type TradeDocumentData } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { consumeTrialQuota, type TrialAccessSession } from "@/lib/runtime/trial-auth";
 import { runtimeFileUrl } from "@/lib/runtime/files";
 import { withPublicAction } from "../../public-action";

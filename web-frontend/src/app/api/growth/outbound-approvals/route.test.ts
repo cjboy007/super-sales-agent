@@ -5,7 +5,6 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const originalDataRoot = process.env.SSA_DATA_ROOT;
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 const originalEmailFlag = process.env.SSA_ENABLE_REAL_EMAIL_SEND;
 const originalCrmFlag = process.env.SSA_ENABLE_REAL_CRM_WRITE;
 const originalDocumentFlag = process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
@@ -14,9 +13,6 @@ let tempRoot = "";
 beforeEach(() => {
   tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ssa-growth-outbound-approvals-route-test-"));
   process.env.SSA_DATA_ROOT = tempRoot;
-  process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-    { token: "hero-token", workspaces: ["hero-pumps"] },
-  ]);
   delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   delete process.env.SSA_ENABLE_REAL_CRM_WRITE;
   delete process.env.SSA_ENABLE_REAL_DOCUMENT_GENERATION;
@@ -25,9 +21,6 @@ beforeEach(() => {
 afterEach(() => {
   if (originalDataRoot === undefined) delete process.env.SSA_DATA_ROOT;
   else process.env.SSA_DATA_ROOT = originalDataRoot;
-
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
 
   if (originalEmailFlag === undefined) delete process.env.SSA_ENABLE_REAL_EMAIL_SEND;
   else process.env.SSA_ENABLE_REAL_EMAIL_SEND = originalEmailFlag;
@@ -41,12 +34,11 @@ afterEach(() => {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
-function request(url: string, init: { method?: string; body?: unknown; token?: string } = {}): NextRequest {
+function request(url: string, init: { method?: string; body?: unknown } = {}): NextRequest {
   return new NextRequest(url, {
     method: init.method,
     body: init.body ? JSON.stringify(init.body) : undefined,
     headers: {
-      Authorization: `Bearer ${init.token || "hero-token"}`,
       ...(init.body ? { "content-type": "application/json" } : {}),
     },
   });
@@ -116,20 +108,18 @@ async function createPhase9Draft() {
 }
 
 describe("/api/growth/outbound-approvals routes", () => {
-  it("enforces workspace-scoped auth on reads and approval request creation", async () => {
+  it("returns approval state for explicitly selected workspaces without activation auth", async () => {
     const listRoute = await import("./route");
-    const requestRoute = await import("./request/route");
 
-    expect((await listRoute.GET(request("http://localhost/api/growth/outbound-approvals?project=farreach"))).status).toBe(403);
-    expect((await requestRoute.POST(request("http://localhost/api/growth/outbound-approvals/request?project=farreach", {
-      method: "POST",
-      body: { sourceDraftRunId: "blocked", sourceDraftId: "blocked", intendedActionType: "email_send" },
-    }))).status).toBe(403);
+    const farreach = await listRoute.GET(request("http://localhost/api/growth/outbound-approvals?project=farreach"));
+    const farreachJson = await farreach.json();
+    const hero = await listRoute.GET(request("http://localhost/api/growth/outbound-approvals?project=hero-pumps"));
+    const heroJson = await hero.json();
 
-    const allowed = await listRoute.GET(request("http://localhost/api/growth/outbound-approvals?project=hero-pumps"));
-    const json = await allowed.json();
-    expect(allowed.status).toBe(200);
-    expect(json).toMatchObject({
+    expect(farreach.status).toBe(200);
+    expect(farreachJson.data.workspaceId).toBe("farreach");
+    expect(hero.status).toBe(200);
+    expect(heroJson).toMatchObject({
       success: true,
       data: {
         workspaceId: "hero-pumps",

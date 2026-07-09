@@ -7,13 +7,13 @@ const pageSource = readFileSync(join(process.cwd(), "src/app/health/page.tsx"), 
 const agentStatusSource = readFileSync(join(process.cwd(), "src/app/agent-status/page.tsx"), "utf8");
 
 describe("health check page UI", () => {
-  it("renders a business-facing beta health check page from the safe health API", () => {
+  it("renders a business-facing health check page from the safe health API", () => {
     expect(pageSource).toContain("Health Check");
     expect(pageSource).toContain("健康检查");
     expect(pageSource).toContain("fetch(\"/api/health\"");
     expect(pageSource).toContain("!json.beta?.readiness");
     expect(pageSource).toContain("scopedResponse = await apiFetch");
-    expect(pageSource).toContain("Beta readiness");
+    expect(pageSource).toContain("Readiness");
     expect(pageSource).toContain("Automation status");
     expect(pageSource).toContain("Mailbox sync");
     expect(pageSource).toContain("Task recovery");
@@ -58,10 +58,10 @@ describe("health check page UI", () => {
     expect(pageSource).toContain("item.detail");
   });
 
-  it("links health checks to the beta guide without exposing runtime commands", () => {
-    expect(pageSource).toContain("Beta guide");
-    expect(pageSource).toContain("内测指南");
-    expect(pageSource).toContain("/docs/PUBLIC_BETA_READINESS.md");
+  it("links health checks to the readiness guide without exposing runtime commands", () => {
+    expect(pageSource).toContain("Readiness guide");
+    expect(pageSource).toContain("就绪指南");
+    expect(pageSource).toContain("/docs/DEPLOYMENT_READINESS.md");
   });
 
   it("links health checks to the user guide without exposing implementation details", () => {

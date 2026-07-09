@@ -856,14 +856,14 @@
           "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
           "role": null,
           "tag": "MAIN",
-          "text": "全部客户0活跃客户0风险客户0国家/地区0客户列表 / 客户详情0 个可见客户 / 每页 20 个AllProspectActive CustomerDormantRiskArchivedAllBeta access token is required.第 1 / 1上一页下一页让 Jaden 帮我看会带上本页筛选和当前数据，不会外发就绪Jaden 会参考这"
+          "text": "全部客户0活跃客户0风险客户0国家/地区0客户列表 / 客户详情0 个可见客户 / 每页 20 个AllProspectActive CustomerDormantRiskArchivedAllWorkspace data is unavailable.第 1 / 1上一页下一页让 Jaden 帮我看会带上本页筛选和当前数据，不会外发就绪Jaden 会参考这"
         },
         {
           "aria": null,
           "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
           "role": null,
           "tag": "SECTION",
-          "text": "客户列表 / 客户详情0 个可见客户 / 每页 20 个AllProspectActive CustomerDormantRiskArchivedAllBeta access token is required."
+          "text": "客户列表 / 客户详情0 个可见客户 / 每页 20 个AllProspectActive CustomerDormantRiskArchivedAllWorkspace data is unavailable."
         },
         {
           "aria": null,
@@ -873,7 +873,7 @@
           "text": "让 Jaden 帮我看会带上本页筛选和当前数据，不会外发就绪Jaden 会参考这些内容你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。客户列表 / 筛选 All / All / 当前显示 0 / 活跃客户 0 / 搜索 无不会发给客户，只会保存到 JadenOS 内等待复核。提交给 Jaden"
         }
       ],
-      "text": "客户\n\nFARREACH / 客户列表 / 第 1 页\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n实时\n刷新\nEN\n中文\n深色\n\n全部客户\n\n0\n\n活跃客户\n\n0\n\n风险客户\n\n0\n\n国家/地区\n\n0\n\n客户列表 / 客户详情\n\n0 个可见客户 / 每页 20 个\n\nAll\nProspect\nActive Customer\nDormant\nRisk\nArchived\nAll\nBeta access token is required.\n第 1 / 1\n上一页\n下一页\n让 Jaden 帮我看\n\n会带上本页筛选和当前数据，不会外发\n\n就绪\n\nJADEN 会参考这些内容\n\n你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。\n\n客户列表 / 筛选 All / All / 当前显示 0 / 活跃客户 0 / 搜索 无\n\n不会发给客户，只会保存到 JadenOS 内等待复核。\n\n提交给 Jaden",
+      "text": "客户\n\nFARREACH / 客户列表 / 第 1 页\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n实时\n刷新\nEN\n中文\n深色\n\n全部客户\n\n0\n\n活跃客户\n\n0\n\n风险客户\n\n0\n\n国家/地区\n\n0\n\n客户列表 / 客户详情\n\n0 个可见客户 / 每页 20 个\n\nAll\nProspect\nActive Customer\nDormant\nRisk\nArchived\nAll\nWorkspace data is unavailable.\n第 1 / 1\n上一页\n下一页\n让 Jaden 帮我看\n\n会带上本页筛选和当前数据，不会外发\n\n就绪\n\nJADEN 会参考这些内容\n\n你发出的说明会和本页当前筛选、可见记录、统计数字一起保存，Jaden 就知道你正在看什么。\n\n客户列表 / 筛选 All / All / 当前显示 0 / 活跃客户 0 / 搜索 无\n\n不会发给客户，只会保存到 JadenOS 内等待复核。\n\n提交给 Jaden",
       "theme": "light",
       "uiSize": "large",
       "viewport": {
@@ -1328,14 +1328,14 @@
           "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
           "role": null,
           "tag": "MAIN",
-          "text": "全部报价0草稿0已发送0已确认0报价清单第 1 页 / 共 1 页全部报价样品单大货 PI全部草稿已发送已确认已过期Beta access token is required.快速报价客户 / 成本 / 参考价 / PI报价输入客户 / 产品 / 条款内部参考成本 / 供应商 / 历史价输出文件英文预览 / 导出 PI报价统一从快速报价开始，再导出 PI 并"
+          "text": "全部报价0草稿0已发送0已确认0报价清单第 1 页 / 共 1 页全部报价样品单大货 PI全部草稿已发送已确认已过期Workspace data is unavailable.快速报价客户 / 成本 / 参考价 / PI报价输入客户 / 产品 / 条款内部参考成本 / 供应商 / 历史价输出文件英文预览 / 导出 PI报价统一从快速报价开始，再导出 PI 并"
         },
         {
           "aria": null,
           "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
           "role": null,
           "tag": "SECTION",
-          "text": "报价清单第 1 页 / 共 1 页全部报价样品单大货 PI全部草稿已发送已确认已过期Beta access token is required."
+          "text": "报价清单第 1 页 / 共 1 页全部报价样品单大货 PI全部草稿已发送已确认已过期Workspace data is unavailable."
         },
         {
           "aria": null,
@@ -1345,7 +1345,7 @@
           "text": "快速报价客户 / 成本 / 参考价 / PI报价输入客户 / 产品 / 条款内部参考成本 / 供应商 / 历史价输出文件英文预览 / 导出 PI报价统一从快速报价开始，再导出 PI 并归档文件。打开快速报价"
         }
       ],
-      "text": "报价控制台\n\n报价文件 / 状态复核 / 只生成文件\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n刷新\nEN\n中文\n深色\n\n全部报价\n\n0\n\n草稿\n\n0\n\n已发送\n\n0\n\n已确认\n\n0\n\n报价清单\n\n第 1 页 / 共 1 页\n\n全部\n报价\n样品单\n大货 PI\n全部\n草稿\n已发送\n已确认\n已过期\nBeta access token is required.\n快速报价\n\n客户 / 成本 / 参考价 / PI\n\n报价输入\n\n客户 / 产品 / 条款\n\n内部参考\n\n成本 / 供应商 / 历史价\n\n输出文件\n\n英文预览 / 导出 PI\n\n报价统一从快速报价开始，再导出 PI 并归档文件。\n打开快速报价\n总金额 —\n上一页\n下一页",
+      "text": "报价控制台\n\n报价文件 / 状态复核 / 只生成文件\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n刷新\nEN\n中文\n深色\n\n全部报价\n\n0\n\n草稿\n\n0\n\n已发送\n\n0\n\n已确认\n\n0\n\n报价清单\n\n第 1 页 / 共 1 页\n\n全部\n报价\n样品单\n大货 PI\n全部\n草稿\n已发送\n已确认\n已过期\nWorkspace data is unavailable.\n快速报价\n\n客户 / 成本 / 参考价 / PI\n\n报价输入\n\n客户 / 产品 / 条款\n\n内部参考\n\n成本 / 供应商 / 历史价\n\n输出文件\n\n英文预览 / 导出 PI\n\n报价统一从快速报价开始，再导出 PI 并归档文件。\n打开快速报价\n总金额 —\n上一页\n下一页",
       "theme": "light",
       "uiSize": "large",
       "viewport": {
@@ -1821,12 +1821,12 @@
         {
           "aria": null,
           "disabled": true,
-          "text": "保存访问"
+          "text": "保存设置"
         },
         {
           "aria": null,
           "disabled": true,
-          "text": "清除"
+          "text": "重置"
         },
         {
           "aria": null,
@@ -1864,7 +1864,7 @@
           "aria": null,
           "id": null,
           "name": null,
-          "placeholder": "输入团队发给你的内测口令",
+          "placeholder": "输入团队发给你的访问说明",
           "tag": "INPUT",
           "type": "password",
           "value": ""
@@ -2117,14 +2117,14 @@
           "aria": null,
           "href": null,
           "tag": "BUTTON",
-          "text": "保存访问",
+          "text": "保存设置",
           "type": "button"
         },
         {
           "aria": null,
           "href": null,
           "tag": "BUTTON",
-          "text": "清除",
+          "text": "重置",
           "type": "button"
         },
         {
@@ -2216,7 +2216,7 @@
         },
         {
           "tag": "H2",
-          "text": "内测访问"
+          "text": "工作区访问"
         },
         {
           "tag": "H2",
@@ -2373,7 +2373,7 @@
           "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-3",
           "role": null,
           "tag": "MAIN",
-          "text": "JadenOS 入门终端运行 /jadenos onboarding 逐步设置打开$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。完整设置仍可在本页修改。内测访问给外部试用用户准备的访问口令待填写访问口令保存访问清除保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底"
+          "text": "JadenOS 入门终端运行 /jadenos onboarding 逐步设置打开$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。完整设置仍可在本页修改。工作区访问给共享部署准备的访问说明待填写访问说明保存设置重置保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底"
         },
         {
           "aria": null,
@@ -2387,7 +2387,7 @@
           "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
           "role": null,
           "tag": "SECTION",
-          "text": "内测访问给外部试用用户准备的访问口令待填写访问口令保存访问清除保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底层配置。"
+          "text": "工作区访问给共享部署准备的访问说明待填写访问说明保存设置重置保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底层配置。"
         },
         {
           "aria": null,
@@ -2401,7 +2401,7 @@
           "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
           "role": null,
           "tag": "SECTION",
-          "text": "数据保护状态客户数据与产品代码分开保存当前状态需要运维检查运行文件、缓存和客户归档不会在客户页面显示。如果这是生产或内测环境，请让运维确认数据隔离设置。"
+          "text": "数据保护状态客户数据与产品代码分开保存当前状态需要运维检查运行文件、缓存和客户归档不会在客户页面显示。如果这是生产或共享环境，请让运维确认数据隔离设置。"
         },
         {
           "aria": null,
@@ -2425,7 +2425,7 @@
           "text": "安全规则哪些可以自动做，哪些必须审批核心SSA 自己保存销售状态、审批、任务和文件。需要审批客户邮件、外部系统、付款和真实业务变更，在批准前都会锁定。可选工具开发和监督工具可以辅助操作员，但 OpenClaw 不依赖它们运行。"
         }
       ],
-      "text": "系统设置\n\n安全设置 / 密钥隐藏 / 客户发送已锁定\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n保存\nEN\n中文\n深色\nJadenOS 入门终端\n\n运行 /jadenos onboarding 逐步设置\n\n打开\n$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。\n\n完整设置仍可在本页修改。\n\n内测访问\n\n给外部试用用户准备的访问口令\n\n待填写\n访问口令\n保存访问\n清除\n\n保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底层配置。\n\n界面大小\n\n控制全局字号、按钮和输入框尺寸\n\n小\n紧凑，适合高密度表格\n中\n默认，按钮和正文更清楚\n大\n更大字号，适合长时间操作\n数据保护状态\n\n客户数据与产品代码分开保存\n\n当前状态\n\n需要运维检查\n\n运行文件、缓存和客户归档不会在客户页面显示。\n\n如果这是生产或内测环境，请让运维确认数据隔离设置。\n邮箱同步准备\n\n确认新邮件能进入客户时间线\n\n待设置\n\nMailbox setup needs attention before incoming customer email can enter CRM.\n\nComplete the mailbox connection in Settings, then run the resident worker again.\n\n连接邮箱\n自动捕获已开\nCRM 已有动态\nAdd the mailbox account.\nAdd the incoming mail server.\nAdd the mailbox password or app password.\nAI 与调研\n邮件连接\n搜索\nAI 与调研服务\n\nAI 只辅助阅读、起草和总结；关键动作仍由 SSA 控制\n\nDEEPSEEK 密钥\nOPENAI 密钥\nOPENROUTER 密钥\nTAVILY 调研密钥\n默认 AI 模型\ndeepseek-v4-pro\ndeepseekv4pro\ngpt-4o-mini\ngpt-4.1\ndeepseek/deepseek-v4-pro\nopenai/gpt-4o-mini\nanthropic/claude-sonnet-4\nmock\n安全规则\n\n哪些可以自动做，哪些必须审批\n\n核心\n\nSSA 自己保存销售状态、审批、任务和文件。\n\n需要审批\n\n客户邮件、外部系统、付款和真实业务变更，在批准前都会锁定。\n\n可选工具\n\n开发和监督工具可以辅助操作员，但 OpenClaw 不依赖它们运行。",
+      "text": "系统设置\n\n安全设置 / 密钥隐藏 / 客户发送已锁定\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n就绪\n保存\nEN\n中文\n深色\nJadenOS 入门终端\n\n运行 /jadenos onboarding 逐步设置\n\n打开\n$ /jadenos onboarding逐步连接 DeepSeek、邮箱、Hunter、Tavily 和可选连接器。\n\n完整设置仍可在本页修改。\n\n工作区访问\n\n给共享部署准备的访问说明\n\n待填写\n访问说明\n保存设置\n重置\n\n保存后，客户、订单、时间线和设置请求会自动使用这份访问权限；页面不会显示底层配置。\n\n界面大小\n\n控制全局字号、按钮和输入框尺寸\n\n小\n紧凑，适合高密度表格\n中\n默认，按钮和正文更清楚\n大\n更大字号，适合长时间操作\n数据保护状态\n\n客户数据与产品代码分开保存\n\n当前状态\n\n需要运维检查\n\n运行文件、缓存和客户归档不会在客户页面显示。\n\n如果这是生产或共享环境，请让运维确认数据隔离设置。\n邮箱同步准备\n\n确认新邮件能进入客户时间线\n\n待设置\n\nMailbox setup needs attention before incoming customer email can enter CRM.\n\nComplete the mailbox connection in Settings, then run the resident worker again.\n\n连接邮箱\n自动捕获已开\nCRM 已有动态\nAdd the mailbox account.\nAdd the incoming mail server.\nAdd the mailbox password or app password.\nAI 与调研\n邮件连接\n搜索\nAI 与调研服务\n\nAI 只辅助阅读、起草和总结；关键动作仍由 SSA 控制\n\nDEEPSEEK 密钥\nOPENAI 密钥\nOPENROUTER 密钥\nTAVILY 调研密钥\n默认 AI 模型\ndeepseek-v4-pro\ndeepseekv4pro\ngpt-4o-mini\ngpt-4.1\ndeepseek/deepseek-v4-pro\nopenai/gpt-4o-mini\nanthropic/claude-sonnet-4\nmock\n安全规则\n\n哪些可以自动做，哪些必须审批\n\n核心\n\nSSA 自己保存销售状态、审批、任务和文件。\n\n需要审批\n\n客户邮件、外部系统、付款和真实业务变更，在批准前都会锁定。\n\n可选工具\n\n开发和监督工具可以辅助操作员，但 OpenClaw 不依赖它们运行。",
       "theme": "light",
       "uiSize": "large",
       "viewport": {
@@ -3160,7 +3160,7 @@
         },
         {
           "tag": "H2",
-          "text": "内测准备"
+          "text": "就绪检查"
         },
         {
           "tag": "H2",
@@ -3312,14 +3312,14 @@
           "cls": "min-h-0 flex-1 overflow-y-auto p-4 text-[13px] space-y-4",
           "role": null,
           "tag": "MAIN",
-          "text": "Beta access token is required.内测准备-检查中健康检查返回后会显示内测准备项。首次体验路径-健康检查返回后会显示首次体验路径。邮件进入 CRM等待同步检查中健康检查返回后会显示邮件同步状态。连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。待连接邮箱自动捕获未开暂无最近同步演练一封邮件后台 Worker-checki"
+          "text": "Workspace data is unavailable.就绪检查-检查中健康检查返回后会显示就绪检查项。首次体验路径-健康检查返回后会显示首次体验路径。邮件进入 CRM等待同步检查中健康检查返回后会显示邮件同步状态。连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。待连接邮箱自动捕获未开暂无最近同步演练一封邮件后台 Worker-checki"
         },
         {
           "aria": null,
           "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
           "role": null,
           "tag": "SECTION",
-          "text": "内测准备-检查中健康检查返回后会显示内测准备项。"
+          "text": "就绪检查-检查中健康检查返回后会显示就绪检查项。"
         },
         {
           "aria": null,
@@ -3340,7 +3340,7 @@
           "cls": "overflow-hidden rounded-md border border-slate-800 bg-slate-900/45",
           "role": null,
           "tag": "SECTION",
-          "text": "后台 Worker-checking等待健康检查无心跳真实动作已上锁本地开放模式访问页未保护排队0运行中0已完成0失败0待重试0"
+          "text": "后台 Worker-checking等待健康检查无心跳真实动作已上锁开放访问开放访问排队0运行中0已完成0失败0待重试0"
         },
         {
           "aria": null,
@@ -3357,7 +3357,7 @@
           "text": "失败任务0 项需要处理当前没有待处理的失败任务。"
         }
       ],
-      "text": "运维状态\n\n内测就绪 / worker 健康 / 安全门\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n刷新\nEN\n中文\n深色\nBeta access token is required.\n内测准备\n\n-\n\n检查中\n\n健康检查返回后会显示内测准备项。\n\n首次体验路径\n\n-\n\n健康检查返回后会显示首次体验路径。\n\n邮件进入 CRM\n\n等待同步\n\n检查中\n\n健康检查返回后会显示邮件同步状态。\n\n连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。\n\n待连接邮箱\n自动捕获未开\n暂无最近同步\n演练一封邮件\n后台 Worker\n\n-\n\nCHECKING\n\n等待健康检查\n\n无心跳\n真实动作已上锁\n本地开放模式\n访问页未保护\n\n排队\n\n0\n\n运行中\n\n0\n\n已完成\n\n0\n\n失败\n\n0\n\n待重试\n\n0\n\n需要关注\n\n当前没有 worker 告警。\n\n失败任务\n\n0 项需要处理\n\n当前没有待处理的失败任务。",
+      "text": "运维状态\n\n运行就绪 / worker 健康 / 安全门\n\n驾驶舱\n投递台\n客户\n收件箱\n开发信\n报价\n出货文件\n情报\n运维\n设置\n刷新\nEN\n中文\n深色\nWorkspace data is unavailable.\n就绪检查\n\n-\n\n检查中\n\n健康检查返回后会显示就绪检查项。\n\n首次体验路径\n\n-\n\n健康检查返回后会显示首次体验路径。\n\n邮件进入 CRM\n\n等待同步\n\n检查中\n\n健康检查返回后会显示邮件同步状态。\n\n连接邮箱并启动后台 worker 后，新邮件会进入客户时间线。\n\n待连接邮箱\n自动捕获未开\n暂无最近同步\n演练一封邮件\n后台 Worker\n\n-\n\nCHECKING\n\n等待健康检查\n\n无心跳\n真实动作已上锁\n开放访问\n开放访问\n\n排队\n\n0\n\n运行中\n\n0\n\n已完成\n\n0\n\n失败\n\n0\n\n待重试\n\n0\n\n需要关注\n\n当前没有 worker 告警。\n\n失败任务\n\n0 项需要处理\n\n当前没有待处理的失败任务。",
       "theme": "light",
       "uiSize": "large",
       "viewport": {

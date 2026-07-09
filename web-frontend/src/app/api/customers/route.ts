@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSalesRuntime } from "@/lib/runtime";
 import { buildCustomerDirectory, clearCustomerStatusOverride, setCustomerStatusOverride } from "@/lib/runtime/customers";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 

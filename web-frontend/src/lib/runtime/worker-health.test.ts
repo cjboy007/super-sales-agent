@@ -30,7 +30,7 @@ describe("worker health summary", () => {
 
     expect(summary.status).toBe("down");
     expect(summary.alerts).toEqual([
-      "No resident worker heartbeat is visible. Start the worker before external beta.",
+      "No resident worker heartbeat is visible. Start the worker before shared use.",
     ]);
   });
 
@@ -62,7 +62,7 @@ describe("worker health summary", () => {
 
     expect(summary.status).toBe("down");
     expect(summary.alerts).toEqual([
-      "Resident worker is stopped. Start the worker before external beta.",
+      "Resident worker is stopped. Start the worker before shared use.",
     ]);
   });
 

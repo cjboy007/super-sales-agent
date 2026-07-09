@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { betaAccessRequiredForPageRuntime } from "@/lib/runtime/beta-auth-edge";
-import { betaAuthIsConfiguredForRuntime, requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { getBetaReadiness } from "@/lib/runtime/beta-readiness";
 import { createSalesRuntime } from "@/lib/runtime";
 import { summarizeMailboxReadiness } from "@/lib/runtime/mailbox-readiness";
@@ -54,7 +53,6 @@ function publicMailboxReadiness(mailbox: MailboxReadinessSummary) {
 }
 
 export async function GET(request: NextRequest) {
-  const explicitWorkspace = request.nextUrl.searchParams.has("project") || request.nextUrl.searchParams.has("workspaceId");
   const worker = summarizeWorkerHealth();
   const llm = getLlmRuntimeStatus();
   const model = {
@@ -66,24 +64,15 @@ export async function GET(request: NextRequest) {
     mockFallbackActive: llm.readiness === "mock_fallback",
   };
   const beta = {
-    authConfigured: betaAuthIsConfiguredForRuntime(),
-    pageAccessProtected: betaAccessRequiredForPageRuntime(),
+    authConfigured: false,
+    pageAccessProtected: false,
     sideEffectsBlockedByDefault: true,
     model,
   };
 
-  if (beta.authConfigured && !explicitWorkspace) {
-    return NextResponse.json({
-      status: "ok",
-      timestamp: new Date().toISOString(),
-      worker: publicWorkerHealth(worker),
-      beta,
-    });
-  }
-
-  const auth = explicitWorkspace ? requireResolvedWorkspaceAccess(request) : null;
-  if (auth && !auth.ok) return auth.response;
-  const workspaceId = auth?.ok ? auth.workspaceId : "farreach";
+  const access = requireResolvedWorkspaceAccess(request);
+  if (!access.ok) return access.response;
+  const workspaceId = access.workspaceId;
   const workerSupervisor = summarizeWorkerSupervisorReadiness(workspaceId);
   const mailbox = summarizeMailboxReadiness(worker, { workspaceId });
   const runtime = createSalesRuntime();

@@ -48,30 +48,11 @@ POST /api/runtime      body.workspaceId = "farreach"
 
 SSA accepts both `project` and `workspaceId`. Use `workspaceId` in JSON bodies and `project` in query strings for consistency.
 
-## Auth Contract
+## Access Contract
 
-Preferred agent auth:
+SSA open-source runtime does not require activation codes or bearer tokens. API routes resolve workspace context from `project`, `workspaceId`, or request body fields.
 
-```http
-Authorization: Bearer <ssa-beta-token>
-```
-
-Also accepted:
-
-```http
-x-ssa-beta-token: <ssa-beta-token>
-Cookie: ssa-beta-token=<ssa-beta-token>
-```
-
-Token sources, in priority order:
-
-```text
-SSA_BETA_AUTH_TOKENS             JSON array: [{ "token": "...", "workspaces": ["farreach"] }]
-SSA_BETA_AUTH_TOKEN              single wildcard token
-~/.ssa/data/security/beta-auth.json
-```
-
-If no beta token is configured, local dev is open and unresolved workspace defaults to `farreach`. Do not rely on that in agent integrations.
+If no workspace is provided, unresolved workspace defaults to `farreach`. Secure shared or public deployments at the network, reverse-proxy, host, or platform layer.
 
 Workspace resolution rules:
 
@@ -349,22 +330,20 @@ Real file generation is approval and flag gated by `document.generate`.
 
 ## API Reference
 
-### Health, Auth, Config
+### Health, Config
 
 | Method | Path | Purpose | Input |
 | --- | --- | --- | --- |
-| `GET` | `/api/health` | Lightweight status. If beta auth is configured and no workspace is passed, returns basic status without workspace auth. | optional `project`/`workspaceId` |
-| `POST` | `/api/beta-access/verify` | Validate a beta token and return accessible workspaces. | `{ "token": "..." }` |
-| `GET` | `/api/config` | Read masked settings. Admin token required. | none |
-| `POST` | `/api/config` | Update settings. Admin token required. Masked secrets are preserved. | partial settings |
-| `PUT` | `/api/config` | Import settings. Admin token required. | partial settings |
+| `GET` | `/api/health` | Lightweight status. | optional `project`/`workspaceId` |
+| `GET` | `/api/config` | Read masked settings. | none |
+| `POST` | `/api/config` | Update settings. Masked secrets are preserved. | partial settings |
+| `PUT` | `/api/config` | Import settings. | partial settings |
 | `GET` | `/api/system/resources` | Read system resources; `action=reload` clears cache. | optional `action=reload` |
 
 Health example:
 
 ```bash
-curl -H "Authorization: Bearer $SSA_TOKEN" \
-  "$BASE/api/health?project=farreach"
+curl "$BASE/api/health?project=farreach"
 ```
 
 ### Runtime
@@ -373,10 +352,10 @@ curl -H "Authorization: Bearer $SSA_TOKEN" \
 
 | Action | Purpose |
 | --- | --- |
-| omitted / `snapshot` | Workspaces, packs, recent jobs, side effects, events scoped by token |
+| omitted / `snapshot` | Workspaces, packs, recent jobs, side effects, events |
 | `jobs` | Recent runtime jobs |
 | `manifest` | Product/runtime manifest and capability boundary |
-| `workspaces` | Accessible workspaces |
+| `workspaces` | Local workspaces |
 | `side-effects` | Recent side-effect decisions; query `limit` max 500 |
 | `failed-jobs` | Failed operations; query `limit` max 100 |
 | `packs` | Sales packs |
@@ -924,7 +903,7 @@ Response is intentionally high level:
 | --- | --- | --- |
 | `GET` | `/api/events` | Server-Sent Events stream for live agent and email activity |
 
-Requires beta auth. Browser EventSource usually relies on cookie auth. Agents should use an HTTP client that can stream with `Authorization: Bearer ...`.
+No in-app activation or bearer token is required. Agents can use any HTTP client that supports Server-Sent Events.
 
 Event names:
 
@@ -1013,7 +992,6 @@ Use these only for demos and smoke tests.
 
 ```bash
 curl -sS "$BASE/api/assistant/query" \
-  -H "Authorization: Bearer $SSA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "workspaceId": "farreach",
@@ -1026,7 +1004,6 @@ curl -sS "$BASE/api/assistant/query" \
 
 ```bash
 curl -sS "$BASE/api/memory" \
-  -H "Authorization: Bearer $SSA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "workspaceId": "farreach",
@@ -1048,7 +1025,6 @@ Request:
 
 ```bash
 curl -sS "$BASE/api/runtime" \
-  -H "Authorization: Bearer $SSA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "action": "request-crm-write",
@@ -1066,7 +1042,6 @@ Approve:
 
 ```bash
 curl -sS "$BASE/api/runtime" \
-  -H "Authorization: Bearer $SSA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "action": "approve-side-effect",
@@ -1082,7 +1057,6 @@ Execute after `SSA_ENABLE_REAL_CRM_WRITE=true`:
 
 ```bash
 curl -sS "$BASE/api/runtime" \
-  -H "Authorization: Bearer $SSA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "action": "execute-crm-write",
@@ -1095,7 +1069,6 @@ curl -sS "$BASE/api/runtime" \
 
 ```bash
 curl -sS "$BASE/api/runtime" \
-  -H "Authorization: Bearer $SSA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "workspaceId": "farreach",
@@ -1144,7 +1117,7 @@ Key source files:
 web-frontend/src/app/api/*/route.ts                 HTTP routes
 web-frontend/src/lib/runtime/sales-runtime.ts       main runtime facade
 web-frontend/src/lib/runtime/types.ts               public runtime types
-web-frontend/src/lib/runtime/beta-auth.ts           API auth/workspace resolution
+web-frontend/src/lib/runtime/workspace-access.ts    workspace resolution
 web-frontend/src/lib/runtime/side-effect-gate.ts    external action gate
 web-frontend/src/lib/runtime/workflow.ts            runtime job execution
 web-frontend/src/lib/runtime/task-queue.ts          SQLite queue

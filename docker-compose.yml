@@ -9,7 +9,6 @@ services:
       SSA_APP_ROOT: /app
       SSA_DATA_ROOT: /app/data
       SSA_LOCAL_GATEWAY: "true"
-      SSA_BETA_AUTH_REQUIRED: "true"
       SSA_BIND_HOST: "${SSA_BIND_HOST:-127.0.0.1}"
       SSA_PUBLIC_HOST: "${SSA_PUBLIC_HOST:-127.0.0.1}"
       SSA_PUBLIC_PORT: "${SSA_PORT:-3001}"

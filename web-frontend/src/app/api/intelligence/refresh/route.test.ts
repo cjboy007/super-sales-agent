@@ -1,8 +1,7 @@
 import { NextRequest } from "next/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const refreshIntelligenceMock = vi.hoisted(() => vi.fn());
-const originalAuthTokens = process.env.SSA_BETA_AUTH_TOKENS;
 
 vi.mock("@/lib/runtime", () => ({
   createSalesRuntime: () => ({
@@ -12,22 +11,11 @@ vi.mock("@/lib/runtime", () => ({
 
 beforeEach(() => {
   refreshIntelligenceMock.mockReset();
-  process.env.SSA_BETA_AUTH_TOKENS = JSON.stringify([
-    { token: "test-token", workspaces: ["farreach"] },
-  ]);
-});
-
-afterEach(() => {
-  if (originalAuthTokens === undefined) delete process.env.SSA_BETA_AUTH_TOKENS;
-  else process.env.SSA_BETA_AUTH_TOKENS = originalAuthTokens;
 });
 
 function request(url = "http://localhost/api/intelligence/refresh?project=farreach"): NextRequest {
   return new NextRequest(url, {
     method: "POST",
-    headers: {
-      authorization: "Bearer test-token",
-    },
   });
 }
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { QuickQuoteData } from "@/lib/quick-quote";
 import { exportQuickQuotePiPackage, type QuickQuotePiPackageResult } from "@/lib/runtime/quick-quote-export";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 import { consumeTrialQuota, type TrialAccessSession } from "@/lib/runtime/trial-auth";
 
 export const dynamic = "force-dynamic";

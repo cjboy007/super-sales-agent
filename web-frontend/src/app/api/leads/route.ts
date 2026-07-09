@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ApiResponse, PaginatedResponse } from "@/lib/api-types";
 import type { CompanyIntelLeadInput } from "@/lib/runtime";
 import { createSalesRuntime } from "@/lib/runtime";
-import { requireResolvedWorkspaceAccess } from "@/lib/runtime/beta-auth";
+import { requireResolvedWorkspaceAccess } from "@/lib/runtime/workspace-access";
 
 export const dynamic = "force-dynamic";
 

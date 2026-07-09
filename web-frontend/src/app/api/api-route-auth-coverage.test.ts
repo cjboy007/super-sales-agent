@@ -4,15 +4,14 @@ import { globSync } from "glob";
 import { describe, expect, it } from "vitest";
 
 const allowedPublicRoutes = new Set([
-  "src/app/api/beta-access/verify/route.ts",
   "src/app/api/health/route.ts",
   "src/app/api/trial-access/send-code/route.ts",
   "src/app/api/trial-access/verify-code/route.ts",
   "src/app/api/webhooks/okki/route.ts",
 ]);
 
-describe("API route beta auth coverage", () => {
-  it("keeps every non-public API route behind beta or workspace access checks", () => {
+describe("API route workspace coverage", () => {
+  it("keeps every non-public API route behind workspace context checks", () => {
     const routeFiles = globSync("src/app/api/**/route.ts", { cwd: process.cwd(), absolute: true }).sort();
     expect(routeFiles.length).toBeGreaterThan(0);
 
@@ -25,8 +24,8 @@ describe("API route beta auth coverage", () => {
       .filter(({ source }) =>
         !source.includes("requireWorkspaceAccess") &&
         !source.includes("requireResolvedWorkspaceAccess") &&
-        !source.includes("requireBetaAuth") &&
-        !source.includes("requireAdminBetaAuth")
+        !source.includes("requireWorkspaceSession") &&
+        !source.includes("requireAdminWorkspaceAccess")
       )
       .map(({ file }) => file);
 
