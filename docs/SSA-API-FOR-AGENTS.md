@@ -57,12 +57,12 @@ If no workspace is provided, unresolved workspace defaults to `farreach`. Secure
 Workspace resolution rules:
 
 ```text
-explicit workspace in request -> token must allow that workspace
-one-workspace scoped token     -> workspace can be omitted, but omission is discouraged
-wildcard token in protected runtime -> workspace is required on most workspace-scoped API calls
+explicit workspace in request -> that workspace is used
+missing workspace             -> defaults to farreach
+shared/public deployment      -> add protection outside SSA, such as a reverse proxy or platform auth
 ```
 
-Admin-only APIs require wildcard workspace access (`workspaces: ["*"]`):
+Admin-style APIs are open inside SSA's local/open-source runtime. Protect them outside SSA before exposing a shared or public deployment:
 
 ```text
 /api/config
@@ -1089,7 +1089,7 @@ Do:
 
 ```text
 Pass workspaceId/project on every workspace API.
-Use bearer auth.
+Use network, reverse-proxy, host, or platform auth when exposing SSA beyond local trusted use.
 Use /api/assistant/query for questions.
 Use /api/memory for durable facts from OpenClaw/Hermes.
 Use /api/operator-command for user/page instructions that should become planned jobs.
@@ -1101,7 +1101,7 @@ Treat blocked/approval responses as successful safety behavior.
 Don't:
 
 ```text
-Do not assume missing auth/workspace behavior in production.
+Do not expose a shared or public SSA deployment without an external access boundary.
 Do not call SMTP/OKKI/IMAP/payment/bank systems directly from an agent when SSA owns the workflow.
 Do not write generated customer/runtime data into the repo.
 Do not pass arbitrary file paths to /api/files; use returned file tokens.

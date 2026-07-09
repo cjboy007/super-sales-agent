@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const protectedPages = [
+const apiClientPages = [
   "src/app/page.tsx",
   "src/app/growth/page.tsx",
   "src/app/emails/page.tsx",
@@ -21,8 +21,8 @@ const protectedPages = [
   "src/components/ui/PageCommandPanel.tsx",
 ];
 
-describe("beta-aware API client usage on product pages", () => {
-  it.each(protectedPages)("routes protected API requests through useProject apiFetch in %s", (filePath) => {
+describe("project API client usage on product pages", () => {
+  it.each(apiClientPages)("routes workspace API requests through useProject apiFetch in %s", (filePath) => {
     const source = readFileSync(join(process.cwd(), filePath), "utf8");
     expect(source).toContain("useProject");
     expect(source).toContain("apiFetch");

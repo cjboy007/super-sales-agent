@@ -420,7 +420,7 @@ export SSA_ENABLE_REAL_BANK=false
 ```
 真实客户邮件发送还必须带有已批准的服务端 side-effect 决策记录 ID；浏览器请求体里的人工审批标记不能作为放行依据。
 真实冷邮件发送还需要 Hunter 邮箱核验通过；`SSA_ALLOW_UNVERIFIED_EMAIL_SEND=true`
-仅作为人工明确接受风险时的紧急覆盖，不应作为 public beta 默认配置。
+仅作为人工明确接受风险时的紧急覆盖，不应作为共享部署默认配置。
 
 ### OpenClaw / Hermes（可选）
 

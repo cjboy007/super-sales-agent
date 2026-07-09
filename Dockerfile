@@ -34,7 +34,6 @@ ENV NODE_ENV=production \
   SSA_APP_ROOT=/app \
   SSA_DATA_ROOT=/app/data \
   SSA_LOCAL_GATEWAY=true \
-  SSA_BETA_AUTH_REQUIRED=true \
   PORT=3000 \
   HOSTNAME=0.0.0.0
 

@@ -138,7 +138,7 @@ API auth coverage 中明确将以下试用入口列为公开 bootstrap route:
 - `src/app/api/trial-access/send-code/route.ts`
 - `src/app/api/trial-access/verify-code/route.ts`
 
-这两个入口不能先要求 beta session；真实边界由短信验证码、配额、注册开关和 trial session 签发控制。
+这两个入口不能先要求既有 session；真实边界由短信验证码、配额、注册开关和 trial session 签发控制。
 
 ## 验证结果
 
